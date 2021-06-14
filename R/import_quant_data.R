@@ -11,7 +11,11 @@
 #' @export
 #'
 #' @examples
-import_quant_data <- function(quant_dir, tool, intron_mode = FALSE, usa_mode = FALSE, which_counts, intron_metadata) {
+import_quant_data <- function(quant_dir, tool = c("cellranger", "alevin", "alevin-fry", "kallisto"),
+                              intron_mode = FALSE, usa_mode = FALSE, which_counts = c("cDNA", "intron"), intron_metadata) {
+
+  tool <- match.arg(tool)
+  which_counts <= match.arg(which_counts)
 
   if (tool %in% c("alevin-fry", "alevin")){
     sce <- read_alevin(quant_dir, intron_mode, usa_mode, which_counts, intron_metadata)
