@@ -12,15 +12,15 @@
 #'
 #' @examples
 import_quant_data <- function(quant_dir, tool = c("cellranger", "alevin", "alevin-fry", "kallisto"),
-                              intron_mode = FALSE, usa_mode = FALSE, which_counts = c("cDNA", "intron"), intron_metadata) {
+                              intron_mode = FALSE, usa_mode = FALSE, which_counts = c("cDNA", "intron"), intron_metadata_path) {
 
   tool <- match.arg(tool)
-  which_counts <= match.arg(which_counts)
+  which_counts <- match.arg(which_counts)
 
   if (tool %in% c("alevin-fry", "alevin")){
-    sce <- read_alevin(quant_dir, intron_mode, usa_mode, which_counts, intron_metadata)
+    sce <- read_alevin(quant_dir, intron_mode, usa_mode, which_counts, intron_metadata_path)
   } else if (tool == "kallisto") {
-    sce <- read_kallisto(quant_dir, intron_mode, which_counts, intron_metadata)
+    sce <- read_kallisto(quant_dir, intron_mode, which_counts, intron_metadata_path)
   } else if (tool == "cellranger") {
     sce <- read_cellranger(quant_dir)
   }

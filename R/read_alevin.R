@@ -10,7 +10,7 @@
 #'
 #' @examples
 read_alevin <- function(quant_dir, intron_mode = FALSE, usa_mode = FALSE,
-                        which_counts = c("cDNA", "intron"), intron_metadata){
+                        which_counts = c("cDNA", "intron"), intron_metadata_path){
 
   which_counts <- match.arg(which_counts)
 
@@ -20,12 +20,12 @@ read_alevin <- function(quant_dir, intron_mode = FALSE, usa_mode = FALSE,
 
   } else {
     # use tximport for all non-usa mode
-    sce <- tximport::tximport(file.path(quant_dir, "alevin", "quants_mat.gz")) %>%
-      SingleCellExperiment::SingleCellExperiment(list(counts = counts))
+    txi <- tximport::tximport(file.path(quant_dir, "alevin", "quants_mat.gz"), type = "alevin")
+    sce <- SingleCellExperiment::SingleCellExperiment(list(counts = txi$counts))
 
     # collapse intron counts for intron_mode = TRUE
     if (intron_mode == TRUE) {
-      sce < - collapse_intron_counts(counts(sce), which_counts, intron_metadata)
+      sce < - collapse_intron_counts(counts(sce), which_counts, intron_metadata_path)
     }
   }
   return(sce)
