@@ -9,16 +9,21 @@
 #' @export
 #'
 #' @examples
-read_alevin <- function(quant_dir, intron_mode = FALSE, usa_mode = FALSE, which_counts, intron_metadata){
+read_alevin <- function(quant_dir, intron_mode = FALSE, usa_mode = FALSE,
+                        which_counts = c("cDNA", "intron"), intron_metadata){
+
+  which_counts <- match.arg(which_counts)
 
   if(usa_mode == TRUE) {
-    # if usa mode is true then read counts using read_usa
+    # read in counts using read_usa mode
     sce <- read_usa_mode(quant_dir, which_counts)
 
   } else {
+    # use tximport for all non-usa mode
     sce <- tximport::tximport(file.path(quant_dir, "alevin", "quants_mat.gz")) %>%
       SingleCellExperiment::SingleCellExperiment(list(counts = counts))
 
+    # collapse intron counts for intron_mode = TRUE
     if (intron_mode == TRUE) {
       sce < - collapse_intron_counts(counts(sce), which_counts, intron_metadata)
     }
@@ -26,40 +31,39 @@ read_alevin <- function(quant_dir, intron_mode = FALSE, usa_mode = FALSE, which_
   return(sce)
 }
 
-read_usa_mode <- function(quant_dir, which_counts){
+read_usa_mode <- function(quant_dir, which_counts = c("cDNA", "intron")){
+
+  which_counts <- match.arg(which_counts)
 
   # read in .mtx files
-  mtx <- Matrix::readMM(file = file.path(quant_dir, "alevin", "quants_mat.mtx"))
+  mtx <- Matrix::readMM(file = file.path(quant_dir, "alevin", "quants_mat.mtx"))%>%
+    Matrix::t() %>%
+    as("dgCMatrix")
   cols <- readr::read_csv(file = file.path(quant_dir, "alevin", "quants_mat_cols.txt"),
                           col_names = "gene_id")
   rows <- readr::read_csv(file = file.path(quant_dir, "alevin", "quants_mat_rows.txt"),
                           col_names = "barcodes")
+  dimnames(mtx) <- list(cols$gene_id, rows$barcodes)
 
-  if (which_counts = c("S")) {
+  if (which_counts == "cDNA") {
     # only combine counts from S + A
+    intron_genes <- rownames(mtx)[grep("-U", rownames(mtx))]
+    splice_mtx <- mtx[!(rownames(mtx) %in% intron_genes),]
+    # remove A from rowname
+    rownames(splice_mtx) <- gsub("-A", "", rownames(splice_mtx))
+    # combine counts based on gene name
+    counts <- Matrix.utils::aggregate.Matrix(splice_mtx, row.names(splice_mtx))
 
-  } else if ("U" %in% which_counts) {
+  } else if (which_counts == "intron") {
     # combine counts from U, S, and A
+    # remove A from rowname
+    rownames(mtx) <- gsub("-A", "", rownames(mtx))
+    rownames(mtx) <- gsub("-U", "", rownames(mtx))
+    # combine counts based on gene name
+    counts <- Matrix.utils::aggregate.Matrix(mtx, row.names(mtx))
 
   }
   sce <- SingleCellExperiment::SingleCellExperiment(list(counts = counts))
   return(sce)
 }
 
-collapse_intron_counts <- function(counts, which_counts, intron_metadata){
-
-  if(which_counts === c("U", "S")) {
-    shared_genes <- intersect(row.names(counts), rownames(intron_metadata))
-    # replace row names with -I appended with corresponding spliced gene
-    row.names(counts)[which(row.names(counts) %in% shared_genes)] <- intron_metadata[shared_genes, "spliced"]
-    # aggregate Matrix counts by gene name
-    counts <- Matrix.utils::aggregate.Matrix(counts, row.names(counts))
-
-  } else if (which_counts == c("S")) {
-    intron_rows <- grep("-I", row.names(counts))
-    counts <- counts[-intron_rows,]
-  }
-  sce <- SingleCellExperiment::SingleCellExperiment(list(counts = counts))
-  return(sce)
-
-}
