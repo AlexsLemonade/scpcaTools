@@ -9,7 +9,7 @@
 #' @export
 #'
 #' @examples
-read_kallisto <- function(quant_dir, intron_mode = TRUE, which_counts, intron_metadata) {
+read_kallisto <- function(quant_dir, intron_mode = TRUE, which_counts = c("cDNA", "intron"), intron_metadata) {
 
   base_file <- file.path(quant_dir, "counts", "gene_count")
   counts <- Matrix::readMM(paste0(base_file,".mtx"))%>%
