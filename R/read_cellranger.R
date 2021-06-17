@@ -17,6 +17,6 @@ read_cellranger <- function(quant_dir) {
   # change the column names just the barcode value, which is the first part of the barcode name
   # drop colData
   colnames(sce) <- stringr::str_extract(colnames(sce), "^([ACGT]+)")
-  colData(sce) <- NULL
+  SummarizedExperiment::colData(sce) <- NULL
   return(sce)
 }
