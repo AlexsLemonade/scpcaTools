@@ -1,13 +1,17 @@
-#' Title
+#' Merge counts from intron reads with corresponding cDNA reads
 #'
-#' @param counts
-#' @param which_counts
-#' @param intron_metadata
+#' @param counts Counts matrix in sparse matrix format.
+#' @param which_counts The type of counts (cDNA or intron) to include if alignment to intronic regions is TRUE. Default is FALSE.
+#' @param intron_metadata Full path to a two column tsv file containing gene names for both spliced and intronic regions.
 #'
-#' @return
+#' @return SingleCellExperiment of unfiltered gene x cell counts matrix
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' collapse_intron_counts(counts, which_counts = "cDNA",
+#' intron_metadata_path = "<path to intron metadata.tsv>")
+#' }
 collapse_intron_counts <- function(counts, which_counts = c("cDNA", "intron"), intron_metadata_path){
 
   which_counts <- match.arg(which_counts)

@@ -1,8 +1,8 @@
-#' Title
+#' Read in counts data processed with Cellranger
 #'
-#' @param quant_dir
+#' @param quant_dir Full path to directory where output files are located.
 #'
-#' @return
+#' @return SingleCellExperiment of gene x cell counts matrix
 #' @export
 #'
 #' @examples
