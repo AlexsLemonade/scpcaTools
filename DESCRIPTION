@@ -1,11 +1,19 @@
 Package: scpcaTools
 Type: Package
-Title: What the Package Does (Title Case)
+Title:  Single cell data tools for ScPCA
 Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
-License: What license is it under?
+Authors@R: c(
+    person("Ally", "Hawkins",
+           email = "ally.hawkins@ccdatalab.org",
+           role = c("aut", "cre")),
+    person(c("Joshua", "A."), "Shapiro", 
+           email = "josh.shapiro@ccdatalab.org",
+           comment = list(ORCID = "0000-0002-6224-0347"),
+           role = c("aut"))
+    )
+Maintainer: Ally Hawkins <ally.hawkins@ccdatalab.org>
+Description: Tools for processing single cell data associated with the 
+    Alex's Lemonade Stand Foundation Single Cell Pediatric Cancer Atlas.
+License: BSD_3_clause + file LICENSE
 Encoding: UTF-8
 LazyData: true
