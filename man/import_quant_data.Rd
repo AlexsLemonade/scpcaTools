@@ -9,8 +9,7 @@ import_quant_data(
   tool = c("cellranger", "alevin", "alevin-fry", "kallisto"),
   intron_mode = FALSE,
   usa_mode = FALSE,
-  which_counts = c("cDNA", "intron"),
-  intron_metadata_path
+  which_counts = c("spliced", "unspliced")
 )
 }
 \arguments{
@@ -22,10 +21,9 @@ import_quant_data(
 
 \item{usa_mode}{Boolean indicating if Alevin-fry was used, if the USA mode was invoked. Default is FALSE.}
 
-\item{which_counts}{The type of counts (cDNA or intron) to include if alignment to intronic regions is TRUE. Default is FALSE.}
-
-\item{intron_metadata}{Full path to a two column tsv file containing gene names for both spliced and intronic regions.
-Only required if intron_mode = TRUE and usa_mode = FALSE.}
+\item{which_counts}{If intron_mode is TRUE, which type of counts should be included,
+only counts aligned to spliced cDNA ("spliced") or all spliced and unspliced cDNA ("unspliced").
+Default is "spliced".}
 }
 \value{
 SingleCellExperiment of unfiltered gene x cell counts matrix

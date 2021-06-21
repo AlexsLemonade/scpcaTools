@@ -4,28 +4,23 @@
 \alias{collapse_intron_counts}
 \title{Merge counts from intron reads with corresponding cDNA reads}
 \usage{
-collapse_intron_counts(
-  counts,
-  which_counts = c("cDNA", "intron"),
-  intron_metadata_path
-)
+collapse_intron_counts(counts, which_counts = c("spliced", "unspliced"))
 }
 \arguments{
-\item{counts}{Counts matrix in sparse matrix format.}
+\item{counts}{Counts matrix with rownames corresponding to gene names and colnames corresponding to cell barcodes.}
 
-\item{which_counts}{The type of counts (cDNA or intron) to include if alignment to intronic regions is TRUE. Default is FALSE.}
-
-\item{intron_metadata}{Full path to a two column tsv file containing gene names for both spliced and intronic regions.}
+\item{which_counts}{If intron_mode is TRUE, which type of counts should be included,
+only counts aligned to spliced cDNA ("spliced") or all spliced and unspliced cDNA ("unspliced").
+Default is "spliced".}
 }
 \value{
-SingleCellExperiment of unfiltered gene x cell counts matrix
+unfiltered gene x cell counts matrix
 }
 \description{
 Merge counts from intron reads with corresponding cDNA reads
 }
 \examples{
 \dontrun{
-collapse_intron_counts(counts, which_counts = "cDNA",
-intron_metadata_path = "<path to intron metadata.tsv>")
+collapse_intron_counts(counts, which_counts = "cDNA")
 }
 }

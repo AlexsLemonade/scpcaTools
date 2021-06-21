@@ -8,21 +8,21 @@ read_alevin(
   quant_dir,
   intron_mode = FALSE,
   usa_mode = FALSE,
-  which_counts = c("cDNA", "intron"),
-  intron_metadata_path
+  which_counts = c("spliced", "unspliced")
 )
 }
 \arguments{
 \item{quant_dir}{Full path to directory where output files are located.}
 
-\item{intron_mode}{Boolean indicating if the files included alignment to intronic regions. Default is FALSE.}
+\item{intron_mode}{Boolean indicating if the files included alignment to intronic regions.
+Default is FALSE.}
 
-\item{usa_mode}{Boolean indicating if Alevin-fry was used, if the USA mode was invoked. Default is FALSE.}
+\item{usa_mode}{Boolean indicating if Alevin-fry was used, if the USA mode was invoked.
+Default is FALSE.}
 
-\item{intron_metadata_path}{Full path to a two column tsv file containing gene names for both spliced and intronic regions.
-Only required if intron_mode = TRUE and usa_mode = FALSE.}
-
-\item{tool}{Type of tool used to create files (Alevin or Alevin-fry).}
+\item{which_counts}{If intron_mode is TRUE, which type of counts should be included,
+only counts aligned to spliced cDNA ("spliced") or all spliced and unspliced cDNA ("unspliced").
+Default is "spliced".}
 }
 \value{
 SingleCellExperiment of unfiltered gene x cell counts matrix.
@@ -35,6 +35,6 @@ Read in counts data processed with Alevin or Alevin-fry
 read_alevin(quant_dir,
 intron_mode = TRUE,
 usa_mode = TRUE,
-which_counts = "intron")
+which_counts = "unspliced")
 }
 }

@@ -6,9 +6,9 @@
 #' @param tool Type of tool used to create files (Alevin, Alevin-fry, Cellranger, or Kallisto).
 #' @param intron_mode Boolean indicating if the files included alignment to intronic regions. Default is FALSE.
 #' @param usa_mode Boolean indicating if Alevin-fry was used, if the USA mode was invoked. Default is FALSE.
-#' @param which_counts The type of counts (cDNA or intron) to include if alignment to intronic regions is TRUE. Default is FALSE.
-#' @param intron_metadata Full path to a two column tsv file containing gene names for both spliced and intronic regions.
-#'           Only required if intron_mode = TRUE and usa_mode = FALSE.
+#' @param which_counts If intron_mode is TRUE, which type of counts should be included,
+#'        only counts aligned to spliced cDNA ("spliced") or all spliced and unspliced cDNA ("unspliced").
+#'        Default is "spliced".
 #'
 #' @return SingleCellExperiment of unfiltered gene x cell counts matrix
 #' @export
@@ -25,10 +25,30 @@
 #' }
 #'
 import_quant_data <- function(quant_dir, tool = c("cellranger", "alevin", "alevin-fry", "kallisto"),
-                              intron_mode = FALSE, usa_mode = FALSE, which_counts = c("cDNA", "intron"), intron_metadata_path) {
+                              intron_mode = FALSE, usa_mode = FALSE, which_counts = c("spliced", "unspliced")) {
 
   tool <- match.arg(tool)
   which_counts <- match.arg(which_counts)
+
+  # checks for intron_mode and usa_mode
+  if(!is.boolean(intron_mode)){
+    stop("intron_mode must be set as TRUE or FALSE")
+  }
+  if(!is.boolean(usa_mode)){
+    stop("usa_mode must be set as TRUE or FALSE")
+  }
+
+  ## check that intron_metadata_path is provided
+  # if(intron_mode == TRUE & usa_mode == FALSE){
+  #   if(!file.exists(intron_metadata_path)){
+  #     stop("Missing intron metadata file, check that file path is correct")
+  #   } else {
+  #     intron_metadata <- readr::read_tsv(intron_metadata_path)
+  #     if(colnames(intron_metadata != c("spliced", "intron"))) {
+  #       stop("Incorrect column names for intron metadata")
+  #     }
+  #   }
+  # }
 
   if (tool %in% c("alevin-fry", "alevin")){
     sce <- read_alevin(quant_dir, intron_mode, usa_mode, which_counts, intron_metadata_path)

@@ -7,8 +7,7 @@
 read_kallisto(
   quant_dir,
   intron_mode = FALSE,
-  which_counts = c("cDNA", "intron"),
-  intron_metadata_path
+  which_counts = c("spliced", "unspliced")
 )
 }
 \arguments{
@@ -16,10 +15,9 @@ read_kallisto(
 
 \item{intron_mode}{Boolean indicating if the files included alignment to intronic regions. Default is FALSE.}
 
-\item{which_counts}{The type of counts (cDNA or intron) to include if alignment to intronic regions is TRUE. Default is FALSE.}
-
-\item{intron_metadata_path}{Full path to a two column tsv file containing gene names for both spliced and intronic regions.
-Only required if intron_mode = TRUE and usa_mode = FALSE.}
+\item{which_counts}{If intron_mode is TRUE, which type of counts should be included,
+only counts aligned to spliced cDNA ("spliced") or all spliced and unspliced cDNA ("unspliced").
+Default is "spliced".}
 }
 \value{
 SingleCellExperiment of unfiltered gene x cell counts matrix
@@ -31,7 +29,6 @@ Read in counts data processed with Kallisto
 \dontrun{
 read_kallisto(quant_dir,
 intron_mode = TRUE,
-which_counts = "intron",
-intron_metadata_path = "<path to intron metadata.tsv>")
+which_counts = "intron")
 }
 }
