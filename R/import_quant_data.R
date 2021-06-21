@@ -3,7 +3,7 @@
 #' Imports the gene x cell matrix output from either Alevin, Alevin-fry, Cellranger, or Kallisto and returns a SingleCellExperiment.
 #'
 #' @param quant_dir Full path to directory where output files are located.
-#' @param tool Type of tool used to create files (Alevin, Alevin-fry, Cellranger, or Kallisto).
+#' @param tool Type of tool used to create files (alevin, alevin-fry, cellranger, or kallisto).
 #' @param intron_mode Boolean indicating if the files included alignment to intronic regions.
 #'        Default is FALSE.
 #' @param usa_mode Boolean indicating if Alevin-fry was used, if the USA mode was invoked.
@@ -50,8 +50,8 @@ import_quant_data <- function(quant_dir, tool = c("cellranger", "alevin", "alevi
   }
 
   # check that filter is only true for tools alevin, alevin-fry, or kallisto
-  if(tool == "cellranger" & filter == TRUE){
-    warning("Filtering mode not supported with cellranger")
+  if((tool == "cellranger" | tool == "alevin")  & filter == TRUE){
+    warning("Filtering mode not supported with cellranger or alevin")
   }
 
   ## check that intron_metadata_path is provided
