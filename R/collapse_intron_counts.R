@@ -17,8 +17,8 @@ collapse_intron_counts <- function(counts, which_counts = c("spliced", "unsplice
 
   intron_genes <- str_subset(rownames(counts), "-I$")
   if(is.na(intron_genes)){
-    stop("No counts corresponding to intronic reads detected,
-         must have tag -I at the end of gene name to signify intronic read.")
+    stop('No counts corresponding to intronic reads detected,
+         must have tag "-I" at the end of gene name to signify intronic read.')
   }
 
   if(which_counts == "spliced") {

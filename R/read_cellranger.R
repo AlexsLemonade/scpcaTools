@@ -5,7 +5,6 @@
 #' @return SingleCellExperiment of gene x cell counts matrix
 #' @export
 #'
-#' @examples
 read_cellranger <- function(quant_dir) {
 
   cellranger_file <- file.path(quant_dir, "outs", "filtered_feature_bc_matrix.h5")
@@ -13,7 +12,7 @@ read_cellranger <- function(quant_dir) {
     stop("Missing filtered_feature_bc_matrix.h5 file from cellranger output")
   }
 
-  sce <- read10xCounts(cellranger_file,
+  sce <- DropletUtils::read10xCounts(cellranger_file,
                        sample.names = basename(quant_dir),
                        col.names = TRUE)
 

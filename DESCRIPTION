@@ -22,6 +22,12 @@ RoxygenNote: 7.1.1.9001
 Imports: 
     DropletUtils,
     magrittr,
+    Matrix,
+    Matrix.utils,
     methods,
+    readr,
+    rjson,
     SingleCellExperiment,
-    stringr
+    stringr,
+    SummarizedExperiment,
+    tximport

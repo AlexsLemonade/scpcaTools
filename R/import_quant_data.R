@@ -4,8 +4,8 @@
 #'
 #' @param quant_dir Full path to directory where output files are located.
 #' @param tool Type of tool used to create files (Alevin, Alevin-fry, Cellranger, or Kallisto).
-#' @param intron_mode Boolean indicating if the files included alignment to intronic regions. Default is FALSE.
-#' @param usa_mode Boolean indicating if Alevin-fry was used, if the USA mode was invoked. Default is FALSE.
+#' @param intron_mode Logical indicating if the files included alignment to intronic regions. Default is FALSE.
+#' @param usa_mode Logical indicating if Alevin-fry was used, if the USA mode was invoked. Default is FALSE.
 #' @param which_counts If intron_mode is TRUE, which type of counts should be included,
 #'        only counts aligned to spliced cDNA ("spliced") or all spliced and unspliced cDNA ("unspliced").
 #'        Default is "spliced".
@@ -31,10 +31,10 @@ import_quant_data <- function(quant_dir, tool = c("cellranger", "alevin", "alevi
   which_counts <- match.arg(which_counts)
 
   # checks for intron_mode and usa_mode
-  if(!is.boolean(intron_mode)){
+  if(!is.logical(intron_mode)){
     stop("intron_mode must be set as TRUE or FALSE")
   }
-  if(!is.boolean(usa_mode)){
+  if(!is.logical(usa_mode)){
     stop("usa_mode must be set as TRUE or FALSE")
   }
 
@@ -51,9 +51,9 @@ import_quant_data <- function(quant_dir, tool = c("cellranger", "alevin", "alevi
   # }
 
   if (tool %in% c("alevin-fry", "alevin")){
-    sce <- read_alevin(quant_dir, intron_mode, usa_mode, which_counts, intron_metadata_path)
+    sce <- read_alevin(quant_dir, intron_mode, usa_mode, which_counts)
   } else if (tool == "kallisto") {
-    sce <- read_kallisto(quant_dir, intron_mode, which_counts, intron_metadata_path)
+    sce <- read_kallisto(quant_dir, intron_mode, which_counts)
   } else if (tool == "cellranger") {
     sce <- read_cellranger(quant_dir)
   }

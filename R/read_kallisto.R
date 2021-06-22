@@ -1,7 +1,7 @@
 #' Read in counts data processed with Kallisto
 #'
 #' @param quant_dir Full path to directory where output files are located.
-#' @param intron_mode Boolean indicating if the files included alignment to intronic regions. Default is FALSE.
+#' @param intron_mode Logical indicating if the files included alignment to intronic regions. Default is FALSE.
 #' @param which_counts If intron_mode is TRUE, which type of counts should be included,
 #'        only counts aligned to spliced cDNA ("spliced") or all spliced and unspliced cDNA ("unspliced").
 #'        Default is "spliced".
@@ -19,29 +19,29 @@ read_kallisto <- function(quant_dir, intron_mode = FALSE, which_counts = c("spli
 
   which_counts <- match.arg(which_counts)
 
-  if(!is.boolean(intron_mode)){
+  if(!is.logical(intron_mode)){
     stop("intron_mode must be set as TRUE or FALSE")
   }
 
-  kallisto_files <- list("gene_count.mtx", "gene_count.genes.txt", "gene_count.barcodes.txt")
+  kallisto_files <- c("gene_count.mtx", "gene_count.genes.txt", "gene_count.barcodes.txt")
   kallisto_dir <- file.path(quant_dir, "counts")
 
   if(!dir.exists(file.path(kallisto_dir))){
     stop("Missing kallisto directory with output files")
   }
-  for (file in kallisto_files){
-    if(!file.exists(file.path(kallisto_dir, file))){
-      error_message <- paste("Missing kallisto output file", file, sep = " ")
-      stop(error_message)
-    }
+
+  missing <- !file.exists(file.path(kallisto_dir, kallisto_files))
+  if(any(missing)) {
+    missing_files <- paste(kallisto_files[missing], collapse = ", ")
+    stop(paste0("Missing Kallisto output file(s): ", missing_files))
   }
 
   base_file <- file.path(kallisto_dir, "gene_count")
   counts <- Matrix::readMM(paste0(base_file,".mtx"))%>%
     t() %>% # transpose to gene x cell orientation
     as("dgCMatrix") # compress sparse matrix
-  dimnames(counts) <- list(readLines(paste0(base,".genes.txt")),
-                           readLines(paste0(base,".barcodes.txt")))
+  dimnames(counts) <- list(readLines(paste0(base_file,".genes.txt")),
+                           readLines(paste0(base_file,".barcodes.txt")))
 
   if(intron_mode == TRUE) {
     collapsed_counts <- collapse_intron_counts(counts, which_counts)

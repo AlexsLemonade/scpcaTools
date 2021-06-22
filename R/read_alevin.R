@@ -1,9 +1,9 @@
 #' Read in counts data processed with Alevin or Alevin-fry
 #'
 #' @param quant_dir Full path to directory where output files are located.
-#' @param intron_mode Boolean indicating if the files included alignment to intronic regions.
+#' @param intron_mode Logical indicating if the files included alignment to intronic regions.
 #'        Default is FALSE.
-#' @param usa_mode Boolean indicating if Alevin-fry was used, if the USA mode was invoked.
+#' @param usa_mode Logical indicating if Alevin-fry was used, if the USA mode was invoked.
 #'        Default is FALSE.
 #' @param which_counts If intron_mode is TRUE, which type of counts should be included,
 #'        only counts aligned to spliced cDNA ("spliced") or all spliced and unspliced cDNA ("unspliced").
@@ -15,20 +15,20 @@
 #' @examples
 #' \dontrun{
 #' read_alevin(quant_dir,
-#' intron_mode = TRUE,
-#' usa_mode = TRUE,
-#' which_counts = "unspliced")
-#' }
+#'                      intron_mode = TRUE,
+#'                      usa_mode = TRUE,
+#'                      which_counts = "unspliced")
+#'}
 read_alevin <- function(quant_dir, intron_mode = FALSE, usa_mode = FALSE,
                         which_counts = c("spliced", "unspliced")){
 
   which_counts <- match.arg(which_counts)
 
   # checks for intron_mode and usa_mode
-  if(!is.boolean(intron_mode)){
+  if(!is.logical(intron_mode)){
     stop("intron_mode must be set as TRUE or FALSE")
   }
-  if(!is.boolean(usa_mode)){
+  if(!is.logical(usa_mode)){
     stop("usa_mode must be set as TRUE or FALSE")
   }
 
@@ -50,17 +50,17 @@ read_alevin <- function(quant_dir, intron_mode = FALSE, usa_mode = FALSE,
 
   } else {
     # use tximport for all non-usa mode
-    alevin_files <- list("quants_mat_cols.txt", "quants_mat_rows.txt", "quants_mat.gz", "alevin.log")
+    alevin_files <- c("quants_mat_cols.txt", "quants_mat_rows.txt", "quants_mat.gz", "alevin.log")
 
     # check that all files exist in quant directory
     if(!dir.exists(file.path(quant_dir, "alevin"))){
       stop("Missing alevin directory with output files")
     }
-    for (file in alevin_files){
-      if(!file.exists(file.path(quant_dir, "alevin", file))){
-        error_message <- paste("Missing alevin output file", file, sep = " ")
-        stop(error_message)
-      }
+
+    missing <- !file.exists(file.path(quant_dir, "alevin", alevin_files))
+    if(any(missing)) {
+      missing_files <- paste(alevin_files[missing], collapse = ", ")
+      stop(paste0("Missing Alevin output file(s): ", missing_files))
     }
 
     if(!file.exists(file.path(quant_dir, "cmd_info.json"))){
@@ -72,7 +72,7 @@ read_alevin <- function(quant_dir, intron_mode = FALSE, usa_mode = FALSE,
 
     # collapse intron counts for intron_mode = TRUE
     if (intron_mode == TRUE) {
-      counts < - collapse_intron_counts(counts(sce), which_counts)
+      counts <- collapse_intron_counts(counts(sce), which_counts)
       sce <- SingleCellExperiment(list(counts = counts))
     }
   }
@@ -94,18 +94,19 @@ read_usa_mode <- function(quant_dir, which_counts = c("spliced", "unspliced")){
   which_counts <- match.arg(which_counts)
 
   # check that all files exist in quant_dir
-  alevin_files <- list("quants_mat_cols.txt", "quants_mat_rows.txt", "quants_mat.mtx", "alevin.log")
+  alevin_files <- c("quants_mat_cols.txt", "quants_mat_rows.txt", "quants_mat.mtx", "alevin.log")
 
   # check that all files exist in quant directory
   if(!dir.exists(file.path(quant_dir, "alevin"))){
     stop("Missing alevin directory with output files")
   }
-  for (file in alevin_files){
-    if(!file.exists(file.path(quant_dir, "alevin", file))){
-      error_message <- paste("Missing alevin output file", file, sep = " ")
-      stop(error_message)
-    }
+
+  missing <- !file.exists(file.path(quant_dir, "alevin", alevin_files))
+  if(any(missing)) {
+    missing_files <- paste(alevin_files[missing], collapse = ", ")
+    stop(paste0("Missing Alevin output file(s): ", missing_files))
   }
+
   meta_json_path <- file.path(quant_dir, "meta_info.json")
   if(!file.exists(meta_json_path)){
     stop("Missing meta_info.json in Alevin output directory")
@@ -138,9 +139,8 @@ read_usa_mode <- function(quant_dir, which_counts = c("spliced", "unspliced")){
 
   } else if (which_counts == "unspliced") {
     # combine counts from U, S, and A
-    # remove A from rowname
-    rownames(mtx) <- str_remove(rownames(mtx), "-A$")
-    rownames(mtx) <- str_remove(rownames(mtx), "-U$")
+    # remove A & U from rowname
+    rownames(mtx) <- str_remove(rownames(mtx), "-[AU]$")
     # combine counts based on gene name
     counts <- Matrix.utils::aggregate.Matrix(mtx, rownames(mtx))
 

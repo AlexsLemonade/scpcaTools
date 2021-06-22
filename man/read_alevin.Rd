@@ -33,8 +33,8 @@ Read in counts data processed with Alevin or Alevin-fry
 \examples{
 \dontrun{
 read_alevin(quant_dir,
-intron_mode = TRUE,
-usa_mode = TRUE,
-which_counts = "unspliced")
+                     intron_mode = TRUE,
+                     usa_mode = TRUE,
+                     which_counts = "unspliced")
 }
 }
