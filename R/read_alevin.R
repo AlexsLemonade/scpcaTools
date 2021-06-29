@@ -1,24 +1,34 @@
 #' Read in counts data processed with Alevin or Alevin-fry
 #'
-#' @param quant_dir Path to directory where output files are located.
+#' @param quant_dir Full path to directory where output files are located.
 #' @param intron_mode Logical indicating if the files included alignment to intronic regions.
-#'        Default is FALSE.
+#'   Default is FALSE.
 #' @param usa_mode Logical indicating if Alevin-fry was used, if the USA mode was invoked.
-#'        Default is FALSE.
+#'   Default is FALSE.
 #' @param which_counts If intron_mode is TRUE, which type of counts should be included,
-#'        only counts aligned to spliced cDNA ("spliced") or all spliced and unspliced cDNA ("unspliced").
-#'        Default is "spliced".
+#'   only counts aligned to spliced cDNA ("spliced") or all spliced and unspliced cDNA ("unspliced").
+#'   Default is "spliced".
 #'
 #' @return SingleCellExperiment of unfiltered gene x cell counts matrix.
 #' @export
 #'
 #' @examples
 #' \dontrun{
+#'
+#' # import output files processed with either Alevin or Alevin-fry with alignment to
+#' # cDNA only, including only spliced cDNA in final counts matrix
+#' read_alevin(quant_dir)
+#'
+#' # import output files processed with either Alevin or Alevin-fry with alignment to
+#' # cDNA + introns and including all unspliced cDNA in final counts matrix
 #' read_alevin(quant_dir,
 #'             intron_mode = TRUE,
 #'             which_counts = "unspliced")
+#'
 #'}
-read_alevin <- function(quant_dir, intron_mode = FALSE, usa_mode = FALSE,
+read_alevin <- function(quant_dir,
+                        intron_mode = FALSE,
+                        usa_mode = FALSE,
                         which_counts = c("spliced", "unspliced")){
 
   which_counts <- match.arg(which_counts)
@@ -31,21 +41,20 @@ read_alevin <- function(quant_dir, intron_mode = FALSE, usa_mode = FALSE,
     stop("usa_mode must be set as TRUE or FALSE")
   }
 
-  ## check that intron_metadata is provided
-  # if(intron_mode == TRUE & usa_mode == FALSE){
-  #   if(!intron_metadata){
-  #     stop("Missing intron metadata table")
-  #   } else {
-  #     if(colnames(intron_metadata != c("spliced", "intron"))) {
-  #       stop("Incorrect column names for intron metadata")
-  #     }
-  #   }
-  # }
+  # check that usa_mode and intron_mode are used with the proper tools
+  if(usa_mode & tool %in% c("cellranger", "alevin", "kallisto")){
+    stop("USA mode only compatible with alevin-fry.")
+  }
+  if(intron_mode & tool %in% c("cellranger")){
+    stop("Intron mode not compatible with cellranger.")
+  }
+  if(usa_mode & intron_mode){
+    stop("Can only read counts using either usa mode or intron mode.")
+  }
 
   if(usa_mode) {
     # read in counts using read_usa mode
     counts <- read_usa_mode(quant_dir, which_counts)
-    sce <- SingleCellExperiment(list(counts = counts))
 
   } else {
     # use tximport for all non-usa mode
@@ -70,7 +79,7 @@ read_alevin <- function(quant_dir, intron_mode = FALSE, usa_mode = FALSE,
     counts <- txi$counts
 
     # collapse intron counts for intron_mode = TRUE
-    if (intron_mode == TRUE) {
+    if (intron_mode) {
       counts <- collapse_intron_counts(counts, which_counts)
     }
   }
@@ -80,7 +89,7 @@ read_alevin <- function(quant_dir, intron_mode = FALSE, usa_mode = FALSE,
 
 #' Read in counts data processed with Alevin-fry in USA mode
 #'
-#' @param quant_dir Path to directory where output files are located.
+#' @param quant_dir Full path to directory where output files are located.
 #' @param which_counts If intron_mode is TRUE, which type of counts should be included,
 #'        only counts aligned to spliced cDNA ("spliced") or all spliced and unspliced cDNA ("unspliced").
 #'        Default is "spliced".
@@ -88,7 +97,8 @@ read_alevin <- function(quant_dir, intron_mode = FALSE, usa_mode = FALSE,
 #' @return unfiltered gene x cell counts matrix
 #'
 #' @examples
-read_usa_mode <- function(quant_dir, which_counts = c("spliced", "unspliced")){
+read_usa_mode <- function(quant_dir,
+                          which_counts = c("spliced", "unspliced")){
 
   which_counts <- match.arg(which_counts)
 

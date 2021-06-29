@@ -14,10 +14,10 @@ read_alevin(
 \arguments{
 \item{quant_dir}{Full path to directory where output files are located.}
 
-\item{intron_mode}{Boolean indicating if the files included alignment to intronic regions.
+\item{intron_mode}{Logical indicating if the files included alignment to intronic regions.
 Default is FALSE.}
 
-\item{usa_mode}{Boolean indicating if Alevin-fry was used, if the USA mode was invoked.
+\item{usa_mode}{Logical indicating if Alevin-fry was used, if the USA mode was invoked.
 Default is FALSE.}
 
 \item{which_counts}{If intron_mode is TRUE, which type of counts should be included,
@@ -32,9 +32,16 @@ Read in counts data processed with Alevin or Alevin-fry
 }
 \examples{
 \dontrun{
+
+# import output files processed with either Alevin or Alevin-fry with alignment to
+# cDNA only, including only spliced cDNA in final counts matrix
+read_alevin(quant_dir)
+
+# import output files processed with either Alevin or Alevin-fry with alignment to
+# cDNA + introns and including all unspliced cDNA in final counts matrix
 read_alevin(quant_dir,
-                     intron_mode = TRUE,
-                     usa_mode = TRUE,
-                     which_counts = "unspliced")
+            intron_mode = TRUE,
+            which_counts = "unspliced")
+
 }
 }

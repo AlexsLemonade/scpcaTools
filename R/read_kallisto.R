@@ -1,21 +1,27 @@
 #' Read in counts data processed with Kallisto
 #'
 #' @param quant_dir Path to directory where output files are located.
-#' @param intron_mode Logical indicating if the files included alignment to intronic regions. Default is FALSE.
+#' @param intron_mode Logical indicating if the files included alignment to intronic regions.
+#'   Default is FALSE.
 #' @param which_counts If intron_mode is TRUE, which type of counts should be included,
-#'        only counts aligned to spliced cDNA ("spliced") or all spliced and unspliced cDNA ("unspliced").
-#'        Default is "spliced".
+#'   only counts aligned to spliced cDNA ("spliced") or all spliced and unspliced cDNA ("unspliced").
+#'   Default is "spliced".
 #'
 #' @return SingleCellExperiment of unfiltered gene x cell counts matrix
 #' @export
 #'
 #' @examples
 #' \dontrun{
+#'
+#' # import output files processed with kallisto with alignment to cDNA + introns,
+#' # including all unspliced cDNA counts in final counts matrix
 #' read_kallisto(quant_dir,
 #'               intron_mode = TRUE,
-#'               which_counts = "intron")
+#'               which_counts = "unspliced")
 #' }
-read_kallisto <- function(quant_dir, intron_mode = FALSE, which_counts = c("spliced", "unspliced")) {
+read_kallisto <- function(quant_dir,
+                          intron_mode = FALSE,
+                          which_counts = c("spliced", "unspliced")) {
 
   which_counts <- match.arg(which_counts)
 
@@ -42,7 +48,7 @@ read_kallisto <- function(quant_dir, intron_mode = FALSE, which_counts = c("spli
   dimnames(counts) <- list(readLines(file.path(kallisto_dir, "gene_count.genes.txt")),
                            readLines(file.path(kallisto_dir, "gene_count.barcodes.txt")))
 
-  if(intron_mode == TRUE) {
+  if(intron_mode) {
     counts <- collapse_intron_counts(counts, which_counts)
   }
   sce <- SingleCellExperiment(list(counts = counts))

@@ -11,9 +11,10 @@ read_kallisto(
 )
 }
 \arguments{
-\item{quant_dir}{Full path to directory where output files are located.}
+\item{quant_dir}{Path to directory where output files are located.}
 
-\item{intron_mode}{Boolean indicating if the files included alignment to intronic regions. Default is FALSE.}
+\item{intron_mode}{Logical indicating if the files included alignment to intronic regions.
+Default is FALSE.}
 
 \item{which_counts}{If intron_mode is TRUE, which type of counts should be included,
 only counts aligned to spliced cDNA ("spliced") or all spliced and unspliced cDNA ("unspliced").
@@ -27,8 +28,11 @@ Read in counts data processed with Kallisto
 }
 \examples{
 \dontrun{
+
+# import output files processed with kallisto with alignment to cDNA + introns,
+# including all unspliced cDNA counts in final counts matrix
 read_kallisto(quant_dir,
-intron_mode = TRUE,
-which_counts = "intron")
+              intron_mode = TRUE,
+              which_counts = "unspliced")
 }
 }

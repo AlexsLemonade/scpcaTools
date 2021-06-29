@@ -15,3 +15,12 @@ SingleCellExperiment of gene x cell counts matrix
 \description{
 Read in counts data processed with Cellranger
 }
+\examples{
+\dontrun{
+
+# Import data from cellranger output directory quant_dir
+read_cellranger(quant_dir)
+
+}
+
+}

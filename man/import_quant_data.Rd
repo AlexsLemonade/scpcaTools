@@ -7,9 +7,9 @@
 import_quant_data(
   quant_dir,
   tool = c("cellranger", "alevin", "alevin-fry", "kallisto"),
+  which_counts = c("spliced", "unspliced"),
   intron_mode = FALSE,
-  usa_mode = FALSE,
-  which_counts = c("spliced", "unspliced")
+  usa_mode = FALSE
 )
 }
 \arguments{
@@ -17,13 +17,15 @@ import_quant_data(
 
 \item{tool}{Type of tool used to create files (Alevin, Alevin-fry, Cellranger, or Kallisto).}
 
-\item{intron_mode}{Boolean indicating if the files included alignment to intronic regions. Default is FALSE.}
-
-\item{usa_mode}{Boolean indicating if Alevin-fry was used, if the USA mode was invoked. Default is FALSE.}
-
 \item{which_counts}{If intron_mode is TRUE, which type of counts should be included,
 only counts aligned to spliced cDNA ("spliced") or all spliced and unspliced cDNA ("unspliced").
 Default is "spliced".}
+
+\item{intron_mode}{Logical indicating if the files included alignment to intronic regions.
+Default is FALSE.}
+
+\item{usa_mode}{Logical indicating if Alevin-fry was used, if the USA mode was invoked.
+Default is FALSE.}
 }
 \value{
 SingleCellExperiment of unfiltered gene x cell counts matrix
@@ -33,13 +35,31 @@ Imports the gene x cell matrix output from either Alevin, Alevin-fry, Cellranger
 }
 \examples{
 \dontrun{
+# read in single cell RNA seq data processed using cellranger
 import_quant_data(quant_dir,
 tool = "cellranger")
 
+# read in single-cell RNA seq data processed using alevin-fry in USA mode
+# with alignment to cDNA only and including counts for spliced cDNA only
 import_quant_data(quant_dir,
-tool = "alevin-fry",
-intron_mode = FALSE,
-usa_mode = TRUE)
+  tool = "alevin-fry",
+  intron_mode = FALSE,
+  usa_mode = TRUE)
+
+# read in single-nuclei RNA-seq data processed using alevin-fry in
+# USA mode with alignment to cDNA + introns and including counts for
+# unspliced cDNA
+import_quant_data(quant_dir,
+  tool = "alevin-fry",
+  usa_mode = TRUE,
+  which_counts = "unspliced")
+
+# read in single-nuclei RNA-seq data processed using kallisto with
+alignment to cDNA + introns and including counts for unspliced cDNA
+import_quant_data(quant_dir,
+  tool = "kallisto",
+  intron_mode = TRUE,
+  which_counts = "unspliced")
 }
 
 }
