@@ -1,16 +1,18 @@
 #' Merge counts from intron reads with corresponding cDNA reads
 #'
 #' @param counts Counts matrix with rownames corresponding to gene names and colnames corresponding to cell barcodes.
-#' @param which_counts If intron_mode is TRUE, which type of counts should be included,
-#'        only counts aligned to spliced cDNA ("spliced") or all spliced and unspliced cDNA ("unspliced").
-#'        Default is "spliced".
+#' @param which_counts If intron_mode is TRUE, which type of counts should be included:
+#'   only counts aligned to spliced cDNA ("spliced") or all spliced and unspliced cDNA ("unspliced").
+#'   Default is "spliced".
 #'
 #' @return unfiltered gene x cell counts matrix
 #'
 #' @examples
 #' \dontrun{
-#' collapse_intron_counts(counts, which_counts = "cDNA")
+#' collapse_intron_counts(counts, which_counts = "spliced")
 #' }
+#'
+#' @noRd
 collapse_intron_counts <- function(counts, which_counts = c("spliced", "unspliced")){
 
   which_counts <- match.arg(which_counts)

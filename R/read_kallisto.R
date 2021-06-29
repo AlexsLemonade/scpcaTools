@@ -1,6 +1,6 @@
 #' Read in counts data processed with Kallisto
 #'
-#' @param quant_dir Full path to directory where output files are located.
+#' @param quant_dir Path to directory where output files are located.
 #' @param intron_mode Logical indicating if the files included alignment to intronic regions. Default is FALSE.
 #' @param which_counts If intron_mode is TRUE, which type of counts should be included,
 #'        only counts aligned to spliced cDNA ("spliced") or all spliced and unspliced cDNA ("unspliced").
@@ -12,8 +12,8 @@
 #' @examples
 #' \dontrun{
 #' read_kallisto(quant_dir,
-#' intron_mode = TRUE,
-#' which_counts = "intron")
+#'               intron_mode = TRUE,
+#'               which_counts = "intron")
 #' }
 read_kallisto <- function(quant_dir, intron_mode = FALSE, which_counts = c("spliced", "unspliced")) {
 
@@ -36,19 +36,16 @@ read_kallisto <- function(quant_dir, intron_mode = FALSE, which_counts = c("spli
     stop(paste0("Missing Kallisto output file(s): ", missing_files))
   }
 
-  base_file <- file.path(kallisto_dir, "gene_count")
-  counts <- Matrix::readMM(paste0(base_file,".mtx"))%>%
+  counts <- Matrix::readMM(file.path(kallisto_dir, "gene_count.mtx"))%>%
     t() %>% # transpose to gene x cell orientation
     as("dgCMatrix") # compress sparse matrix
-  dimnames(counts) <- list(readLines(paste0(base_file,".genes.txt")),
-                           readLines(paste0(base_file,".barcodes.txt")))
+  dimnames(counts) <- list(readLines(file.path(kallisto_dir, "gene_count.genes.txt")),
+                           readLines(file.path(kallisto_dir, "gene_count.barcodes.txt")))
 
   if(intron_mode == TRUE) {
-    collapsed_counts <- collapse_intron_counts(counts, which_counts)
-    sce <- SingleCellExperiment(list(counts = collapsed_counts))
-  } else {
-    sce <- SingleCellExperiment(list(counts = counts))
+    counts <- collapse_intron_counts(counts, which_counts)
   }
+  sce <- SingleCellExperiment(list(counts = counts))
 
   return(sce)
 }

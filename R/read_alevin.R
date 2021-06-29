@@ -1,6 +1,6 @@
 #' Read in counts data processed with Alevin or Alevin-fry
 #'
-#' @param quant_dir Full path to directory where output files are located.
+#' @param quant_dir Path to directory where output files are located.
 #' @param intron_mode Logical indicating if the files included alignment to intronic regions.
 #'        Default is FALSE.
 #' @param usa_mode Logical indicating if Alevin-fry was used, if the USA mode was invoked.
@@ -15,9 +15,8 @@
 #' @examples
 #' \dontrun{
 #' read_alevin(quant_dir,
-#'                      intron_mode = TRUE,
-#'                      usa_mode = TRUE,
-#'                      which_counts = "unspliced")
+#'             intron_mode = TRUE,
+#'             which_counts = "unspliced")
 #'}
 read_alevin <- function(quant_dir, intron_mode = FALSE, usa_mode = FALSE,
                         which_counts = c("spliced", "unspliced")){
@@ -43,7 +42,7 @@ read_alevin <- function(quant_dir, intron_mode = FALSE, usa_mode = FALSE,
   #   }
   # }
 
-  if(usa_mode == TRUE) {
+  if(usa_mode) {
     # read in counts using read_usa mode
     counts <- read_usa_mode(quant_dir, which_counts)
     sce <- SingleCellExperiment(list(counts = counts))
@@ -68,20 +67,20 @@ read_alevin <- function(quant_dir, intron_mode = FALSE, usa_mode = FALSE,
     }
 
     txi <- tximport::tximport(file.path(quant_dir, "alevin", "quants_mat.gz"), type = "alevin")
-    sce <- SingleCellExperiment(list(counts = txi$counts))
+    counts <- txi$counts
 
     # collapse intron counts for intron_mode = TRUE
     if (intron_mode == TRUE) {
-      counts <- collapse_intron_counts(counts(sce), which_counts)
-      sce <- SingleCellExperiment(list(counts = counts))
+      counts <- collapse_intron_counts(counts, which_counts)
     }
   }
+  sce <- SingleCellExperiment(list(counts = counts))
   return(sce)
 }
 
 #' Read in counts data processed with Alevin-fry in USA mode
 #'
-#' @param quant_dir Full path to directory where output files are located.
+#' @param quant_dir Path to directory where output files are located.
 #' @param which_counts If intron_mode is TRUE, which type of counts should be included,
 #'        only counts aligned to spliced cDNA ("spliced") or all spliced and unspliced cDNA ("unspliced").
 #'        Default is "spliced".
@@ -137,7 +136,7 @@ read_usa_mode <- function(quant_dir, which_counts = c("spliced", "unspliced")){
     # combine counts based on gene name
     counts <- Matrix.utils::aggregate.Matrix(splice_mtx, rownames(splice_mtx))
 
-  } else if (which_counts == "unspliced") {
+  } else { # unspliced
     # combine counts from U, S, and A
     # remove A & U from rowname
     rownames(mtx) <- str_remove(rownames(mtx), "-[AU]$")
@@ -147,4 +146,3 @@ read_usa_mode <- function(quant_dir, which_counts = c("spliced", "unspliced")){
   }
   return(counts)
 }
-

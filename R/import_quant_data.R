@@ -24,8 +24,11 @@
 #' usa_mode = TRUE)
 #' }
 #'
-import_quant_data <- function(quant_dir, tool = c("cellranger", "alevin", "alevin-fry", "kallisto"),
-                              intron_mode = FALSE, usa_mode = FALSE, which_counts = c("spliced", "unspliced")) {
+import_quant_data <- function(quant_dir,
+                              tool = c("cellranger", "alevin", "alevin-fry", "kallisto"),
+                              which_counts = c("spliced", "unspliced"),
+                              intron_mode = FALSE, 
+                              usa_mode = FALSE) {
 
   tool <- match.arg(tool)
   which_counts <- match.arg(which_counts)
