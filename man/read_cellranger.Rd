@@ -7,11 +7,20 @@
 read_cellranger(quant_dir)
 }
 \arguments{
-\item{quant_dir}{Full path to directory where output files are located.}
+\item{quant_dir}{Path to directory where output files are located.}
 }
 \value{
 SingleCellExperiment of gene x cell counts matrix
 }
 \description{
 Read in counts data processed with Cellranger
+}
+\examples{
+\dontrun{
+
+# Import data from cellranger output directory quant_dir
+read_cellranger(quant_dir)
+
+}
+
 }

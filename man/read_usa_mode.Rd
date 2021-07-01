@@ -7,7 +7,7 @@
 read_usa_mode(quant_dir, which_counts = c("spliced", "unspliced"))
 }
 \arguments{
-\item{quant_dir}{Full path to directory where output files are located.}
+\item{quant_dir}{Path to directory where output files are located.}
 
 \item{which_counts}{If intron_mode is TRUE, which type of counts should be included,
 only counts aligned to spliced cDNA ("spliced") or all spliced and unspliced cDNA ("unspliced").

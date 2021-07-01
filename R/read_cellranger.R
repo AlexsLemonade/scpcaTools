@@ -1,11 +1,18 @@
 #' Read in counts data processed with Cellranger
 #'
-#' @param quant_dir Full path to directory where output files are located.
+#' @param quant_dir Path to directory where output files are located.
 #'
 #' @return SingleCellExperiment of gene x cell counts matrix
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#'
+#' # Import data from cellranger output directory quant_dir
+#' read_cellranger(quant_dir)
+#'
+#' }
+#'
 read_cellranger <- function(quant_dir) {
 
   cellranger_file <- file.path(quant_dir, "outs", "filtered_feature_bc_matrix.h5")
@@ -13,7 +20,7 @@ read_cellranger <- function(quant_dir) {
     stop("Missing filtered_feature_bc_matrix.h5 file from cellranger output")
   }
 
-  sce <- read10xCounts(cellranger_file,
+  sce <- DropletUtils::read10xCounts(cellranger_file,
                        sample.names = basename(quant_dir),
                        col.names = TRUE)
 
