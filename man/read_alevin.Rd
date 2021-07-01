@@ -12,7 +12,7 @@ read_alevin(
 )
 }
 \arguments{
-\item{quant_dir}{Full path to directory where output files are located.}
+\item{quant_dir}{Path to directory where output files are located.}
 
 \item{intron_mode}{Logical indicating if the files included alignment to intronic regions.
 Default is FALSE.}

@@ -32,16 +32,16 @@
 #' # USA mode with alignment to cDNA + introns and including counts for
 #' # unspliced cDNA
 #' import_quant_data(quant_dir,
-#'   tool = "alevin-fry",
-#'   usa_mode = TRUE,
-#'   which_counts = "unspliced")
+#'                   tool = "alevin-fry",
+#'                   usa_mode = TRUE,
+#'                   which_counts = "unspliced")
 #'
 #' # read in single-nuclei RNA-seq data processed using kallisto with
 #' # alignment to cDNA + introns and including counts for unspliced cDNA
 #' import_quant_data(quant_dir,
-#'   tool = "kallisto",
-#'   intron_mode = TRUE,
-#'   which_counts = "unspliced")
+#'                   tool = "kallisto",
+#'                   intron_mode = TRUE,
+#'                   which_counts = "unspliced")
 #' }
 #'
 import_quant_data <- function(quant_dir,

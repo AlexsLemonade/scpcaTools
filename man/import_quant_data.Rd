@@ -13,7 +13,7 @@ import_quant_data(
 )
 }
 \arguments{
-\item{quant_dir}{Full path to directory where output files are located.}
+\item{quant_dir}{Path to directory where output files are located.}
 
 \item{tool}{Type of tool used to create files (Alevin, Alevin-fry, Cellranger, or Kallisto).}
 
@@ -42,24 +42,24 @@ tool = "cellranger")
 # read in single-cell RNA seq data processed using alevin-fry in USA mode
 # with alignment to cDNA only and including counts for spliced cDNA only
 import_quant_data(quant_dir,
-  tool = "alevin-fry",
-  intron_mode = FALSE,
-  usa_mode = TRUE)
+                  tool = "alevin-fry",
+                  intron_mode = FALSE,
+                  usa_mode = TRUE)
 
 # read in single-nuclei RNA-seq data processed using alevin-fry in
 # USA mode with alignment to cDNA + introns and including counts for
 # unspliced cDNA
 import_quant_data(quant_dir,
-  tool = "alevin-fry",
-  usa_mode = TRUE,
-  which_counts = "unspliced")
+                  tool = "alevin-fry",
+                  usa_mode = TRUE,
+                  which_counts = "unspliced")
 
 # read in single-nuclei RNA-seq data processed using kallisto with
-alignment to cDNA + introns and including counts for unspliced cDNA
+# alignment to cDNA + introns and including counts for unspliced cDNA
 import_quant_data(quant_dir,
-  tool = "kallisto",
-  intron_mode = TRUE,
-  which_counts = "unspliced")
+                  tool = "kallisto",
+                  intron_mode = TRUE,
+                  which_counts = "unspliced")
 }
 
 }

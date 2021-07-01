@@ -12,12 +12,12 @@
 #'
 #' # only keep counts from spliced cDNA in final counts matrix
 #' collapse_intron_counts(counts,
-#'  which_counts = "spliced")
+#'                        which_counts = "spliced")
 #' }
 #'
 #' # include unspliced cDNA in final counts matrix
 #' collapse_intron_counts(counts,
-#'   which_counts = "unspliced")
+#'                        which_counts = "unspliced")
 #'
 #' @noRd
 collapse_intron_counts <- function(counts,
