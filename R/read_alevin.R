@@ -1,6 +1,6 @@
 #' Read in counts data processed with Alevin or Alevin-fry
 #'
-#' @param quant_dir Full path to directory where output files are located.
+#' @param quant_dir Path to directory where output files are located.
 #' @param intron_mode Logical indicating if the files included alignment to intronic regions.
 #'   Default is FALSE.
 #' @param usa_mode Logical indicating if Alevin-fry was used, if the USA mode was invoked.
@@ -89,7 +89,7 @@ read_alevin <- function(quant_dir,
 
 #' Read in counts data processed with Alevin-fry in USA mode
 #'
-#' @param quant_dir Full path to directory where output files are located.
+#' @param quant_dir Path to directory where output files are located.
 #' @param which_counts If intron_mode is TRUE, which type of counts should be included,
 #'        only counts aligned to spliced cDNA ("spliced") or all spliced and unspliced cDNA ("unspliced").
 #'        Default is "spliced".
