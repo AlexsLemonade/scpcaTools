@@ -9,13 +9,16 @@ import_quant_data(
   tool = c("cellranger", "alevin", "alevin-fry", "kallisto"),
   which_counts = c("spliced", "unspliced"),
   intron_mode = FALSE,
-  usa_mode = FALSE
+  usa_mode = FALSE,
+  filter = FALSE,
+  fdr_cutoff = 0.01,
+  ...
 )
 }
 \arguments{
 \item{quant_dir}{Path to directory where output files are located.}
 
-\item{tool}{Type of tool used to create files (Alevin, Alevin-fry, Cellranger, or Kallisto).}
+\item{tool}{Type of tool used to create files (alevin, alevin-fry, cellranger, or kallisto).}
 
 \item{which_counts}{If intron_mode is TRUE, which type of counts should be included,
 only counts aligned to spliced cDNA ("spliced") or all spliced and unspliced cDNA ("unspliced").
@@ -26,6 +29,14 @@ Default is FALSE.}
 
 \item{usa_mode}{Logical indicating if Alevin-fry was used, if the USA mode was invoked.
 Default is FALSE.}
+
+\item{filter}{Logical indicating whether or not to filter the counts matrix.
+Filtering is performed using DropletUtils::emptyDrops and cannot be performed with Cellranger.}
+
+\item{fdr_cutoff}{FDR cutoff to use for DropletUtils::emptyDrops.
+Default is 0.01.}
+
+\item{...}{Any arguments to be passed into DropletUtils::emptyDrops.}
 }
 \value{
 SingleCellExperiment of unfiltered gene x cell counts matrix
@@ -48,18 +59,21 @@ import_quant_data(quant_dir,
 
 # read in single-nuclei RNA-seq data processed using alevin-fry in
 # USA mode with alignment to cDNA + introns and including counts for
-# unspliced cDNA
+# unspliced cDNA and perform filtering
 import_quant_data(quant_dir,
                   tool = "alevin-fry",
                   usa_mode = TRUE,
-                  which_counts = "unspliced")
+                  which_counts = "unspliced",
+                  filter = TRUE)
 
 # read in single-nuclei RNA-seq data processed using kallisto with
 # alignment to cDNA + introns and including counts for unspliced cDNA
+# and perform filtering
 import_quant_data(quant_dir,
                   tool = "kallisto",
                   intron_mode = TRUE,
-                  which_counts = "unspliced")
+                  which_counts = "unspliced",
+                  filter = TRUE)
 }
 
 }
