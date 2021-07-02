@@ -9,7 +9,7 @@
 #' \dontrun{
 #' filter_counts(sce = sce_object)
 #' }
-filter_counts <- function(sce) {
+filter_counts <- function(sce, fdr_cutoff = 0.01, ...) {
 
   if(!is(sce,"SingleCellExperiment")){
     stop("Input must be a SingleCellExperiment object.")
@@ -19,11 +19,14 @@ filter_counts <- function(sce) {
   counts <- counts(sce)
 
   # calculate probability of being an empty droplet
-  empty_df <- DropletUtils::emptyDrops(counts)
-  cells <- rownames(empty_df[which(empty_df$Limited == "TRUE" & empty_df$FDR <= 0.01),])
+  empty_df <- DropletUtils::emptyDrops(counts, ...)
+  if(any(empty_df$FDR > fdr_cutoff & empty_df$Limited){
+    warn(glue::glue("`niters` may be set too low for emptyDrops filtering.",
+                    " Current value is {empty_df@metadata$niters}."))
+  }
+  cells <- rownames(empty_df)[which(empty_df$FDR <= fdr_cutoff)]
 
   # subset original counts matrix by cells that pass filter
-  counts <- counts[, cells]
-  sce <- SingleCellExperiment(list(counts = counts))
+  sce <- sce[, cells]
   return(sce)
 }
