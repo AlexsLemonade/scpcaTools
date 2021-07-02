@@ -34,6 +34,7 @@ collapse_intron_counts <- function(counts,
     stop("Missing spliced genes in counts matrix.")
   }
 
+
   if(which_counts == "spliced") {
     counts <- counts[spliced_genes,]
   } else if (which_counts == "unspliced") {
