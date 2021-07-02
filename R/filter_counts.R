@@ -1,8 +1,11 @@
 #' Filter counts matrix using DropletUtils::emptyDrops
 #'
-#' @param sce SingleCellExperiment with unfiltered gene x cell counts matrix
+#' @param sce SingleCellExperiment with unfiltered gene x cell counts matrix.
+#' @param fdr_cutoff FDR cutoff to use for DropletUtils::emptyDrops.
+#'   Default is 0.01.
+#' @param ... Any arguments to be passed into DropletUtils::emptyDrops.
 #'
-#' @return SingleCellExperiment with filtered gene x cell matrix
+#' @return SingleCellExperiment with filtered gene x cell matrix.
 #' @export
 #'
 #' @examples
@@ -15,13 +18,10 @@ filter_counts <- function(sce, fdr_cutoff = 0.01, ...) {
     stop("Input must be a SingleCellExperiment object.")
   }
 
-  # grab counts from single cell experiment
-  counts <- counts(sce)
-
   # calculate probability of being an empty droplet
-  empty_df <- DropletUtils::emptyDrops(counts, ...)
-  if(any(empty_df$FDR > fdr_cutoff & empty_df$Limited){
-    warn(glue::glue("`niters` may be set too low for emptyDrops filtering.",
+  empty_df <- DropletUtils::emptyDrops(sce, ...)
+  if(any(empty_df$FDR > fdr_cutoff & empty_df$Limited)){
+    warning(glue::glue("`niters` may be set too low for emptyDrops filtering.",
                     " Current value is {empty_df@metadata$niters}."))
   }
   cells <- rownames(empty_df)[which(empty_df$FDR <= fdr_cutoff)]

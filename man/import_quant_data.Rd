@@ -10,7 +10,9 @@ import_quant_data(
   which_counts = c("spliced", "unspliced"),
   intron_mode = FALSE,
   usa_mode = FALSE,
-  filter = FALSE
+  filter = FALSE,
+  fdr_cutoff = 0.01,
+  ...
 )
 }
 \arguments{
@@ -30,6 +32,11 @@ Default is FALSE.}
 
 \item{filter}{Logical indicating whether or not to filter the counts matrix.
 Filtering is performed using DropletUtils::emptyDrops and cannot be performed with Cellranger.}
+
+\item{fdr_cutoff}{FDR cutoff to use for DropletUtils::emptyDrops.
+Default is 0.01.}
+
+\item{...}{Any arguments to be passed into DropletUtils::emptyDrops.}
 }
 \value{
 SingleCellExperiment of unfiltered gene x cell counts matrix

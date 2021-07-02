@@ -21,6 +21,7 @@ LazyData: true
 RoxygenNote: 7.1.1.9001
 Imports: 
     DropletUtils,
+    glue,
     magrittr,
     Matrix,
     Matrix.utils,
