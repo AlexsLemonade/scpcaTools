@@ -85,24 +85,22 @@ import_quant_data <- function(quant_dir,
   }
 
   # check that filter is not used with cellranger
-  if(filter == TRUE & tool == "cellranger"){
+  if(filter & tool == "cellranger"){
     stop("Cannot perform emptyDrops filtering on cellranger output.")
   }
 
-
   if (tool %in% c("alevin-fry", "alevin")){
     sce <- read_alevin(quant_dir, intron_mode, usa_mode, which_counts)
-  } else if (tool == "kallisto") {
-    sce <- read_kallisto(quant_dir, intron_mode, which_counts)
-  } else if (tool == "cellranger") {
-    sce <- read_cellranger(quant_dir)
-  }
-
-  # only perform filtering for non-cellranger tools
-  if(tool != "cellranger") {
-    if(filter) {
+    if (filter){
       sce <- filter_counts(sce)
     }
+  } else if (tool == "kallisto") {
+    sce <- read_kallisto(quant_dir, intron_mode, which_counts)
+    if(filter){
+      sce <- filter_counts(sce)
+    }
+  } else if (tool == "cellranger") {
+    sce <- read_cellranger(quant_dir)
   }
 
   return(sce)
