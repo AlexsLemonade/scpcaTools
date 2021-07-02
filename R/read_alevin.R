@@ -41,6 +41,7 @@ read_alevin <- function(quant_dir,
     stop("usa_mode must be set as TRUE or FALSE")
   }
 
+  # check that usa_mode and intron_mode are not used together
   if(usa_mode & intron_mode){
     stop("Can only read counts using either usa mode or intron mode.")
   }
