@@ -19,7 +19,7 @@ filter_counts <- function(sce, fdr_cutoff = 0.01, ...) {
   }
 
   # calculate probability of being an empty droplet
-  empty_df <- DropletUtils::emptyDrops(sce, ...)
+  empty_df <- DropletUtils::emptyDrops(counts(sce), ...)
   if(any(empty_df$FDR > fdr_cutoff & empty_df$Limited, na.rm = TRUE)){
     warning(glue::glue("`niters` may be set too low for emptyDrops filtering.",
                     " Current value is {empty_df@metadata$niters}."))
