@@ -19,8 +19,7 @@ filter_counts <- function(sce) {
   counts <- counts(sce)
 
   # calculate probability of being an empty droplet
-  empty_df <- DropletUtils::emptyDrops(counts,
-                         BiocParallel::MulticoreParam(4))
+  empty_df <- DropletUtils::emptyDrops(counts)
   cells <- rownames(empty_df[which(empty_df$Limited == "TRUE" & empty_df$FDR <= 0.01),])
 
   # subset original counts matrix by cells that pass filter
