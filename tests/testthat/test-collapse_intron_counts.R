@@ -1,26 +1,26 @@
 intron_mat <- Matrix::Matrix(
-  data = c(0,1,2,100,
-           1,1,100,0
+  data = c(0,1,2,100,10,
+           1,1,100,0,10
            ),
-  nrow = 4
+  ncol = 2
 )
-rownames(intron_mat) <- c("a", "a-I", "b", "b-I")
+rownames(intron_mat) <- c("a", "a-I", "b", "b-I", "c")
 
 spliced_mat <- Matrix::Matrix(
-  data = c(0,2,
-           1,100
+  data = c(0,2,10,
+           1,100,10
   ),
-  nrow = 2
+  ncol = 2
 )
-rownames(spliced_mat) <- c("a", "b")
+rownames(spliced_mat) <- c("a", "b", "c")
 
 unspliced_mat <- Matrix::Matrix(
-  data = c(1,102,
-           2,100
+  data = c(1,102,10,
+           2,100,10
   ),
-  nrow = 2
+  ncol = 2
 )
-rownames(unspliced_mat) <- c("a", "b")
+rownames(unspliced_mat) <- c("a", "b", "c")
 
 # We are checking only contents & names, because
 # aggregate.Matrix used internally may add additional attributes
