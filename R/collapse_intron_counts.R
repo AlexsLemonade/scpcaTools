@@ -26,11 +26,11 @@ collapse_intron_counts <- function(counts,
   which_counts <- match.arg(which_counts)
 
   intron_genes <- str_subset(rownames(counts), "-I$")
-  if(is.na(intron_genes)){
+  if(length(intron_genes) == 0){
     stop('No counts corresponding to intronic reads detected,
          must have tag "-I" at the end of gene name to signify intronic read.')
   }
-  if(all.equal(intron_genes,rownames(counts)) != TRUE){
+  if(identical(intron_genes, rownames(counts))){
     stop("Missing spliced genes in counts matrix.")
   }
 
