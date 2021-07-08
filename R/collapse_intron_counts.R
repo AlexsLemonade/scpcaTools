@@ -25,25 +25,23 @@ collapse_intron_counts <- function(counts,
 
   which_counts <- match.arg(which_counts)
 
-  intron_genes <- str_subset(rownames(counts), "-I$")
-  if(all(is.na(intron_genes))){
+  spliced_genes <- str_detect(rownames(counts), "-I$", negate = TRUE)
+  if(all(spliced_genes)){
     stop('No counts corresponding to intronic reads detected,
          must have tag "-I" at the end of gene name to signify intronic read.')
   }
-  if(!all(intron_genes %in% rownames(counts))){
+  if(all(!spliced_genes)){
     stop("Missing spliced genes in counts matrix.")
   }
 
 
   if(which_counts == "spliced") {
-    spliced_genes <- str_subset(rownames(counts), "-I$", negate = TRUE)
     counts <- counts[spliced_genes,]
-
   } else if (which_counts == "unspliced") {
-    # remove -I at the end of the gene name
-    rownames(counts) <- str_remove(rownames(counts), "-I$")
+    # remove -I at the end of the gene names
+    genes <- str_remove(rownames(counts), "-I$")
     # aggregate Matrix counts by gene name
-    counts <- Matrix.utils::aggregate.Matrix(counts, rownames(counts))
+    counts <- Matrix.utils::aggregate.Matrix(counts, genes)
   }
   return(counts)
 
