@@ -15,14 +15,20 @@
 #' @examples
 #' \dontrun{
 #'
-#' # import output files processed with either Alevin or Alevin-fry with alignment to
+#' # Import output files processed with either Alevin or Alevin-fry with alignment to
 #' # cDNA only, including only spliced cDNA in final counts matrix
 #' read_alevin(quant_dir)
 #'
-#' # import output files processed with either Alevin or Alevin-fry with alignment to
+#' # Import output files processed with either Alevin or Alevin-fry with alignment to
 #' # cDNA + introns and including all unspliced cDNA in final counts matrix
 #' read_alevin(quant_dir,
 #'             intron_mode = TRUE,
+#'             which_counts = "unspliced")
+#'
+#' # Import output files processed with alevin-fry USA mode
+#' # including all unspliced cDNA in final counts matrix
+#' read_alevin(quant_dir,
+#'             usa_mode = TRUE,
 #'             which_counts = "unspliced")
 #'
 #'}
@@ -84,13 +90,12 @@ read_alevin <- function(quant_dir,
 #' Read in counts data processed with Alevin-fry in USA mode
 #'
 #' @param quant_dir Path to directory where output files are located.
-#' @param which_counts If intron_mode is TRUE, which type of counts should be included,
+#' @param which_counts Which type of counts should be included,
 #'        only counts aligned to spliced cDNA ("spliced") or all spliced and unspliced cDNA ("unspliced").
 #'        Default is "spliced".
 #'
 #' @return unfiltered gene x cell counts matrix
 #'
-#' @examples
 read_usa_mode <- function(quant_dir,
                           which_counts = c("spliced", "unspliced")){
 
@@ -125,28 +130,12 @@ read_usa_mode <- function(quant_dir,
   mtx <- Matrix::readMM(file = file.path(quant_dir, "alevin", "quants_mat.mtx"))%>%
     Matrix::t() %>%
     as("dgCMatrix")
-  cols <- readr::read_csv(file = file.path(quant_dir, "alevin", "quants_mat_cols.txt"),
-                          col_names = "gene_id")
-  rows <- readr::read_csv(file = file.path(quant_dir, "alevin", "quants_mat_rows.txt"),
-                          col_names = "barcodes")
-  dimnames(mtx) <- list(cols$gene_id, rows$barcodes)
+  cols <- scan(file = file.path(quant_dir, "alevin", "quants_mat_cols.txt"),
+               what = "character")
+  rows <- scan(file = file.path(quant_dir, "alevin", "quants_mat_rows.txt"),
+               what = "character")
+  dimnames(mtx) <- list(cols, rows)
 
-  if (which_counts == "spliced") {
-    # only combine counts from S + A
-    intron_genes <- str_subset(rownames(mtx), "-U$")
-    splice_mtx <- mtx[!(rownames(mtx) %in% intron_genes),]
-    # remove A from rowname
-    rownames(splice_mtx) <- str_remove(rownames(splice_mtx), "-A$")
-    # combine counts based on gene name
-    counts <- Matrix.utils::aggregate.Matrix(splice_mtx, rownames(splice_mtx))
-
-  } else { # unspliced
-    # combine counts from U, S, and A
-    # remove A & U from rowname
-    rownames(mtx) <- str_remove(rownames(mtx), "-[AU]$")
-    # combine counts based on gene name
-    counts <- Matrix.utils::aggregate.Matrix(mtx, rownames(mtx))
-
-  }
+  counts <- collapse_intron_counts(mtx, which_counts)
   return(counts)
 }

@@ -33,14 +33,20 @@ Read in counts data processed with Alevin or Alevin-fry
 \examples{
 \dontrun{
 
-# import output files processed with either Alevin or Alevin-fry with alignment to
+# Import output files processed with either Alevin or Alevin-fry with alignment to
 # cDNA only, including only spliced cDNA in final counts matrix
 read_alevin(quant_dir)
 
-# import output files processed with either Alevin or Alevin-fry with alignment to
+# Import output files processed with either Alevin or Alevin-fry with alignment to
 # cDNA + introns and including all unspliced cDNA in final counts matrix
 read_alevin(quant_dir,
             intron_mode = TRUE,
+            which_counts = "unspliced")
+
+# Import output files processed with alevin-fry USA mode
+# including all unspliced cDNA in final counts matrix
+read_alevin(quant_dir,
+            usa_mode = TRUE,
             which_counts = "unspliced")
 
 }
