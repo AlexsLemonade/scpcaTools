@@ -20,8 +20,9 @@ Default is FALSE.}
 \item{usa_mode}{Logical indicating if Alevin-fry was used, if the USA mode was invoked.
 Default is FALSE.}
 
-\item{which_counts}{If intron_mode is TRUE, which type of counts should be included,
+\item{which_counts}{Which type of counts should be included,
 only counts aligned to spliced cDNA ("spliced") or all spliced and unspliced cDNA ("unspliced").
+Applies if `intron_mode` or `usa_mode` is TRUE.
 Default is "spliced".}
 }
 \value{
