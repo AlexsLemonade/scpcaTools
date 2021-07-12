@@ -22,11 +22,11 @@ RoxygenNote: 7.1.1.9001
 Imports: 
     DropletUtils,
     glue,
+    jsonlite,
     magrittr,
     Matrix,
     Matrix.utils,
     methods,
-    rjson,
     SingleCellExperiment,
     stringr,
     SummarizedExperiment,
