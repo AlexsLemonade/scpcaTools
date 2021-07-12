@@ -20,8 +20,9 @@ Default is FALSE.}
 \item{usa_mode}{Logical indicating if Alevin-fry was used, if the USA mode was invoked.
 Default is FALSE.}
 
-\item{which_counts}{If intron_mode is TRUE, which type of counts should be included,
+\item{which_counts}{Which type of counts should be included,
 only counts aligned to spliced cDNA ("spliced") or all spliced and unspliced cDNA ("unspliced").
+Applies if `intron_mode` or `usa_mode` is TRUE.
 Default is "spliced".}
 }
 \value{
@@ -33,14 +34,20 @@ Read in counts data processed with Alevin or Alevin-fry
 \examples{
 \dontrun{
 
-# import output files processed with either Alevin or Alevin-fry with alignment to
+# Import output files processed with either Alevin or Alevin-fry with alignment to
 # cDNA only, including only spliced cDNA in final counts matrix
 read_alevin(quant_dir)
 
-# import output files processed with either Alevin or Alevin-fry with alignment to
+# Import output files processed with either Alevin or Alevin-fry with alignment to
 # cDNA + introns and including all unspliced cDNA in final counts matrix
 read_alevin(quant_dir,
             intron_mode = TRUE,
+            which_counts = "unspliced")
+
+# Import output files processed with alevin-fry USA mode
+# including all unspliced cDNA in final counts matrix
+read_alevin(quant_dir,
+            usa_mode = TRUE,
             which_counts = "unspliced")
 
 }
