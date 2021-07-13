@@ -132,9 +132,9 @@ read_usa_mode <- function(quant_dir,
     Matrix::t() %>%
     as("dgCMatrix")
   cols <- scan(file = file.path(quant_dir, "alevin", "quants_mat_cols.txt"),
-               what = "character")
+               what = "character", quiet = TRUE)
   rows <- scan(file = file.path(quant_dir, "alevin", "quants_mat_rows.txt"),
-               what = "character")
+               what = "character", quiet = TRUE)
   dimnames(mtx) <- list(cols, rows)
 
   counts <- collapse_intron_counts(mtx, which_counts)
