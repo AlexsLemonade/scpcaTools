@@ -45,8 +45,8 @@ rowdata_to_df <- function(sce) {
   }
 
   # make sure that input has rowData
-  if(any(is.na(rowData(sce)))){
-    stop("SingleCellExperiment has empty rowData slot")
+  if(ncol(rowData(sce)) == 0){
+    warning("SingleCellExperiment has empty rowData slot")
   }
 
   # convert rowData to data.frame column containing gene names
