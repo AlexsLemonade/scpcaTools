@@ -30,6 +30,7 @@ Imports:
     SingleCellExperiment,
     stringr,
     SummarizedExperiment,
+    tibble,
     tximport
 Suggests: 
     testthat (>= 3.0.0)
