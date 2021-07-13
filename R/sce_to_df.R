@@ -6,6 +6,8 @@
 #'   and a column, "cell_id", corresponding to the cell_barcodes or columns of the
 #'   SingleCellExperiment object.
 #'
+#' @import SingleCellExperiment
+#'
 #' @export
 #'
 coldata_to_df <- function(sce) {
@@ -16,8 +18,8 @@ coldata_to_df <- function(sce) {
   }
 
   # make sure that input has colData
-  if(any(is.na(colData(sce)))){
-    stop("SingleCellExperiment has empty colData slot")
+  if(ncol(colData(sce)) == 0){
+    warning("SingleCellExperiment has empty colData slot.")
   }
 
   # convert colData to data.frame with column containing cell barcodes
