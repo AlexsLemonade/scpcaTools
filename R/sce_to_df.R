@@ -35,8 +35,10 @@ coldata_to_df <- function(sce) {
 #' @return data.frame containing rowData from the SingleCellExperiment object
 #'   and a column, "gene_id", corresponding to the gene names or rows of the
 #'   SingleCellExperiment object.
-#' @export
 #'
+#' @import SingleCellExperiment
+#'
+#' @export
 rowdata_to_df <- function(sce) {
 
   # make sure that input is a SingleCellExperiment
