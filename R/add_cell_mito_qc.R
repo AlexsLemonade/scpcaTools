@@ -24,12 +24,12 @@ add_cell_mito_qc <- function(sce, mito, ...){
 
   # check that mito is not empty, otherwise resulting colData will be innacurate
   if(length(mito) == 0){
-    warning("Mitochondrial gene list not used, resulting mitochondrial metrics will not be accurate.")
+    stop("Mitochondrial gene list not used, cannot calculate mitochondrial metrics.")
   }
 
-  # check that mito genes are present in sce
+  # check that mito genes are present in sce, otherwise colData will have 0's for mito columns
   if(length(intersect(mito, rownames(sce))) == 0){
-    warning("sce does not contain genes corresponding to the list of mito gene names.")
+    warning("sce does not contain genes corresponding to the list of mito gene names")
   }
 
   # add per cell QC with mitochondrial subset
