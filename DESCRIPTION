@@ -27,6 +27,7 @@ Imports:
     Matrix,
     Matrix.utils,
     methods,
+    scater,
     SingleCellExperiment,
     stringr,
     SummarizedExperiment,
