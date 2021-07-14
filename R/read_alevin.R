@@ -99,7 +99,6 @@ read_alevin <- function(quant_dir,
 #'
 read_usa_mode <- function(quant_dir,
                           which_counts = c("spliced", "unspliced")){
-
   which_counts <- match.arg(which_counts)
 
   # check that all files exist in quant_dir
