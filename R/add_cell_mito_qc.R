@@ -5,7 +5,10 @@
 #' @param ... Any additional arguments to be passed to scater::addPerCellQC.
 #'
 #' @return SingleCellExperiment with colData slot containing calculated QC metrics.
-#'  Columns include sum, detected, subsets_mito_sum, subsets_mito_detected, subsets_mito_percent, and total.
+#'  Columns include sum, detected, mito_sum, mito_detected, mito_percent, and total.
+#'
+#' @import SummarizedExperiment
+#'
 #' @export
 #'
 #' @examples
@@ -33,7 +36,14 @@ add_cell_mito_qc <- function(sce, mito, ...){
   }
 
   # add per cell QC with mitochondrial subset
-  scater::addPerCellQC(sce,
-                       subsets = list(mito = mito[mito %in% rownames(sce)]),
-                       ...)
+  sce <- scater::addPerCellQC(
+    sce,
+    subsets = list(mito = mito[mito %in% rownames(sce)]),
+    ...
+  )
+  # simplify naming
+  names(colData(sce)) <- stringr::str_replace(names(colData(sce)),
+                                              "^subsets_mito_",
+                                              "mito_")
+  return(sce)
 }
