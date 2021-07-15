@@ -15,7 +15,7 @@ add_cell_mito_qc(sce, mito, ...)
 }
 \value{
 SingleCellExperiment with colData slot containing calculated QC metrics.
- Columns include sum, detected, subsets_mito_sum, subsets_mito_detected, subsets_mito_percent, and total.
+ Columns include sum, detected, mito_sum, mito_detected, mito_percent, and total.
 }
 \description{
 Calculate QC metrics for all reads and mitochondrial subset for each cell in a SingleCellExperiment
