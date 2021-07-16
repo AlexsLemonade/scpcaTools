@@ -1,0 +1,32 @@
+---
+params:
+  sample: Example
+  sce: !r SingleCellExperiment::SingleCellExperiment()
+  date: !r Sys.Date()
+
+title: "`r glue::glue('ScPCA QC report for {params$sample}')`"
+author: "CCDL"
+date: "`r params$date`"
+output: 
+  html_document:
+    toc: true
+    toc_depth: 2
+    toc_float: true
+    number_sections: true
+---
+
+# Introduction
+```{r setup, message=FALSE}
+library(SingleCellExperiment)
+```
+
+# `r params$sample` Experiment Information
+
+This sample has `r ncol(params$sce)` cells, assayed for `r nrow(params$sce)` genes.
+
+# Session Info
+```{r session_info}
+sessioninfo::session_info()
+```
+
+
