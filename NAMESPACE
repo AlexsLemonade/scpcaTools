@@ -3,6 +3,7 @@
 export(add_cell_mito_qc)
 export(coldata_to_df)
 export(filter_counts)
+export(generate_qc_report)
 export(import_quant_data)
 export(read_alevin)
 export(read_cellranger)
