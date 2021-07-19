@@ -20,7 +20,7 @@ test_that("reading salmon alevin data works", {
 test_that("reading alevin-fry USA mode works", {
   sce <- read_alevin(usa_dir,
                      usa_mode = TRUE,
-                    which_counts = "spliced")
+                     which_counts = "spliced")
   expect_s4_class(sce, "SingleCellExperiment")
   expect_equal(dim(sce), sce_af_size)
   # check that column names are barcodes

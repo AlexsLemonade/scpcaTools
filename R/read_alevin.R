@@ -53,36 +53,30 @@ read_alevin <- function(quant_dir,
     stop("Can only read counts using either usa mode or intron mode.")
   }
 
+  # check that the expected quant directory exists
+  if(!dir.exists(file.path(quant_dir, "alevin"))){
+    stop("Missing alevin directory with output files")
+  }
+
+  # check for cmd_info
+  cmd_info_file <- file.path(quant_dir, "cmd_info.json")
+  if(!file.exists(cmd_info_file)){
+    stop("Missing cmd_info.json in Alevin output directory")
+  } else {
+    cmd_info <- jsonlite::read_json(cmd_info_file)
+  }
+  # alevin-only has a ``
+  salmon_version <- cmd_info$salmon_version
+
   if(usa_mode) {
     # read in counts using read_usa mode
-    counts <- read_usa_mode(quant_dir, which_counts)
-
+    counts <- read_usa_mode(quant_dir)
   } else {
-    # use tximport for all non-usa mode
-    alevin_files <- c("quants_mat_cols.txt", "quants_mat_rows.txt", "quants_mat.gz")
+    counts <- read_tximport(quant_dir)
+  }
 
-    # check that all files exist in quant directory
-    if(!dir.exists(file.path(quant_dir, "alevin"))){
-      stop("Missing alevin directory with output files")
-    }
-
-    missing <- !file.exists(file.path(quant_dir, "alevin", alevin_files))
-    if(any(missing)) {
-      missing_files <- paste(alevin_files[missing], collapse = ", ")
-      stop(paste0("Missing Alevin output file(s): ", missing_files))
-    }
-
-    if(!file.exists(file.path(quant_dir, "cmd_info.json"))){
-      stop("Missing cmd_info.json in Alevin output directory")
-    }
-
-    txi <- suppressMessages(tximport::tximport(file.path(quant_dir, "alevin", "quants_mat.gz"), type = "alevin"))
-    counts <- txi$counts
-
-    # collapse intron counts for intron_mode = TRUE
-    if (intron_mode) {
-      counts <- collapse_intron_counts(counts, which_counts)
-    }
+  if (intron_mode | usa_mode) {
+    counts <- collapse_intron_counts(counts, which_counts)
   }
   sce <- SingleCellExperiment(list(counts = counts))
   return(sce)
@@ -91,15 +85,10 @@ read_alevin <- function(quant_dir,
 #' Read in counts data processed with Alevin-fry in USA mode
 #'
 #' @param quant_dir Path to directory where output files are located.
-#' @param which_counts Which type of counts should be included,
-#'        only counts aligned to spliced cDNA ("spliced") or all spliced and unspliced cDNA ("unspliced").
-#'        Default is "spliced".
 #'
-#' @return unfiltered gene x cell counts matrix
+#' @return unfiltered and uncollapsed gene x cell counts matrix
 #'
-read_usa_mode <- function(quant_dir,
-                          which_counts = c("spliced", "unspliced")){
-  which_counts <- match.arg(which_counts)
+read_usa_mode <- function(quant_dir){
 
   # check that all files exist in quant_dir
   alevin_files <- c("quants_mat_cols.txt", "quants_mat_rows.txt", "quants_mat.mtx")
@@ -131,13 +120,36 @@ read_usa_mode <- function(quant_dir,
   }
 
   # read in .mtx files
-  mtx <- Matrix::readMM(file = file.path(quant_dir, "alevin", "quants_mat.mtx"))%>%
+  counts <- Matrix::readMM(file = file.path(quant_dir, "alevin", "quants_mat.mtx"))%>%
     Matrix::t() %>%
     as("dgCMatrix")
   cols <- readLines(file.path(quant_dir, "alevin", "quants_mat_cols.txt"))
   rows <- readLines(file.path(quant_dir, "alevin", "quants_mat_rows.txt"))
-  dimnames(mtx) <- list(cols, rows)
-
-  counts <- collapse_intron_counts(mtx, which_counts)
+  dimnames(counts) <- list(cols, rows)
   return(counts)
+}
+
+#' Read in counts data processed with Alevin or alevin-fry in tximport-compatible formats
+#'
+#' @param quant_dir Path to directory where output files are located.
+#'
+#' @return unfiltered & uncollapsed gene x cell counts matrix
+#'
+read_tximport <- function(quant_dir){
+
+  # check that all files exist in quant_dir
+  # use tximport for all non-usa mode
+  alevin_files <- c("quants_mat_cols.txt", "quants_mat_rows.txt", "quants_mat.gz")
+
+  missing <- !file.exists(file.path(quant_dir, "alevin", alevin_files))
+  if(any(missing)) {
+    missing_files <- paste(alevin_files[missing], collapse = ", ")
+    stop(paste0("Missing Alevin output file(s): ", missing_files))
+  }
+
+  txi <- suppressMessages(tximport::tximport(
+    file.path(quant_dir, "alevin", "quants_mat.gz"),
+    type = "alevin"
+  ))
+  counts <- txi$counts
 }
