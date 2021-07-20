@@ -11,6 +11,7 @@ Currently, the `import_quant_data` function can support single-nuclei RNA seq co
 ## Testing
 
 To test the import functions in this package, you must also have installed the [`scpcaData` package](https://github.com/AlexsLemonade/scpcaData).
+This can be done by running `remotes::install_github("AlexsLemonade/scpcaData")`
 
   <!-- badges: start -->
   [![R-CMD-check](https://github.com/AlexsLemonade/scpcaTools/workflows/R-CMD-check/badge.svg)](https://github.com/AlexsLemonade/scpcaTools/actions)

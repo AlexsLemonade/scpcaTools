@@ -12,8 +12,10 @@ test_that("Check that reading USA mode works", {
   expect_s4_class(sce, "SingleCellExperiment")
   expect_equal(dim(sce), sce_size)
   # check that column names are barcodes
-  col_barcode <- stringr::str_detect(colnames(sce), "^[ACGT]+$")
+  col_barcode <- str_detect(colnames(sce), "^[ACGT]+$")
   expect_true(all(col_barcode))
+  unmerged_genes <- str_subset(rownames(sce), "-[IUA]$")
+  expect_length(unmerged_genes, 0)
 })
 
 
@@ -26,5 +28,7 @@ test_that("Check that reading intron mode works", {
   # check that column names are barcodes
   col_barcode <- stringr::str_detect(colnames(sce), "^[ACGT]+$")
   expect_true(all(col_barcode))
+  unmerged_genes <- str_subset(rownames(sce), "-[IUA]$")
+  expect_length(unmerged_genes, 0)
 
 })
