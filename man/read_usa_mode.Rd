@@ -4,17 +4,13 @@
 \alias{read_usa_mode}
 \title{Read in counts data processed with Alevin-fry in USA mode}
 \usage{
-read_usa_mode(quant_dir, which_counts = c("spliced", "unspliced"))
+read_usa_mode(quant_dir)
 }
 \arguments{
 \item{quant_dir}{Path to directory where output files are located.}
-
-\item{which_counts}{Which type of counts should be included,
-only counts aligned to spliced cDNA ("spliced") or all spliced and unspliced cDNA ("unspliced").
-Default is "spliced".}
 }
 \value{
-unfiltered gene x cell counts matrix
+unfiltered and uncollapsed gene x cell counts matrix
 }
 \description{
 Read in counts data processed with Alevin-fry in USA mode

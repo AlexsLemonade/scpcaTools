@@ -13,6 +13,9 @@
 #' @return SingleCellExperiment of unfiltered gene x cell counts matrix.
 #' @export
 #'
+#' @import SingleCellExperiment
+#' @import SummarizedExperiment
+#'
 #' @examples
 #' \dontrun{
 #'
@@ -65,7 +68,6 @@ read_alevin <- function(quant_dir,
   } else {
     cmd_info <- jsonlite::read_json(cmd_info_file)
   }
-  # alevin-only has a ``
   salmon_version <- cmd_info$salmon_version
 
   if(usa_mode) {
@@ -79,6 +81,10 @@ read_alevin <- function(quant_dir,
     counts <- collapse_intron_counts(counts, which_counts)
   }
   sce <- SingleCellExperiment(list(counts = counts))
+
+  # set metadata fields
+  metadata(sce)$pipeline <- "alevin"
+  metadata(sce)$salmon_version <- cmd_info$salmon_version
   return(sce)
 }
 
