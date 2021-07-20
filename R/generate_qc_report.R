@@ -2,7 +2,7 @@
 #'
 #' @param sce A SingleCellExperiment object that the report will describe
 #' @param sample_name The name of the sample
-#' @param outfile The output file path that will be created.
+#' @param output The output file path that will be created.
 #'   If the file name does not include an extension, ".html" will be added automatically.
 #'   Any directories in the path will be created as needed.
 #'
