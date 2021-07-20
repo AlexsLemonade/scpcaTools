@@ -8,8 +8,8 @@
 #'
 #' @return A SingleCellExperiment object.
 #'
-#' @import stats
-#' @import utils
+#' @importFrom stats rexp rpois
+#' @importFrom utils head
 #'
 #' @examples
 #' \dontrun{
