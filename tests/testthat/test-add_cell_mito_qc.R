@@ -1,26 +1,9 @@
 # create a SCE with random data
 set.seed(1665)
-ncells <- 100
-# generate barcodes
-cell_barcodes <- replicate(
-  ncells + 10, # account for (rare, but possible) duplicates
-  paste0(sample(c("A","T","G","C"), 10, replace = TRUE), collapse = '')
-) %>%
-  unique() %>%
-  head(ncells)
-
-# gene names
-genes <- sprintf("GENE%04d", 1:200)
-
-# random counts matrix
-counts <- matrix(rpois(ncells * length(genes), 2),
-                 ncol = ncells,
-                 dimnames = list(genes, cell_barcodes))
-
-sce <- SingleCellExperiment(list(counts = counts))
+sce <- sim_sce(n_cells = 100, n_genes = 200, n_empty = 0)
 
 test_that("Check QC addition", {
-  mito <- c(genes[1:10], "GENE9999") # include a gene that is not in the sce
+  mito <- c(rownames(sce)[1:10], "ZZZZZZ") # include a gene that is not in the sce
   sce <- add_cell_mito_qc(sce, mito = mito)
   expected_cols <- c("sum", "detected", "total",
                      "mito_sum","mito_detected", "mito_percent")
