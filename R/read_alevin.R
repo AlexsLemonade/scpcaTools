@@ -59,7 +59,7 @@ read_alevin <- function(quant_dir,
 
   } else {
     # use tximport for all non-usa mode
-    alevin_files <- c("quants_mat_cols.txt", "quants_mat_rows.txt", "quants_mat.gz", "alevin.log")
+    alevin_files <- c("quants_mat_cols.txt", "quants_mat_rows.txt", "quants_mat.gz")
 
     # check that all files exist in quant directory
     if(!dir.exists(file.path(quant_dir, "alevin"))){
@@ -76,7 +76,7 @@ read_alevin <- function(quant_dir,
       stop("Missing cmd_info.json in Alevin output directory")
     }
 
-    txi <- tximport::tximport(file.path(quant_dir, "alevin", "quants_mat.gz"), type = "alevin")
+    txi <- suppressMessages(tximport::tximport(file.path(quant_dir, "alevin", "quants_mat.gz"), type = "alevin"))
     counts <- txi$counts
 
     # collapse intron counts for intron_mode = TRUE
@@ -99,11 +99,10 @@ read_alevin <- function(quant_dir,
 #'
 read_usa_mode <- function(quant_dir,
                           which_counts = c("spliced", "unspliced")){
-
   which_counts <- match.arg(which_counts)
 
   # check that all files exist in quant_dir
-  alevin_files <- c("quants_mat_cols.txt", "quants_mat_rows.txt", "quants_mat.mtx", "alevin.log")
+  alevin_files <- c("quants_mat_cols.txt", "quants_mat_rows.txt", "quants_mat.mtx")
 
   # check that all files exist in quant directory
   if(!dir.exists(file.path(quant_dir, "alevin"))){
@@ -131,10 +130,8 @@ read_usa_mode <- function(quant_dir,
   mtx <- Matrix::readMM(file = file.path(quant_dir, "alevin", "quants_mat.mtx"))%>%
     Matrix::t() %>%
     as("dgCMatrix")
-  cols <- scan(file = file.path(quant_dir, "alevin", "quants_mat_cols.txt"),
-               what = "character")
-  rows <- scan(file = file.path(quant_dir, "alevin", "quants_mat_rows.txt"),
-               what = "character")
+  cols <- readLines(file.path(quant_dir, "alevin", "quants_mat_cols.txt"))
+  rows <- readLines(file.path(quant_dir, "alevin", "quants_mat_rows.txt"))
   dimnames(mtx) <- list(cols, rows)
 
   counts <- collapse_intron_counts(mtx, which_counts)

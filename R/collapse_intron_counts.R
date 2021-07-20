@@ -55,5 +55,7 @@ collapse_intron_counts <- function(counts,
   genes <- str_remove(rownames(counts), "-[IUA]$")
   # aggregate Matrix counts by gene name
   counts <- Matrix.utils::aggregate.Matrix(counts, genes)
+  # drop extra slots silently
+  counts <- suppressWarnings(BiocGenerics::updateObject(counts))
   return(counts)
 }

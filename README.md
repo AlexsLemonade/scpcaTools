@@ -11,7 +11,6 @@ Counts matrices from either of these pre-processing tools can be imported into R
 
 Currently, the `import_quant_data` function can support single-nuclei RNA seq counts data that has been aligned to a pre-mRNA index by using the `intron_mode=TRUE` and `which_counts=intron` options. There is also support to import data processed using Alevin-fry's USA mode by using the `usa_mode=TRUE` option. 
 
-
 ## Installation 
 
 The package can be installed from github with:
@@ -19,3 +18,9 @@ The package can be installed from github with:
 ```r
 remotes::install_github("AlexsLemonade/scpcaTools")
 ```
+
+
+## Testing
+
+To test the import functions in this package, you must also have installed the [`scpcaData` package](https://github.com/AlexsLemonade/scpcaData).
+This can be done by running `remotes::install_github("AlexsLemonade/scpcaData")`
