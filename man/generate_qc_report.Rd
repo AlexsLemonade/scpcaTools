@@ -11,12 +11,12 @@ generate_qc_report(sce, sample_name, output = NULL)
 
 \item{sample_name}{The name of the sample}
 
-\item{outfile}{The output file path that will be created.
+\item{output}{The output file path that will be created.
 If the file name does not include an extension, ".html" will be added automatically.
 Any directories in the path will be created as needed.}
 }
 \value{
-The path of the output file
+The full path of the output file
 }
 \description{
 Generate a QC report from a SingleCellExperiment object
@@ -25,4 +25,5 @@ Generate a QC report from a SingleCellExperiment object
 \dontrun{
 generate_qc_report(my_sce, "Sample 1", output = "reports/sample1_report.html")
 }
+
 }
