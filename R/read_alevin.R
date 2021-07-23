@@ -61,15 +61,6 @@ read_alevin <- function(quant_dir,
     stop("Missing alevin directory with output files")
   }
 
-  # check for cmd_info
-  cmd_info_file <- file.path(quant_dir, "cmd_info.json")
-  if(!file.exists(cmd_info_file)){
-    stop("Missing cmd_info.json in Alevin output directory")
-  } else {
-    cmd_info <- jsonlite::read_json(cmd_info_file)
-  }
-  salmon_version <- cmd_info$salmon_version
-
   if(usa_mode) {
     # read in counts using read_usa mode
     counts <- read_usa_mode(quant_dir)
@@ -159,3 +150,38 @@ read_tximport <- function(quant_dir){
   ))
   counts <- txi$counts
 }
+
+read_alevin_metadata <- function(quant_dir){
+  # check for cmd_info for salmon alevin version
+  cmd_info_file <- file.path(quant_dir, "cmd_info.json")
+  if(file.exists(cmd_info_file)){
+    salmon_info <- jsonlite::read_json(cmd_info_file)
+  } else {
+    warning("Missing cmd_info.json in Alevin output directory.")
+    salmon_info <- list(salmon_version = NA)
+  }
+  salmon_version <- salmon_info$salmon_version
+
+  # get alevin-fry info from quant.json
+  af_quant_file <- file.path(quant_dir, "quant.json")
+  # version < 0.4.1 use meta_info.json
+  af_meta_file <- file.path(quant_dir, "meta_info.json")
+  if(file.exists(af_quant_file)){
+    af_info <- jsonlite::read_json(af_quant_file)  
+  } else if(file.exists(af_meta_file)){
+    af_info <- jsonlite::read_json(af_meta_file)
+  } else {
+    warning("Missing quant.json and meta_info.json in alevin-fry output directory.")
+    af_info <- list(version_str = NA)
+  }
+
+  af_permit_file <- file.path(quant_dir, "generate_permit_list.json")
+  if(file.exists(af_permit_file)){
+    af_info <- c(af_info, jsonlite::read_json(af_permit_file))
+  } else {
+    warning("Missing generate_permit_list.json in alevin-fry output directory.")
+  }
+
+
+}
+
