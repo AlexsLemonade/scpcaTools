@@ -115,14 +115,18 @@ read_usa_mode <- function(quant_dir,
     stop(paste0("Missing Alevin output file(s): ", missing_files))
   }
 
-  meta_json_path <- file.path(quant_dir, "meta_info.json")
-  if(!file.exists(meta_json_path)){
-    stop("Missing meta_info.json in Alevin output directory")
+  quant_json_path <- file.path(quant_dir, "quant.json")
+  if(!file.exists(quant_json_path)){
+    # file for alevin-fry < 0.4.1
+    quant_json_path <- file.path(quant_dir, "meta_info.json")
+    if(!file.exists(quant_json_path)){
+      stop("Missing quant.json (or meta_info.json) in Alevin output directory")
+    }
   }
 
   # check that USA mode is true in JSON file
-  meta_json <- jsonlite::fromJSON(meta_json_path)
-  if(meta_json$usa_mode != "TRUE"){
+  quant_json <- jsonlite::fromJSON(quant_json_path)
+  if(quant_json$usa_mode != "TRUE"){
     stop("Output files not in USA mode")
   }
 
