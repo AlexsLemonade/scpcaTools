@@ -125,8 +125,8 @@ read_usa_mode <- function(quant_dir,
   }
 
   # check that USA mode is true in JSON file
-  quant_json <- jsonlite::read_json(quant_json_path)
-  if(!quant_json$usa_mode){
+  quant_json <- jsonlite::fromJSON(quant_json_path)
+  if(quant_json$usa_mode != "TRUE"){
     stop("Output files not in USA mode")
   }
 
