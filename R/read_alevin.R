@@ -86,7 +86,7 @@ read_alevin <- function(quant_dir,
 
 #' Read in counts data processed with Alevin-fry in with mtx output.
 #'
-#' @param quant_dir Path to directory where output files are located.
+#' @param quant_dir Path to alevin output directory.
 #'
 #' @return unfiltered and uncollapsed gene x cell counts matrix
 #'
@@ -118,7 +118,7 @@ read_alevin_mtx <- function(quant_dir){
 
 #' Read in counts data processed with Alevin or alevin-fry in tximport-compatible formats
 #'
-#' @param quant_dir Path to directory where output files are located.
+#' @param quant_dir Path to alevin output directory.
 #'
 #' @return unfiltered & uncollapsed gene x cell counts matrix
 #'
@@ -143,8 +143,7 @@ read_tximport <- function(quant_dir){
 
 #' Read alevin metadata from json files
 #'
-#' @param quant_dir Path alevin output directory
-#' @param transcript_type A string indicating output types
+#' @param quant_dir Path alevin output directory.
 #'
 #' @return A list containing alevin run metadata,
 #'   with NULL values for missing elements.

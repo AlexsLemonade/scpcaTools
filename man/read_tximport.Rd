@@ -7,7 +7,7 @@
 read_tximport(quant_dir)
 }
 \arguments{
-\item{quant_dir}{Path to directory where output files are located.}
+\item{quant_dir}{Path to alevin output directory.}
 }
 \value{
 unfiltered & uncollapsed gene x cell counts matrix
