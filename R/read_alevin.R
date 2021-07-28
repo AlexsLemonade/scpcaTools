@@ -62,7 +62,7 @@ read_alevin <- function(quant_dir,
   }
 
   # read metadata
-  meta <- read_alevin_metadata(quant_dir, which_counts)
+  meta <- read_alevin_metadata(quant_dir)
 
   # Read the count data
   if(usa_mode) {
