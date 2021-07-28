@@ -15,6 +15,8 @@ test_that("reading salmon alevin data works", {
   # check that column names are barcodes
   col_barcode <- str_detect(colnames(sce), "^[ACGT]+$")
   expect_true(all(col_barcode))
+  expect_equal(sce@metadata$mapping_tool, "alevin")
+  expect_null(sce@metadata$alevin_fry_version)
 })
 
 test_that("reading alevin-fry USA mode works", {
@@ -45,6 +47,10 @@ test_that("reading alevin-fry intron mode works", {
   # check that column names are barcodes
   col_barcode <- stringr::str_detect(colnames(sce), "^[ACGT]+$")
   expect_true(all(col_barcode))
+  # check metadata
+  expect_equal(sce@metadata$mapping_tool, "alevin-fry")
+  expect_equal(sce@metadata$transcript_type, "unspliced")
+
   # no remaining unspliced
   unmerged_genes <- str_subset(rownames(sce), "-[IUA]$")
   expect_length(unmerged_genes, 0)
