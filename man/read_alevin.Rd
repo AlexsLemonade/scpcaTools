@@ -17,7 +17,7 @@ read_alevin(
 \item{intron_mode}{Logical indicating if the files included alignment to intronic regions.
 Default is FALSE.}
 
-\item{usa_mode}{Logical indicating if Alevin-fry was used, if the USA mode was invoked.
+\item{usa_mode}{Logical indicating if Alevin-fry was used, if USA mode was invoked.
 Default is FALSE.}
 
 \item{which_counts}{Which type of counts should be included,
