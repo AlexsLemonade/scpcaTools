@@ -61,8 +61,7 @@ read_alevin <- function(quant_dir,
     stop("Missing alevin directory with output files")
   }
 
-  # read in alevin metadata
-
+  # Read in alevin metadata
   cmd_info_path <- file.path(quant_dir, "cmd_info.json")
   permit_json_path <- file.path(quant_dir, "generate_permit_list.json")
   collate_json_path <- file.path(quant_dir, "collate.json")
@@ -97,37 +96,38 @@ read_alevin <- function(quant_dir,
   }
 
   # Create a metadata list
-  metadata <- list(salmon_version = cmd_info$salmon_version)
+  metadata <- list(salmon_version = cmd_info[['salmon_version']],
+                   reference_index = cmd_info[['index']],
+                   transcript_type = which_counts)
 
   # if we have permit_info data, we used alevin-fry, otherwise alevin
-  if (length(permit_info)) == 0){
-    metadata$pipeline <- "alevin"
+  if (length(permit_info) == 0){
+    metadata$mapping_tool <- "alevin"
   } else {
-    metadata$pipeline <- "alevin-fry"
-    # permit_info has had a version string since at least 0.3.0,
-    # but other json files added it late.
-    # We will assume that that version applies to all alevin-fry steps
-    metadata$alevin_fry_version <- permit_info$version_str
-
+    metadata$mapping_tool <- "alevin-fry"
   }
 
+  # Add other metadata
+  # assume all alevin-fry tool versions are the same
+  metadata$alevinfry_version <- permit_info[['version_str']]
+  metadata$af_permit_type <- permit_info[['permit-list-type']]
+  metadata$af_resolution <- quant_info[['resolution_strategy']]
+
+
+  # Read the count data
   if(usa_mode) {
     # read in counts using read_usa mode
     counts <- read_usa_mode(quant_dir)
-    metadata$usa_mode <-
   } else {
     counts <- read_tximport(quant_dir)
   }
-
   if (intron_mode | usa_mode) {
     counts <- collapse_intron_counts(counts, which_counts)
-    metadata$which_counts <- which_counts
   }
-  sce <- SingleCellExperiment(list(counts = counts))
 
-  # set metadata fields
-  metadata(sce)$pipeline <- "alevin"
-  metadata(sce)$salmon_version <- cmd_info$salmon_version
+  # make the SCE object
+  sce <- SingleCellExperiment(assays = list(counts = counts),
+                              metadata = metadata)
   return(sce)
 }
 
