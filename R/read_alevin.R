@@ -61,62 +61,12 @@ read_alevin <- function(quant_dir,
     stop("Missing alevin directory with output files")
   }
 
-  # Read in alevin metadata
-  cmd_info_path <- file.path(quant_dir, "cmd_info.json")
-  permit_json_path <- file.path(quant_dir, "generate_permit_list.json")
-  collate_json_path <- file.path(quant_dir, "collate.json")
-  quant_json_path <- file.path(quant_dir, "quant.json")
-  if(!file.exists(quant_json_path)){
-    # file for alevin-fry < 0.4.1
-    quant_json_path <- file.path(quant_dir, "meta_info.json")
-  }
-
-  # get cmd_info, which should always be present
-  if (file.exists(cmd_info_path)){
-    cmd_info <- jsonlite::read_json(cmd_info_path)
-  } else {
-    stop("cmd_info.json is missing")
-  }
-
-  # Read other info files if they exist. Otherwise, create dummy values
-  if (file.exists(permit_json_path)){
-    permit_info <- jsonlite::read_json(permit_json_path)
-  } else {
-    permit_info <- list()
-  }
-  if (file.exists(quant_json_path)){
-    collate_info <- jsonlite::read_json(collate_json_path)
-  } else {
-    collate_info <- list()
-  }
-  if (file.exists(quant_json_path)){
-    quant_info <- jsonlite::read_json(quant_json_path)
-  } else {
-    quant_info <- list()
-  }
-
-  # Create a metadata list
-  metadata <- list(salmon_version = cmd_info[['salmon_version']],
-                   reference_index = cmd_info[['index']],
-                   transcript_type = which_counts)
-
-  # if we have permit_info data, we used alevin-fry, otherwise alevin
-  if (length(permit_info) == 0){
-    metadata$mapping_tool <- "alevin"
-  } else {
-    metadata$mapping_tool <- "alevin-fry"
-  }
-
-  # Add other metadata
-  # assume all alevin-fry tool versions are the same
-  metadata$alevinfry_version <- permit_info[['version_str']]
-  metadata$af_permit_type <- permit_info[['permit-list-type']]
-  metadata$af_resolution <- quant_info[['resolution_strategy']]
-
+  # read metadata
+  meta <- read_alevin_metadata(quant_dir, which_counts)
 
   # Read the count data
   if(usa_mode) {
-    if(quant_info$usa_mode != TRUE){
+    if(meta$usa_mode != TRUE){
       stop("Output files not in USA mode")
     }
     counts <- read_alevin_mtx(quant_dir)
@@ -129,7 +79,7 @@ read_alevin <- function(quant_dir,
 
   # make the SCE object
   sce <- SingleCellExperiment(assays = list(counts = counts),
-                              metadata = metadata)
+                              metadata = meta)
   return(sce)
 }
 
@@ -190,37 +140,68 @@ read_tximport <- function(quant_dir){
   counts <- txi$counts
 }
 
-read_alevin_metadata <- function(quant_dir){
-  # check for cmd_info for salmon alevin version
-  cmd_info_file <- file.path(quant_dir, "cmd_info.json")
-  if(file.exists(cmd_info_file)){
-    salmon_info <- jsonlite::read_json(cmd_info_file)
-  } else {
-    warning("Missing cmd_info.json in Alevin output directory.")
-    salmon_info <- list(salmon_version = NA)
-  }
-  salmon_version <- salmon_info$salmon_version
-
-  # get alevin-fry info from quant.json
-  af_quant_file <- file.path(quant_dir, "quant.json")
-  # version < 0.4.1 use meta_info.json
-  af_meta_file <- file.path(quant_dir, "meta_info.json")
-  if(file.exists(af_quant_file)){
-    af_info <- jsonlite::read_json(af_quant_file)
-  } else if(file.exists(af_meta_file)){
-    af_info <- jsonlite::read_json(af_meta_file)
-  } else {
-    warning("Missing quant.json and meta_info.json in alevin-fry output directory.")
-    af_info <- list(version_str = NA)
+#' Read alevin metadata from json files
+#'
+#' @param quant_dir Path alevin output directory
+#' @param transcript_type A string indicating output types
+#'
+#' @return A list containing alevin run metadata,
+#'   with NULL values for missing elements.
+#'
+#' @noRd
+read_alevin_metadata <- function(quant_dir, transcript_type){
+  cmd_info_path <- file.path(quant_dir, "cmd_info.json")
+  permit_json_path <- file.path(quant_dir, "generate_permit_list.json")
+  collate_json_path <- file.path(quant_dir, "collate.json")
+  quant_json_path <- file.path(quant_dir, "quant.json")
+  if(!file.exists(quant_json_path)){
+    # file for alevin-fry < 0.4.1
+    quant_json_path <- file.path(quant_dir, "meta_info.json")
   }
 
-  af_permit_file <- file.path(quant_dir, "generate_permit_list.json")
-  if(file.exists(af_permit_file)){
-    af_info <- c(af_info, jsonlite::read_json(af_permit_file))
+  # get cmd_info, which should always be present
+  if (file.exists(cmd_info_path)){
+    cmd_info <- jsonlite::read_json(cmd_info_path)
   } else {
-    warning("Missing generate_permit_list.json in alevin-fry output directory.")
+    stop("cmd_info.json is missing")
   }
 
+  # Read other info files if they exist. Otherwise, create dummy values
+  if (file.exists(permit_json_path)){
+    permit_info <- jsonlite::read_json(permit_json_path)
+  } else {
+    permit_info <- list()
+  }
+  if (file.exists(quant_json_path)){
+    collate_info <- jsonlite::read_json(collate_json_path)
+  } else {
+    collate_info <- list()
+  }
+  if (file.exists(quant_json_path)){
+    quant_info <- jsonlite::read_json(quant_json_path)
+  } else {
+    quant_info <- list()
+  }
 
+  # Create a metadata list
+  meta <- list(salmon_version = cmd_info[['salmon_version']],
+               reference_index = cmd_info[['index']],
+               transcript_type = transcript_type)
+
+  # if we have permit_info data, we used alevin-fry, otherwise alevin
+  if (length(permit_info) == 0){
+    meta$mapping_tool <- "alevin"
+  } else {
+    meta$mapping_tool <- "alevin-fry"
+  }
+
+  # Add other metadata
+  # assume all alevin-fry tool versions are the same
+  meta$alevinfry_version <- permit_info[['version_str']]
+  meta$af_permit_type <- permit_info[['permit-list-type']]
+  meta$af_resolution <- quant_info[['resolution_strategy']]
+  meta$usa_mode <- quant_info[['usa_mode']]
+
+  return(meta)
 }
 
