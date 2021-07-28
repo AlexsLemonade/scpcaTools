@@ -75,6 +75,7 @@ read_alevin <- function(quant_dir,
   }
   if (intron_mode | usa_mode) {
     counts <- collapse_intron_counts(counts, which_counts)
+    meta$transcript_type <- which_counts
   }
 
   # make the SCE object
@@ -149,7 +150,7 @@ read_tximport <- function(quant_dir){
 #'   with NULL values for missing elements.
 #'
 #' @noRd
-read_alevin_metadata <- function(quant_dir, transcript_type){
+read_alevin_metadata <- function(quant_dir){
   cmd_info_path <- file.path(quant_dir, "cmd_info.json")
   permit_json_path <- file.path(quant_dir, "generate_permit_list.json")
   collate_json_path <- file.path(quant_dir, "collate.json")
@@ -185,8 +186,7 @@ read_alevin_metadata <- function(quant_dir, transcript_type){
 
   # Create a metadata list
   meta <- list(salmon_version = cmd_info[['salmon_version']],
-               reference_index = cmd_info[['index']],
-               transcript_type = transcript_type)
+               reference_index = cmd_info[['index']])
 
   # if we have permit_info data, we used alevin-fry, otherwise alevin
   if (length(permit_info) == 0){
