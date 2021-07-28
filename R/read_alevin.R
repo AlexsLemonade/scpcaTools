@@ -116,8 +116,10 @@ read_alevin <- function(quant_dir,
 
   # Read the count data
   if(usa_mode) {
-    # read in counts using read_usa mode
-    counts <- read_usa_mode(quant_dir)
+    if(is.logical(quant_info$usa_mode) & !quant_info$usa_mode){
+      stop("Output files not in USA mode")
+    }
+    counts <- read_alevin_mtx(quant_dir)
   } else {
     counts <- read_tximport(quant_dir)
   }
@@ -131,13 +133,13 @@ read_alevin <- function(quant_dir,
   return(sce)
 }
 
-#' Read in counts data processed with Alevin-fry in USA mode
+#' Read in counts data processed with Alevin-fry in with mtx output.
 #'
 #' @param quant_dir Path to directory where output files are located.
 #'
 #' @return unfiltered and uncollapsed gene x cell counts matrix
 #'
-read_usa_mode <- function(quant_dir){
+read_alevin_mtx <- function(quant_dir){
 
   # check that all files exist in quant_dir
   alevin_files <- c("quants_mat_cols.txt", "quants_mat_rows.txt", "quants_mat.mtx")
