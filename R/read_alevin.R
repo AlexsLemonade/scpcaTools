@@ -3,7 +3,7 @@
 #' @param quant_dir Path to directory where output files are located.
 #' @param intron_mode Logical indicating if the files included alignment to intronic regions.
 #'   Default is FALSE.
-#' @param usa_mode Logical indicating if Alevin-fry was used, if the USA mode was invoked.
+#' @param usa_mode Logical indicating if Alevin-fry was used, if USA mode was invoked.
 #'   Default is FALSE.
 #' @param which_counts Which type of counts should be included,
 #'   only counts aligned to spliced cDNA ("spliced") or all spliced and unspliced cDNA ("unspliced").
@@ -12,6 +12,9 @@
 #'
 #' @return SingleCellExperiment of unfiltered gene x cell counts matrix.
 #' @export
+#'
+#' @import SingleCellExperiment
+#' @import SummarizedExperiment
 #'
 #' @examples
 #' \dontrun{
@@ -53,53 +56,41 @@ read_alevin <- function(quant_dir,
     stop("Can only read counts using either usa mode or intron mode.")
   }
 
-  if(usa_mode) {
-    # read in counts using read_usa mode
-    counts <- read_usa_mode(quant_dir, which_counts)
-
-  } else {
-    # use tximport for all non-usa mode
-    alevin_files <- c("quants_mat_cols.txt", "quants_mat_rows.txt", "quants_mat.gz")
-
-    # check that all files exist in quant directory
-    if(!dir.exists(file.path(quant_dir, "alevin"))){
-      stop("Missing alevin directory with output files")
-    }
-
-    missing <- !file.exists(file.path(quant_dir, "alevin", alevin_files))
-    if(any(missing)) {
-      missing_files <- paste(alevin_files[missing], collapse = ", ")
-      stop(paste0("Missing Alevin output file(s): ", missing_files))
-    }
-
-    if(!file.exists(file.path(quant_dir, "cmd_info.json"))){
-      stop("Missing cmd_info.json in Alevin output directory")
-    }
-
-    txi <- suppressMessages(tximport::tximport(file.path(quant_dir, "alevin", "quants_mat.gz"), type = "alevin"))
-    counts <- txi$counts
-
-    # collapse intron counts for intron_mode = TRUE
-    if (intron_mode) {
-      counts <- collapse_intron_counts(counts, which_counts)
-    }
+  # check that the expected quant directory exists
+  if(!dir.exists(file.path(quant_dir, "alevin"))){
+    stop("Missing alevin directory with output files")
   }
-  sce <- SingleCellExperiment(list(counts = counts))
+
+  # read metadata
+  meta <- read_alevin_metadata(quant_dir)
+
+  # Read the count data
+  if(usa_mode) {
+    if(meta$usa_mode != TRUE){
+      stop("Output files not in USA mode")
+    }
+    counts <- read_alevin_mtx(quant_dir)
+  } else {
+    counts <- read_tximport(quant_dir)
+  }
+  if (intron_mode | usa_mode) {
+    counts <- collapse_intron_counts(counts, which_counts)
+    meta$transcript_type <- which_counts
+  }
+
+  # make the SCE object
+  sce <- SingleCellExperiment(assays = list(counts = counts),
+                              metadata = meta)
   return(sce)
 }
 
-#' Read in counts data processed with Alevin-fry in USA mode
+#' Read in counts data processed with Alevin-fry in with mtx output.
 #'
-#' @param quant_dir Path to directory where output files are located.
-#' @param which_counts Which type of counts should be included,
-#'        only counts aligned to spliced cDNA ("spliced") or all spliced and unspliced cDNA ("unspliced").
-#'        Default is "spliced".
+#' @param quant_dir Path to alevin output directory.
 #'
-#' @return unfiltered gene x cell counts matrix
+#' @return unfiltered and uncollapsed gene x cell counts matrix
 #'
-read_usa_mode <- function(quant_dir,
-                          which_counts = c("spliced", "unspliced")){
-  which_counts <- match.arg(which_counts)
+read_alevin_mtx <- function(quant_dir){
 
   # check that all files exist in quant_dir
   alevin_files <- c("quants_mat_cols.txt", "quants_mat_rows.txt", "quants_mat.mtx")
@@ -115,29 +106,100 @@ read_usa_mode <- function(quant_dir,
     stop(paste0("Missing Alevin output file(s): ", missing_files))
   }
 
-  quant_json_path <- file.path(quant_dir, "quant.json")
-  if(!file.exists(quant_json_path)){
-    # file for alevin-fry < 0.4.1
-    quant_json_path <- file.path(quant_dir, "meta_info.json")
-    if(!file.exists(quant_json_path)){
-      stop("Missing quant.json (or meta_info.json) in Alevin output directory")
-    }
-  }
-
-  # check that USA mode is true in JSON file
-  quant_json <- jsonlite::fromJSON(quant_json_path)
-  if(quant_json$usa_mode != "TRUE"){
-    stop("Output files not in USA mode")
-  }
-
   # read in .mtx files
-  mtx <- Matrix::readMM(file = file.path(quant_dir, "alevin", "quants_mat.mtx"))%>%
+  counts <- Matrix::readMM(file = file.path(quant_dir, "alevin", "quants_mat.mtx"))%>%
     Matrix::t() %>%
     as("dgCMatrix")
   cols <- readLines(file.path(quant_dir, "alevin", "quants_mat_cols.txt"))
   rows <- readLines(file.path(quant_dir, "alevin", "quants_mat_rows.txt"))
-  dimnames(mtx) <- list(cols, rows)
-
-  counts <- collapse_intron_counts(mtx, which_counts)
+  dimnames(counts) <- list(cols, rows)
   return(counts)
 }
+
+#' Read in counts data processed with Alevin or alevin-fry in tximport-compatible formats
+#'
+#' @param quant_dir Path to alevin output directory.
+#'
+#' @return unfiltered & uncollapsed gene x cell counts matrix
+#'
+read_tximport <- function(quant_dir){
+
+  # check that all files exist in quant_dir
+  # use tximport for all non-usa mode
+  alevin_files <- c("quants_mat_cols.txt", "quants_mat_rows.txt", "quants_mat.gz")
+
+  missing <- !file.exists(file.path(quant_dir, "alevin", alevin_files))
+  if(any(missing)) {
+    missing_files <- paste(alevin_files[missing], collapse = ", ")
+    stop(paste0("Missing Alevin output file(s): ", missing_files))
+  }
+
+  txi <- suppressMessages(tximport::tximport(
+    file.path(quant_dir, "alevin", "quants_mat.gz"),
+    type = "alevin"
+  ))
+  counts <- txi$counts
+}
+
+#' Read alevin metadata from json files
+#'
+#' @param quant_dir Path alevin output directory.
+#'
+#' @return A list containing alevin run metadata,
+#'   with NULL values for missing elements.
+#'
+#' @noRd
+read_alevin_metadata <- function(quant_dir){
+  cmd_info_path <- file.path(quant_dir, "cmd_info.json")
+  permit_json_path <- file.path(quant_dir, "generate_permit_list.json")
+  # Unused file, but leaving for future reference
+  # collate_json_path <- file.path(quant_dir, "collate.json")
+  quant_json_path <- file.path(quant_dir, "quant.json")
+  if(!file.exists(quant_json_path)){
+    # file for alevin-fry < 0.4.1
+    quant_json_path <- file.path(quant_dir, "meta_info.json")
+  }
+
+  # get cmd_info, which should always be present
+  if (file.exists(cmd_info_path)){
+    cmd_info <- jsonlite::read_json(cmd_info_path)
+  } else {
+    stop("cmd_info.json is missing")
+  }
+
+  # Read other info files if they exist. Otherwise, create dummy values
+  if (file.exists(permit_json_path)){
+    permit_info <- jsonlite::read_json(permit_json_path)
+  } else {
+    permit_info <- list()
+  }
+  if (file.exists(quant_json_path)){
+    quant_info <- jsonlite::read_json(quant_json_path)
+  } else {
+    quant_info <- list()
+  }
+
+  # Create a metadata list
+  meta <- list(salmon_version = cmd_info$salmon_version,
+               reference_index = cmd_info[['index']])
+  # using $ notation  for `salmon_version` to get partial matching due to salmon 1.5.2 bug
+  # see https://github.com/COMBINE-lab/salmon/issues/691
+
+  # if we have permit_info data, we used alevin-fry, otherwise alevin
+  if (length(permit_info) == 0){
+    meta$mapping_tool <- "alevin"
+  } else {
+    meta$mapping_tool <- "alevin-fry"
+  }
+
+  # Add other metadata
+  # assume all alevin-fry tool versions are the same
+  meta$alevinfry_version <- permit_info[['version_str']]
+  meta$af_permit_type <- permit_info[['permit-list-type']]
+  meta$af_resolution <- quant_info[['resolution_strategy']]
+  meta$af_tx2gene <- cmd_info[['tgMap']]
+  meta$usa_mode <- quant_info[['usa_mode']]
+
+  return(meta)
+}
+

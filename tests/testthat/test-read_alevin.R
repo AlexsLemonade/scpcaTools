@@ -15,17 +15,29 @@ test_that("reading salmon alevin data works", {
   # check that column names are barcodes
   col_barcode <- str_detect(colnames(sce), "^[ACGT]+$")
   expect_true(all(col_barcode))
+  expect_equal(sce@metadata$mapping_tool, "alevin")
+  expect_false(is.null(sce@metadata$salmon_version))
+  expect_false(is.null(sce@metadata$reference_index))
+  expect_null(sce@metadata$alevinfry_version)
+
 })
 
 test_that("reading alevin-fry USA mode works", {
   sce <- read_alevin(usa_dir,
                      usa_mode = TRUE,
-                    which_counts = "spliced")
+                     which_counts = "spliced")
   expect_s4_class(sce, "SingleCellExperiment")
   expect_equal(dim(sce), sce_af_size)
   # check that column names are barcodes
   col_barcode <- str_detect(colnames(sce), "^[ACGT]+$")
   expect_true(all(col_barcode))
+  # check metadata
+  expect_equal(sce@metadata$mapping_tool, "alevin-fry")
+  expect_equal(sce@metadata$transcript_type, "spliced")
+  expect_false(is.null(sce@metadata$salmon_version))
+  expect_false(is.null(sce@metadata$reference_index))
+  expect_false(is.null(sce@metadata$alevinfry_version))
+
   # no remaining unspliced
   unmerged_genes <- str_subset(rownames(sce), "-[IUA]$")
   expect_length(unmerged_genes, 0)
@@ -41,6 +53,13 @@ test_that("reading alevin-fry intron mode works", {
   # check that column names are barcodes
   col_barcode <- stringr::str_detect(colnames(sce), "^[ACGT]+$")
   expect_true(all(col_barcode))
+  # check metadata
+  expect_equal(sce@metadata$mapping_tool, "alevin-fry")
+  expect_equal(sce@metadata$transcript_type, "unspliced")
+  expect_false(is.null(sce@metadata$salmon_version))
+  expect_false(is.null(sce@metadata$reference_index))
+  expect_false(is.null(sce@metadata$alevinfry_version))
+
   # no remaining unspliced
   unmerged_genes <- str_subset(rownames(sce), "-[IUA]$")
   expect_length(unmerged_genes, 0)
