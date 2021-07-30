@@ -16,7 +16,10 @@ test_that("reading salmon alevin data works", {
   col_barcode <- str_detect(colnames(sce), "^[ACGT]+$")
   expect_true(all(col_barcode))
   expect_equal(sce@metadata$mapping_tool, "alevin")
-  expect_null(sce@metadata$alevin_fry_version)
+  expect_false(is.null(sce@metadata$salmon_version))
+  expect_false(is.null(sce@metadata$reference_index))
+  expect_null(sce@metadata$alevinfry_version)
+
 })
 
 test_that("reading alevin-fry USA mode works", {
@@ -31,6 +34,9 @@ test_that("reading alevin-fry USA mode works", {
   # check metadata
   expect_equal(sce@metadata$mapping_tool, "alevin-fry")
   expect_equal(sce@metadata$transcript_type, "spliced")
+  expect_false(is.null(sce@metadata$salmon_version))
+  expect_false(is.null(sce@metadata$reference_index))
+  expect_false(is.null(sce@metadata$alevinfry_version))
 
   # no remaining unspliced
   unmerged_genes <- str_subset(rownames(sce), "-[IUA]$")
@@ -50,6 +56,9 @@ test_that("reading alevin-fry intron mode works", {
   # check metadata
   expect_equal(sce@metadata$mapping_tool, "alevin-fry")
   expect_equal(sce@metadata$transcript_type, "unspliced")
+  expect_false(is.null(sce@metadata$salmon_version))
+  expect_false(is.null(sce@metadata$reference_index))
+  expect_false(is.null(sce@metadata$alevinfry_version))
 
   # no remaining unspliced
   unmerged_genes <- str_subset(rownames(sce), "-[IUA]$")

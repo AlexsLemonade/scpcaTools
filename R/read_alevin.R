@@ -152,7 +152,8 @@ read_tximport <- function(quant_dir){
 read_alevin_metadata <- function(quant_dir){
   cmd_info_path <- file.path(quant_dir, "cmd_info.json")
   permit_json_path <- file.path(quant_dir, "generate_permit_list.json")
-  collate_json_path <- file.path(quant_dir, "collate.json")
+  # Unused file, but leaving for future reference
+  # collate_json_path <- file.path(quant_dir, "collate.json")
   quant_json_path <- file.path(quant_dir, "quant.json")
   if(!file.exists(quant_json_path)){
     # file for alevin-fry < 0.4.1
@@ -173,19 +174,16 @@ read_alevin_metadata <- function(quant_dir){
     permit_info <- list()
   }
   if (file.exists(quant_json_path)){
-    collate_info <- jsonlite::read_json(collate_json_path)
-  } else {
-    collate_info <- list()
-  }
-  if (file.exists(quant_json_path)){
     quant_info <- jsonlite::read_json(quant_json_path)
   } else {
     quant_info <- list()
   }
 
   # Create a metadata list
-  meta <- list(salmon_version = cmd_info[['salmon_version']],
+  meta <- list(salmon_version = cmd_info$salmon_version,
                reference_index = cmd_info[['index']])
+  # using $ notation  for `salmon_version` to get partial matching due to salmon 1.5.2 bug
+  # see https://github.com/COMBINE-lab/salmon/issues/691
 
   # if we have permit_info data, we used alevin-fry, otherwise alevin
   if (length(permit_info) == 0){
@@ -199,6 +197,7 @@ read_alevin_metadata <- function(quant_dir){
   meta$alevinfry_version <- permit_info[['version_str']]
   meta$af_permit_type <- permit_info[['permit-list-type']]
   meta$af_resolution <- quant_info[['resolution_strategy']]
+  meta$af_tx2gene <- cmd_info[['tgMap']]
   meta$usa_mode <- quant_info[['usa_mode']]
 
   return(meta)
