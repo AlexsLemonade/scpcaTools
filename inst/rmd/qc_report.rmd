@@ -24,6 +24,22 @@ library(SingleCellExperiment)
 
 This sample has `r ncol(params$sce)` cells, assayed for `r nrow(params$sce)` genes.
 
+```{r echo=FALSE}
+# extract sce metadata containing processing information as table
+processing_info <- sce@metadata %>%
+  as.data.frame() %>%
+  t() %>%
+  # remove any empty slots before making table
+  na.omit()
+
+# remove underscores from rownames for table 
+rownames(processing_info) = str_replace_all(rownames(processing_info), "_", " ")
+
+# make table with processing information
+knitr::kable(processing_info, "simple", caption = "Processing Information")
+```
+
+
 # Session Info
 ```{r session_info}
 sessioninfo::session_info()
