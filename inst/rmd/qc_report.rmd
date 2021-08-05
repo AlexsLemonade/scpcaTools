@@ -20,9 +20,7 @@ output:
 library(SingleCellExperiment)
 ```
 
-# `r params$sample` Experiment Information
-
-This sample has `r ncol(params$sce)` cells, assayed for `r nrow(params$sce)` genes.
+# Processing Information for `r params$sample`
 
 ```{r echo=FALSE}
 # extract sce metadata containing processing information as table
@@ -36,9 +34,11 @@ processing_info <- sce@metadata %>%
 rownames(processing_info) = str_replace_all(rownames(processing_info), "_", " ")
 
 # make table with processing information
-knitr::kable(processing_info, "simple", caption = "Processing Information")
+knitr::kable(processing_info, "simple")
 ```
+# `r params$sample` Experiment Summary 
 
+This sample has `r ncol(params$sce)` cells, assayed for `r nrow(params$sce)` genes.
 
 # Session Info
 ```{r session_info}
