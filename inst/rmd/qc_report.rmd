@@ -30,11 +30,15 @@ processing_info <- sce@metadata %>%
   # remove any empty slots before making table
   na.omit()
 
-# remove underscores from rownames for table 
-rownames(processing_info) = str_replace_all(rownames(processing_info), "_", " ")
+if(!is.null(processing_info)){
+  # remove underscores from rownames for table 
+  rownames(processing_info) = str_replace_all(rownames(processing_info), "_", " ")
 
-# make table with processing information
-knitr::kable(processing_info, "simple")
+  # make table with processing information
+  knitr::kable(processing_info, "simple")
+} else {
+  glue::glue("No processing information available for {params$sample}")
+}
 ```
 # `r params$sample` Experiment Summary 
 
