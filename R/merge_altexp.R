@@ -8,14 +8,21 @@
 #' @param sce a SingleCellExperiment object
 #' @param alt_exp a second SummarizedExperiment to add as an alternative experiment
 #'   Most likely, this will also be a SingleCellExperiment, but it does not have to be.
+#'   The AltExp in the output will be a SingleCellExperiment
 #' @param alt_name The name to use for the alternative experiment slot
 #'
-#' @return A SingleCellExperiment with an AltExp slot.
+#' @return A SingleCellExperiment with an AltExp slot containing another SingleCellExperiment.
 #' @export
 #'
 #' @import SingleCellExperiment
 #'
-merge_altexp <- function(sce, alt_exp, alt_name ){
+merge_altexp <- function(sce, alt_exp, alt_name){
+  if(!is(sce, "SingleCellExperiment")){
+    stop("sce must be a SingleCellExperiment object")
+  }
+  if(!is(alt_exp, "SummarizedExperiment")){
+    stop("alt_exp must be a SummarizedExperiment (or SingleCellExperiment) object")
+  }
   sce_cells <- colnames(sce)
   alt_cells <- colnames(alt_exp)
   alt_rows <- rownames(alt_exp)
