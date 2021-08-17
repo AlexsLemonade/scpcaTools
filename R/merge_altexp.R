@@ -15,7 +15,7 @@
 #' @export
 #'
 #' @import SingleCellExperiment
-#' @import SummarizedExperiment
+#' @importFrom S4Vectors metadata
 #'
 merge_altexp <- function(sce, alt_exp, alt_name){
   if(!is(sce, "SingleCellExperiment")){
@@ -37,6 +37,6 @@ merge_altexp <- function(sce, alt_exp, alt_name){
   # sort to original order (dropping alt-only cells)
   alt_counts_all <- alt_counts_all[, sce_cells]
   altExp(sce, alt_name) <- SingleCellExperiment(assays = list(counts = alt_counts_all),
-                                                metadata = alt_exp@metadata)
+                                                metadata = metadata(alt_exp))
   return(sce)
 }

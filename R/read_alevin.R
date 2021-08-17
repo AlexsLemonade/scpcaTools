@@ -48,8 +48,8 @@ read_alevin <- function(quant_dir,
   which_counts <- match.arg(which_counts)
 
   # checks for *_mode
-  if(!is.logical(mtx_mode)){
-    stop("mtx_mode must be set as TRUE or FALSE")
+  if(!is.logical(mtx_format)){
+    stop("mtx_format must be set as TRUE or FALSE")
   }
   if(!is.logical(intron_mode)){
     stop("intron_mode must be set as TRUE or FALSE")
