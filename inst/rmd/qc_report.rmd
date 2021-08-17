@@ -24,15 +24,25 @@ library(SingleCellExperiment)
 
 ```{r echo=FALSE}
 # extract sce metadata containing processing information as table
-processing_info <- sce@metadata %>%
-  as.data.frame() %>%
+metadata_list <- metadata(params$sce) 
+
+processing_info <- data.frame(
+  "Salmon Version" = metadata_list$salmon_version,
+  "Alevin-fry Version" = metadata_list$alevinfry_version,
+  "Index" = metadata_list$reference_index,
+  "Filtering Method" = metadata_list$af_permit_type,
+  "Resolution" = metadata_list$af_resolution, 
+  "Unspliced transcripts included" = metadata_list$transcript_type
+) %>% 
+  dplyr::mutate(Unspliced.transcripts.included = dplyr::case_when(Unspliced.transcripts.included == "spliced" ~ FALSE,
+                                 Unspliced.transcripts.included == "unspliced" ~ TRUE)) %>%
   t() %>%
   # remove any empty slots before making table
   na.omit()
 
 if(!is.null(processing_info)){
   # remove underscores from rownames for table 
-  rownames(processing_info) = str_replace_all(rownames(processing_info), "_", " ")
+  rownames(processing_info) = str_replace_all(rownames(processing_info), "\\.", " ")
 
   # make table with processing information
   knitr::kable(processing_info, "simple")
@@ -40,6 +50,31 @@ if(!is.null(processing_info)){
   glue::glue("No processing information available for {params$sample}")
 }
 ```
+
+
+```{r echo=FALSE}
+sample_information <- data.frame(
+  "Sample ID" = params$sample,
+  "Version 10X" = metadata_list$version_10X,
+  "Number of Reads" = metadata_list$total_reads,
+  "Number of Mapped Reads" = metadata_list$mapped_reads,
+  "Number of Cells Reported by Alevin-fry" = metadata_list$num_cells
+) %>%
+  t() %>%
+  # remove any empty slots before making table
+  na.omit()
+
+if(!is.null(sample_information)){
+  # remove underscores from rownames for table 
+  rownames(sample_information) = str_replace_all(rownames(sample_information), "\\.", " ")
+
+  # make table with processing information
+  knitr::kable(sample_information, "simple")
+} else {
+  glue::glue("No sample information available for {params$sample}")
+}
+```
+
 # `r params$sample` Experiment Summary 
 
 This sample has `r ncol(params$sce)` cells, assayed for `r nrow(params$sce)` genes.
