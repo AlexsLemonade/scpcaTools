@@ -155,16 +155,23 @@ read_alevin_metadata <- function(quant_dir){
   # Unused file, but leaving for future reference
   # collate_json_path <- file.path(quant_dir, "collate.json")
   quant_json_path <- file.path(quant_dir, "quant.json")
+  aux_meta_path <- file.path(quant_dir, "aux_info", "meta_info.json")
+
   if(!file.exists(quant_json_path)){
     # file for alevin-fry < 0.4.1
     quant_json_path <- file.path(quant_dir, "meta_info.json")
   }
 
-  # get cmd_info, which should always be present
+  # get cmd_info and aux_info/meta_info.json, which should always be present
   if (file.exists(cmd_info_path)){
     cmd_info <- jsonlite::read_json(cmd_info_path)
   } else {
     stop("cmd_info.json is missing")
+  }
+  if (file.exists(aux_meta_path)){
+    aux_meta <- jsonlite::read_json(aux_meta_path)
+  } else {
+    stop("meta_info.json in aux_info folder is missing")
   }
 
   # Read other info files if they exist. Otherwise, create dummy values
@@ -181,7 +188,9 @@ read_alevin_metadata <- function(quant_dir){
 
   # Create a metadata list
   meta <- list(salmon_version = cmd_info$salmon_version,
-               reference_index = cmd_info[['index']])
+               reference_index = cmd_info[['index']],
+               total_reads = aux_meta[['num_processed']],
+               mapped_reads = aux_meta[['num_mapped']])
   # using $ notation  for `salmon_version` to get partial matching due to salmon 1.5.2 bug
   # see https://github.com/COMBINE-lab/salmon/issues/691
 
@@ -199,6 +208,8 @@ read_alevin_metadata <- function(quant_dir){
   meta$af_resolution <- quant_info[['resolution_strategy']]
   meta$af_tx2gene <- cmd_info[['tgMap']]
   meta$usa_mode <- quant_info[['usa_mode']]
+  meta$num_cells <- quant_info[['num_quantified_cells']]
+  meta$version_10X <- names(cmd_info)[[3]]
 
   return(meta)
 }
