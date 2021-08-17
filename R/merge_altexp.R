@@ -15,6 +15,7 @@
 #' @export
 #'
 #' @import SingleCellExperiment
+#' @import SummarizedExperiment
 #'
 merge_altexp <- function(sce, alt_exp, alt_name){
   if(!is(sce, "SingleCellExperiment")){
@@ -34,11 +35,8 @@ merge_altexp <- function(sce, alt_exp, alt_name){
                                  dimnames = list(alt_rows, alt_missing_cells))
   alt_counts_all <- cbind(counts(alt_exp), empty_counts)
   # sort to original order (dropping alt-only cells)
-  alt_counts_all <- alt_counts_all[, cell_barcodes]
+  alt_counts_all <- alt_counts_all[, sce_cells]
   altExp(sce, alt_name) <- SingleCellExperiment(assays = list(counts = alt_counts_all),
-                                                metadata = metadata(alt_exp))
-
-  message(glue::glue("{ncol(alt_exp)} cells with Alternative Expression counts were used",
-                     " and {length(alt_missing_cells)} blank cells were added with zero counts."))
+                                                metadata = alt_exp@metadata)
   return(sce)
 }
