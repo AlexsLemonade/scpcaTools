@@ -9,6 +9,7 @@
 #'   only counts aligned to spliced cDNA ("spliced") or all spliced and unspliced cDNA ("unspliced").
 #'   Applies if `intron_mode` or `usa_mode` is TRUE.
 #'   Default is "spliced".
+#' @param version_10x Version of 10X kit used to process library.
 #'
 #' @return SingleCellExperiment of unfiltered gene x cell counts matrix.
 #' @export
@@ -39,7 +40,8 @@
 read_alevin <- function(quant_dir,
                         intron_mode = FALSE,
                         usa_mode = FALSE,
-                        which_counts = c("spliced", "unspliced")){
+                        which_counts = c("spliced", "unspliced"),
+                        version_10x = NULL){
 
   which_counts <- match.arg(which_counts)
 
@@ -62,7 +64,7 @@ read_alevin <- function(quant_dir,
   }
 
   # read metadata
-  meta <- read_alevin_metadata(quant_dir)
+  meta <- read_alevin_metadata(quant_dir, version_10x)
 
   # Read the count data
   if(usa_mode) {
@@ -144,12 +146,13 @@ read_tximport <- function(quant_dir){
 #' Read alevin metadata from json files
 #'
 #' @param quant_dir Path alevin output directory.
+#' @param version_10x Version of 10X kit used to process library.
 #'
 #' @return A list containing alevin run metadata,
 #'   with NULL values for missing elements.
 #'
 #' @noRd
-read_alevin_metadata <- function(quant_dir){
+read_alevin_metadata <- function(quant_dir, version_10x){
   cmd_info_path <- file.path(quant_dir, "cmd_info.json")
   permit_json_path <- file.path(quant_dir, "generate_permit_list.json")
   # Unused file, but leaving for future reference
@@ -208,8 +211,12 @@ read_alevin_metadata <- function(quant_dir){
   meta$af_resolution <- quant_info[['resolution_strategy']]
   meta$af_tx2gene <- cmd_info[['tgMap']]
   meta$usa_mode <- quant_info[['usa_mode']]
-  meta$num_cells <- quant_info[['num_quantified_cells']]
-  meta$version_10X <- names(cmd_info)[[3]]
+  meta$af_num_cells <- quant_info[['num_quantified_cells']]
+
+  # if version of 10X is provided, add to metadata
+  if(!(is.null(version_10x))){
+    meta$version_10x <- version_10x
+  }
 
   return(meta)
 }
