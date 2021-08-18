@@ -8,7 +8,8 @@ read_alevin(
   quant_dir,
   intron_mode = FALSE,
   usa_mode = FALSE,
-  which_counts = c("spliced", "unspliced")
+  which_counts = c("spliced", "unspliced"),
+  version_10x = NULL
 )
 }
 \arguments{
@@ -24,6 +25,8 @@ Default is FALSE.}
 only counts aligned to spliced cDNA ("spliced") or all spliced and unspliced cDNA ("unspliced").
 Applies if `intron_mode` or `usa_mode` is TRUE.
 Default is "spliced".}
+
+\item{version_10x}{Version of 10X kit used to process library.}
 }
 \value{
 SingleCellExperiment of unfiltered gene x cell counts matrix.

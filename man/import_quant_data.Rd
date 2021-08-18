@@ -12,6 +12,7 @@ import_quant_data(
   usa_mode = FALSE,
   filter = FALSE,
   fdr_cutoff = 0.01,
+  version_10x = NULL,
   ...
 )
 }
@@ -35,6 +36,8 @@ Filtering is performed using DropletUtils::emptyDrops and cannot be performed wi
 
 \item{fdr_cutoff}{FDR cutoff to use for DropletUtils::emptyDrops.
 Default is 0.01.}
+
+\item{version_10x}{Version of 10X kit used to process library.}
 
 \item{...}{Any arguments to be passed into DropletUtils::emptyDrops.}
 }
