@@ -9,7 +9,7 @@ read_alevin(
   intron_mode = FALSE,
   usa_mode = FALSE,
   which_counts = c("spliced", "unspliced"),
-  version_10x = NULL
+  tech_version = NULL
 )
 }
 \arguments{
@@ -26,7 +26,7 @@ only counts aligned to spliced cDNA ("spliced") or all spliced and unspliced cDN
 Applies if `intron_mode` or `usa_mode` is TRUE.
 Default is "spliced".}
 
-\item{version_10x}{Version of 10X kit used to process library.}
+\item{tech_version}{Technology or kit used to process library (i.e. 10Xv3, 10Xv3.1).}
 }
 \value{
 SingleCellExperiment of unfiltered gene x cell counts matrix.

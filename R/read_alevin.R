@@ -9,7 +9,7 @@
 #'   only counts aligned to spliced cDNA ("spliced") or all spliced and unspliced cDNA ("unspliced").
 #'   Applies if `intron_mode` or `usa_mode` is TRUE.
 #'   Default is "spliced".
-#' @param version_10x Version of 10X kit used to process library.
+#' @param tech_version Technology or kit used to process library (i.e. 10Xv3, 10Xv3.1).
 #'
 #' @return SingleCellExperiment of unfiltered gene x cell counts matrix.
 #' @export
@@ -41,7 +41,7 @@ read_alevin <- function(quant_dir,
                         intron_mode = FALSE,
                         usa_mode = FALSE,
                         which_counts = c("spliced", "unspliced"),
-                        version_10x = NULL){
+                        tech_version = NULL){
 
   which_counts <- match.arg(which_counts)
 
@@ -64,7 +64,7 @@ read_alevin <- function(quant_dir,
   }
 
   # read metadata
-  meta <- read_alevin_metadata(quant_dir, version_10x)
+  meta <- read_alevin_metadata(quant_dir, tech_version)
 
   # Read the count data
   if(usa_mode) {
@@ -146,13 +146,13 @@ read_tximport <- function(quant_dir){
 #' Read alevin metadata from json files
 #'
 #' @param quant_dir Path alevin output directory.
-#' @param version_10x Version of 10X kit used to process library.
+#' @param tech_version Technology or kit used to process library (i.e. 10Xv3, 10Xv3.1).
 #'
 #' @return A list containing alevin run metadata,
 #'   with NULL values for missing elements.
 #'
 #' @noRd
-read_alevin_metadata <- function(quant_dir, version_10x){
+read_alevin_metadata <- function(quant_dir, tech_version){
   cmd_info_path <- file.path(quant_dir, "cmd_info.json")
   permit_json_path <- file.path(quant_dir, "generate_permit_list.json")
   # Unused file, but leaving for future reference
@@ -213,9 +213,9 @@ read_alevin_metadata <- function(quant_dir, version_10x){
   meta$usa_mode <- quant_info[['usa_mode']]
   meta$af_num_cells <- quant_info[['num_quantified_cells']]
 
-  # if version of 10X is provided, add to metadata
-  if(!(is.null(version_10x))){
-    meta$version_10x <- version_10x
+  # if tech version is provided, add to metadata
+  if(!(is.null(tech_version))){
+    meta$tech_version <- tech_version
   }
 
   return(meta)
