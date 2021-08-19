@@ -27,6 +27,11 @@ merge_altexp <- function(sce, alt_exp, alt_name){
   sce_cells <- colnames(sce)
   alt_cells <- colnames(alt_exp)
   alt_rows <- rownames(alt_exp)
+  
+  # check that at least 50% of cells in alt experiment are found in original sce
+  if(length(intersect(sce_cells, alt_cells)) < length(alt_cells)*0.20){
+    warning("Alternative experiment has less than 20% overlap with SingleCellExperiment.")
+  }
   # perform "left join": create blank columns for cells without alt counts
   alt_missing_cells <- sce_cells[!sce_cells %in% alt_cells]
   empty_counts <- Matrix::Matrix(0,
