@@ -38,31 +38,24 @@ processing_info <- tibble::tibble(
   ) %>%
   t()
 
-if(!is.null(processing_info)){
-  # make table with processing information
-  knitr::kable(processing_info, "simple")
-} else {
-  glue::glue("No processing information available for {params$sample}")
-}
+
+# make table with processing information
+knitr::kable(processing_info, "simple")
 ```
 
 
 ```{r echo=FALSE}
 sample_information <- tibble::tibble(
   "Sample id" = params$sample,
-  "10X version" = metadata_list$version_10x,
+  "Tech version" = metadata_list$tech_version,
   "Number of reads sequenced" = format(metadata_list$total_reads, big.mark = ',', scientific = FALSE),
   "Number of mapped reads" = metadata_list$mapped_reads,
   "Number of cells reported by alevin-fry" = metadata_list$af_num_cells
 ) %>%
   t()
 
-if(!is.null(sample_information)){
-  # make table with processing information
-  knitr::kable(sample_information, "simple")
-} else {
-  glue::glue("No sample information available for {params$sample}")
-}
+# make table with sample information
+knitr::kable(sample_information, "simple")
 ```
 
 # `r params$sample` Experiment Summary 
