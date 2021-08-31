@@ -29,6 +29,7 @@ Imports:
     Matrix.utils,
     methods,
     rmarkdown,
+    S4Vectors,
     scater,
     SingleCellExperiment,
     stringr,
