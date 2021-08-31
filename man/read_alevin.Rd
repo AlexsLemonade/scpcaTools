@@ -6,6 +6,7 @@
 \usage{
 read_alevin(
   quant_dir,
+  mtx_format = FALSE,
   intron_mode = FALSE,
   usa_mode = FALSE,
   which_counts = c("spliced", "unspliced")
@@ -14,10 +15,14 @@ read_alevin(
 \arguments{
 \item{quant_dir}{Path to directory where output files are located.}
 
+\item{mtx_format}{Logical indicating if input data is in matrix market format.
+Default is FALSE.}
+
 \item{intron_mode}{Logical indicating if the files included alignment to intronic regions.
 Default is FALSE.}
 
 \item{usa_mode}{Logical indicating if Alevin-fry was used, if USA mode was invoked.
+Implies the input data is in matrix market format.
 Default is FALSE.}
 
 \item{which_counts}{Which type of counts should be included,

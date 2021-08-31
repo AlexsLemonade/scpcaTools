@@ -1,9 +1,12 @@
 #' Read in counts data processed with Alevin or Alevin-fry
 #'
 #' @param quant_dir Path to directory where output files are located.
+#' @param mtx_format Logical indicating if input data is in matrix market format.
+#'   Default is FALSE.
 #' @param intron_mode Logical indicating if the files included alignment to intronic regions.
 #'   Default is FALSE.
 #' @param usa_mode Logical indicating if Alevin-fry was used, if USA mode was invoked.
+#'   Implies the input data is in matrix market format.
 #'   Default is FALSE.
 #' @param which_counts Which type of counts should be included,
 #'   only counts aligned to spliced cDNA ("spliced") or all spliced and unspliced cDNA ("unspliced").
@@ -37,13 +40,17 @@
 #'
 #'}
 read_alevin <- function(quant_dir,
+                        mtx_format = FALSE,
                         intron_mode = FALSE,
                         usa_mode = FALSE,
                         which_counts = c("spliced", "unspliced")){
 
   which_counts <- match.arg(which_counts)
 
-  # checks for intron_mode and usa_mode
+  # checks for *_mode
+  if(!is.logical(mtx_format)){
+    stop("mtx_format must be set as TRUE or FALSE")
+  }
   if(!is.logical(intron_mode)){
     stop("intron_mode must be set as TRUE or FALSE")
   }
@@ -65,8 +72,8 @@ read_alevin <- function(quant_dir,
   meta <- read_alevin_metadata(quant_dir)
 
   # Read the count data
-  if(usa_mode) {
-    if(meta$usa_mode != TRUE){
+  if(mtx_format | usa_mode) {
+    if(usa_mode & meta$usa_mode != TRUE){
       stop("Output files not in USA mode")
     }
     counts <- read_alevin_mtx(quant_dir)
