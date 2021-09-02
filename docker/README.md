@@ -9,4 +9,4 @@ docker build . -t ghcr.io/alexslemonade/scpca-tools
 ```
 
 
-Note that this image does not include Rstudio, in attempt to make the image smaller. 
+Note that this image does not include RStudio, in attempt to make the image smaller. 
