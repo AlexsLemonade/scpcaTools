@@ -22,6 +22,24 @@ library(SingleCellExperiment)
 
 # Processing Information for `r params$sample`
 
+## Sample Metrics
+
+```{r echo=FALSE}
+sample_information <- tibble::tibble(
+  "Sample id" = params$sample,
+  "Tech version" = metadata_list$tech_version,
+  "Number of reads sequenced" = format(metadata_list$total_reads, big.mark = ',', scientific = FALSE),
+  "Number of mapped reads" = format(metadata_list$mapped_reads, big.mark = ',', scientific = FALSE),
+  "Number of cells reported by alevin-fry" = format(metadata_list$af_num_cells, big.mark = ',', scientific = FALSE)
+) %>%
+  t()
+
+# make table with sample information
+knitr::kable(sample_information, "simple")
+```
+
+## Pre-Processing
+
 ```{r echo=FALSE}
 # extract sce metadata containing processing information as table
 metadata_list <- metadata(params$sce) 
@@ -41,21 +59,6 @@ processing_info <- tibble::tibble(
 
 # make table with processing information
 knitr::kable(processing_info, "simple")
-```
-
-
-```{r echo=FALSE}
-sample_information <- tibble::tibble(
-  "Sample id" = params$sample,
-  "Tech version" = metadata_list$tech_version,
-  "Number of reads sequenced" = format(metadata_list$total_reads, big.mark = ',', scientific = FALSE),
-  "Number of mapped reads" = format(metadata_list$mapped_reads, big.mark = ',', scientific = FALSE),
-  "Number of cells reported by alevin-fry" = format(metadata_list$af_num_cells, big.mark = ',', scientific = FALSE)
-) %>%
-  t()
-
-# make table with sample information
-knitr::kable(sample_information, "simple")
 ```
 
 # `r params$sample` Experiment Summary 
