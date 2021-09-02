@@ -219,11 +219,8 @@ read_alevin_metadata <- function(quant_dir, tech_version){
   meta$af_tx2gene <- cmd_info[['tgMap']]
   meta$usa_mode <- quant_info[['usa_mode']]
   meta$af_num_cells <- quant_info[['num_quantified_cells']]
+  meta$tech_version <- tech_version
 
-  # if tech version is provided, add to metadata
-  if(!(is.null(tech_version))){
-    meta$tech_version <- tech_version
-  }
 
   return(meta)
 }

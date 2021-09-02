@@ -32,9 +32,9 @@ processing_info <- tibble::tibble(
   "Transcriptome index" = metadata_list$reference_index,
   "Filtering method" = metadata_list$af_permit_type,
   "Resolution" = metadata_list$af_resolution, 
-  "Unspliced transcripts included" = dplyr::case_when(
-      metadata_list$transcript_type == "spliced" ~ "No",
-      metadata_list$transcript_type == "unspliced" ~ "Yes" )
+  "Transcripts included" = dplyr::case_when(
+      metadata_list$transcript_type == "spliced" ~ "Spliced only",
+      metadata_list$transcript_type == "unspliced" ~ "Spliced and unspliced" )
   ) %>%
   t()
 
@@ -49,8 +49,8 @@ sample_information <- tibble::tibble(
   "Sample id" = params$sample,
   "Tech version" = metadata_list$tech_version,
   "Number of reads sequenced" = format(metadata_list$total_reads, big.mark = ',', scientific = FALSE),
-  "Number of mapped reads" = metadata_list$mapped_reads,
-  "Number of cells reported by alevin-fry" = metadata_list$af_num_cells
+  "Number of mapped reads" = format(metadata_list$mapped_reads, big.mark = ',', scientific = FALSE),
+  "Number of cells reported by alevin-fry" = format(metadata_list$af_num_cells, big.mark = ',', scientific = FALSE)
 ) %>%
   t()
 
