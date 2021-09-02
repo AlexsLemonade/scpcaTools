@@ -1,5 +1,6 @@
 FROM rocker/r-ver:4.0.5
 LABEL maintainer="ccdl@alexslemonade.org"
+LABEL org.opencontainers.image.source https://github.com/AlexsLemonade/scpcaTools
 
 COPY scripts/install_scpca_deps.sh .
 
