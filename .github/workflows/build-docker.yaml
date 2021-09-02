@@ -33,5 +33,6 @@ jobs:
           tags: |
             type=sha
             type=schedule,pattern={{date 'YYYY-MM-DD'}}
-      - run: |
-        echo ${{ steps.meta.outputs.tags }}
+
+      - run: echo "${{ steps.meta.outputs.tags }}"
+
