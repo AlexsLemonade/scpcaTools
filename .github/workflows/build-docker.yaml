@@ -10,7 +10,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: scpca-tools
+  IMAGE_NAME: alexslemonade/scpca-tools
 
 jobs:
   build_and_push:
