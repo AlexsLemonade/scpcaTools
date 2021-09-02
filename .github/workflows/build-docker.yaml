@@ -36,7 +36,7 @@ jobs:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
             type=sha
-            type=schedule,pattern={{date 'YYYY-MM-DD'}}
+            type=schedule,pattern={{date 'YYYYMMDD'}}
 
       - run: echo "${{ steps.meta.outputs.tags }}"
 
