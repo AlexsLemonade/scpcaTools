@@ -9,7 +9,8 @@ read_alevin(
   mtx_format = FALSE,
   intron_mode = FALSE,
   usa_mode = FALSE,
-  which_counts = c("spliced", "unspliced")
+  which_counts = c("spliced", "unspliced"),
+  tech_version = NULL
 )
 }
 \arguments{
@@ -29,6 +30,8 @@ Default is FALSE.}
 only counts aligned to spliced cDNA ("spliced") or all spliced and unspliced cDNA ("unspliced").
 Applies if `intron_mode` or `usa_mode` is TRUE.
 Default is "spliced".}
+
+\item{tech_version}{Technology or kit used to process library (i.e. 10Xv3, 10Xv3.1).}
 }
 \value{
 SingleCellExperiment of unfiltered gene x cell counts matrix.

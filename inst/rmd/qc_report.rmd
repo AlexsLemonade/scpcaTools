@@ -20,7 +20,48 @@ output:
 library(SingleCellExperiment)
 ```
 
-# `r params$sample` Experiment Information
+# Processing Information for `r params$sample`
+
+## Sample Metrics
+
+```{r echo=FALSE}
+sample_information <- tibble::tibble(
+  "Sample id" = params$sample,
+  "Tech version" = metadata_list$tech_version,
+  "Number of reads sequenced" = format(metadata_list$total_reads, big.mark = ',', scientific = FALSE),
+  "Number of mapped reads" = format(metadata_list$mapped_reads, big.mark = ',', scientific = FALSE),
+  "Number of cells reported by alevin-fry" = format(metadata_list$af_num_cells, big.mark = ',', scientific = FALSE)
+) %>%
+  t()
+
+# make table with sample information
+knitr::kable(sample_information, "simple")
+```
+
+## Pre-Processing
+
+```{r echo=FALSE}
+# extract sce metadata containing processing information as table
+metadata_list <- metadata(params$sce) 
+
+processing_info <- tibble::tibble(
+  "Salmon version" = metadata_list$salmon_version,
+  "Alevin-fry version" = metadata_list$alevinfry_version,
+  "Transcriptome index" = metadata_list$reference_index,
+  "Filtering method" = metadata_list$af_permit_type,
+  "Resolution" = metadata_list$af_resolution, 
+  "Transcripts included" = dplyr::case_when(
+      metadata_list$transcript_type == "spliced" ~ "Spliced only",
+      metadata_list$transcript_type == "unspliced" ~ "Spliced and unspliced" )
+  ) %>%
+  t()
+
+
+# make table with processing information
+knitr::kable(processing_info, "simple")
+```
+
+# `r params$sample` Experiment Summary 
 
 This sample has `r ncol(params$sce)` cells, assayed for `r nrow(params$sce)` genes.
 

@@ -15,6 +15,7 @@
 #'   Filtering is performed using DropletUtils::emptyDrops and cannot be performed with Cellranger.
 #' @param fdr_cutoff FDR cutoff to use for DropletUtils::emptyDrops.
 #'   Default is 0.01.
+#' @param tech_version Technology or kit used to process library (i.e. 10Xv3, 10Xv3.1).
 #' @param ... Any arguments to be passed into DropletUtils::emptyDrops.
 #'
 #' @return SingleCellExperiment of unfiltered gene x cell counts matrix
@@ -59,6 +60,7 @@ import_quant_data <- function(quant_dir,
                               usa_mode = FALSE,
                               filter = FALSE,
                               fdr_cutoff = 0.01,
+                              tech_version = NULL,
                               ...) {
 
   which_counts <- match.arg(which_counts)
@@ -103,7 +105,7 @@ import_quant_data <- function(quant_dir,
   }
 
   if (tool %in% c("alevin-fry", "alevin")){
-    sce <- read_alevin(quant_dir, intron_mode, usa_mode, which_counts)
+    sce <- read_alevin(quant_dir, intron_mode, usa_mode, which_counts, tech_version)
   } else if (tool == "kallisto") {
     sce <- read_kallisto(quant_dir, intron_mode, which_counts)
   } else if (tool == "cellranger") {
