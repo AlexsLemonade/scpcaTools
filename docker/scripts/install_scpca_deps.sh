@@ -56,7 +56,6 @@ Rscript -e "BiocManager::install(c( \
     'ensembldb', \
     'fishpond', \
     'GenomicFeatures', \
-    'LoomExperiment', \
     'miQC', \
     'scran', \
     'scater', \
