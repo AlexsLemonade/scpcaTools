@@ -7,6 +7,8 @@ on:
       - main
       - master
       - jashapiro/33-automate-docker-builds
+    tags:
+      - 'v*'
 
 env:
   REGISTRY: ghcr.io
@@ -37,6 +39,12 @@ jobs:
           tags: |
             type=sha
             type=raw,value={{date 'YYYY-MM-DD'}}
+            type=semver,pattern={{raw}}
 
-      - run: echo "${{ steps.meta.outputs.tags }}"
+      - uses: docker/build-push-action@v2
+        with:
+          context: docker
+          push: false
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
 
