@@ -29,7 +29,7 @@ apt-get -y --no-install-recommends install \
 
 #### R packages
 ###############
-# this comes first since bioconductor packages are 
+# this comes first since bioconductor packages are
 # dependent on updated matrixStats
 install2.r --error --skipinstalled -n $NCPUS \
     BiocManager \
@@ -42,7 +42,7 @@ install2.r --error --skipinstalled -n $NCPUS \
     rprojroot \
     RSQLite \
     tidyverse \
-    
+
 
 ##########################
 # Install bioconductor packages
@@ -57,6 +57,7 @@ Rscript -e "BiocManager::install(c( \
     'fishpond', \
     'GenomicFeatures', \
     'LoomExperiment', \
+    'miQC', \
     'scran', \
     'scater', \
     'SingleCellExperiment', \
