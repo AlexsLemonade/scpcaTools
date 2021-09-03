@@ -1,6 +1,6 @@
 BSD 3-Clause License
 
-Copyright (c) 2017-2018
+Copyright (c) 2021
 Childhood Cancer Data Lab, Alex's Lemonade Stand Foundation.
 All rights reserved.
 
