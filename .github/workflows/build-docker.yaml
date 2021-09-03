@@ -1,12 +1,9 @@
-# Build a the docker image
 name: Build scpca-tools image
 
 on:
   push:
     branches:
       - main
-      - master
-      - jashapiro/33-automate-docker-builds
     tags:
       - 'v*'
 
