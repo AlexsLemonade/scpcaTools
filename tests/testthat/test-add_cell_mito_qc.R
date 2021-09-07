@@ -7,7 +7,7 @@ test_that("Check QC addition", {
   sce <- add_cell_mito_qc(sce, mito = mito, miQC = TRUE)
   expected_cols <- c("sum", "detected", "total",
                      "subsets_mito_sum","subsets_mito_detected", "subsets_mito_percent",
-                     "posterior_probability")
+                     "prob_compromised")
   # check column names
   expect_true(all(expected_cols %in% names(colData(sce))))
   # make sure we don't get all zeros, which would indicate match failure

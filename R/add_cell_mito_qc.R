@@ -54,21 +54,8 @@ add_cell_mito_qc <- function(sce, mito, miQC = FALSE, ...){
     # generate linear mixture model of probability of cells being compromised
     model <- miQC::mixtureModel(sce)
 
-    # grab posterior probability from fitted model
-    # code from miQC plotModel.R lines 52-70 https://github.com/greenelab/miQC/blob/main/R/plotModel.R
-    predictions <- flexmix::fitted(model)
-    intercept1 <- flexmix::parameters(model, component = 1)[1]
-    intercept2 <- flexmix::parameters(model, component = 2)[1]
-    if (intercept1 > intercept2) {
-      compromised_dist <- 1
-    } else {
-      compromised_dist <- 2
-    }
-
-    posterior <- flexmix::posterior(model)
-
-    # add posterior probability of cells being compromised to colData
-    sce$posterior_probability <- posterior[, compromised_dist]
+    # use filter cells, but keeping all cells, to add a column to colData with prob_compromised
+    sce <- miQC::filterCells(sce, model, posterior_cutoff = 1, verbose = FALSE)
   }
 
   return(sce)
