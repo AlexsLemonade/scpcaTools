@@ -28,6 +28,7 @@ Imports:
     Matrix,
     Matrix.utils,
     methods,
+    miQC,
     rmarkdown,
     S4Vectors,
     scater,

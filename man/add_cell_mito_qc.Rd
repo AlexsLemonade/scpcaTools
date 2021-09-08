@@ -4,12 +4,15 @@
 \alias{add_cell_mito_qc}
 \title{Calculate QC metrics for all reads and mitochondrial subset for each cell in a SingleCellExperiment}
 \usage{
-add_cell_mito_qc(sce, mito, ...)
+add_cell_mito_qc(sce, mito, miQC = FALSE, ...)
 }
 \arguments{
 \item{sce}{SingleCellExperiment object.}
 
 \item{mito}{Character vector of mitochondrial gene names in the same format as rownames of SingleCellExperiment object.}
+
+\item{miQC}{Logical indicating whether or not to calculate the posterior probability of a cell being compromised using
+the linear mixture model in miQC. Default is FALSE.}
 
 \item{...}{Any additional arguments to be passed to scater::addPerCellQC.}
 }
