@@ -56,6 +56,7 @@ add_cell_mito_qc <- function(sce, mito, miQC = FALSE, ...){
 
     # use filter cells, but keeping all cells, to add a column to colData with prob_compromised
     sce <- miQC::filterCells(sce, model, posterior_cutoff = 1, verbose = FALSE)
+    metadata(sce)$miQC_model <- model
   }
 
   return(sce)
