@@ -2,6 +2,7 @@
 params:
   sample: Example
   sce: !r SingleCellExperiment::SingleCellExperiment()
+  filtered_sce: NULL
   date: !r Sys.Date()
 
 title: "`r glue::glue('ScPCA QC report for {params$sample}')`"
