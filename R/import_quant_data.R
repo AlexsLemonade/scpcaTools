@@ -4,6 +4,8 @@
 #'
 #' @param quant_dir Path to directory where output files are located.
 #' @param tool Type of tool used to create files (alevin, alevin-fry, cellranger, or kallisto).
+#' @param mtx_format Logical indicating if input data is in matrix market format.
+#'   Default is FALSE.
 #' @param intron_mode Logical indicating if the files included alignment to intronic regions.
 #'   Default is FALSE.
 #' @param usa_mode Logical indicating if Alevin-fry was used, if the USA mode was invoked.
@@ -56,6 +58,7 @@
 import_quant_data <- function(quant_dir,
                               tool = c("cellranger", "alevin", "alevin-fry", "kallisto"),
                               which_counts = c("spliced", "unspliced"),
+                              mtx_format = FALSE,
                               intron_mode = FALSE,
                               usa_mode = FALSE,
                               filter = FALSE,
@@ -78,6 +81,9 @@ import_quant_data <- function(quant_dir,
   }
   if(!is.logical(filter)){
     stop("filter must be set as TRUE or FALSE")
+  }
+  if(!is.logical(mtx_format)){
+    stop("mtx_format must be set as TRUE or FALSE")
   }
 
   # check that usa_mode and intron_mode are used with the proper tools
@@ -105,7 +111,7 @@ import_quant_data <- function(quant_dir,
   }
 
   if (tool %in% c("alevin-fry", "alevin")){
-    sce <- read_alevin(quant_dir, intron_mode, usa_mode, which_counts, tech_version)
+    sce <- read_alevin(quant_dir, mtx_format, intron_mode, usa_mode, which_counts, tech_version)
   } else if (tool == "kallisto") {
     sce <- read_kallisto(quant_dir, intron_mode, which_counts)
   } else if (tool == "cellranger") {
