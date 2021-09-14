@@ -96,9 +96,35 @@ knitr::kable(processing_info, "simple")
 
 This sample has `r ncol(sce)` cells, assayed for `r nrow(sce)` genes.
 
-```{asis, echo = has_filtered}
-After filtering, there are `r ncol(filtered_sce)` cells.
+```{r, results = 'asis'}
+if(has_filtered){
+  cat("After filtering, there are", ncol(filtered_sce), "cells.")
+}
 ```
+
+## Knee plot
+```{r}
+unfiltered_celldata <- data.frame(colData(unfiltered_sce)) %>%
+  mutate(
+    rank = rank(- unfiltered_sce$sum), # using full spec for clarity 
+    filter_status = factor(ifelse(colnames(unfiltered_sce) %in% colnames(filtered_sce),
+                                  "Passed", "Excluded"),
+                           levels = c("Passed", "Excluded"))
+  )
+
+ggplot(unfiltered_celldata, aes(x = rank, y = sum, color = filter_status))+
+  geom_point(aes(shape = filter_status)) +
+  scale_y_log10() + 
+  scale_color_manual(values = c("navyblue", "grey")) + 
+  scale_shape_manual(values = c(16, 1)) + # filled and unfilled circles
+  labs(
+    x = "Rank", 
+    y = "UMI count",
+    color = "Filter status",
+    shape = "Filter status"
+  ) 
+```
+
 
 # Session Info
 ```{r session_info}
