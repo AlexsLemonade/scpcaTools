@@ -50,8 +50,8 @@ generate_qc_report <- function(sce,
     output_file = output_file,
     output_dir = output_dir,
     params = list(
-      sce = sce,
       sample = sample_name,
+      unfiltered_sce = sce,
       filtered_sce = filtered_sce
     ),
     envir = new.env()
