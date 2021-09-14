@@ -1,7 +1,7 @@
 #' Generate a QC report from a SingleCellExperiment object
 #'
-#' @param sce A SingleCellExperiment object that the report will describe
-#' @param sample_name The name of the sample
+#' @param sample_name The name of the sample for report headers
+#' @param unfiltered_sce A SingleCellExperiment object that the report will describe
 #' @param filtered_sce An optional filtered single cell experiment derived from first
 #' @param output The output file path that will be created.
 #'   If the file name does not include an extension, ".html" will be added automatically.
@@ -13,11 +13,11 @@
 #'
 #' @examples
 #' \dontrun{
-#' generate_qc_report(my_sce, "Sample 1", output = "reports/sample1_report.html")
+#' generate_qc_report("Sample 1", my_sce, output = "reports/sample1_report.html")
 #' }
 #'
-generate_qc_report <- function(sce,
-                               sample_name,
+generate_qc_report <- function(sample_name,
+                               unfiltered_sce,
                                filtered_sce = NULL,
                                output = NULL){
   if(!inherits(sce, "SingleCellExperiment")){
