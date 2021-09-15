@@ -8,6 +8,7 @@ import_quant_data(
   quant_dir,
   tool = c("cellranger", "alevin", "alevin-fry", "kallisto"),
   which_counts = c("spliced", "unspliced"),
+  mtx_format = FALSE,
   intron_mode = FALSE,
   usa_mode = FALSE,
   filter = FALSE,
@@ -24,6 +25,9 @@ import_quant_data(
 \item{which_counts}{If intron_mode is TRUE, which type of counts should be included,
 only counts aligned to spliced cDNA ("spliced") or all spliced and unspliced cDNA ("unspliced").
 Default is "spliced".}
+
+\item{mtx_format}{Logical indicating if input data is in matrix market format.
+Default is FALSE.}
 
 \item{intron_mode}{Logical indicating if the files included alignment to intronic regions.
 Default is FALSE.}
