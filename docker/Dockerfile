@@ -1,4 +1,4 @@
-FROM rocker/r-ver:4.0.5
+FROM rocker/r-ver:4.1.0
 LABEL maintainer="ccdl@alexslemonade.org"
 LABEL org.opencontainers.image.source https://github.com/AlexsLemonade/scpcaTools
 
