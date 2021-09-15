@@ -4,12 +4,14 @@
 \alias{generate_qc_report}
 \title{Generate a QC report from a SingleCellExperiment object}
 \usage{
-generate_qc_report(sce, sample_name, output = NULL)
+generate_qc_report(sce, sample_name, filtered_sce = NULL, output = NULL)
 }
 \arguments{
 \item{sce}{A SingleCellExperiment object that the report will describe}
 
 \item{sample_name}{The name of the sample}
+
+\item{filtered_sce}{An optional filtered single cell experiment derived from first}
 
 \item{output}{The output file path that will be created.
 If the file name does not include an extension, ".html" will be added automatically.
