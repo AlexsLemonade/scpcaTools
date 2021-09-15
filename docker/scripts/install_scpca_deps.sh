@@ -25,6 +25,7 @@ apt-get -y --no-install-recommends install \
     libudunits2-dev \
     libxml2-dev \
     libxtst6 \
+    pandoc \
   && rm -rf /var/lib/apt/lists/*
 
 #### R packages
