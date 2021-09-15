@@ -41,12 +41,13 @@ install2.r --error --skipinstalled -n $NCPUS \
     rmarkdown \
     rprojroot \
     RSQLite \
-    tidyverse \
+    tidyverse 
 
 
 ##########################
 # Install bioconductor packages
-Rscript -e "BiocManager::install(c( \
+Rscript -e "withCallingHandlers(
+  BiocManager::install(c( \
     'AnnotationHub', \
     'Biostrings', \
     'bluster', \
@@ -62,7 +63,8 @@ Rscript -e "BiocManager::install(c( \
     'SingleCellExperiment', \
     'SummarizedExperiment', \
     'tximport'), \
-    update = FALSE)"
+    update = FALSE), \
+  warning = function(w) stop(w))" 
 
 rm -rf /tmp/downloaded_packages
 rm -rf /tmp/Rtmp*
