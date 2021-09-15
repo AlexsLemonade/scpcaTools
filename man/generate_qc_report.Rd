@@ -4,12 +4,17 @@
 \alias{generate_qc_report}
 \title{Generate a QC report from a SingleCellExperiment object}
 \usage{
-generate_qc_report(sce, sample_name, filtered_sce = NULL, output = NULL)
+generate_qc_report(
+  sample_name,
+  unfiltered_sce,
+  filtered_sce = NULL,
+  output = NULL
+)
 }
 \arguments{
-\item{sce}{A SingleCellExperiment object that the report will describe}
+\item{sample_name}{The name of the sample for report headers}
 
-\item{sample_name}{The name of the sample}
+\item{unfiltered_sce}{A SingleCellExperiment object that the report will describe}
 
 \item{filtered_sce}{An optional filtered single cell experiment derived from first}
 
@@ -25,7 +30,7 @@ Generate a QC report from a SingleCellExperiment object
 }
 \examples{
 \dontrun{
-generate_qc_report(my_sce, "Sample 1", output = "reports/sample1_report.html")
+generate_qc_report("Sample 1", my_sce, output = "reports/sample1_report.html")
 }
 
 }

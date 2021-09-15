@@ -20,19 +20,19 @@ generate_qc_report <- function(sample_name,
                                unfiltered_sce,
                                filtered_sce = NULL,
                                output = NULL){
-  if(!inherits(sce, "SingleCellExperiment")){
-    stop("`sce` must be a SingleCellExperiment object.")
+  if(!inherits(unfiltered_sce, "SingleCellExperiment")){
+    stop("`unfiltered_sce` must be a SingleCellExperiment object.")
   }
   # check that the filtered sce is as expected
   if(!is.null(filtered_sce)){
     if (!inherits(filtered_sce, "SingleCellExperiment")){
       stop("`filtered_sce` must be a SingleCellExperiment object.")
     }
-    if (ncol(sce) < ncol(filtered_sce)){
-      stop("`filtered_sce` should have fewer cells than `sce`")
+    if (ncol(unfiltered_sce) < ncol(filtered_sce)){
+      stop("`filtered_sce` should have fewer cells than `unfiltered_sce`")
     }
-    if (!all(colnames(filtered_sce) %in% colnames(sce))){
-      "Some cells in `filtered_sce` are not present in `sce`, from which it should be derived."
+    if (!all(colnames(filtered_sce) %in% colnames(unfiltered_sce))){
+      "Some cells in `filtered_sce` are not present in `unfiltered_sce`, from which it should be derived."
     }
   }
 
@@ -51,7 +51,7 @@ generate_qc_report <- function(sample_name,
     output_dir = output_dir,
     params = list(
       sample = sample_name,
-      unfiltered_sce = sce,
+      unfiltered_sce = unfiltered_sce,
       filtered_sce = filtered_sce
     ),
     envir = new.env()
