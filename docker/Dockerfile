@@ -7,8 +7,9 @@ COPY scripts/install_scpca_deps.sh .
 RUN bash ./install_scpca_deps.sh
 
 ##########################
-# Install scpcaTools package
-RUN Rscript -e "remotes::install_github('AlexsLemonade/scpcaTools')"
+# Install scpcaTools package (& test loading)
+RUN Rscript -e "remotes::install_github('AlexsLemonade/scpcaTools'); \
+  require(scpcaTools)"
 
 # set final workdir for commands
 WORKDIR /home
