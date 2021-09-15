@@ -29,6 +29,13 @@ apt-get -y --no-install-recommends install \
 
 #### R packages
 ###############
+
+# Set CRAN mirror to allow access to more recent matrixStats
+CRAN="https://packagemanager.rstudio.com/cran/__linux__/focal/2021-08-27"
+echo "options(repos = c(CRAN = '${CRAN}'), download.file.method = 'libcurl')" >> ${R_HOME}/etc/Rprofile.site
+# update all to that repo
+Rscript -e "update.packages(ask = FALSE)"
+
 # this comes first since bioconductor packages are
 # dependent on updated matrixStats
 install2.r --error --skipinstalled -n $NCPUS \
