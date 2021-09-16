@@ -20,6 +20,10 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: r-lib/actions/setup-r@v1
+      - name: Install pandoc
+        run: |
+          sudo apt-get update
+          sudo apt-get -y --no-install-recommends install pandoc
       - name: Install dependencies
         run: |
           options(repos = c(CRAN = "https://packagemanager.rstudio.com/cran/__linux__/focal/latest"))

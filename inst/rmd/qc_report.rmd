@@ -94,7 +94,7 @@ knitr::kable(processing_info, "simple")
 
 # `r sample` Experiment Summary 
 
-This sample has `r ncol(sce)` cells, assayed for `r nrow(sce)` genes.
+This sample has `r ncol(unfiltered_sce)` cells, assayed for `r nrow(unfiltered_sce)` genes.
 
 ```{r, results = 'asis'}
 if(has_filtered){
