@@ -45,7 +45,7 @@ generate_qc_report <- function(sample_name,
   }
 
   rmd <- system.file(file.path("rmd", "qc_report.rmd"), package = "scpcaTools")
-  rmarkdown::render(
+  suppressPackageStartupMessages(rmarkdown::render(
     rmd,
     output_file = output_file,
     output_dir = output_dir,
@@ -54,6 +54,7 @@ generate_qc_report <- function(sample_name,
       unfiltered_sce = unfiltered_sce,
       filtered_sce = filtered_sce
     ),
-    envir = new.env()
-  )
+    envir = new.env(),
+    quiet = TRUE
+  ))
 }
