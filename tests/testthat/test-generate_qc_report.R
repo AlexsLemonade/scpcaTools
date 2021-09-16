@@ -7,4 +7,6 @@ test_that("generating a qc report works", {
                                 unfiltered_sce = sce,
                                 filtered_sce = filt_sce, )
   expect_true(file.exists(qc_file))
+  # clean up
+  file.remove(qc_file)
 })
