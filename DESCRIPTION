@@ -31,6 +31,7 @@ Imports:
     Matrix.utils,
     methods,
     miQC,
+    rlang,
     rmarkdown,
     S4Vectors,
     scater,
@@ -38,6 +39,7 @@ Imports:
     stringr,
     SummarizedExperiment,
     tibble,
+    tidyr,
     tximport
 Suggests: 
     scpcaData,
