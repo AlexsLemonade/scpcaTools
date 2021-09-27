@@ -4,13 +4,13 @@
 \alias{add_gene_symbols}
 \title{Add Gene symbols to a SingleCellExperiment from a GTF file}
 \usage{
-add_gene_symbols(sce, gtf)
+add_gene_symbols(sce, gene_info)
 }
 \arguments{
 \item{sce}{SingleCellExperiment object}
 
-\item{gtf}{A GRanges object or data frame with annotation information corresponding to the SCE.
-Most importantly, the `gene_id` column should match the row names of the SCE
+\item{gene_info}{A GRanges object or data frame with annotation information corresponding to the SCE.
+Most importantly should contain a `gene_id` column that matches the row names of the SCE
 and a `gene_name` column with the gene symbols should be included.}
 }
 \value{
