@@ -66,6 +66,7 @@ Rscript -e "withCallingHandlers(
     'fishpond', \
     'GenomicFeatures', \
     'miQC', \
+    'scater', \
     'scran', \
     'scuttle', \
     'SingleCellExperiment', \
