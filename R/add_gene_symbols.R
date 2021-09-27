@@ -9,6 +9,9 @@
 #'
 #' @import SummarizedExperiment
 #' @importFrom rlang .data
+#'
+#' @export
+#'
 
 add_gene_symbols <- function(sce, gene_info){
   if(!is(sce, "SingleCellExperiment")){
