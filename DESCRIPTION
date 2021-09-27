@@ -34,7 +34,7 @@ Imports:
     rlang,
     rmarkdown,
     S4Vectors,
-    scater,
+    scuttle,
     SingleCellExperiment,
     stringr,
     SummarizedExperiment,

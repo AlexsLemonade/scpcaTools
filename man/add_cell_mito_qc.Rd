@@ -14,7 +14,7 @@ add_cell_mito_qc(sce, mito, miQC = FALSE, ...)
 \item{miQC}{Logical indicating whether or not to calculate the posterior probability of a cell being compromised using
 the linear mixture model in miQC. Default is FALSE.}
 
-\item{...}{Any additional arguments to be passed to scater::addPerCellQC.}
+\item{...}{Any additional arguments to be passed to scuttle::addPerCellQCMetrics.}
 }
 \value{
 SingleCellExperiment with colData slot containing calculated QC metrics.
