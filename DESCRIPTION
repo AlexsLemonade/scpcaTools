@@ -31,13 +31,15 @@ Imports:
     Matrix.utils,
     methods,
     miQC,
+    rlang,
     rmarkdown,
     S4Vectors,
-    scater,
+    scuttle,
     SingleCellExperiment,
     stringr,
     SummarizedExperiment,
     tibble,
+    tidyr,
     tximport
 Suggests: 
     scpcaData,

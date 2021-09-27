@@ -4,7 +4,7 @@
 #' @param mito Character vector of mitochondrial gene names in the same format as rownames of SingleCellExperiment object.
 #' @param miQC Logical indicating whether or not to calculate the posterior probability of a cell being compromised using
 #'   the linear mixture model in miQC. Default is FALSE.
-#' @param ... Any additional arguments to be passed to scater::addPerCellQC.
+#' @param ... Any additional arguments to be passed to scuttle::addPerCellQCMetrics.
 #'
 #' @return SingleCellExperiment with colData slot containing calculated QC metrics.
 #'  Columns include sum, detected, mito_sum, mito_detected, mito_percent, and total.
@@ -43,7 +43,7 @@ add_cell_mito_qc <- function(sce, mito, miQC = FALSE, ...){
   }
 
   # add per cell QC with mitochondrial subset
-  sce <- scater::addPerCellQC(
+  sce <- scuttle::addPerCellQCMetrics(
     sce,
     subsets = list(mito = mito[mito %in% rownames(sce)]),
     ...
