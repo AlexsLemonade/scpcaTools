@@ -49,7 +49,7 @@ install2.r --error --skipinstalled -n $NCPUS \
     rmarkdown \
     rprojroot \
     RSQLite \
-    tidyverse 
+    tidyverse
 
 
 ##########################
@@ -67,12 +67,12 @@ Rscript -e "withCallingHandlers(
     'GenomicFeatures', \
     'miQC', \
     'scran', \
-    'scater', \
+    'scuttle', \
     'SingleCellExperiment', \
     'SummarizedExperiment', \
     'tximport'), \
     update = FALSE), \
-  warning = function(w) stop(w))" 
+  warning = function(w) stop(w))"
 
 rm -rf /tmp/downloaded_packages
 rm -rf /tmp/Rtmp*
