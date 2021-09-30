@@ -46,6 +46,11 @@ if (!has_filtered){
 # add cell stats if missing
 if (is.null(unfiltered_sce$sum)){
   unfiltered_sce <- scuttle::addPerCellQCMetrics(unfiltered_sce)
+  unfiltered_sce$subsets_mito_percent <- NA_real_
+}
+if (is.null(filtered_sce$sum)){
+  filtered_sce <- scuttle::addPerCellQCMetrics(filtered_sce)
+  filtered_sce$subsets_mito_percent <- NA_real_
 }
 ```
 
@@ -61,12 +66,12 @@ unfiltered_meta <- metadata(unfiltered_sce)
 
 sample_information <- tibble::tibble(
   "Sample id" = sample_id,
-  "Tech version" = format(unfiltered_meta$tech_version),
+  "Tech version" = format(unfiltered_meta$tech_version), # format to keep nulls
   "Number of reads sequenced" = format(unfiltered_meta$total_reads, big.mark = ',', scientific = FALSE),
   "Number of mapped reads" = format(unfiltered_meta$mapped_reads, big.mark = ',', scientific = FALSE),
   "Number of cells reported by alevin-fry" = format(unfiltered_meta$af_num_cells, big.mark = ',', scientific = FALSE)
 ) %>%
-  mutate(across(.fns = ~ifelse(.x == "NULL", "N/A", .x))) %>%
+  mutate(across(.fns = ~ifelse(.x == "NULL", "N/A", .x))) %>% # reformat nulls
   t()
 
 # make table with sample information
@@ -109,7 +114,7 @@ if(has_filtered){
 ```
 
 ## Knee plot
-```{r}
+```{r, fig.cap="Knee plot of filtered and unfiltered droplets"}
 unfiltered_celldata <- data.frame(colData(unfiltered_sce)) %>%
   mutate(
     rank = rank(- unfiltered_sce$sum), # using full spec for clarity 
@@ -129,7 +134,32 @@ ggplot(unfiltered_celldata, aes(x = rank, y = sum, color = filter_status))+
     y = "UMI count",
     color = "Filter status",
     shape = "Filter status"
-  ) 
+  ) + 
+  theme(legend.position = c(0, 0),
+        legend.justification = c(0,0),
+        legend.background = element_rect(color = "grey20", size = 0.25),
+        legend.box.margin = margin(rep(5, 4)))
+```
+
+
+## UMI-gene count plot
+
+```{r, fig.cap="Total UMI x genes expressed"}
+filtered_celldata <- data.frame(colData(filtered_sce)) 
+
+ggplot(filtered_celldata, 
+       aes (x = sum,
+            y = detected, 
+            color = subsets_mito_percent)) +
+  geom_point(alpha = 0.3) +
+  scale_color_viridis_c(limits = c(0, 100)) + 
+  labs(x = "Total UMI Count",
+       y = "Number of Genes Expressed",
+       color = "Mitochondrial\nPercent") + 
+  theme(legend.position = c(0, 1),
+        legend.justification = c(0,1),
+        legend.background = element_rect(color = "grey20", size = 0.25),
+        legend.box.margin = margin(rep(5, 4)))
 ```
 
 
