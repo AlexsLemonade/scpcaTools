@@ -75,9 +75,10 @@ sample_information <- tibble::tibble(
   t()
 
 # make table with sample information
-knitr::kable(sample_information,
-             caption = "Sample Information") %>%
-  kableExtra::kable_styling(bootstrap_options = "striped")
+knitr::kable(sample_information) %>%
+  kableExtra::kable_styling(bootstrap_options = "striped",
+                            full_width = FALSE,
+                            position = "left")
 ```
 
 ## Pre-Processing Information
@@ -99,8 +100,10 @@ processing_info <- tibble::tibble(
 
 
 # make table with processing information
-knitr::kable(processing_info, caption ="Processing information") %>%
-  kableExtra::kable_styling(bootstrap_options = "striped")
+knitr::kable(processing_info) %>%
+  kableExtra::kable_styling(bootstrap_options = "striped",
+                            full_width = FALSE,
+                            position = "left")
 ```
 
 # `r sample_id` Experiment Summary 
