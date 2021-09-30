@@ -44,6 +44,7 @@ install2.r --error --skipinstalled -n $NCPUS \
     DBI \
     devtools \
     here \
+    kableExtra \
     matrixStats \
     optparse \
     rmarkdown \
