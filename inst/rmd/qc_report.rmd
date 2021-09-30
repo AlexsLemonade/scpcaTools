@@ -120,17 +120,19 @@ if(has_filtered){
 ```{r, fig.cap="Knee plot of filtered and unfiltered droplets"}
 unfiltered_celldata <- data.frame(colData(unfiltered_sce)) %>%
   mutate(
-    rank = rank(- unfiltered_sce$sum), # using full spec for clarity 
+    rank = rank(- unfiltered_sce$sum, ties.method = "first"), # using full spec for clarity 
     filter_status = factor(ifelse(colnames(unfiltered_sce) %in% colnames(filtered_sce),
                                   "Passed", "Excluded"),
                            levels = c("Passed", "Excluded"))
-  )
+  ) %>%
+  filter(sum > 0) %>% # remove zeros for plotting
+  arrange(desc(rank))
 
 ggplot(unfiltered_celldata, aes(x = rank, y = sum, color = filter_status))+
-  geom_point(aes(shape = filter_status)) +
+  geom_point(aes(shape = filter_status),alpha = 0.2, size = 2) +
   scale_y_log10() +
   scale_x_log10() + 
-  scale_color_manual(values = c("navyblue", "grey")) + 
+  scale_color_manual(values = c("navyblue", "grey40")) + 
   scale_shape_manual(values = c(16, 1)) + # filled and unfilled circles
   labs(
     x = "Rank", 
@@ -138,6 +140,7 @@ ggplot(unfiltered_celldata, aes(x = rank, y = sum, color = filter_status))+
     color = "Filter status",
     shape = "Filter status"
   ) + 
+  guides(color = guide_legend(override.aes = list(alpha = 1))) + 
   theme(legend.position = c(0, 0),
         legend.justification = c(0,0),
         legend.background = element_rect(color = "grey20", size = 0.25),
@@ -145,7 +148,7 @@ ggplot(unfiltered_celldata, aes(x = rank, y = sum, color = filter_status))+
 ```
 
 
-## UMI-gene count plot
+## UMI - expressed gene count plot
 
 ```{r, fig.cap="Total UMI x genes expressed"}
 filtered_celldata <- data.frame(colData(filtered_sce)) 
