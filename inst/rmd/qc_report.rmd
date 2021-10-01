@@ -46,11 +46,17 @@ if (!has_filtered){
 # add cell stats if missing
 if (is.null(unfiltered_sce$sum)){
   unfiltered_sce <- scuttle::addPerCellQCMetrics(unfiltered_sce)
-  unfiltered_sce$subsets_mito_percent <- NA_real_
 }
 if (is.null(filtered_sce$sum)){
   filtered_sce <- scuttle::addPerCellQCMetrics(filtered_sce)
   filtered_sce$subsets_mito_percent <- NA_real_
+  skip_miQC <- TRUE
+} else{
+  skip_miQC <- FALSE
+}
+# add miQC model if missing
+if (is.null(metadata(filtered_sce)$miQC_model) & !skip_miQC){
+  metadata(filtered_sce)$miQC_model <- miQC::mixtureModel(filtered_sce)
 }
 ```
 
@@ -166,6 +172,22 @@ ggplot(filtered_celldata,
         legend.justification = c(0,1),
         legend.background = element_rect(color = "grey20", size = 0.25),
         legend.box.margin = margin(rep(5, 4)))
+```
+
+## miQC model diagnostics
+
+```{r, fig.cap="miQC model diagnostics plot", results='asis', warning=FALSE}
+if(skip_miQC){
+  cat("miQC model not created, skipping miQC plot. Usually this is because mitochondrial gene data was not available.")
+}else{
+  # remove prob_compromised if it exists, as this will cause errors with plotModel
+  filtered_sce$prob_compromised <- NULL
+  miQC::plotModel(filtered_sce, model = metadata(filtered_sce)$miQC_model) + 
+    theme(legend.position = c(1, 1),
+      legend.justification = c(1,1),
+      legend.background = element_rect(color = "grey20", size = 0.25),
+      legend.box.margin = margin(rep(5, 4)))
+}
 ```
 
 
