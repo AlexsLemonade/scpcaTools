@@ -46,7 +46,6 @@ if (!has_filtered){
 # add cell stats if missing
 if (is.null(unfiltered_sce$sum)){
   unfiltered_sce <- scuttle::addPerCellQCMetrics(unfiltered_sce)
-  unfiltered_sce$subsets_mito_percent <- NA_real_
 }
 if (is.null(filtered_sce$sum)){
   filtered_sce <- scuttle::addPerCellQCMetrics(filtered_sce)
