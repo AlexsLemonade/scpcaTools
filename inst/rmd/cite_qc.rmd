@@ -1,0 +1,18 @@
+## CITE-seq statistics
+
+```{r}
+cite_exp <- altExp(filtered_sce, "CITEseq")
+antibody_tags <- as.data.frame(rowData(cite_exp)) %>%
+  tibble::rownames_to_column("Antibody tag") %>%
+  select("Antibody tag",
+         "Percent of cells detected" = detected) %>%
+  # sort by leading characters, then numeric portion
+  arrange(stringr::str_extract(`Antibody tag`, "^[A-Za-z]+"),
+          as.numeric(stringr::str_extract(`Antibody tag`, "\\d+")))
+
+knitr::kable(antibody_tags, digits = 2) %>%
+  kableExtra::kable_styling(bootstrap_options = "striped",
+                            full_width = FALSE,
+                            position = "left")
+```
+
