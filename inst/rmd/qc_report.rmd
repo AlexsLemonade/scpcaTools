@@ -186,7 +186,7 @@ if(skip_miQC){
   filtered_sce$prob_compromised <- NULL
   miQC::plotModel(filtered_sce, model = metadata(filtered_sce)$miQC_model) + 
     coord_cartesian(ylim = c(0,100)) +
-    labs(x = "Number of genes expressed",
+    labs(x = "Number of genes detected",
          y = "Percent reads mitochondrial") +
     theme(plot.margin = margin(rep(20, 4)),
           legend.position = c(1, 1),
