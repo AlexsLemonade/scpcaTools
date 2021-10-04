@@ -123,7 +123,7 @@ if(has_filtered){
 ```
 
 ## Knee plot
-```{r, fig.cap="Knee plot of filtered and unfiltered droplets"}
+```{r, fig.alt="Knee plot of filtered and unfiltered droplets"}
 unfiltered_celldata <- data.frame(colData(unfiltered_sce)) %>%
   mutate(
     rank = rank(- unfiltered_sce$sum, ties.method = "first"), # using full spec for clarity 
@@ -136,27 +136,28 @@ unfiltered_celldata <- data.frame(colData(unfiltered_sce)) %>%
 
 ggplot(unfiltered_celldata, aes(x = rank, y = sum, color = filter_status))+
   geom_point(aes(shape = filter_status),alpha = 0.2, size = 2) +
-  scale_y_log10() +
-  scale_x_log10() + 
-  scale_color_manual(values = c("navyblue", "grey40")) + 
+  scale_x_log10(labels = scales::label_number()) +
+  scale_y_log10(labels = scales::label_number()) + 
+  scale_color_manual(values = c("darkgreen", "grey80")) + 
   scale_shape_manual(values = c(16, 1)) + # filled and unfilled circles
   labs(
     x = "Rank", 
-    y = "UMI count",
+    y = "Total UMI count",
     color = "Filter status",
     shape = "Filter status"
   ) + 
   guides(color = guide_legend(override.aes = list(alpha = 1))) + 
-  theme(legend.position = c(0, 0),
+  theme(plot.margin = margin(rep(20, 4)),
+        legend.position = c(0, 0),
         legend.justification = c(0,0),
         legend.background = element_rect(color = "grey20", size = 0.25),
         legend.box.margin = margin(rep(5, 4)))
 ```
 
 
-## UMI - expressed gene count plot
+## Cell read metrics 
 
-```{r, fig.cap="Total UMI x genes expressed"}
+```{r, fig.alt="Total UMI x genes expressed"}
 filtered_celldata <- data.frame(colData(filtered_sce)) 
 
 ggplot(filtered_celldata, 
@@ -165,10 +166,11 @@ ggplot(filtered_celldata,
             color = subsets_mito_percent)) +
   geom_point(alpha = 0.3) +
   scale_color_viridis_c(limits = c(0, 100)) + 
-  labs(x = "Total UMI Count",
-       y = "Number of Genes Expressed",
-       color = "Mitochondrial\nPercent") + 
-  theme(legend.position = c(0, 1),
+  labs(x = "Total UMI count",
+       y = "Number of genes detected",
+       color = "Percent reads\nmitochondrial") + 
+  theme(plot.margin = margin(rep(20, 4)),
+        legend.position = c(0, 1),
         legend.justification = c(0,1),
         legend.background = element_rect(color = "grey20", size = 0.25),
         legend.box.margin = margin(rep(5, 4)))
@@ -176,17 +178,21 @@ ggplot(filtered_celldata,
 
 ## miQC model diagnostics
 
-```{r, fig.cap="miQC model diagnostics plot", results='asis', warning=FALSE}
+```{r, fig.alt="miQC model diagnostics plot", results='asis', warning=FALSE}
 if(skip_miQC){
   cat("miQC model not created, skipping miQC plot. Usually this is because mitochondrial gene data was not available.")
 }else{
   # remove prob_compromised if it exists, as this will cause errors with plotModel
   filtered_sce$prob_compromised <- NULL
   miQC::plotModel(filtered_sce, model = metadata(filtered_sce)$miQC_model) + 
-    theme(legend.position = c(1, 1),
-      legend.justification = c(1,1),
-      legend.background = element_rect(color = "grey20", size = 0.25),
-      legend.box.margin = margin(rep(5, 4)))
+    coord_cartesian(ylim = c(0,100)) +
+    labs(x = "Number of genes expressed",
+         y = "Percent reads mitochondrial") +
+    theme(plot.margin = margin(rep(20, 4)),
+          legend.position = c(1, 1),
+          legend.justification = c(1,1),
+          legend.background = element_rect(color = "grey20", size = 0.25),
+          legend.box.margin = margin(rep(5, 4)))
 }
 ```
 
