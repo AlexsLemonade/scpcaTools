@@ -26,6 +26,7 @@ Imports:
     ggplot2,
     glue,
     jsonlite,
+    kableExtra,
     magrittr,
     Matrix,
     Matrix.utils,
