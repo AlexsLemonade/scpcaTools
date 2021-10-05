@@ -40,7 +40,7 @@ unfiltered_sce <- params$unfiltered_sce
 filtered_sce <- params$filtered_sce
 
 has_filtered <- !is.null(filtered_sce)
-has_cite <- "CITEseq" %in% altExpNames(filtered_sce)
+
 
 # if there is no filtered sce, use the unfiltered for both
 if (!has_filtered){
@@ -61,6 +61,14 @@ if (is.null(filtered_sce$sum)){
 if (is.null(metadata(filtered_sce)$miQC_model) & !skip_miQC){
   metadata(filtered_sce)$miQC_model <- miQC::mixtureModel(filtered_sce)
 }
+
+## Check for additional modalities
+modalities <- c("RNA-seq")
+
+has_cite <- "CITEseq" %in% altExpNames(filtered_sce)
+if (has_cite){
+  modalities <- c(modalities, "CITE-seq")
+}
 ```
 
 # Processing Information for `r sample_id`
@@ -74,6 +82,7 @@ unfiltered_meta <- metadata(unfiltered_sce)
 sample_information <- tibble::tibble(
   "Sample id" = sample_id,
   "Tech version" = format(unfiltered_meta$tech_version), # format to keep nulls
+  "Data modalities" = paste(modalities, collapse = ", "),
   "Number of reads sequenced" = format(unfiltered_meta$total_reads, big.mark = ',', scientific = FALSE),
   "Percent of reads mapped" = paste0(round((unfiltered_meta$mapped_reads/unfiltered_meta$total_reads) *100, 2), "%"),
   "Number of cells reported by alevin-fry" = format(unfiltered_meta$af_num_cells, big.mark = ',', scientific = FALSE)
@@ -286,8 +295,6 @@ In such situations, the calculated probability of compromise may not be valid (s
 <!-- Next section included only if CITE-seq data is present -->
 ```{r, child='cite_qc.rmd', eval = has_cite}
 ```
-
-
 
 
 # Session Info
