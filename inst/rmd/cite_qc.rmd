@@ -47,11 +47,11 @@ antibody_tags <- as.data.frame(rowData(cite_exp)) %>%
           as.numeric(stringr::str_extract(Antibody, "\\d+")))
 
 knitr::kable(antibody_tags, digits = 2) %>%
-  kableExtra::kable_styling(bootstrap_options = "striped",
+  kableExtra::kable_styling(bootstrap_options = c("striped", "condensed"),
                             full_width = FALSE,
-                            position = "left") %>%
-  kableExtra::column_spec(2, monospace = TRUE) %>%
-  kableExtra::scroll_box(height = "500px", fixed_thead = TRUE)
+                            position = "left",
+                            ) %>%
+  kableExtra::column_spec(2, monospace = TRUE) 
   
 ```
 
