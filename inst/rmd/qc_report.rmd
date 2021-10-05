@@ -180,6 +180,36 @@ ggplot(unfiltered_celldata, aes(x = rank, y = sum, color = filter_status))+
         legend.box.margin = margin(rep(5, 4)))
 ```
 
+```{r, fig.alt="Smoothed knee plot of filtered and unfiltered droplets"}}
+grouped_celldata <- unfiltered_celldata %>%
+  select(sum, rank, filter_status) %>%
+  mutate(rank_group = floor(rank / 100) )%>%
+  group_by(rank_group) %>%
+  summarize(
+    mean_sum = mean(sum),
+    mean_rank = mean(rank),
+    mean_passed = sum(filter_status == "Passed") / n() * 100
+  )
+
+ggplot(grouped_celldata, aes(x = mean_rank, y = mean_sum, color = mean_passed)) + 
+  geom_line(size = 2, lineend = "round", linejoin= "round") +
+  scale_x_log10(labels = scales::label_number()) +
+  scale_y_log10(labels = scales::label_number(accuracy = 1)) + 
+  scale_color_gradient2(low = "grey70", 
+                        mid = "forestgreen", 
+                        high = "darkgreen", 
+                        midpoint = 50) +
+  labs(
+    x = "Rank", 
+    y = "Total UMI count",
+    color = "% passing\ncell filter"
+  ) + 
+  theme(legend.position = c(0, 0),
+        legend.justification = c(0,0),
+        legend.background = element_rect(color = "grey20", size = 0.25),
+        legend.box.margin = margin(rep(5, 4)))
+```
+
 
 ## Cell Read Metrics 
 
