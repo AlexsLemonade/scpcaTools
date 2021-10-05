@@ -72,7 +72,7 @@ sample_information <- tibble::tibble(
   "Sample id" = sample_id,
   "Tech version" = format(unfiltered_meta$tech_version), # format to keep nulls
   "Number of reads sequenced" = format(unfiltered_meta$total_reads, big.mark = ',', scientific = FALSE),
-  "Number of mapped reads" = format(unfiltered_meta$mapped_reads, big.mark = ',', scientific = FALSE),
+  "Percent of reads mapped" = paste0(round((unfiltered_meta$mapped_reads/unfiltered_meta$total_reads) *100, 2), "%"),
   "Number of cells reported by alevin-fry" = format(unfiltered_meta$af_num_cells, big.mark = ',', scientific = FALSE)
 ) %>%
   mutate(across(.fns = ~ifelse(.x == "NULL", "N/A", .x))) %>% # reformat nulls
@@ -124,10 +124,11 @@ if(has_filtered){
 
 ```{r}
 basic_statistics <- tibble::tibble(
-  "Number of cells post filtering"              = format(ncol(filtered_sce), big.mark = ","),
-  "Median UMI count per cell"                   = format(median(filtered_sce$sum), big.mark = ","),
-  "Median genes detected per cell"              = format(median(filtered_sce$detected), big.mark = ","),
-  "Median percent reads mitochondrial per cell" = paste0(round(median(filtered_sce$subsets_mito_percent), 2), "%")
+  "Number of cells post filtering"     = format(ncol(filtered_sce), big.mark = ","),
+  "Percent of reads in cells"          = paste0(round((sum(filtered_sce$sum)/sum(unfiltered_sce$sum))*100,2),"%"),
+  "Median UMI count per cell"          = format(median(filtered_sce$sum), big.mark = ","),
+  "Median genes detected per cell"     = format(median(filtered_sce$detected), big.mark = ","),
+  "Median percent reads mitochondrial" = paste0(round(median(filtered_sce$subsets_mito_percent), 2), "%")
   ) %>%
   mutate(across(.fns = ~ifelse(.x == "NULL", "N/A", .x))) %>%
   t()
