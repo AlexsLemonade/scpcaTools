@@ -263,6 +263,12 @@ if(skip_miQC){
 }
 ```
 
+We calculate the probability that a cell is compromised due to degradation or rupture using [`miQC`](https://bioconductor.org/packages/release/bioc/html/miQC.html) ([Hippen _et al._ 2021](https://doi.org/10.1371/journal.pcbi.1009290)).
+This relies on fitting a mixture model using the number of genes expressed by a cell and the percentage of mitochondrial reads.
+The expected plot will show a characteristic triangular shape and two model fit lines.
+Cells with low numbers of genes expressed may have both low and high mitochondrial percentage, but cells with many genes tend to have a low mitochondrial percentage.
+If the model has failed to fit properly, the pattern of cells may differ, and there may only be one model fit line. 
+In such situations, the calculated probability of compromise may not be valid (see [miQC vignette](https://bioconductor.org/packages/3.13/bioc/vignettes/miQC/inst/doc/miQC.html#when-not-to-use-miqc) for more details).
 
 # Session Info
 <details>
