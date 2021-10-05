@@ -282,7 +282,9 @@ Cells with low numbers of genes expressed may have both low and high mitochondri
 If the model has failed to fit properly, the pattern of cells may differ, and there may only be one model fit line. 
 In such situations, the calculated probability of compromise may not be valid (see [miQC vignette](https://bioconductor.org/packages/3.13/bioc/vignettes/miQC/inst/doc/miQC.html#when-not-to-use-miqc) for more details).
 
-```{r cite-seq, child='cite_qc.rmd', eval = has_cite}
+
+<!-- Next section included only if CITE-seq data is present -->
+```{r, child='cite_qc.rmd', eval = has_cite}
 ```
 
 
