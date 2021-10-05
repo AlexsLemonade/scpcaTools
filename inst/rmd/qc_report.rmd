@@ -180,18 +180,26 @@ ggplot(unfiltered_celldata, aes(x = rank, y = sum, color = filter_status))+
         legend.box.margin = margin(rep(5, 4)))
 ```
 
-```{r, fig.alt="Smoothed knee plot of filtered and unfiltered droplets"}}
+```{r, fig.alt="Smoothed knee plot of filtered and unfiltered droplets"}
 grouped_celldata <- unfiltered_celldata %>%
   select(sum, rank, filter_status) %>%
   mutate(rank_group = floor(rank / 100) )%>%
   group_by(rank_group) %>%
   summarize(
-    mean_sum = mean(sum),
-    mean_rank = mean(rank),
-    mean_passed = sum(filter_status == "Passed") / n() * 100
+    med_sum = median(sum),
+    med_rank = median(rank),
+    pct_passed = sum(filter_status == "Passed") / n() * 100
   )
 
-ggplot(grouped_celldata, aes(x = mean_rank, y = mean_sum, color = mean_passed)) + 
+top_celldata <- unfiltered_celldata %>%
+  select(sum, rank, filter_status) %>%
+  filter(rank <= 50) %>%
+  mutate(filter_status = ifelse(filter_status == "Passed", 100, 0))
+
+ggplot(grouped_celldata, aes(x = med_rank, y = med_sum, color = pct_passed)) + 
+  geom_point(mapping = aes(x = rank, y = sum, color = filter_status),
+             data = top_celldata,
+             alpha = 0.5) + 
   geom_line(size = 2, lineend = "round", linejoin= "round") +
   scale_x_log10(labels = scales::label_number()) +
   scale_y_log10(labels = scales::label_number(accuracy = 1)) + 
