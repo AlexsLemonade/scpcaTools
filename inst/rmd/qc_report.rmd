@@ -80,10 +80,11 @@ sample_information <- tibble::tibble(
   t()
 
 # make table with sample information
-knitr::kable(sample_information) %>%
+knitr::kable(sample_information, align = 'r') %>%
   kableExtra::kable_styling(bootstrap_options = "striped",
                             full_width = FALSE,
-                            position = "left")
+                            position = "left") %>%
+  kableExtra::column_spec(2, monospace = TRUE)
 ```
 
 ## Pre-Processing Information
@@ -105,10 +106,11 @@ processing_info <- tibble::tibble(
 
 
 # make table with processing information
-knitr::kable(processing_info) %>%
+knitr::kable(processing_info, align = 'r') %>%
   kableExtra::kable_styling(bootstrap_options = "striped",
                             full_width = FALSE,
-                            position = "left")
+                            position = "left") %>%
+  kableExtra::column_spec(2, monospace = TRUE)
 ```
 
 # `r sample_id` Experiment Summary 
@@ -136,10 +138,11 @@ basic_statistics <- tibble::tibble(
 
 
 # make table with basic statistics
-knitr::kable(basic_statistics, align = "lr") %>%
+knitr::kable(basic_statistics, align = 'r') %>%
   kableExtra::kable_styling(bootstrap_options = "striped",
                             full_width = FALSE,
-                            position = "left")
+                            position = "left") %>%
+  kableExtra::column_spec(2, monospace = TRUE)
 
 ```
 
