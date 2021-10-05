@@ -12,8 +12,7 @@ output:
   html_document:
     toc: true
     toc_depth: 2
-    toc_float: 
-      collapsed: false
+    toc_float: true
     number_sections: false
     code_download: true
 ---
