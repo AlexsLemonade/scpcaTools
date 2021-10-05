@@ -1,7 +1,8 @@
-## CITE-seq statistics
+# CITE-seq Experiment Summary
 
+## CITE-seq Statistics
 ```{r}
-cite_exp <- altExp(filtered_sce2, "CITEseq")
+cite_exp <- altExp(filtered_sce, "CITEseq")
 cite_meta <- metadata(cite_exp)
 
 # add rowData if missing
@@ -30,15 +31,15 @@ cite_information <- tibble::tibble(
 knitr::kable(cite_information, align = 'r') %>%
   kableExtra::kable_styling(bootstrap_options = "striped",
                             full_width = FALSE,
-                            position = "left") %>%
+                            position = "left")
   kableExtra::column_spec(2, monospace = TRUE)
 ```
 
-
+## Antibody Derived Tag Statistics 
 ```{r}
 antibody_tags <- as.data.frame(rowData(cite_exp)) %>%
-  tibble::rownames_to_column("Antibody tag") %>%
-  select("Antibody tag",
+  tibble::rownames_to_column("Antibody") %>%
+  select("Antibody",
          "Percent of cells detected" = detected) %>%
   # sort by leading characters, then numeric portion
   arrange(stringr::str_extract(`Antibody tag`, "^[A-Za-z]+"),
@@ -48,6 +49,8 @@ knitr::kable(antibody_tags, digits = 2) %>%
   kableExtra::kable_styling(bootstrap_options = "striped",
                             full_width = FALSE,
                             position = "left") %>%
-  kableExtra::column_spec(2, monospace = TRUE)
+  kableExtra::column_spec(2, monospace = TRUE) %>%
+  kableExtra::scroll_box(height = "500px", fixed_thead = TRUE)
+  
 ```
 
