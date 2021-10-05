@@ -60,8 +60,6 @@ if (is.null(metadata(filtered_sce)$miQC_model) & !skip_miQC){
 }
 ```
 
-# Introduction
-
 # Processing Information for `r sample_id`
 
 ## Raw Sample Metrics
@@ -74,7 +72,7 @@ sample_information <- tibble::tibble(
   "Sample id" = sample_id,
   "Tech version" = format(unfiltered_meta$tech_version), # format to keep nulls
   "Number of reads sequenced" = format(unfiltered_meta$total_reads, big.mark = ',', scientific = FALSE),
-  "Number of mapped reads" = format(unfiltered_meta$mapped_reads, big.mark = ',', scientific = FALSE),
+  "Percent of reads mapped" = paste0(round((unfiltered_meta$mapped_reads/unfiltered_meta$total_reads) *100, 2), "%"),
   "Number of cells reported by alevin-fry" = format(unfiltered_meta$af_num_cells, big.mark = ',', scientific = FALSE)
 ) %>%
   mutate(across(.fns = ~ifelse(.x == "NULL", "N/A", .x))) %>% # reformat nulls
@@ -122,7 +120,31 @@ if(has_filtered){
 }
 ```
 
-## Knee plot
+## Cell Statistics 
+
+```{r}
+basic_statistics <- tibble::tibble(
+  "Number of cells post filtering"     = format(ncol(filtered_sce), big.mark = ","),
+  "Percent of reads in cells"          = paste0(round((sum(filtered_sce$sum)/sum(unfiltered_sce$sum))*100,2),"%"),
+  "Median UMI count per cell"          = format(median(filtered_sce$sum), big.mark = ","),
+  "Median genes detected per cell"     = format(median(filtered_sce$detected), big.mark = ","),
+  "Median percent reads mitochondrial" = paste0(round(median(filtered_sce$subsets_mito_percent), 2), "%")
+  ) %>%
+  mutate(across(.fns = ~ifelse(.x == "NULL", "N/A", .x))) %>%
+  t()
+
+
+# make table with basic statistics
+knitr::kable(basic_statistics, align = "lr") %>%
+  kableExtra::kable_styling(bootstrap_options = "striped",
+                            full_width = FALSE,
+                            position = "left")
+
+```
+
+
+## Knee Plot
+
 ```{r, fig.alt="Knee plot of filtered and unfiltered droplets"}
 unfiltered_celldata <- data.frame(colData(unfiltered_sce)) %>%
   mutate(
@@ -155,7 +177,7 @@ ggplot(unfiltered_celldata, aes(x = rank, y = sum, color = filter_status))+
 ```
 
 
-## Cell read metrics 
+## Cell Read Metrics 
 
 ```{r, fig.alt="Total UMI x genes expressed"}
 filtered_celldata <- data.frame(colData(filtered_sce)) 
@@ -176,7 +198,7 @@ ggplot(filtered_celldata,
         legend.box.margin = margin(rep(5, 4)))
 ```
 
-## miQC model diagnostics
+## miQC Model Diagnostics
 
 ```{r, fig.alt="miQC model diagnostics plot", results='asis', warning=FALSE}
 if(skip_miQC){
