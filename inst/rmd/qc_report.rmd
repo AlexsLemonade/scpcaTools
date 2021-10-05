@@ -146,7 +146,6 @@ knitr::kable(basic_statistics, align = 'r') %>%
 
 ```
 
-
 ## Knee Plot
 
 ```{r, fig.alt="Knee plot of filtered and unfiltered droplets"}
@@ -242,6 +241,10 @@ ggplot(filtered_celldata,
         legend.background = element_rect(color = "grey20", size = 0.25),
         legend.box.margin = margin(rep(5, 4)))
 ```
+
+The above plot of cell metrics includes only droplets which have passed the `emptyDrops()` filter.
+The plot will usually display a strong (but curved) relationship between the total UMI count and the number of genes detected.
+Cells with low counts and high mitochondrial percentages may require further filtering.
 
 ## miQC Model Diagnostics
 
