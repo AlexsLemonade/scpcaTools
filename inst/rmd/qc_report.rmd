@@ -6,7 +6,7 @@ params:
   date: !r Sys.Date()
 
 title: "`r glue::glue('ScPCA QC report for {params$sample}')`"
-author: "CCDL"
+author: "Childhood Cancer Data Lab"
 date: "`r params$date`"
 output: 
   html_document:
