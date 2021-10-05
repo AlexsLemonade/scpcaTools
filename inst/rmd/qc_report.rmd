@@ -120,21 +120,21 @@ if(has_filtered){
 }
 ```
 
-## Basic Cell Statistics 
+## Cell Statistics 
 
 ```{r}
 basic_statistics <- tibble::tibble(
   "Number of cells post filtering"              = format(ncol(filtered_sce), big.mark = ","),
   "Median UMI count per cell"                   = format(median(filtered_sce$sum), big.mark = ","),
   "Median genes detected per cell"              = format(median(filtered_sce$detected), big.mark = ","),
-  "Median percent reads mitochondrial per cell" = paste0(round(median(filtered_sce$subsets_mito_percent), 2), " %")
+  "Median percent reads mitochondrial per cell" = paste0(round(median(filtered_sce$subsets_mito_percent), 2), "%")
   ) %>%
   mutate(across(.fns = ~ifelse(.x == "NULL", "N/A", .x))) %>%
   t()
 
 
 # make table with basic statistics
-knitr::kable(basic_statistics) %>%
+knitr::kable(basic_statistics, align = "lr") %>%
   kableExtra::kable_styling(bootstrap_options = "striped",
                             full_width = FALSE,
                             position = "left")
