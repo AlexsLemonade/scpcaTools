@@ -3,9 +3,6 @@
 ## CITE-seq Statistics
 
 ```{r}
-cite_exp <- altExp(filtered_sce, "CITEseq")
-cite_meta <- metadata(cite_exp)
-
 # add rowData if missing
 if (is.null(rowData(cite_exp)$detected)){
   cite_exp <- scuttle::addPerFeatureQCMetrics(cite_exp)

@@ -83,16 +83,27 @@ sample_information <- tibble::tibble(
   "Sample id" = sample_id,
   "Tech version" = format(unfiltered_meta$tech_version), # format to keep nulls
   "Data modalities" = paste(modalities, collapse = ", "),
-  "Number of reads sequenced" = format(unfiltered_meta$total_reads, big.mark = ',', scientific = FALSE),
-  "Percent of reads mapped" = paste0(round((unfiltered_meta$mapped_reads/unfiltered_meta$total_reads) *100, 2), "%"),
-  "Number of cells reported by alevin-fry" = format(unfiltered_meta$af_num_cells, big.mark = ',', scientific = FALSE)
+  "Cells reported by alevin-fry" = 
+    format(unfiltered_meta$af_num_cells, big.mark = ',', scientific = FALSE),
+  "Number of genes assayed" = 
+    format(nrow(unfiltered_sce), big.mark = ',', scientific = FALSE),
+  "RNA-seq reads sequenced" = 
+    format(unfiltered_meta$total_reads, big.mark = ',', scientific = FALSE),
+  "Percent RNA-seq reads mapped to transcripts" = 
+    paste0(round((unfiltered_meta$mapped_reads/unfiltered_meta$total_reads) *100, 2), "%")
 )
 if (has_cite){
-  cite_meta <- metadata(altExp(unfiltered_sce, "CITEseq"))
+  cite_exp <- altExp(filtered_sce, "CITEseq")
+  cite_meta <- metadata(cite_exp)
+  
   sample_information <- sample_information %>%
     mutate(
-      "CITE-seq reads sequenced" = format(cite_meta$total_reads, big.mark = ',', scientific = FALSE),
-      "CITE-seq reads mapped" = format(cite_meta$mapped_reads, big.mark = ',', scientific = FALSE),
+      "Number of ADTs assayed" = 
+        format(nrow(cite_exp), big.mark = ',', scientific = FALSE),
+      "CITE-seq reads sequenced" = 
+        format(cite_meta$total_reads, big.mark = ',', scientific = FALSE),
+      "Percent CITE-seq reads mapped to ADTs" = 
+        paste0(round(cite_meta$mapped_reads/cite_meta$total_reads * 100, digits = 2), "%")
     )
 }
 
@@ -134,7 +145,7 @@ knitr::kable(processing_info, align = 'r') %>%
   kableExtra::column_spec(2, monospace = TRUE)
 ```
 
-# `r sample_id` Experiment Summary 
+# RNA-seq Experiment Summary 
 
 This sample has `r ncol(unfiltered_sce)` cells, assayed for `r nrow(unfiltered_sce)` genes.
 
