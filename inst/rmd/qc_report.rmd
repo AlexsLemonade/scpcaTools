@@ -169,54 +169,31 @@ knitr::kable(basic_statistics, align = 'r') %>%
 
 ## Knee Plot
 
-```{r, fig.alt="Knee plot of filtered and unfiltered droplets"}
+```{r, fig.alt="Smoothed knee plot of filtered and unfiltered droplets"}
 unfiltered_celldata <- data.frame(colData(unfiltered_sce)) %>%
   mutate(
     rank = rank(- unfiltered_sce$sum, ties.method = "first"), # using full spec for clarity 
-    filter_status = factor(ifelse(colnames(unfiltered_sce) %in% colnames(filtered_sce),
-                                  "Passed", "Excluded"),
-                           levels = c("Passed", "Excluded"))
+    filter_pass = colnames(unfiltered_sce) %in% colnames(filtered_sce)
   ) %>%
-  filter(sum > 0) %>% # remove zeros for plotting
-  arrange(desc(rank))
+  select(sum, rank, filter_pass) %>%
+  filter(sum > 0) # remove zeros for plotting
 
-ggplot(unfiltered_celldata, aes(x = rank, y = sum, color = filter_status))+
-  geom_point(aes(size = filter_status), alpha = 0.2) +
-  scale_x_log10(labels = scales::label_number()) +
-  scale_y_log10(labels = scales::label_number()) + 
-  scale_color_manual(values = c("darkgreen", "grey80")) + 
-  scale_size_manual(values = c(2, 1)) +
-  labs(
-    x = "Rank", 
-    y = "Total UMI count",
-    color = "Filter status",
-    size  = "Filter status"
-  ) + 
-  guides(color = guide_legend(override.aes = list(alpha = 1))) + 
-  theme(legend.position = c(0, 0),
-        legend.justification = c(0,0),
-        legend.background = element_rect(color = "grey20", size = 0.25),
-        legend.box.margin = margin(rep(5, 4)))
-```
 
-```{r, fig.alt="Smoothed knee plot of filtered and unfiltered droplets"}
 grouped_celldata <- unfiltered_celldata %>%
-  select(sum, rank, filter_status) %>%
   mutate(rank_group = floor(rank / 100) )%>%
   group_by(rank_group) %>%
   summarize(
     med_sum = median(sum),
     med_rank = median(rank),
-    pct_passed = sum(filter_status == "Passed") / n() * 100
-  )
+    pct_passed = sum(filter_pass) / n() * 100
+  ) 
 
 top_celldata <- unfiltered_celldata %>%
-  select(sum, rank, filter_status) %>%
   filter(rank <= 50) %>%
-  mutate(filter_status = ifelse(filter_status == "Passed", 100, 0))
+  mutate(filter_pct = ifelse(filter_pass, 100, 0))
 
 ggplot(grouped_celldata, aes(x = med_rank, y = med_sum, color = pct_passed)) + 
-  geom_point(mapping = aes(x = rank, y = sum, color = filter_status),
+  geom_point(mapping = aes(x = rank, y = sum, color = filter_pct),
              data = top_celldata,
              alpha = 0.5) + 
   geom_line(size = 2, lineend = "round", linejoin= "round") +
@@ -238,8 +215,9 @@ ggplot(grouped_celldata, aes(x = med_rank, y = med_sum, color = pct_passed)) +
 ```
 
 The total UMI count of each droplet (barcode) plotted against the rank of that droplet allows visualization of the distribution of sequencing depth across droplets. 
-The droplets that are expected to contain cells were identified with [`DropletUtils::emptyDrops()`](https://bioconductor.org/packages/release/bioc/html/DropletUtils.html) , which uses both the total UMI counts and expressed gene content ([Lun  _et al._ 2019](https://doi.org/10.1186/s13059-019-1662-y)).
-As the boundary between droplets passing and failing this filter does not correspond only to the axes of this plot, some regions contain droplets in both categories, so we here color the plot by the percentage passing the filter.
+The droplets that are expected to contain cells were identified with [`DropletUtils::emptyDrops()`](https://bioconductor.org/packages/release/bioc/html/DropletUtils.html), which uses both the total UMI counts and expressed gene content ([Lun  _et al._ 2019](https://doi.org/10.1186/s13059-019-1662-y)).
+As the boundary between droplets passing and failing this filter is not solely dependent on total UMI count, some regions contain droplets in both categories.
+The color in this plot indicates the percentage of droplets in a region passing the filter.
 
 ## Cell Read Metrics 
 
@@ -263,7 +241,7 @@ ggplot(filtered_celldata,
 
 The above plot of cell metrics includes only droplets which have passed the `emptyDrops()` filter.
 The plot will usually display a strong (but curved) relationship between the total UMI count and the number of genes detected.
-Cells with low counts and high mitochondrial percentages may require further filtering.
+Cells with low UMI counts and high mitochondrial percentages may require further filtering.
 
 ## miQC Model Diagnostics
 
@@ -288,6 +266,8 @@ We calculate the probability that a cell is compromised due to degradation or ru
 This relies on fitting a mixture model using the number of genes expressed by a cell and the percentage of mitochondrial reads.
 The expected plot will show a characteristic triangular shape and two model fit lines.
 Cells with low numbers of genes expressed may have both low and high mitochondrial percentage, but cells with many genes tend to have a low mitochondrial percentage.
+Compromised cells are likely to have a fewer genes detected and higher percentage of mitochondrial reads.
+
 If the model has failed to fit properly, the pattern of cells may differ, and there may only be one model fit line. 
 In such situations, the calculated probability of compromise may not be valid (see [miQC vignette](https://bioconductor.org/packages/3.13/bioc/vignettes/miQC/inst/doc/miQC.html#when-not-to-use-miqc) for more details).
 
