@@ -149,54 +149,31 @@ knitr::kable(basic_statistics, align = 'r') %>%
 
 ## Knee Plot
 
-```{r, fig.alt="Knee plot of filtered and unfiltered droplets"}
+```{r, fig.alt="Smoothed knee plot of filtered and unfiltered droplets"}
 unfiltered_celldata <- data.frame(colData(unfiltered_sce)) %>%
   mutate(
     rank = rank(- unfiltered_sce$sum, ties.method = "first"), # using full spec for clarity 
-    filter_status = factor(ifelse(colnames(unfiltered_sce) %in% colnames(filtered_sce),
-                                  "Passed", "Excluded"),
-                           levels = c("Passed", "Excluded"))
+    filter_pass = colnames(unfiltered_sce) %in% colnames(filtered_sce)
   ) %>%
-  filter(sum > 0) %>% # remove zeros for plotting
-  arrange(desc(rank))
+  select(sum, rank, filter_pass) %>%
+  filter(sum > 0) # remove zeros for plotting
 
-ggplot(unfiltered_celldata, aes(x = rank, y = sum, color = filter_status))+
-  geom_point(aes(size = filter_status), alpha = 0.2) +
-  scale_x_log10(labels = scales::label_number()) +
-  scale_y_log10(labels = scales::label_number()) + 
-  scale_color_manual(values = c("darkgreen", "grey80")) + 
-  scale_size_manual(values = c(2, 1)) +
-  labs(
-    x = "Rank", 
-    y = "Total UMI count",
-    color = "Filter status",
-    size  = "Filter status"
-  ) + 
-  guides(color = guide_legend(override.aes = list(alpha = 1))) + 
-  theme(legend.position = c(0, 0),
-        legend.justification = c(0,0),
-        legend.background = element_rect(color = "grey20", size = 0.25),
-        legend.box.margin = margin(rep(5, 4)))
-```
 
-```{r, fig.alt="Smoothed knee plot of filtered and unfiltered droplets"}
 grouped_celldata <- unfiltered_celldata %>%
-  select(sum, rank, filter_status) %>%
   mutate(rank_group = floor(rank / 100) )%>%
   group_by(rank_group) %>%
   summarize(
     med_sum = median(sum),
     med_rank = median(rank),
-    pct_passed = sum(filter_status == "Passed") / n() * 100
-  )
+    pct_passed = sum(filter_pass) / n() * 100
+  ) 
 
 top_celldata <- unfiltered_celldata %>%
-  select(sum, rank, filter_status) %>%
   filter(rank <= 50) %>%
-  mutate(filter_status = ifelse(filter_status == "Passed", 100, 0))
+  mutate(filter_pct = ifelse(filter_pass, 100, 0))
 
 ggplot(grouped_celldata, aes(x = med_rank, y = med_sum, color = pct_passed)) + 
-  geom_point(mapping = aes(x = rank, y = sum, color = filter_status),
+  geom_point(mapping = aes(x = rank, y = sum, color = filter_pct),
              data = top_celldata,
              alpha = 0.5) + 
   geom_line(size = 2, lineend = "round", linejoin= "round") +
