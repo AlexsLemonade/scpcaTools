@@ -147,14 +147,6 @@ knitr::kable(processing_info, align = 'r') %>%
 
 # RNA-seq Experiment Summary 
 
-This sample has `r ncol(unfiltered_sce)` cells, assayed for `r nrow(unfiltered_sce)` genes.
-
-```{r, results = 'asis'}
-if(has_filtered){
-  cat("After filtering, there are", ncol(filtered_sce), "cells.")
-}
-```
-
 ## Cell Statistics 
 
 ```{r}
