@@ -254,8 +254,18 @@ if(skip_miQC){
 }else{
   # remove prob_compromised if it exists, as this will cause errors with plotModel
   filtered_sce$prob_compromised <- NULL
-  miQC::plotModel(filtered_sce, model = metadata(filtered_sce)$miQC_model) + 
+  miQC_model <- metadata(filtered_sce)$miQC_model
+  
+  if (length(miQC_model@components) < 2){
+    # model didn't fit, just plot metrics
+    miQC_plot <- miQC::plotMetrics(filtered_sce)
+  }else{
+    miQC_plot <- miQC::plotModel(filtered_sce, model = miQC_model)
+  }
+  
+  miQC_plot + 
     coord_cartesian(ylim = c(0,100)) +
+    scale_x_continuous(labels = scales::label_number()) +
     labs(x = "Number of genes detected",
          y = "Percent reads mitochondrial") +
     theme(legend.position = c(1, 1),
@@ -271,7 +281,8 @@ The expected plot will show a characteristic triangular shape and two model fit 
 Cells with low numbers of genes expressed may have both low and high mitochondrial percentage, but cells with many genes tend to have a low mitochondrial percentage.
 Compromised cells are likely to have a fewer genes detected and higher percentage of mitochondrial reads.
 
-If the model has failed to fit properly, the pattern of cells may differ, and there may only be one model fit line. 
+If the model has failed to fit properly, the pattern of cells may differ, and there may not be model fit lines.
+This can be the result of a low-quality library or may occur if there is no mitochondrial content, as in the case of a high-quality single-nucleus sample.
 In such situations, the calculated probability of compromise may not be valid (see [miQC vignette](https://bioconductor.org/packages/3.13/bioc/vignettes/miQC/inst/doc/miQC.html#when-not-to-use-miqc) for more details).
 
 
