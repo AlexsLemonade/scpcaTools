@@ -4,13 +4,13 @@
 #' @param sce SingleCellExperiment object.
 #'
 #' @return SingleCellExperiment with prob_compromised column added to colData
-#'   and a miQC_model slot in the metadata.
+#'   If the model fits properly, there will also be a miQC_model slot added to the metadata.
 #'
 #' @import SummarizedExperiment
 #'
 #' @export
 #'
-add_cell_mito_qc <- function(sce){
+add_miQC <- function(sce){
   # check that input is a SingleCellExperiment
   if(!is(sce, "SingleCellExperiment")){
     stop("sce must be a SingleCellExperiment object")
@@ -29,17 +29,16 @@ add_cell_mito_qc <- function(sce){
     miQC::mixtureModel(sce),
     error = function(x){NA}
   )
-  if (!is.na(model) && length(model@components) < 2){
+  if (class(model) == "flexmix"  && length(model@components) < 2){
     # first model fit gave only one component, give it one more chance.
     model <- miQC::mixtureModel(sce)
   }
-  if (is.na(model) || length(model@components) < 2){
+  if (class(model) != "flexmix" || length(model@components) < 2){
     # no good fit, fill prob_compromised with NA
     sce$prob_compromised <- NA_real_
   }else{
     sce <- miQC::filterCells(sce, model = model, posterior_cutoff = 1, verbose = FALSE)
+    metadata(sce)$miQC_model <- model
   }
-  metadata(sce)$miQC_model <- model
-
   return(sce)
 }
