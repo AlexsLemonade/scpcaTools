@@ -2,6 +2,7 @@
 
 export(add_cell_mito_qc)
 export(add_gene_symbols)
+export(add_miQC)
 export(coldata_to_df)
 export(filter_counts)
 export(generate_qc_report)
