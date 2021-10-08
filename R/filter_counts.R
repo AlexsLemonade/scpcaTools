@@ -3,7 +3,7 @@
 #' @param sce SingleCellExperiment with unfiltered gene x cell counts matrix.
 #' @param fdr_cutoff FDR cutoff to use for DropletUtils::emptyDrops.
 #'   Default is 0.01.
-#' @param seed A random seed for reproducibility.
+#' @param seed An optional random seed for reproducibility.
 #' @param ... Any arguments to be passed into DropletUtils::emptyDrops.
 #'
 #' @return SingleCellExperiment with filtered gene x cell matrix.
