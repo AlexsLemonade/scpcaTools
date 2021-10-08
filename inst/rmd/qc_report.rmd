@@ -21,7 +21,8 @@ output:
 ```{r setup, message = FALSE, echo = FALSE}
 # knitr options
 knitr::opts_chunk$set(
-  echo = FALSE
+  echo = FALSE,
+  warning = FALSE
 )
 
 library(SingleCellExperiment)
@@ -52,14 +53,12 @@ if (is.null(unfiltered_sce$sum)){
 }
 if (is.null(filtered_sce$sum)){
   filtered_sce <- scuttle::addPerCellQCMetrics(filtered_sce)
+}
+if (is.null(filtered_sce$subsets_mito_percent)){
   filtered_sce$subsets_mito_percent <- NA_real_
   skip_miQC <- TRUE
-} else{
+}else{
   skip_miQC <- FALSE
-}
-# add miQC model if missing
-if (is.null(metadata(filtered_sce)$miQC_model) & !skip_miQC){
-  metadata(filtered_sce)$miQC_model <- miQC::mixtureModel(filtered_sce)
 }
 
 ## Check for additional modalities
