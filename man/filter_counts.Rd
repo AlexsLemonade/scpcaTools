@@ -12,7 +12,7 @@ filter_counts(sce, fdr_cutoff = 0.01, seed = NULL, ...)
 \item{fdr_cutoff}{FDR cutoff to use for DropletUtils::emptyDrops.
 Default is 0.01.}
 
-\item{seed}{A random seed for reproducibility.}
+\item{seed}{An optional random seed for reproducibility.}
 
 \item{...}{Any arguments to be passed into DropletUtils::emptyDrops.}
 }
