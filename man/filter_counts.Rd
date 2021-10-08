@@ -4,13 +4,15 @@
 \alias{filter_counts}
 \title{Filter counts matrix using DropletUtils::emptyDrops}
 \usage{
-filter_counts(sce, fdr_cutoff = 0.01, ...)
+filter_counts(sce, fdr_cutoff = 0.01, seed = NULL, ...)
 }
 \arguments{
 \item{sce}{SingleCellExperiment with unfiltered gene x cell counts matrix.}
 
 \item{fdr_cutoff}{FDR cutoff to use for DropletUtils::emptyDrops.
 Default is 0.01.}
+
+\item{seed}{A random seed for reproducibility.}
 
 \item{...}{Any arguments to be passed into DropletUtils::emptyDrops.}
 }

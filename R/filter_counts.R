@@ -3,6 +3,7 @@
 #' @param sce SingleCellExperiment with unfiltered gene x cell counts matrix.
 #' @param fdr_cutoff FDR cutoff to use for DropletUtils::emptyDrops.
 #'   Default is 0.01.
+#' @param seed A random seed for reproducibility.
 #' @param ... Any arguments to be passed into DropletUtils::emptyDrops.
 #'
 #' @return SingleCellExperiment with filtered gene x cell matrix.
@@ -12,7 +13,9 @@
 #' \dontrun{
 #' filter_counts(sce = sce_object)
 #' }
-filter_counts <- function(sce, fdr_cutoff = 0.01, ...) {
+filter_counts <- function(sce, fdr_cutoff = 0.01, seed = NULL, ...) {
+
+  set.seed(seed)
 
   if(!is(sce,"SingleCellExperiment")){
     stop("Input must be a SingleCellExperiment object.")
