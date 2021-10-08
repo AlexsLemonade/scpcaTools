@@ -11,7 +11,6 @@ test_that("Check QC addition", {
   # check column names
   expect_true(all(expected_cols %in% names(colData(sce))))
   # make sure we don't get all zeros, which would indicate match failure
-  expect_false(is.null(metadata(sce)$miQC_model))
   expect_gt(mean(sce$subsets_mito_percent), 0)
 
 })

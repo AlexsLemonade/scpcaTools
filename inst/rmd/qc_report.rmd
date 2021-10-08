@@ -258,7 +258,7 @@ if(skip_miQC){
   filtered_sce$prob_compromised <- NULL
   miQC_model <- metadata(filtered_sce)$miQC_model
   
-  if (length(miQC_model@components) < 2){
+  if (is.null(miQC_model) || length(miQC_model@components) < 2){
     # model didn't fit, just plot metrics
     miQC_plot <- miQC::plotMetrics(filtered_sce)
   }else{
