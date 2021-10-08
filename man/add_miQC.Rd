@@ -4,10 +4,12 @@
 \alias{add_miQC}
 \title{Add miQC model and probability compromised to a SingleCellExperiment object}
 \usage{
-add_miQC(sce)
+add_miQC(sce, seed = NULL)
 }
 \arguments{
 \item{sce}{SingleCellExperiment object.}
+
+\item{seed}{An optional random seed for reproducibility.}
 }
 \value{
 SingleCellExperiment with prob_compromised column added to colData

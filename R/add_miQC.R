@@ -3,6 +3,8 @@
 #'
 #' @param sce SingleCellExperiment object.
 #'
+#' @param seed An optional random seed for reproducibility.
+#'
 #' @return SingleCellExperiment with prob_compromised column added to colData
 #'   If the model fits properly, there will also be a miQC_model slot added to the metadata.
 #'
@@ -10,7 +12,7 @@
 #'
 #' @export
 #'
-add_miQC <- function(sce){
+add_miQC <- function(sce, seed = NULL){
   # check that input is a SingleCellExperiment
   if(!is(sce, "SingleCellExperiment")){
     stop("sce must be a SingleCellExperiment object")
@@ -23,6 +25,9 @@ add_miQC <- function(sce){
   if(!is.null(sce$prob_compromised)){
     warning("prob_compromised was already calculated and will be replaced.")
   }
+
+  # set seed
+  set.seed(seed)
 
   # generate linear mixture model of probability of cells being compromised
   model <- tryCatch(
