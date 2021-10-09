@@ -199,7 +199,7 @@ ggplot(grouped_celldata, aes(x = med_rank, y = med_sum, color = pct_passed)) +
              data = top_celldata,
              alpha = 0.5) + 
   geom_line(size = 2, lineend = "round", linejoin= "round") +
-  scale_x_log10(labels = scales::label_number()) +
+  scale_x_log10(labels = scales::label_number(accuracy = 1)) +
   scale_y_log10(labels = scales::label_number(accuracy = 1)) + 
   scale_color_gradient2(low = "grey70", 
                         mid = "forestgreen", 
@@ -232,8 +232,8 @@ ggplot(filtered_celldata,
             color = subsets_mito_percent)) +
   geom_point(alpha = 0.3) +
   scale_color_viridis_c(limits = c(0, 100)) + 
-  scale_x_continuous(labels = scales::label_number()) +
-  scale_x_continuous(labels = scales::label_number()) +
+  scale_x_continuous(labels = scales::label_number(accuracy = 1)) +
+  scale_y_continuous(labels = scales::label_number(accuracy = 1)) +
   labs(x = "Total UMI count",
        y = "Number of genes detected",
        color = "Percent reads\nmitochondrial") + 
@@ -266,7 +266,7 @@ if(skip_miQC){
   
   miQC_plot + 
     coord_cartesian(ylim = c(0,100)) +
-    scale_x_continuous(labels = scales::label_number()) +
+    scale_x_continuous(labels = scales::label_number(accuracy = 1)) +
     labs(x = "Number of genes detected",
          y = "Percent reads mitochondrial") +
     theme(legend.position = c(1, 1),
