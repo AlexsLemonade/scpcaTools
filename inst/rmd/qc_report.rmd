@@ -21,8 +21,7 @@ output:
 ```{r setup, message = FALSE, echo = FALSE}
 # knitr options
 knitr::opts_chunk$set(
-  echo = FALSE,
-  warning = FALSE
+  echo = FALSE
 )
 
 library(SingleCellExperiment)
