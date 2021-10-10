@@ -31,5 +31,10 @@ filter_counts <- function(sce, fdr_cutoff = 0.01, seed = NULL, ...) {
 
   # subset original counts matrix by cells that pass filter
   sce <- sce[, cells]
+
+  # remove feature stats that are no longer valid
+  drop_cols <- colnames(rowData(sce)) %in% c('mean', 'detected')
+  rowData(sce) <- rowData(sce)[!drop_cols]
+
   return(sce)
 }
