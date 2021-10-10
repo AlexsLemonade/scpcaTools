@@ -1,5 +1,10 @@
 #' Filter counts matrix using DropletUtils::emptyDrops
 #'
+#' This function will filter a SingleCellExperiment object using DropletUtils::emptyDrops(),
+#'   as well as any associated alternative experiments. If mean expression and percent detected
+#'   were previously calculated in the columns `mean` and `detected`, respectively, these
+#'   will be removed from both the main and alternative experiments.
+#'
 #' @param sce SingleCellExperiment with unfiltered gene x cell counts matrix.
 #' @param fdr_cutoff FDR cutoff to use for DropletUtils::emptyDrops.
 #'   Default is 0.01.
