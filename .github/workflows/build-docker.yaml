@@ -34,8 +34,6 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
-            type=sha
-            type=raw,value={{date 'YYYY-MM-DD'}}
             type=semver,pattern={{raw}}
             type=edge,branch=main
 
