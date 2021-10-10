@@ -35,6 +35,10 @@ filter_counts <- function(sce, fdr_cutoff = 0.01, seed = NULL, ...) {
   # remove feature stats that are no longer valid
   drop_cols <- colnames(rowData(sce)) %in% c('mean', 'detected')
   rowData(sce) <- rowData(sce)[!drop_cols]
+  for (alt in alt_names) { # alt expts too
+    drop_cols = colnames(rowData(altExp(filtered_sce, alt))) %in% c('mean', 'detected')
+    rowData(altExp(filtered_sce, alt)) <- rowData(altExp(filtered_sce, alt))[!drop_cols]
+  }
 
   return(sce)
 }
