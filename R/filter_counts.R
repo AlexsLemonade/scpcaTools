@@ -1,5 +1,10 @@
 #' Filter counts matrix using DropletUtils::emptyDrops
 #'
+#' This function will filter a SingleCellExperiment object using DropletUtils::emptyDrops(),
+#'   as well as any associated alternative experiments. If mean expression and percent detected
+#'   were previously calculated in the columns `mean` and `detected`, respectively, these
+#'   will be removed from both the main and alternative experiments.
+#'
 #' @param sce SingleCellExperiment with unfiltered gene x cell counts matrix.
 #' @param fdr_cutoff FDR cutoff to use for DropletUtils::emptyDrops.
 #'   Default is 0.01.
@@ -7,6 +12,9 @@
 #' @param ... Any arguments to be passed into DropletUtils::emptyDrops.
 #'
 #' @return SingleCellExperiment with filtered gene x cell matrix.
+#'
+#' @import SingleCellExperiment
+#'
 #' @export
 #'
 #' @examples
@@ -31,5 +39,13 @@ filter_counts <- function(sce, fdr_cutoff = 0.01, seed = NULL, ...) {
 
   # subset original counts matrix by cells that pass filter
   sce <- sce[, cells]
+
+  # remove feature stats that are no longer valid
+  drop_cols <- colnames(rowData(sce)) %in% c('mean', 'detected')
+  rowData(sce) <- rowData(sce)[!drop_cols]
+  for (alt in altExpNames(sce)) { # alt expts too
+    drop_cols = colnames(rowData(altExp(sce, alt))) %in% c('mean', 'detected')
+    rowData(altExp(sce, alt)) <- rowData(altExp(sce, alt))[!drop_cols]
+  }
   return(sce)
 }
