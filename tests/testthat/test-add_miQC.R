@@ -7,6 +7,7 @@ test_that("miQC addition is correct", {
   sce <- scuttle::addPerCellQCMetrics(sce, subsets = list(mito = mito))
   sce <- add_miQC(sce)
   expect_true("prob_compromised" %in% colnames(colData(sce)))
+  expect_true("miQC_pass" %in% colnames(colData(sce)))
   expect_true("miQC_model" %in% names(metadata(sce)))
 })
 
