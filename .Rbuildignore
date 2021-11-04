@@ -1,5 +1,6 @@
 ^renv$
 ^renv\.lock$
+^dependencies.R$
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^\.github$
