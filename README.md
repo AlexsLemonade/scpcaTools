@@ -33,8 +33,11 @@ Packages that are required for the main `scpcaTools` package should be included 
 To keep this up to date, `renv::snapshot()` should be run periodically during development(before submitting PRs), which should add any packages that are used in `scpcaTools` scripts and notebooks to `renv.lock`.  
 When checking out a branch, `renv::restore()` can be used to keep local package installations in sync.
 
-Packages that are not required for the `scpcaTools` scripts directly, but might be suggested (such as `fishpond` for `tximport`) can be added to the `renv.lock` file by updating the `dependencies.R` file.
-Similarly, packages that we might want to be installed in the Docker image but are not part of `scpcaTools` directly can be added to `dependencies.R` to be sure they are part of the image.
+Packages that are not required for the `scpcaTools` scripts directly, but that should be installed in the Docker image can be added to `docker/dependencies.R` to be sure they are part of the image.
+
+Conversely, if there are packages that should _not_ be added to the docker image (such as `scpcaData`), they should be set as ignored in `renv/settings.dcf`. 
+
+Note that `renv` is not used when testing the package in CI, so package versions may be different from those specified in `renv.lock`.
 
 
 
