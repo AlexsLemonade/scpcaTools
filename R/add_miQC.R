@@ -51,11 +51,12 @@ add_miQC <- function(sce, posterior_cutoff = 0.7, seed = NULL){
                              posterior_cutoff = 1,
                              enforce_left_cutoff = FALSE,
                              verbose = FALSE)
-    miqc_pass <- colnames(sce) %in% colnames(miQC::filterCells(sce,
-                                                               model = model,
-                                                               posterior_cutoff = posterior_cutoff,
-                                                               verbose = FALSE))
-    sce$miQC_pass = miqc_pass
+    # test whether cells would pass filtering
+    pass_cells <- colnames(miQC::filterCells(sce,
+                                             model = model,
+                                             posterior_cutoff = posterior_cutoff,
+                                             verbose = FALSE))
+    sce$miQC_pass <- colnames(sce) %in% pass_cells
     metadata(sce)$miQC_model <- model
   }
   return(sce)
