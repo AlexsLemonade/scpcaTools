@@ -1,4 +1,4 @@
-# additional packages from suggests
+# additional packages from suggests lists
 # and/or for the Docker image
 
 library(AnnotationHub)

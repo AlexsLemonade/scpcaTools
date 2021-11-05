@@ -19,8 +19,22 @@ The package can be installed from github with:
 remotes::install_github("AlexsLemonade/scpcaTools")
 ```
 
-
 ## Testing
 
 To test the import functions in this package, you must also have installed the [`scpcaData` package](https://github.com/AlexsLemonade/scpcaData).
 This can be done by running `remotes::install_github("AlexsLemonade/scpcaData")`
+
+## Docker image and `renv`
+
+This repository also includes a Dockerfile and associated scripts for building a Docker image that includes the `scpcaTools` package and some additional packages used in other ScPCA repositories, notably [scpca-nf](https://github.com/AlexsLemonade/scpca-nf).
+To support this, we use [`renv`](https://rstudio.github.io/renv/index.html) to track the versioned set of packages that will be installed in that Docker image.
+
+Packages that are required for the main `scpcaTools` package should be included in the `renv.lock` file as they are installed and used.
+To keep this up to date, `renv::snapshot()` should be run periodically during development(before submitting PRs), which should add any packages that are used in `scpcaTools` scripts and notebooks to `renv.lock`.  
+When checking out a branch, `renv::restore()` can be used to keep local package installations in sync.
+
+Packages that are not required for the `scpcaTools` scripts directly, but might be suggested (such as `fishpond` for `tximport`) can be added to the `renv.lock` file by updating the `dependencies.R` file.
+Similarly, packages that we might want to be installed in the Docker image but are not part of `scpcaTools` directly can be added to `dependencies.R` to be sure they are part of the image.
+
+
+
