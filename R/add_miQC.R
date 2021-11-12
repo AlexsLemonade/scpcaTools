@@ -12,7 +12,7 @@
 #'
 #' @export
 #'
-add_miQC <- function(sce, posterior_cutoff = 0.7, seed = NULL){
+add_miQC <- function(sce, posterior_cutoff = 0.75, seed = NULL){
   # check that input is a SingleCellExperiment
   if(!is(sce, "SingleCellExperiment")){
     stop("sce must be a SingleCellExperiment object")
