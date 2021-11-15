@@ -2,7 +2,7 @@
 #'
 #'
 #' @param sce SingleCellExperiment object.
-#'
+#' @param posterior_cutoff Optional posterior cutoff used for the miQC filtering calculation (default 0.75)
 #' @param seed An optional random seed for reproducibility.
 #'
 #' @return SingleCellExperiment with prob_compromised column added to colData
@@ -12,7 +12,7 @@
 #'
 #' @export
 #'
-add_miQC <- function(sce, seed = NULL){
+add_miQC <- function(sce, posterior_cutoff = 0.75, seed = NULL){
   # check that input is a SingleCellExperiment
   if(!is(sce, "SingleCellExperiment")){
     stop("sce must be a SingleCellExperiment object")
@@ -25,6 +25,10 @@ add_miQC <- function(sce, seed = NULL){
   if(!is.null(sce$prob_compromised)){
     warning("prob_compromised was already calculated and will be replaced.")
   }
+  # check if miQC_pass exists
+  if(!is.null(sce$miQC_pass)){
+    warning("miQC_pass was already calculated and will be replaced.")
+  }
 
   # set seed
   set.seed(seed)
@@ -34,15 +38,25 @@ add_miQC <- function(sce, seed = NULL){
     miQC::mixtureModel(sce),
     error = function(x){NA}
   )
-  if (class(model) == "flexmix"  && length(model@components) < 2){
+  if (is(model, "flexmix")  && length(model@components) < 2){
     # first model fit gave only one component, give it one more chance.
     model <- miQC::mixtureModel(sce)
   }
-  if (class(model) != "flexmix" || length(model@components) < 2){
+  if (!is(model, "flexmix") || length(model@components) < 2){
     # no good fit, fill prob_compromised with NA
     sce$prob_compromised <- NA_real_
   }else{
-    sce <- miQC::filterCells(sce, model = model, posterior_cutoff = 1, verbose = FALSE)
+    sce <- miQC::filterCells(sce,
+                             model = model,
+                             posterior_cutoff = 1,
+                             enforce_left_cutoff = FALSE,
+                             verbose = FALSE)
+    # test whether cells would pass filtering
+    pass_cells <- colnames(miQC::filterCells(sce,
+                                             model = model,
+                                             posterior_cutoff = posterior_cutoff,
+                                             verbose = FALSE))
+    sce$miQC_pass <- colnames(sce) %in% pass_cells
     metadata(sce)$miQC_model <- model
   }
   return(sce)
