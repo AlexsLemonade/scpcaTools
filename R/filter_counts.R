@@ -1,15 +1,17 @@
-#' Filter counts matrix using DropletUtils::emptyDrops
+#' Filter counts matrix using DropletUtils::emptyDropsCellRanger
 #'
-#' This function will filter a SingleCellExperiment object using DropletUtils::emptyDrops(),
-#'   as well as any associated alternative experiments. If mean expression and percent detected
+#' This function will filter a SingleCellExperiment object using DropletUtils::emptyDropsCellRanger() by default,
+#'   or DropletUtils::emptyDrops(), as well as any associated alternative experiments. If mean expression and percent detected
 #'   were previously calculated in the columns `mean` and `detected`, respectively, these
 #'   will be removed from both the main and alternative experiments.
 #'
 #' @param sce SingleCellExperiment with unfiltered gene x cell counts matrix.
-#' @param fdr_cutoff FDR cutoff to use for DropletUtils::emptyDrops.
+#' @param cr_like Logical indicating whether or not to use DropletUtils::emptyDropsCellRanger.
+#'   Default is set to TRUE.
+#' @param fdr_cutoff FDR cutoff to use for DropletUtils::emptyDropsCellRanger or DropletUtils::emptyDrops.
 #'   Default is 0.01.
 #' @param seed An optional random seed for reproducibility.
-#' @param ... Any arguments to be passed into DropletUtils::emptyDrops.
+#' @param ... Any arguments to be passed into DropletUtils::emptyDropsCellRanger or DropletUtils::emptyDrops.
 #'
 #' @return SingleCellExperiment with filtered gene x cell matrix.
 #'
@@ -21,7 +23,7 @@
 #' \dontrun{
 #' filter_counts(sce = sce_object)
 #' }
-filter_counts <- function(sce, fdr_cutoff = 0.01, seed = NULL, ...) {
+filter_counts <- function(sce, cr_like = TRUE, fdr_cutoff = 0.01, seed = NULL, ...) {
 
   set.seed(seed)
 
@@ -29,8 +31,17 @@ filter_counts <- function(sce, fdr_cutoff = 0.01, seed = NULL, ...) {
     stop("Input must be a SingleCellExperiment object.")
   }
 
+  if(!is.logical(cr_like)){
+    stop("cr_like must be set as TRUE or FALSE")
+  }
+
   # calculate probability of being an empty droplet
-  empty_df <- DropletUtils::emptyDrops(counts(sce), ...)
+  if(cr_like){
+    empty_df <- DropletUtils::emptyDropsCellRanger(m = round(counts(sce)), ...)
+  } else {
+    empty_df <- DropletUtils::emptyDrops(counts(sce), ...)
+  }
+
   if(any(empty_df$FDR > fdr_cutoff & empty_df$Limited, na.rm = TRUE)){
     warning(glue::glue("`niters` may be set too low for emptyDrops filtering.",
                     " Current value is {empty_df@metadata$niters}."))
