@@ -1,5 +1,5 @@
 set.seed(1665)
-sce <- sim_sce(n_cells = 100, n_genes = 200, n_empty = 100)
+sce <- sim_sce(n_cells = 200, n_genes = 200, n_empty = 100000)
 
 test_that("Cell filtering with emptyDropsCellRanger() is as expected", {
   filtered_sce <- filter_counts(sce)

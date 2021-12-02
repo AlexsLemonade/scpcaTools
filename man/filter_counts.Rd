@@ -2,7 +2,7 @@
 % Please edit documentation in R/filter_counts.R
 \name{filter_counts}
 \alias{filter_counts}
-\title{Filter counts matrix using DropletUtils::emptyDrops}
+\title{Filter counts matrix using DropletUtils::emptyDropsCellRanger}
 \usage{
 filter_counts(sce, cr_like = TRUE, fdr_cutoff = 0.01, seed = NULL, ...)
 }
@@ -23,8 +23,8 @@ Default is 0.01.}
 SingleCellExperiment with filtered gene x cell matrix.
 }
 \description{
-This function will filter a SingleCellExperiment object using DropletUtils::emptyDrops(),
-  as well as any associated alternative experiments. If mean expression and percent detected
+This function will filter a SingleCellExperiment object using DropletUtils::emptyDropsCellRanger() by default,
+  or DropletUtils::emptyDrops(), as well as any associated alternative experiments. If mean expression and percent detected
   were previously calculated in the columns `mean` and `detected`, respectively, these
   will be removed from both the main and alternative experiments.
 }
