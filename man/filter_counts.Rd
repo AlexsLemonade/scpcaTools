@@ -2,26 +2,29 @@
 % Please edit documentation in R/filter_counts.R
 \name{filter_counts}
 \alias{filter_counts}
-\title{Filter counts matrix using DropletUtils::emptyDrops}
+\title{Filter counts matrix using DropletUtils::emptyDropsCellRanger}
 \usage{
-filter_counts(sce, fdr_cutoff = 0.01, seed = NULL, ...)
+filter_counts(sce, cr_like = TRUE, fdr_cutoff = 0.01, seed = NULL, ...)
 }
 \arguments{
 \item{sce}{SingleCellExperiment with unfiltered gene x cell counts matrix.}
 
-\item{fdr_cutoff}{FDR cutoff to use for DropletUtils::emptyDrops.
+\item{cr_like}{Logical indicating whether or not to use DropletUtils::emptyDropsCellRanger.
+Default is set to TRUE.}
+
+\item{fdr_cutoff}{FDR cutoff to use for DropletUtils::emptyDropsCellRanger or DropletUtils::emptyDrops.
 Default is 0.01.}
 
 \item{seed}{An optional random seed for reproducibility.}
 
-\item{...}{Any arguments to be passed into DropletUtils::emptyDrops.}
+\item{...}{Any arguments to be passed into DropletUtils::emptyDropsCellRanger or DropletUtils::emptyDrops.}
 }
 \value{
 SingleCellExperiment with filtered gene x cell matrix.
 }
 \description{
-This function will filter a SingleCellExperiment object using DropletUtils::emptyDrops(),
-  as well as any associated alternative experiments. If mean expression and percent detected
+This function will filter a SingleCellExperiment object using DropletUtils::emptyDropsCellRanger() by default,
+  or DropletUtils::emptyDrops(), as well as any associated alternative experiments. If mean expression and percent detected
   were previously calculated in the columns `mean` and `detected`, respectively, these
   will be removed from both the main and alternative experiments.
 }
