@@ -1,4 +1,4 @@
-FROM rocker/r-ver:4.1.1
+FROM rocker/r-ver:4.1.2
 LABEL maintainer="ccdl@alexslemonade.org"
 LABEL org.opencontainers.image.source https://github.com/AlexsLemonade/scpcaTools
 
@@ -7,7 +7,7 @@ COPY scripts/install_scpca_deps.sh .
 RUN bash ./install_scpca_deps.sh
 
 # Use renv for R packages
-ENV RENV_VERSION 0.14.0
+ENV RENV_VERSION 0.15.0
 ENV RENV_CONFIG_CACHE_ENABLED FALSE
 RUN Rscript -e "install.packages('remotes'); \
       remotes::install_github('rstudio/renv@${RENV_VERSION}')"
