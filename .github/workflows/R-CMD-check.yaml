@@ -29,9 +29,9 @@ jobs:
         run: |
           options(repos = c(CRAN = "https://packagemanager.rstudio.com/cran/__linux__/focal/latest"))
           options(BioC_mirror = "https://packagemanager.rstudio.com/bioconductor")
-          install.packages("pak")
-          pak::pkg_install("AlexsLemonade/scpcaData")
-        shell: Rscript --vanilla {0}
+          install.packages("remotes")
+          remotes::install_github("AlexsLemonade/scpcaData")
+        shell: Rscript {0}
 
       - uses: r-lib/actions/setup-r-dependencies@v1
         with:
