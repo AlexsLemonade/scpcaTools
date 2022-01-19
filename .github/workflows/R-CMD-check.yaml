@@ -19,17 +19,16 @@ jobs:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v2
+      - uses: r-lib/actions/setup-pandoc@v1
       - uses: r-lib/actions/setup-r@v1
-      - name: Install pandoc
-        run: |
-          sudo apt-get update
-          sudo apt-get -y --no-install-recommends install pandoc
+
       - name: Install dependencies
         run: |
           options(repos = c(CRAN = "https://packagemanager.rstudio.com/cran/__linux__/focal/latest"))
           options(BioC_mirror = "https://packagemanager.rstudio.com/bioconductor")
           install.packages(c("remotes", "rcmdcheck"))
           remotes::install_cran("BiocManager")
+          remotes::install_deps(dependencies = TRUE, repos = BiocManager::repositories())
           remotes::install_deps(dependencies = TRUE, repos = BiocManager::repositories())
           remotes::install_github("AlexsLemonade/scpcaData")
         shell: Rscript {0}
