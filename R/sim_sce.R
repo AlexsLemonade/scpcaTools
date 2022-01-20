@@ -47,8 +47,8 @@ sim_sce <- function(n_genes = 200, n_cells = 100, n_empty = 1000, n_groups = 3){
   cell_barcodes <- replicate(
     (n_cells + n_empty) * 1.1, # account for (rare, but possible) duplicates
     paste0(sample(c("A","T","G","C"), 12, replace = TRUE), collapse = '')
-  ) %>%
-    unique() %>%
+  ) |>
+    unique() |>
     head(n_cells + n_empty)
 
   # combine matrices and build SCE

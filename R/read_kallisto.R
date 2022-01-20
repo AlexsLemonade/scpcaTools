@@ -42,8 +42,8 @@ read_kallisto <- function(quant_dir,
     stop(paste0("Missing Kallisto output file(s): ", missing_files))
   }
 
-  counts <- Matrix::readMM(file.path(kallisto_dir, "gene_count.mtx"))%>%
-    BiocGenerics::t() %>% # transpose to gene x cell orientation
+  counts <- Matrix::readMM(file.path(kallisto_dir, "gene_count.mtx"))|>
+    BiocGenerics::t() |> # transpose to gene x cell orientation
     as("dgCMatrix") # compress sparse matrix
   dimnames(counts) <- list(readLines(file.path(kallisto_dir, "gene_count.genes.txt")),
                            readLines(file.path(kallisto_dir, "gene_count.barcodes.txt")))
