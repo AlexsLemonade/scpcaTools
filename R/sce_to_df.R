@@ -23,7 +23,7 @@ coldata_to_df <- function(sce) {
   }
 
   # convert colData to data.frame with column containing cell barcodes
-  df <- as.data.frame(colData(sce)) %>%
+  df <- as.data.frame(colData(sce)) |>
     tibble::rownames_to_column(var = "cell_id")
   return(df)
 }
@@ -52,7 +52,7 @@ rowdata_to_df <- function(sce) {
   }
 
   # convert rowData to data.frame column containing gene names
-  df <- as.data.frame(rowData(sce)) %>%
+  df <- as.data.frame(rowData(sce)) |>
     tibble::rownames_to_column(var = "gene_id")
   return(df)
 }

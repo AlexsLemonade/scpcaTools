@@ -99,7 +99,7 @@ if (has_cite){
   cite_exp <- altExp(filtered_sce, "CITEseq")
   cite_meta <- metadata(cite_exp)
   
-  sample_information <- sample_information %>%
+  sample_information <- sample_information |>
     mutate(
       "Number of ADTs assayed" = 
         format(nrow(cite_exp), big.mark = ',', scientific = FALSE),
@@ -110,15 +110,15 @@ if (has_cite){
     )
 }
 
-sample_information <- sample_information %>%
-  mutate(across(.fns = ~ifelse(.x == "NULL", "N/A", .x))) %>% # reformat nulls
+sample_information <- sample_information |>
+  mutate(across(.fns = ~ifelse(.x == "NULL", "N/A", .x))) |> # reformat nulls
   t()
 
 # make table with sample information
-knitr::kable(sample_information, align = 'r') %>%
+knitr::kable(sample_information, align = 'r') |>
   kableExtra::kable_styling(bootstrap_options = "striped",
                             full_width = FALSE,
-                            position = "left") %>%
+                            position = "left") |>
   kableExtra::column_spec(2, monospace = TRUE)
 ```
 
@@ -135,16 +135,16 @@ processing_info <- tibble::tibble(
       format(unfiltered_meta$transcript_type) == "spliced" ~ "Spliced only",
       format(unfiltered_meta$transcript_type) == "unspliced" ~ "Spliced and unspliced",
       TRUE ~ format(unfiltered_meta$transcript_type))
-  ) %>%
-  mutate(across(.fns = ~ifelse(.x == "NULL", "N/A", .x))) %>%
+  ) |>
+  mutate(across(.fns = ~ifelse(.x == "NULL", "N/A", .x))) |>
   t()
 
 
 # make table with processing information
-knitr::kable(processing_info, align = 'r') %>%
+knitr::kable(processing_info, align = 'r') |>
   kableExtra::kable_styling(bootstrap_options = "striped",
                             full_width = FALSE,
-                            position = "left") %>%
+                            position = "left") |>
   kableExtra::column_spec(2, monospace = TRUE)
 ```
 
@@ -159,16 +159,16 @@ basic_statistics <- tibble::tibble(
   "Median UMI count per cell"          = format(median(filtered_sce$sum), big.mark = ","),
   "Median genes detected per cell"     = format(median(filtered_sce$detected), big.mark = ","),
   "Median percent reads mitochondrial" = paste0(round(median(filtered_sce$subsets_mito_percent), 2), "%")
-  ) %>%
-  mutate(across(.fns = ~ifelse(.x == "NULL", "N/A", .x))) %>%
+  ) |>
+  mutate(across(.fns = ~ifelse(.x == "NULL", "N/A", .x))) |>
   t()
 
 
 # make table with basic statistics
-knitr::kable(basic_statistics, align = 'r') %>%
+knitr::kable(basic_statistics, align = 'r') |>
   kableExtra::kable_styling(bootstrap_options = "striped",
                             full_width = FALSE,
-                            position = "left") %>%
+                            position = "left") |>
   kableExtra::column_spec(2, monospace = TRUE)
 
 ```
@@ -176,26 +176,26 @@ knitr::kable(basic_statistics, align = 'r') %>%
 ## Knee Plot
 
 ```{r, fig.alt="Smoothed knee plot of filtered and unfiltered droplets"}
-unfiltered_celldata <- data.frame(colData(unfiltered_sce)) %>%
+unfiltered_celldata <- data.frame(colData(unfiltered_sce)) |>
   mutate(
     rank = rank(- unfiltered_sce$sum, ties.method = "first"), # using full spec for clarity 
     filter_pass = colnames(unfiltered_sce) %in% colnames(filtered_sce)
-  ) %>%
-  select(sum, rank, filter_pass) %>%
+  ) |>
+  select(sum, rank, filter_pass) |>
   filter(sum > 0) # remove zeros for plotting
 
 
-grouped_celldata <- unfiltered_celldata %>%
-  mutate(rank_group = floor(rank / 100) )%>%
-  group_by(rank_group) %>%
+grouped_celldata <- unfiltered_celldata |>
+  mutate(rank_group = floor(rank / 100) )|>
+  group_by(rank_group) |>
   summarize(
     med_sum = median(sum),
     med_rank = median(rank),
     pct_passed = sum(filter_pass) / n() * 100
   ) 
 
-top_celldata <- unfiltered_celldata %>%
-  filter(rank <= 50) %>%
+top_celldata <- unfiltered_celldata |>
+  filter(rank <= 50) |>
   mutate(filter_pct = ifelse(filter_pass, 100, 0))
 
 ggplot(grouped_celldata, aes(x = med_rank, y = med_sum, color = pct_passed)) + 

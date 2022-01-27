@@ -10,5 +10,4 @@
 #' @import methods
 #' @import SingleCellExperiment
 #' @import stringr
-#' @importFrom magrittr %>%
 NULL
