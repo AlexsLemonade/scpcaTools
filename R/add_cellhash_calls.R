@@ -27,17 +27,17 @@ add_barcode_table <- function(sce, barcode_table, altexp_id = "cellhash"){
   }
   # check that input is a SingleCellExperiment
   if(!(is(barcode_table, "data.frame") &&
-     all(c("barcode_id", "sample_id") %in% barcode_table))){
+     all(c("barcode_id", "sample_id") %in% colnames(barcode_table)))){
     stop("barcode_table must be a data frame with columns `barcode_id` and `sample_id`")
   }
 
   # get barcodes in table
   altexp_rowdata <- rowData(altExp(sce, altexp_id)) |>
     as.data.frame() |>
-    tibble::rowid_to_column("barcode_id")
+    tibble::rownames_to_column("barcode_id")
 
   barcode_rowdata <- altexp_rowdata |>
-    dplyr::left_join(barcode_table) |>
+    dplyr::left_join(barcode_table, by = "barcode_id") |>
     dplyr::select("barcode_id", "sample_id")
 
   # test that each barcode has a corresponding sample
