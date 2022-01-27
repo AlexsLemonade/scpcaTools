@@ -55,30 +55,3 @@ add_barcode_table <- function(sce, barcode_table, altexp_id = "cellhash"){
   return(sce)
 }
 
-
-#' Add sample of origin calls using DropletUtils::hashedDrops()
-#'
-#' @param sce SingleCellExperiment object.
-#' @param altexp_id The name of the alternative experiment that contains the cellhash data
-#' @param ... Any additional arguments to be passed to DropletUtils::hashedDrops()
-#'
-#' @return SingleCellExperiment with colData slot containing the demultiplexing calls
-#'
-#' @import SingleCellExperiment
-#'
-#'
-#' @export
-#'
-#' @examples
-#' \dontrun{
-
-#' }
-add_hashedDrops_calls <- function(sce,
-                                  altexp_id = "cellhash",
-                                  ...){
-
-  # check that input is a SingleCellExperiment
-  if(!is(sce, "SingleCellExperiment")){
-    stop("sce must be a SingleCellExperiment object")
-  }
-}
