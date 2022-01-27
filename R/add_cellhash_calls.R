@@ -32,13 +32,22 @@ add_barcode_table <- function(sce, barcode_table, altexp_id = "cellhash"){
   }
 
   # get barcodes in table
-  altexp_rows <- rowData(altExp(sce, altexp_id)) |>
+  altexp_rowdata <- rowData(altExp(sce, altexp_id)) |>
     as.data.frame() |>
     tibble::rowid_to_column("barcode_id")
 
-  barcode_rowdata <- altexp_barcodes |>
+  barcode_rowdata <- altexp_rowdata |>
     dplyr::left_join(barcode_table) |>
     dplyr::select("barcode_id", "sample_id")
+
+  # test that each barcode has a corresponding sample
+  missing_barcodes <- barcode_rowdata |>
+    dplyr::filter(is.na(sample_id)) |>
+    dplyr::pull(barcode_id)
+  if (length(missing_barcodes)){
+    warning(paste0("The following `barcode_id`s do not have corresponding `sample_id`s:",
+                   paste0(missing_barcodes, collapse = ", ")))
+  }
 
   rowData(altExp(sce))$barcode_id <- barcode_rowdata$barcode_id
   rowData(altExp(sce))$sample_id <- barcode_rowdata$sample_id
