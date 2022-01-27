@@ -6,7 +6,7 @@
 #'   Default value: "cellhash"
 #'
 #'
-#' @return SingleCellExperiment with colData slot containing the demultiplexing calls
+#' @return SingleCellExperiment with rowData for the altExp containing barcode and sample ids
 #'
 #' @import SingleCellExperiment
 #' @importFrom rlang .data

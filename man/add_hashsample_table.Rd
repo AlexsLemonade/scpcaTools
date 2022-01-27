@@ -15,7 +15,7 @@ add_hashsample_table(sce, hashsample_table, altexp_id = "cellhash")
 Default value: "cellhash"}
 }
 \value{
-SingleCellExperiment with colData slot containing the demultiplexing calls
+SingleCellExperiment with rowData for the altExp containing barcode and sample ids
 }
 \description{
 Add cellhash sample information to altExperiment rowData
