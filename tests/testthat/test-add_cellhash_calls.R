@@ -31,6 +31,7 @@ test_that("cellhash functions work", {
   expect_error(add_hashsample_table(sce, hashsample_table, altexp_id = "foo"))
   # test with bad barcode tables
   expect_error(add_hashsample_table(sce, data.frame(a = 1:4, b = 1:4)))
+  expect_error(add_hashsample_table(sce, rbind(hashsample_table, c("tag1", "sample5"))))
   expect_error(add_hashsample_table(sce, hashsample_table[,1]))
 
 

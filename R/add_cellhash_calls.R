@@ -34,14 +34,23 @@ add_hashsample_table <- function(sce, hashsample_table, altexp_id = "cellhash"){
     stop("hashsample_table must be a data frame with columns `barcode_id` and `sample_id`")
   }
 
-  # get barcodes in table
+  # get barcodes from sce if needed
   altexp_rowdata <- rowData(altExp(sce, altexp_id)) |>
-    as.data.frame() |>
-    tibble::rownames_to_column("barcode_id")
+    as.data.frame()
+  if (!"barcode_id" %in% colnames(altexp_rowdata)){
+    altexp_rowdata <- altexp_rowdata |>
+      tibble::rownames_to_column("barcode_id")
+  }
+
 
   barcode_rowdata <- altexp_rowdata |>
     dplyr::left_join(hashsample_table, by = "barcode_id") |>
-    dplyr::select("barcode_id", "sample_id")
+    dplyr::select("barcode_id", "sample_id") |>
+    dplyr::distinct()
+
+  if (any(duplicated(barcode_rowdata$barcode_id))){
+    stop("`barcode_ids` in `hashsample_table can not be duplicated.")
+  }
 
   # test that each barcode has a corresponding sample
   missing_barcodes <- barcode_rowdata |>
