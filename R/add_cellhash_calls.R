@@ -4,6 +4,10 @@
 #' @param hashsample_table A data_frame of barcode_id and sample_id.
 #' @param altexp_id The name of the alternative experiment that contains the cellhash data.
 #'   Default value: "cellhash"
+#' @param removed_unlabeled Should data for barcodes with no corresponding sample be removed
+#'   from the altExp. Default `TRUE`.
+#' @param replace_rownames Replace rownames for the altExp with sample_ids.
+#'   Requires `remove_unlabeled` to be TRUE. Default `FALSE`.
 #'
 #'
 #' @return SingleCellExperiment with rowData for the altExp containing barcode and sample ids
@@ -20,7 +24,10 @@
 #' add_hashsample_table(sce = sce,
 #'                      hashsample_table = barcode_ids)
 #' }
-add_hashsample_table <- function(sce, hashsample_table, altexp_id = "cellhash"){
+add_hashsample_table <- function(sce, hashsample_table,
+                                 altexp_id = "cellhash",
+                                 remove_unlabeled = TRUE,
+                                 replace_rownames = FALSE){
   # check that input is a SingleCellExperiment
   if(!is(sce, "SingleCellExperiment")){
     stop("sce must be a SingleCellExperiment object")
@@ -29,9 +36,13 @@ add_hashsample_table <- function(sce, hashsample_table, altexp_id = "cellhash"){
     stop(glue::glue("altexp_id `{altexp_id}` not found as an experiment in sce"))
   }
   # check that input is a SingleCellExperiment
-  if(!(is(hashsample_table, "data.frame") &&
+  if(!(is(hashsample_table, "data.frame") &
      all(c("barcode_id", "sample_id") %in% colnames(hashsample_table)))){
     stop("hashsample_table must be a data frame with columns `barcode_id` and `sample_id`")
+  }
+  # check requirements for replace_rownames
+  if(replace_rownames & !remove_unlabeled){
+    stop("replace_rownames = TRUE requires remove_unlabeled to be TRUE")
   }
 
   # get barcodes from sce if needed
@@ -49,20 +60,29 @@ add_hashsample_table <- function(sce, hashsample_table, altexp_id = "cellhash"){
     dplyr::distinct()
 
   if (any(duplicated(barcode_rowdata$barcode_id))){
-    stop("`barcode_ids` in `hashsample_table can not be duplicated.")
+    stop("`barcode_ids` in `hashsample_table` can not be duplicated.")
   }
 
   # test that each barcode has a corresponding sample
   missing_barcodes <- barcode_rowdata |>
     dplyr::filter(is.na(.data$sample_id)) |>
     dplyr::pull(.data$barcode_id)
-  if (length(missing_barcodes)){
+
+  if (remove_unlabeled){
+    missing_rows <- rownames(altExp(sce, altexp_id)) %in% missing_barcodes
+    altExp(sce, altexp_id) <- altExp(sce, altexp_id)[!missing_rows,]
+    barcode_rowdata <- barcode_rowdata[!missing_rows,]
+  } else if (length(missing_barcodes) > 0){
     warning(paste0("The following `barcode_id`s do not have corresponding `sample_id`s:",
                    paste0(missing_barcodes, collapse = ", ")))
   }
 
-  rowData(altExp(sce))$barcode_id <- barcode_rowdata$barcode_id
-  rowData(altExp(sce))$sample_id <- barcode_rowdata$sample_id
+  rowData(altExp(sce, altexp_id))$barcode_id <- barcode_rowdata$barcode_id
+  rowData(altExp(sce, altexp_id))$sample_id <- barcode_rowdata$sample_id
+
+  if (replace_rownames){
+    rownames(altExp(sce, altexp_id)) <- rowData(altExp(sce, altexp_id))$sample_id
+  }
 
   return(sce)
 }

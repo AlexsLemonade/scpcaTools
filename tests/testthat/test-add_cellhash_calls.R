@@ -26,7 +26,12 @@ test_that("cellhash functions work", {
   expect_equal(hashsample_table, extracted_barcodes)
 
   # test when not all barcodes are present
-  expect_warning(add_hashsample_table(sce, hashsample_table[1:2,]))
+  expect_warning(add_hashsample_table(sce, hashsample_table[1:2,], remove_unlabeled = FALSE))
+  reduced_sce <- add_hashsample_table(sce, hashsample_table[1:2,], remove_unlabeled = TRUE)
+  expect_equal(sort(rownames(altExp(reduced_sce))), sort(hashsample_table$barcode_id[1:2]))
+  # test rowname replacements
+  reduced_sce <- add_hashsample_table(sce, hashsample_table[1:2,], replace_rownames = TRUE)
+  expect_equal(sort(rownames(altExp(reduced_sce))), sort(hashsample_table$sample_id[1:2]))
   # test with the wrong altexp_id
   expect_error(add_hashsample_table(sce, hashsample_table, altexp_id = "foo"))
   # test with bad barcode tables
