@@ -4,8 +4,8 @@
 #' @param hashsample_table A data_frame of barcode_id and sample_id.
 #' @param altexp_id The name of the alternative experiment that contains the cellhash data.
 #'   Default value: "cellhash"
-#' @param remove_unlabeled Should data for barcodes with no corresponding sample be removed
-#'   from the altExp. Default `FALSE`.
+#' @param remove_unlabeled Remove altExp data for barcodes with no `sample_id`in the `hashsample_table`
+#'   Default `FALSE`.
 #' @param replace_rownames Replace rownames for the altExp with sample_ids.
 #'   Requires `remove_unlabeled` to be TRUE. Default `FALSE`.
 #'
@@ -96,7 +96,9 @@ add_cellhash_ids <- function(sce, hashsample_table,
 #' @param ... Other arguments to pass to DropletUtils::hashedDrops
 #'
 #'
-#' @return SingleCellExperiment with colData columns containing the demultiplexing calls
+#' @return SingleCellExperiment with a `colData` column `hashedDrops_id` containing the confident demultiplexing calls.
+#'   Other results from `DropletUtils::hashedDrops()` are included in the `rowData` for the cellhash `altExp`,
+#'   with the prefix `hashedDrops_`. See [DropletUtils::hashedDrops()] for the contents of these fields.
 #'
 #' @import SingleCellExperiment
 #' @importFrom rlang .data

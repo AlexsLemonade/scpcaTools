@@ -20,8 +20,8 @@ add_cellhash_ids(
 \item{altexp_id}{The name of the alternative experiment that contains the cellhash data.
 Default value: "cellhash"}
 
-\item{remove_unlabeled}{Should data for barcodes with no corresponding sample be removed
-from the altExp. Default `FALSE`.}
+\item{remove_unlabeled}{Remove altExp data for barcodes with no `sample_id`in the `hashsample_table`
+Default `FALSE`.}
 
 \item{replace_rownames}{Replace rownames for the altExp with sample_ids.
 Requires `remove_unlabeled` to be TRUE. Default `FALSE`.}
