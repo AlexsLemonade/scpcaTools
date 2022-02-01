@@ -8,16 +8,14 @@ test_that("cellhash functions work", {
   # create hash reads matrix (random order for barcodes)
   hash_reads <- matrix(ncol = 100, nrow = 4,
                        dimnames = list(sample(hashsample_table$barcode_id), colnames(sce)),
-                       c(rep(c(1000,1,1,1), 25),
-                         rep(c(1,1000,1,1), 25),
-                         rep(c(1,1,1000,1), 25),
-                         rep(c(1,1,1,1000), 25)))
+                       rpois(400, 10)) # random background
+  hash_reads[cbind(1:4, 1:100)] <- 1000 # one barcode higher for each column
   # add as altExp
   hash_sce <- SingleCellExperiment(list(counts = hash_reads))
   altExp(sce, "cellhash") <- hash_sce
 
   # add barcode table to sce
-  sce_hashtable <- add_hashsample_table(sce, hashsample_table, altexp_id = "cellhash")
+  sce_hashtable <- add_cellhash_ids(sce, hashsample_table, altexp_id = "cellhash")
   # pull out barcodes and sort to match original
   extracted_barcodes <- rowData(altExp(sce_hashtable, "cellhash"))|>
     as.data.frame() |>
@@ -26,32 +24,32 @@ test_that("cellhash functions work", {
   expect_equal(hashsample_table, extracted_barcodes)
 
   # test when not all barcodes are present
-  expect_warning(add_hashsample_table(sce, hashsample_table[1:2,], remove_unlabeled = FALSE))
-  reduced_sce <- add_hashsample_table(sce, hashsample_table[1:2,], remove_unlabeled = TRUE)
+  expect_warning(add_cellhash_ids(sce, hashsample_table[1:2,], remove_unlabeled = FALSE))
+  reduced_sce <- add_cellhash_ids(sce, hashsample_table[1:2,], remove_unlabeled = TRUE)
   expect_equal(sort(rownames(altExp(reduced_sce))), sort(hashsample_table$barcode_id[1:2]))
   # test rowname replacements
-  reduced_sce <- add_hashsample_table(sce, hashsample_table[1:2,], replace_rownames = TRUE)
+  reduced_sce <- add_cellhash_ids(sce, hashsample_table[1:2,], remove_unlabeled = TRUE, replace_rownames = TRUE)
   expect_equal(sort(rownames(altExp(reduced_sce))), sort(hashsample_table$sample_id[1:2]))
   # test with the wrong altexp_id
-  expect_error(add_hashsample_table(sce, hashsample_table, altexp_id = "foo"))
+  expect_error(add_cellhash_ids(sce, hashsample_table, altexp_id = "foo"))
   # test with bad barcode tables
-  expect_error(add_hashsample_table(sce, data.frame(a = 1:4, b = 1:4)))
-  expect_error(add_hashsample_table(sce, rbind(hashsample_table, c("tag1", "sample5"))))
-  expect_error(add_hashsample_table(sce, hashsample_table[,1]))
+  expect_error(add_cellhash_ids(sce, data.frame(a = 1:4, b = 1:4)))
+  expect_error(add_cellhash_ids(sce, rbind(hashsample_table, c("tag1", "sample5"))))
+  expect_error(add_cellhash_ids(sce, hashsample_table[,1]))
 
 
   hash_sce <- add_demux_hashedDrops(sce_hashtable)
   hash_cols <- c("hashedDrops_id",
                  "hashedDrops_bestid",
-                 "hashedDrops_logfc",
-                 "hashedDrops_confident")
-  expect_true(all(hash_cols %in% colnames(colData(hash_sce))))
+                 "hashedDrops_LogFC",
+                 "hashedDrops_Confident") # a subset of the expected columns for the altExp rowData
+  expect_true(all(hash_cols %in% colnames(colData(altExp(hash_sce)))))
+  expect_false(is.null(hash_sce$hashedDrops_id))
   # check the results are by sample_id
-  expect_true(all(hash_sce$hashedDrops_bestid[!is.na(hash_sce$hashedDrops_bestid)] %in% hashsample_table$sample_id))
   expect_true(all(hash_sce$hashedDrops_id[!is.na(hash_sce$hashedDrops_id)] %in% hashsample_table$sample_id))
   # results with no sample table present
   expect_warning(hash_sce_nosample <- add_demux_hashedDrops(sce))
-  expect_true(all(hash_sce_nosample$hashedDrops_bestid %in% rownames(altExp(hash_sce_nosample, "cellhash"))))
+  expect_true(all(hash_sce_nosample$hashedDrops_id[!is.na(hash_sce_nosample$hashedDrops_id)] %in% rownames(altExp(hash_sce_nosample))))
 })
 
 

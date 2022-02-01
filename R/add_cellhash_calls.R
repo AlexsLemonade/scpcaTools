@@ -131,18 +131,25 @@ add_demux_hashedDrops <- function(sce, altexp_id = "cellhash", ...){
   hash_result <- DropletUtils::hashedDrops(altExp(sce, altexp_id), ...)
   stopifnot(all.equal(rownames(hash_result), colnames(sce)))
 
-  # extract results for table
+  # extract results with sample ids for main rowData table
   hashedDrops_bestid = sample_ids[hash_result$Best]
   hashedDrops_id = ifelse(hash_result$Confident,
                           hashedDrops_bestid,
                           NA_character_)
 
 
-  # add table results to sce
+  ### add all table results to altExp rowData
+
+  # rename results with prefix
+  colnames(hash_result) <- paste0("hashedDrops_", colnames(hash_result))
+  # add hashedDrops results to altExp
+  colData(altExp(sce, altexp_id))[, colnames(hash_result)] <- hash_result
+
+  # add labeled results
+  altExp(sce, altexp_id)$hashedDrops_id <- hashedDrops_id
+  altExp(sce, altexp_id)$hashedDrops_bestid <- hashedDrops_bestid
+  # add id to main sce table
   sce$hashedDrops_id <- hashedDrops_id
-  sce$hashedDrops_bestid <- hashedDrops_bestid
-  sce$hashedDrops_logfc <- hash_result$LogFC
-  sce$hashedDrops_confident <- hash_result$Confident
 
   return(sce)
 }
