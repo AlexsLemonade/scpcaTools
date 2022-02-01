@@ -35,7 +35,7 @@ add_hashsample_table <- function(sce, hashsample_table,
   if(!altexp_id %in% altExpNames(sce)){
     stop(glue::glue("altexp_id `{altexp_id}` not found as an experiment in sce"))
   }
-  # check that input is a SingleCellExperiment
+  # check that hashsample_table is a data frame containing a sample_id and barcode_id column
   if(!(is(hashsample_table, "data.frame") &
      all(c("barcode_id", "sample_id") %in% colnames(hashsample_table)))){
     stop("hashsample_table must be a data frame with columns `barcode_id` and `sample_id`")
@@ -45,7 +45,7 @@ add_hashsample_table <- function(sce, hashsample_table,
     stop("replace_rownames = TRUE requires remove_unlabeled to be TRUE")
   }
 
-  # get barcodes from sce if needed
+  # get rowData from sce and add barcode_id column if needed
   altexp_rowdata <- rowData(altExp(sce, altexp_id)) |>
     as.data.frame()
   if (!"barcode_id" %in% colnames(altexp_rowdata)){
