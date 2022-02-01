@@ -5,7 +5,7 @@
 #' @param altexp_id The name of the alternative experiment that contains the cellhash data.
 #'   Default value: "cellhash"
 #' @param removed_unlabeled Should data for barcodes with no corresponding sample be removed
-#'   from the altExp. Default `TRUE`.
+#'   from the altExp. Default `FALSE`.
 #' @param replace_rownames Replace rownames for the altExp with sample_ids.
 #'   Requires `remove_unlabeled` to be TRUE. Default `FALSE`.
 #'
@@ -21,13 +21,13 @@
 #' @examples
 #' \dontrun{
 #' # add sample information for a cellhash table
-#' add_hashsample_table(sce = sce,
-#'                      hashsample_table = barcode_ids)
+#' add_cellhash_ids(sce = sce,
+#'                  hashsample_table = barcode_ids)
 #' }
-add_hashsample_table <- function(sce, hashsample_table,
-                                 altexp_id = "cellhash",
-                                 remove_unlabeled = TRUE,
-                                 replace_rownames = FALSE){
+add_cellhash_ids <- function(sce, hashsample_table,
+                             altexp_id = "cellhash",
+                             remove_unlabeled = FALSE,
+                             replace_rownames = FALSE){
   # check that input is a SingleCellExperiment
   if(!is(sce, "SingleCellExperiment")){
     stop("sce must be a SingleCellExperiment object")
@@ -86,6 +86,7 @@ add_hashsample_table <- function(sce, hashsample_table,
 
   return(sce)
 }
+
 
 #' Add cellhash demultiplexing results using DropletUtils::hashedDrops
 #'
