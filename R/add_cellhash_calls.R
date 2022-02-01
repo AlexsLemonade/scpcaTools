@@ -4,7 +4,7 @@
 #' @param hashsample_table A data_frame of barcode_id and sample_id.
 #' @param altexp_id The name of the alternative experiment that contains the cellhash data.
 #'   Default value: "cellhash"
-#' @param removed_unlabeled Should data for barcodes with no corresponding sample be removed
+#' @param remove_unlabeled Should data for barcodes with no corresponding sample be removed
 #'   from the altExp. Default `FALSE`.
 #' @param replace_rownames Replace rownames for the altExp with sample_ids.
 #'   Requires `remove_unlabeled` to be TRUE. Default `FALSE`.
