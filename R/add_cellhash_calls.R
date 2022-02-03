@@ -223,13 +223,13 @@ add_demux_seurat <- function(sce, altexp_id = "cellhash", ...){
                 "hash.ID")
 
   seurat_demux <- seurat_obj@meta.data |>
-    dplyr::select(all_of(hto_cols))|>
+    dplyr::select(dplyr::all_of(hto_cols))|>
     # rename colums with htodemux_ prefix, removing HTO_ if present
     dplyr::rename_with(~ stringr::str_replace(.x, "(HTO_)?(.+)", "HTODemux_\\2")) |>
-    dplyr::mutate(HTODemux_maxsample = sample_ids[HTODemux_maxID],
-                  HTODemux_sampleid = ifelse(HTODemux_hash.ID %in% c("Doublet","Negative"),
+    dplyr::mutate(HTODemux_maxsample = sample_ids[.data$HTODemux_maxID],
+                  HTODemux_sampleid = ifelse(.data$HTODemux_hash.ID %in% c("Doublet","Negative"),
                                              NA_character_,
-                                             sample_ids[HTODemux_hash.ID]))
+                                             sample_ids[.data$HTODemux_hash.ID]))
 
     ## add htodemux columns to altExp
     colData(altExp(sce, altexp_id))[, colnames(seurat_demux)] <- seurat_demux

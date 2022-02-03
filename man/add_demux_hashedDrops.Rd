@@ -15,7 +15,7 @@ Default value: "cellhash"}
 \item{...}{Other arguments to pass to DropletUtils::hashedDrops}
 }
 \value{
-SingleCellExperiment with a `colData` column `hashedDrops_id` containing the confident demultiplexing calls.
+SingleCellExperiment with a `colData` column `hashedDrops_sampleid` containing the confident demultiplexing calls.
   Other results from `DropletUtils::hashedDrops()` are included in the `rowData` for the cellhash `altExp`,
   with the prefix `hashedDrops_`. See [DropletUtils::hashedDrops()] for the contents of these fields.
 }
