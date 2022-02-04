@@ -55,6 +55,7 @@ add_cellhash_ids <- function(sce, hashsample_table,
 
 
   barcode_rowdata <- altexp_rowdata |>
+    dplyr::select(-dplyr::one_of("sample_id")) |> # remove sample_ids if already present
     dplyr::left_join(hashsample_table, by = "barcode_id") |>
     dplyr::select("barcode_id", "sample_id") |>
     dplyr::distinct()
