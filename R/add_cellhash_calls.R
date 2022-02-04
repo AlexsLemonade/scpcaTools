@@ -212,7 +212,8 @@ add_demux_seurat <- function(sce, altexp_id = "cellhash", ...){
   # convert to Seurat object (quietly)
   suppressMessages({
     seurat_obj <- Seurat::CreateSeuratObject(counts(sce))
-    alt_counts <- counts(altExp(sce, altexp_id))
+    # counts need to be integers
+    alt_counts <- round(counts(altExp(sce, altexp_id)))
     rownames(alt_counts) <- seurat_features
     seurat_obj[["HTODemux"]] <- Seurat::CreateAssayObject(counts = alt_counts)
     rm(alt_counts)
