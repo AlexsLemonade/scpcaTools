@@ -220,7 +220,7 @@ add_demux_seurat <- function(sce, altexp_id = "cellhash", ...){
     # seurat requires normalized HTO data
     seurat_obj <- Seurat::NormalizeData(seurat_obj, assay = "HTODemux", normalization.method = "CLR")
     # calculate cellhash results
-    seurat_obj <- Seurat::HTODemux(seurat_obj, assay = "HTODemux")
+    seurat_obj <- Seurat::HTODemux(seurat_obj, assay = "HTODemux", ...)
   })
 
   seurat_demux <- seurat_obj@meta.data |>
