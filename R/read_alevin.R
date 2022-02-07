@@ -12,6 +12,8 @@
 #'   only counts aligned to spliced cDNA ("spliced") or all spliced and unspliced cDNA ("unspliced").
 #'   Applies if `intron_mode` or `usa_mode` is TRUE.
 #'   Default is "spliced".
+#' @param round_counts Logical indicating in the count matrix should be rounded to integers on import.
+#'   Default is TRUE.
 #' @param tech_version Technology or kit used to process library (i.e. 10Xv3, 10Xv3.1).
 #'
 #' @return SingleCellExperiment of unfiltered gene x cell counts matrix.
@@ -45,6 +47,7 @@ read_alevin <- function(quant_dir,
                         intron_mode = FALSE,
                         usa_mode = FALSE,
                         which_counts = c("spliced", "unspliced"),
+                        round_counts = TRUE,
                         tech_version = NULL){
 
   which_counts <- match.arg(which_counts)
@@ -58,6 +61,9 @@ read_alevin <- function(quant_dir,
   }
   if(!is.logical(usa_mode)){
     stop("usa_mode must be set as TRUE or FALSE")
+  }
+  if(!is.logical(round_counts)){
+    stop("round_counts must be set as TRUE or FALSE")
   }
 
   # check that usa_mode and intron_mode are not used together
@@ -85,6 +91,10 @@ read_alevin <- function(quant_dir,
   if (intron_mode | usa_mode) {
     counts <- collapse_intron_counts(counts, which_counts)
     meta$transcript_type <- which_counts
+  }
+
+  if (round_counts){
+    counts <- round(counts)
   }
 
   # make the SCE object
