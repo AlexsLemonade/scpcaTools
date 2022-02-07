@@ -10,6 +10,7 @@ read_alevin(
   intron_mode = FALSE,
   usa_mode = FALSE,
   which_counts = c("spliced", "unspliced"),
+  round_counts = TRUE,
   tech_version = NULL
 )
 }
@@ -30,6 +31,9 @@ Default is FALSE.}
 only counts aligned to spliced cDNA ("spliced") or all spliced and unspliced cDNA ("unspliced").
 Applies if `intron_mode` or `usa_mode` is TRUE.
 Default is "spliced".}
+
+\item{round_counts}{Logical indicating in the count matrix should be rounded to integers on import.
+Default is TRUE.}
 
 \item{tech_version}{Technology or kit used to process library (i.e. 10Xv3, 10Xv3.1).}
 }
