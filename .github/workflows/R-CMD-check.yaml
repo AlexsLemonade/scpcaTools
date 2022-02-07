@@ -32,9 +32,9 @@ jobs:
           remotes::install_cran("BiocManager")
           remotes::install_deps(dependencies = TRUE, repos = BiocManager::repositories())
           remotes::install_github("AlexsLemonade/scpcaData")
-        shell: Rscript {0}
+        shell: Rscript --vanilla {0}
       - name: Check
         run: |
           options(crayon.enabled = TRUE)
           rcmdcheck::rcmdcheck(args = "--no-manual", error_on = "error")
-        shell: Rscript {0}
+        shell: Rscript --vanilla {0}
