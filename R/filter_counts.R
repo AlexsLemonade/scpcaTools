@@ -37,9 +37,20 @@ filter_counts <- function(sce, cr_like = TRUE, fdr_cutoff = 0.01, seed = NULL, .
 
   # calculate probability of being an empty droplet
   if(cr_like){
-    empty_df <- DropletUtils::emptyDropsCellRanger(m = round(counts(sce)), ...)
+    empty_df <- tryCatch(
+      DropletUtils::emptyDropsCellRanger(m = round(counts(sce)), ...),
+      error = function(x){NULL}
+    )
+    # if emptyDropsCellRanger fails, do regular emptyDrops and add filtering method to metadata
+    if(is.null(empty_df)){
+      empty_df <- DropletUtils::emptyDrops(counts(sce), ...)
+      metadata(sce)$emptyDrops_method <- "emptyDrops"
+    } else {
+      metadata(sce)$emptyDrops_method <- "emptyDropsCellRanger"
+    }
   } else {
     empty_df <- DropletUtils::emptyDrops(counts(sce), ...)
+    metadata(sce)$emptyDrops_method <- "emptyDrops"
   }
 
   if(any(empty_df$FDR > fdr_cutoff & empty_df$Limited, na.rm = TRUE)){
