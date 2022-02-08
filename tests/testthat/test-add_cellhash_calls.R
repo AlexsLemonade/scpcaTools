@@ -39,17 +39,32 @@ test_that("cellhash functions work", {
 
 
   hash_sce <- add_demux_hashedDrops(sce_hashtable)
-  hash_cols <- c("hashedDrops_id",
-                 "hashedDrops_bestid",
+  hash_cols <- c("hashedDrops_sampleid",
+                 "hashedDrops_bestsample",
                  "hashedDrops_LogFC",
                  "hashedDrops_Confident") # a subset of the expected columns for the altExp rowData
   expect_true(all(hash_cols %in% colnames(colData(altExp(hash_sce)))))
-  expect_false(is.null(hash_sce$hashedDrops_id))
+  expect_false(is.null(hash_sce$hashedDrops_sampleid))
   # check the results are by sample_id
-  expect_true(all(hash_sce$hashedDrops_id[!is.na(hash_sce$hashedDrops_id)] %in% hashsample_table$sample_id))
+  expect_true(all(hash_sce$hashedDrops_sampleid[!is.na(hash_sce$hashedDrops_sampleid)] %in% hashsample_table$sample_id))
   # results with no sample table present
   expect_warning(hash_sce_nosample <- add_demux_hashedDrops(sce))
-  expect_true(all(hash_sce_nosample$hashedDrops_id[!is.na(hash_sce_nosample$hashedDrops_id)] %in% rownames(altExp(hash_sce_nosample))))
+  expect_true(all(hash_sce_nosample$hashedDrops_sampleid[!is.na(hash_sce_nosample$hashedDrops_sampleid)] %in% rownames(altExp(hash_sce_nosample))))
+
+  # test seurat functions
+  hto_sce <- add_demux_seurat(sce_hashtable)
+  hto_cols <- c("HTODemux_maxID",
+                "HTODemux_secondID",
+                "HTODemux_margin",
+                "HTODemux_classification") # a subset of the expected columns for the altExp rowData
+  expect_true(all(hto_cols %in% colnames(colData(altExp(hto_sce)))))
+  expect_false(is.null(hto_sce$HTODemux_sampleid))
+  # check the results are by sample_id
+  expect_true(all(hto_sce$HTODemux_sampleid[!is.na(hto_sce$HTODemux_sampleid)] %in% hashsample_table$sample_id))
+  # results with no sample table present
+  expect_warning(hto_sce_nosample <- add_demux_seurat(sce))
+  expect_true(all(hto_sce_nosample$hashedDrops_sampleid[!is.na(hto_sce_nosample$hashedDrops_sampleid)] %in% rownames(altExp(hto_sce_nosample))))
+
 })
 
 
