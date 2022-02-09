@@ -68,6 +68,7 @@ filter_counts <- function(sce, cr_like = TRUE, fdr_cutoff = 0.01, seed = NULL, u
     cells <- sce$sum > umi_cutoff
     # replace filtering method with UMI cutoff as method
     metadata(sce)$filtering_method <- "UMI cutoff"
+    metadata(sce)$umi_cutoff <- umi_cutoff
   }
 
   # subset original counts matrix by cells that pass filter
