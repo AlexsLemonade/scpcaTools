@@ -4,7 +4,14 @@
 \alias{filter_counts}
 \title{Filter counts matrix using DropletUtils::emptyDropsCellRanger}
 \usage{
-filter_counts(sce, cr_like = TRUE, fdr_cutoff = 0.01, seed = NULL, ...)
+filter_counts(
+  sce,
+  cr_like = TRUE,
+  fdr_cutoff = 0.01,
+  seed = NULL,
+  umi_cutoff = 100,
+  ...
+)
 }
 \arguments{
 \item{sce}{SingleCellExperiment with unfiltered gene x cell counts matrix.}
@@ -16,6 +23,9 @@ Default is set to TRUE.}
 Default is 0.01.}
 
 \item{seed}{An optional random seed for reproducibility.}
+
+\item{umi_cutoff}{The minimum UMI count for cells to pass filtering, only used if emptyDropsCellRanger and emptyDrops fails.
+Default is 100.}
 
 \item{...}{Any arguments to be passed into DropletUtils::emptyDropsCellRanger or DropletUtils::emptyDrops.}
 }

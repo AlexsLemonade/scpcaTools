@@ -11,6 +11,8 @@
 #' @param fdr_cutoff FDR cutoff to use for DropletUtils::emptyDropsCellRanger or DropletUtils::emptyDrops.
 #'   Default is 0.01.
 #' @param seed An optional random seed for reproducibility.
+#' @param umi_cutoff The minimum UMI count for cells to pass filtering, only used if emptyDropsCellRanger or emptyDrops fails.
+#'   Default is 100.
 #' @param ... Any arguments to be passed into DropletUtils::emptyDropsCellRanger or DropletUtils::emptyDrops.
 #'
 #' @return SingleCellExperiment with filtered gene x cell matrix.
@@ -23,7 +25,7 @@
 #' \dontrun{
 #' filter_counts(sce = sce_object)
 #' }
-filter_counts <- function(sce, cr_like = TRUE, fdr_cutoff = 0.01, seed = NULL, ...) {
+filter_counts <- function(sce, cr_like = TRUE, fdr_cutoff = 0.01, seed = NULL, umi_cutoff = 100, ...) {
 
   set.seed(seed)
 
@@ -35,18 +37,33 @@ filter_counts <- function(sce, cr_like = TRUE, fdr_cutoff = 0.01, seed = NULL, .
     stop("cr_like must be set as TRUE or FALSE")
   }
 
-  # calculate probability of being an empty droplet
-  if(cr_like){
-    empty_df <- DropletUtils::emptyDropsCellRanger(m = round(counts(sce)), ...)
-  } else {
-    empty_df <- DropletUtils::emptyDrops(counts(sce), ...)
+  if(!is.numeric(umi_cutoff) | umi_cutoff < 0){
+    stop("umi_cutoff must be a number greater than or equal to 0")
   }
 
-  if(any(empty_df$FDR > fdr_cutoff & empty_df$Limited, na.rm = TRUE)){
-    warning(glue::glue("`niters` may be set too low for emptyDrops filtering.",
-                    " Current value is {empty_df@metadata$niters}."))
+
+  filter_method <- ifelse(cr_like, "emptyDropsCellRanger", "emptyDrops")
+  filter_func <- get(filter_method, asNamespace("DropletUtils"))
+  # calculate probability of being an empty droplet
+  emptydrops_df <- tryCatch(
+    filter_func(m = round(counts(sce))),
+    error = function(x){NULL}
+    )
+
+  if(is.null(emptydrops_df)){
+    # if emptyDrops failed, filter using a hard UMI threshold
+    cells <- sce$sum >= umi_cutoff
+    metadata(sce)$filtering_method <- "UMI cutoff"
+    metadata(sce)$umi_cutoff <- umi_cutoff
+  } else {
+    # emptyDrops was successful, filter by FDR cutoff
+    if(any(emptydrops_df$FDR > fdr_cutoff & emptydrops_df$Limited, na.rm = TRUE)){
+      warning(glue::glue("`niters` may be set too low for emptyDrops filtering.",
+                         " Current value is {emptydrops_df@metadata$niters}."))
+    }
+    cells <- rownames(emptydrops_df)[which(emptydrops_df$FDR <= fdr_cutoff)]
+    metadata(sce)$filtering_method <- filter_method
   }
-  cells <- rownames(empty_df)[which(empty_df$FDR <= fdr_cutoff)]
 
   # subset original counts matrix by cells that pass filter
   sce <- sce[, cells]

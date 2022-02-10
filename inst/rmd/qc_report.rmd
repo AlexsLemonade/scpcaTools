@@ -129,7 +129,7 @@ processing_info <- tibble::tibble(
   "Salmon version"       = format(unfiltered_meta$salmon_version),
   "Alevin-fry version"   = format(unfiltered_meta$alevinfry_version),
   "Transcriptome index"  = format(unfiltered_meta$reference_index),
-  "Filtering method"     = format(unfiltered_meta$af_permit_type),
+  "Alevin-fry droplet detection"  = format(unfiltered_meta$af_permit_type),
   "Resolution"           = format(unfiltered_meta$af_resolution), 
   "Transcripts included" = dplyr::case_when(
       format(unfiltered_meta$transcript_type) == "spliced" ~ "Spliced only",
@@ -154,6 +154,7 @@ knitr::kable(processing_info, align = 'r') |>
 
 ```{r}
 basic_statistics <- tibble::tibble(
+  "Filtering method"                   = metadata(filtered_sce)$filtering_method, 
   "Number of cells post filtering"     = format(ncol(filtered_sce), big.mark = ","),
   "Percent of reads in cells"          = paste0(round((sum(filtered_sce$sum)/sum(unfiltered_sce$sum))*100,2),"%"),
   "Median UMI count per cell"          = format(median(filtered_sce$sum), big.mark = ","),
@@ -172,6 +173,20 @@ knitr::kable(basic_statistics, align = 'r') |>
   kableExtra::column_spec(2, monospace = TRUE)
 
 ```
+
+```{r, results='asis'}
+if(metadata(filtered_sce)$filtering_method == "UMI cutoff"){
+  glue::glue("
+    <div class=\"alert alert-warning\">
+    
+    This library may contain a low number of cells and was unable to be filtered using `DropletUtils`. 
+    Droplets with a total UMI count ≥ {metadata(filtered_sce)$umi_cutoff} are included in the filtered `SingleCellExperiment` object.
+    
+    </div>
+  ")
+}
+```
+
 
 ## Knee Plot
 
