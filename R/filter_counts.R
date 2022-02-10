@@ -11,7 +11,7 @@
 #' @param fdr_cutoff FDR cutoff to use for DropletUtils::emptyDropsCellRanger or DropletUtils::emptyDrops.
 #'   Default is 0.01.
 #' @param seed An optional random seed for reproducibility.
-#' @param umi_cutoff The minimum UMI count for cells to pass filtering, only used if emptyDropsCellRanger and emptyDrops fails.
+#' @param umi_cutoff The minimum UMI count for cells to pass filtering, only used if emptyDropsCellRanger or emptyDrops fails.
 #'   Default is 100.
 #' @param ... Any arguments to be passed into DropletUtils::emptyDropsCellRanger or DropletUtils::emptyDrops.
 #'
@@ -25,7 +25,7 @@
 #' \dontrun{
 #' filter_counts(sce = sce_object)
 #' }
-filter_counts <- function(sce, cr_like = TRUE, fdr_cutoff = 0.01, seed = NULL, umi_cutoff= 100, ...) {
+filter_counts <- function(sce, cr_like = TRUE, fdr_cutoff = 0.01, seed = NULL, umi_cutoff = 100, ...) {
 
   set.seed(seed)
 

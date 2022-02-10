@@ -174,9 +174,16 @@ knitr::kable(basic_statistics, align = 'r') |>
 
 ```
 
-```{r}
-if(metadata(filtered_sce)$filtering_method %in% "UMI cutoff"){
-  message(glue::glue("This library may contain a low number of droplets and was unable to be filtered using `DropletUtils`. Cells with a total UMI count > {metadata(filtered_sce)$umi_cutoff} are included in the filtered `SingleCellExperiment` object."))
+```{r, results='asis'}
+if(metadata(filtered_sce)$filtering_method == "UMI cutoff"){
+  glue::glue("
+    <div class=\"alert alert-warning\">
+    
+    This library may contain a low number of cells and was unable to be filtered using `DropletUtils`. 
+    Droplets with a total UMI count ≥ {metadata(filtered_sce)$umi_cutoff} are included in the filtered `SingleCellExperiment` object.
+    
+    </div>
+  ")
 }
 ```
 
