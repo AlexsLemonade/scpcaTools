@@ -43,10 +43,10 @@ filter_counts <- function(sce, cr_like = TRUE, fdr_cutoff = 0.01, seed = NULL, u
 
 
   filter_method <- ifelse(cr_like, "emptyDropsCellRanger", "emptyDrops")
-  filter_fun <- get(filter_method, asNamespace("DropletUtils"))
+  filter_func <- get(filter_method, asNamespace("DropletUtils"))
   # calculate probability of being an empty droplet
   emptydrops_df <- tryCatch(
-    do.call(filter_fun, list(m = round(counts(sce)))),
+    filter_func(m = round(counts(sce))),
     error = function(x){NULL}
     )
 
