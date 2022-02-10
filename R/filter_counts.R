@@ -37,8 +37,8 @@ filter_counts <- function(sce, cr_like = TRUE, fdr_cutoff = 0.01, seed = NULL, u
     stop("cr_like must be set as TRUE or FALSE")
   }
 
-  if(!is.numeric(umi_cutoff) & umi_cutoff >= 0){
-    stop("umi_cutoff must be an integer greater than or equal to 0")
+  if(!is.numeric(umi_cutoff) | umi_cutoff < 0){
+    stop("umi_cutoff must be a number greater than or equal to 0")
   }
 
 
