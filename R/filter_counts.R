@@ -41,34 +41,28 @@ filter_counts <- function(sce, cr_like = TRUE, fdr_cutoff = 0.01, seed = NULL, u
     stop("umi_cutoff must be an integer greater than or equal to 0")
   }
 
-  # calculate probability of being an empty droplet
-  if(cr_like){
-    empty_df <- tryCatch(
-      DropletUtils::emptyDropsCellRanger(m = round(counts(sce))),
-      error = function(x){NULL}
-    )
-    metadata(sce)$filtering_method <- "emptyDropsCellRanger"
-  } else {
-    empty_df <- tryCatch(
-      DropletUtils::emptyDrops(counts(sce), ...),
-      error = function(x){NULL}
-    )
-    metadata(sce)$filtering_method <- "emptyDrops"
-  }
 
-  # if emptyDrops doesn't fail, filter by FDR cutoff
-  if(!is.null(empty_df)){
-    if(any(empty_df$FDR > fdr_cutoff & empty_df$Limited, na.rm = TRUE)){
-      warning(glue::glue("`niters` may be set too low for emptyDrops filtering.",
-                         " Current value is {empty_df@metadata$niters}."))
-    }
-    cells <- rownames(empty_df)[which(empty_df$FDR <= fdr_cutoff)]
-  } else {
-    # if emptyDrops fails, filter using a hard UMI threshold
-    cells <- sce$sum > umi_cutoff
-    # replace filtering method with UMI cutoff as method
+  filter_method <- ifelse(cr_like, "emptyDropsCellRanger", "emptyDrops")
+  filter_func <- get(filter_method, asNamespace("DropletUtils"))
+  # calculate probability of being an empty droplet
+  emptydrops_df <- tryCatch(
+    filter_func(m = round(counts(sce))),
+    error = function(x){NULL}
+    )
+
+  if(is.null(emptydrops_df)){
+    # if emptyDrops failed, filter using a hard UMI threshold
+    cells <- sce$sum >= umi_cutoff
     metadata(sce)$filtering_method <- "UMI cutoff"
     metadata(sce)$umi_cutoff <- umi_cutoff
+  } else {
+    # emptyDrops was successful, filter by FDR cutoff
+    if(any(emptydrops_df$FDR > fdr_cutoff & emptydrops_df$Limited, na.rm = TRUE)){
+      warning(glue::glue("`niters` may be set too low for emptyDrops filtering.",
+                         " Current value is {emptydrops_df@metadata$niters}."))
+    }
+    cells <- rownames(emptydrops_df)[which(emptydrops_df$FDR <= fdr_cutoff)]
+    metadata(sce)$filtering_method <- filter_method
   }
 
   # subset original counts matrix by cells that pass filter
