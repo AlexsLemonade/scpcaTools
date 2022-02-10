@@ -6,7 +6,7 @@ test_that("Cell filtering with emptyDropsCellRanger() is as expected", {
   expect_lt(ncol(filtered_sce), ncol(sce))
   expect_true(all(colnames(filtered_sce) %in% colnames(sce)))
   expect_equal(nrow(filtered_sce), nrow(sce))
-  expect_true(metadata(filtered_sce)$filtering_method == "emptyDropsCellRanger")
+  expect_equal(metadata(filtered_sce)$filtering_method, "emptyDropsCellRanger")
 })
 
 test_that("Cell filtering with emptyDrops() is as expected", {
@@ -14,7 +14,7 @@ test_that("Cell filtering with emptyDrops() is as expected", {
   expect_lt(ncol(filtered_sce), ncol(sce))
   expect_true(all(colnames(filtered_sce) %in% colnames(sce)))
   expect_equal(nrow(filtered_sce), nrow(sce))
-  expect_true(metadata(filtered_sce)$filtering_method == "emptyDrops")
+  expect_equal(metadata(filtered_sce)$filtering_method, "emptyDrops")
 })
 
 test_that("Cell filtering with UMI cutoff is as expected", {
@@ -23,7 +23,7 @@ test_that("Cell filtering with UMI cutoff is as expected", {
   expect_lt(ncol(low_cells_filtered_sce), ncol(low_cells_sce))
   expect_true(all(colnames(low_cells_filtered_sce) %in% colnames(low_cells_sce)))
   expect_equal(nrow(low_cells_filtered_sce), nrow(low_cells_sce))
-  expect_true(metadata(low_cells_filtered_sce)$filtering_method == "UMI cutoff")
+  expect_equal(metadata(low_cells_filtered_sce)$filtering_method, "UMI cutoff")
 })
 
 test_that("Cell filtering removes row stats", {
