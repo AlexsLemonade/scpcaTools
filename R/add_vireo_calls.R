@@ -34,13 +34,20 @@ add_demux_vireo <- function(sce, vireo_df){
   vireo_df <- vireo_df |>
     dplyr::rename_with(~ paste0("vireo_", .x)) |>
     # add sampleid with finalized single results
-    dplyr::mutate(vireo_sampleid = ifelse(vireo_donor_id %in% c("doublet","unassigned"),
+    dplyr::mutate(vireo_sampleid = ifelse(vireo_donor_id %in% c("doublet", "unassigned"),
                                           NA_character_,
                                           vireo_donor_id)) |>
     dplyr::relocate(vireo_sampleid) # move vireo_sampleid first
 
   if(!all(vireo_df$vireo_cell %in% colnames(sce))){
     warning("Cell id(s) from vireo do not match cells in sce object.")
+  }
+  # if sample_id is present in the SCE metadata, check that samples are as expected
+  if(!is.null(metadata(sce)$sample_id)){
+    vireo_samples <- unique(vireo_df$vireo_sample_id[!is.na(vireo_df$vireo_sample_id)])
+    if(!all(vireo_samples %in% metadata(sce)$sample_id)){
+      warning("Sample IDs in vireo results do not match those in the sce metadata.")
+    }
   }
 
   # merge vireo results with SCE column names
