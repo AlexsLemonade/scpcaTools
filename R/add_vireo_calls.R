@@ -44,7 +44,7 @@ add_demux_vireo <- function(sce, vireo_df){
   }
   # if sample_id is present in the SCE metadata, check that samples are as expected
   if(!is.null(metadata(sce)$sample_id)){
-    vireo_samples <- unique(vireo_df$vireo_sample_id[!is.na(vireo_df$vireo_sample_id)])
+    vireo_samples <- unique(vireo_df$vireo_sampleid[!is.na(vireo_df$vireo_sampleid)])
     if(!all(vireo_samples %in% metadata(sce)$sample_id)){
       warning("Sample IDs in `vireo_df` do not match those in the `sce` metadata.")
     }

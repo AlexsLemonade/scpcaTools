@@ -79,7 +79,7 @@ add_cellhash_ids <- function(sce, hashsample_table,
   # if sample_id is present in the SCE metadata, check that sample_ids are are as expected
   if(!is.null(metadata(sce)$sample_id)){
     barcode_samples <- unique(barcode_rowdata$sample_id[!is.na(barcode_rowdata$sample_id)])
-    if(!all(vireo_samples %in% metadata(sce)$sample_id)){
+    if(!all(barcode_samples %in% metadata(sce)$sample_id)){
       warning("Sample IDs in `hashsample_table` do not match those in the `sce` metadata.")
     }
   }
