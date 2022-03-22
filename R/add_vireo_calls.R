@@ -1,7 +1,9 @@
 #' Add genetic demultiplexing results to a SCE object from Vireo
 #'
 #' @param sce SingleCellExperiment object.
-#' @param vireo_df A data frame of vireo results
+#' @param vireo_df A data frame of vireo results.
+#'   The expected format is that of the vireo `donor_ids.tsv` file, minimally containing columns
+#'   'cell' and 'donor_id' (but likely to contain other statistics as well).
 #'
 #'
 #' @return SingleCellExperiment with a `colData` column `hashedDrops_sampleid` containing the confident demultiplexing calls.

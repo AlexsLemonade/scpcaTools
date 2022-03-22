@@ -11,6 +11,8 @@ read_alevin(
   usa_mode = FALSE,
   which_counts = c("spliced", "unspliced"),
   round_counts = TRUE,
+  library_id = NULL,
+  sample_id = NULL,
   tech_version = NULL
 )
 }
@@ -34,6 +36,11 @@ Default is "spliced".}
 
 \item{round_counts}{Logical indicating in the count matrix should be rounded to integers on import.
 Default is TRUE.}
+
+\item{library_id}{Optional library identifier}
+
+\item{sample_id}{Optional sample identifier.
+If multiplexed samples are included in a library, this may be a vector.}
 
 \item{tech_version}{Technology or kit used to process library (i.e. 10Xv3, 10Xv3.1).}
 }

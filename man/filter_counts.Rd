@@ -24,7 +24,7 @@ Default is 0.01.}
 
 \item{seed}{An optional random seed for reproducibility.}
 
-\item{umi_cutoff}{The minimum UMI count for cells to pass filtering, only used if emptyDropsCellRanger and emptyDrops fails.
+\item{umi_cutoff}{The minimum UMI count for cells to pass filtering, only used if emptyDropsCellRanger or emptyDrops fails.
 Default is 100.}
 
 \item{...}{Any arguments to be passed into DropletUtils::emptyDropsCellRanger or DropletUtils::emptyDrops.}
