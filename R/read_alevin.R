@@ -14,6 +14,9 @@
 #'   Default is "spliced".
 #' @param round_counts Logical indicating in the count matrix should be rounded to integers on import.
 #'   Default is TRUE.
+#' @param library_id Optional library identifier
+#' @param sample_id Optional sample identifier.
+#'   If multiplexed samples are included in a library, this may be a vector.
 #' @param tech_version Technology or kit used to process library (i.e. 10Xv3, 10Xv3.1).
 #'
 #' @return SingleCellExperiment of unfiltered gene x cell counts matrix.
@@ -48,6 +51,8 @@ read_alevin <- function(quant_dir,
                         usa_mode = FALSE,
                         which_counts = c("spliced", "unspliced"),
                         round_counts = TRUE,
+                        library_id = NULL,
+                        sample_id = NULL,
                         tech_version = NULL){
 
   which_counts <- match.arg(which_counts)
@@ -77,7 +82,11 @@ read_alevin <- function(quant_dir,
   }
 
   # read metadata
-  meta <- read_alevin_metadata(quant_dir, tech_version)
+  meta <- read_alevin_metadata(
+    quant_dir,
+    tech_version,
+    library_id = library_id,
+    sample_id = sample_id)
 
   # Read the count data
   if(mtx_format | usa_mode) {
@@ -164,12 +173,18 @@ read_tximport <- function(quant_dir){
 #'
 #' @param quant_dir Path alevin output directory.
 #' @param tech_version Technology or kit used to process library (i.e. 10Xv3, 10Xv3.1).
+#' @param library_id Optional library identifier
+#' @param sample_id Optional sample identifier.
+#'   If multiplexed samples are included in a library, this may be a vector.
 #'
 #' @return A list containing alevin run metadata,
 #'   with NULL values for missing elements.
 #'
 #' @noRd
-read_alevin_metadata <- function(quant_dir, tech_version){
+read_alevin_metadata <- function(quant_dir,
+                                 tech_version,
+                                 library_id = NULL,
+                                 sample_id = NULL){
   cmd_info_path <- file.path(quant_dir, "cmd_info.json")
   permit_json_path <- file.path(quant_dir, "generate_permit_list.json")
   # Unused file, but leaving for future reference
@@ -207,7 +222,9 @@ read_alevin_metadata <- function(quant_dir, tech_version){
   }
 
   # Create a metadata list
-  meta <- list(salmon_version = cmd_info$salmon_version,
+  meta <- list(library_id = library_id,
+               sample_id = sample_id,
+               salmon_version = cmd_info$salmon_version,
                reference_index = cmd_info[['index']],
                total_reads = aux_meta[['num_processed']],
                mapped_reads = aux_meta[['num_mapped']])
