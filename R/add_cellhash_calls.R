@@ -6,8 +6,6 @@
 #'   Default value: "cellhash"
 #' @param remove_unlabeled Remove altExp data for barcodes with no `sample_id`in the `hashsample_table`
 #'   Default `FALSE`.
-#' @param replace_rownames Replace rownames for the altExp with sample_ids.
-#'   Requires `remove_unlabeled` to be TRUE. Default `FALSE`.
 #'
 #'
 #' @return SingleCellExperiment with rowData for the altExp containing barcode and sample ids
@@ -78,12 +76,17 @@ add_cellhash_ids <- function(sce, hashsample_table,
                    paste0(missing_barcodes, collapse = ", ")))
   }
 
+  # if sample_id is present in the SCE metadata, check that sample_ids are are as expected
+  if(!is.null(metadata(sce)$sample_id)){
+    barcode_samples <- unique(barcode_rowdata$sample_id[!is.na(barcode_rowdata$sample_id)])
+    if(!all(vireo_samples %in% metadata(sce)$sample_id)){
+      warning("Sample IDs in `hashsample_table` do not match those in the `sce` metadata.")
+    }
+  }
+
+
   rowData(altExp(sce, altexp_id))$barcode_id <- barcode_rowdata$barcode_id
   rowData(altExp(sce, altexp_id))$sample_id <- barcode_rowdata$sample_id
-
-  if (replace_rownames){
-    rownames(altExp(sce, altexp_id)) <- rowData(altExp(sce, altexp_id))$sample_id
-  }
 
   return(sce)
 }

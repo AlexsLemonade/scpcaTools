@@ -21,13 +21,13 @@
 add_demux_vireo <- function(sce, vireo_df){
   # check that input is a SingleCellExperiment
   if(!is(sce, "SingleCellExperiment")){
-    stop("sce must be a SingleCellExperiment object")
+    stop("`sce` must be a SingleCellExperiment object")
   }
 
   # check required columns of vireo_df
   vireo_expected_cols = c("cell", "donor_id")
   if(!all(vireo_expected_cols %in% colnames(vireo_df))){
-    stop("Columns in vireo_df do not include 'cell' and/or 'donor_id', as required.")
+    stop("Columns in `vireo_df` do not include 'cell' and/or 'donor_id', as required.")
   }
 
   # rename results with prefix & normalize
@@ -40,13 +40,13 @@ add_demux_vireo <- function(sce, vireo_df){
     dplyr::relocate(vireo_sampleid) # move vireo_sampleid first
 
   if(!all(vireo_df$vireo_cell %in% colnames(sce))){
-    warning("Cell id(s) from vireo do not match cells in sce object.")
+    warning("Cell id(s) from `vireo_df` do not match cells in `sce` object.")
   }
   # if sample_id is present in the SCE metadata, check that samples are as expected
   if(!is.null(metadata(sce)$sample_id)){
     vireo_samples <- unique(vireo_df$vireo_sample_id[!is.na(vireo_df$vireo_sample_id)])
     if(!all(vireo_samples %in% metadata(sce)$sample_id)){
-      warning("Sample IDs in vireo results do not match those in the sce metadata.")
+      warning("Sample IDs in `vireo_df` do not match those in the `sce` metadata.")
     }
   }
 
