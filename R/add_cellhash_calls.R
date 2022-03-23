@@ -6,8 +6,6 @@
 #'   Default value: "cellhash"
 #' @param remove_unlabeled Remove altExp data for barcodes with no `sample_id`in the `hashsample_table`
 #'   Default `FALSE`.
-#' @param replace_rownames Replace rownames for the altExp with sample_ids.
-#'   Requires `remove_unlabeled` to be TRUE. Default `FALSE`.
 #'
 #'
 #' @return SingleCellExperiment with rowData for the altExp containing barcode and sample ids
@@ -26,8 +24,7 @@
 #' }
 add_cellhash_ids <- function(sce, hashsample_table,
                              altexp_id = "cellhash",
-                             remove_unlabeled = FALSE,
-                             replace_rownames = FALSE){
+                             remove_unlabeled = FALSE){
   # check that input is a SingleCellExperiment
   if(!is(sce, "SingleCellExperiment")){
     stop("sce must be a SingleCellExperiment object")
@@ -39,10 +36,6 @@ add_cellhash_ids <- function(sce, hashsample_table,
   if(!(is(hashsample_table, "data.frame") &
      all(c("barcode_id", "sample_id") %in% colnames(hashsample_table)))){
     stop("hashsample_table must be a data frame with columns `barcode_id` and `sample_id`")
-  }
-  # check requirements for replace_rownames
-  if(replace_rownames & !remove_unlabeled){
-    stop("replace_rownames = TRUE requires remove_unlabeled to be TRUE")
   }
 
   # get rowData from sce and add barcode_id column if needed
@@ -78,12 +71,17 @@ add_cellhash_ids <- function(sce, hashsample_table,
                    paste0(missing_barcodes, collapse = ", ")))
   }
 
+  # if sample_id is present in the SCE metadata, check that sample_ids are are as expected
+  if(!is.null(metadata(sce)$sample_id)){
+    barcode_samples <- unique(barcode_rowdata$sample_id[!is.na(barcode_rowdata$sample_id)])
+    if(!all(barcode_samples %in% metadata(sce)$sample_id)){
+      warning("Sample IDs in `hashsample_table` do not match those in the `sce` metadata.")
+    }
+  }
+
+
   rowData(altExp(sce, altexp_id))$barcode_id <- barcode_rowdata$barcode_id
   rowData(altExp(sce, altexp_id))$sample_id <- barcode_rowdata$sample_id
-
-  if (replace_rownames){
-    rownames(altExp(sce, altexp_id)) <- rowData(altExp(sce, altexp_id))$sample_id
-  }
 
   return(sce)
 }

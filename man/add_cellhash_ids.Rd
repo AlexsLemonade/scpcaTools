@@ -8,8 +8,7 @@ add_cellhash_ids(
   sce,
   hashsample_table,
   altexp_id = "cellhash",
-  remove_unlabeled = FALSE,
-  replace_rownames = FALSE
+  remove_unlabeled = FALSE
 )
 }
 \arguments{
@@ -22,9 +21,6 @@ Default value: "cellhash"}
 
 \item{remove_unlabeled}{Remove altExp data for barcodes with no `sample_id`in the `hashsample_table`
 Default `FALSE`.}
-
-\item{replace_rownames}{Replace rownames for the altExp with sample_ids.
-Requires `remove_unlabeled` to be TRUE. Default `FALSE`.}
 }
 \value{
 SingleCellExperiment with rowData for the altExp containing barcode and sample ids

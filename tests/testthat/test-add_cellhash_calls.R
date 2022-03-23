@@ -2,6 +2,7 @@ test_that("cellhash functions work", {
   # create an sce with cellhash data
   set.seed(1665)
   sce <- sim_sce(n_cells = 100, n_genes = 200, n_empty = 0)
+  metadata(sce)$sample_id <- paste0("sample", 1:4)
   # create barcode and sample ids
   hashsample_table <- data.frame(barcode_id = paste0("tag", 1:4),
                               sample_id = paste0("sample", 1:4))
@@ -27,15 +28,17 @@ test_that("cellhash functions work", {
   expect_warning(add_cellhash_ids(sce, hashsample_table[1:2,], remove_unlabeled = FALSE))
   reduced_sce <- add_cellhash_ids(sce, hashsample_table[1:2,], remove_unlabeled = TRUE)
   expect_equal(sort(rownames(altExp(reduced_sce))), sort(hashsample_table$barcode_id[1:2]))
-  # test rowname replacements
-  reduced_sce <- add_cellhash_ids(sce, hashsample_table[1:2,], remove_unlabeled = TRUE, replace_rownames = TRUE)
-  expect_equal(sort(rownames(altExp(reduced_sce))), sort(hashsample_table$sample_id[1:2]))
+
   # test with the wrong altexp_id
   expect_error(add_cellhash_ids(sce, hashsample_table, altexp_id = "foo"))
   # test with bad barcode tables
   expect_error(add_cellhash_ids(sce, data.frame(a = 1:4, b = 1:4)))
   expect_error(add_cellhash_ids(sce, rbind(hashsample_table, c("tag1", "sample5"))))
   expect_error(add_cellhash_ids(sce, hashsample_table[,1]))
+  # test with different sample_ids
+  wrong_table <- data.frame(barcode_id = paste0("tag", 1:4),
+                            sample_id = paste0("other", 1:4))
+  expect_warning(add_cellhash_ids(sce, wrong_table))
 
 
   hash_sce <- add_demux_hashedDrops(sce_hashtable)
@@ -48,7 +51,7 @@ test_that("cellhash functions work", {
   # check the results are by sample_id
   expect_true(all(hash_sce$hashedDrops_sampleid[!is.na(hash_sce$hashedDrops_sampleid)] %in% hashsample_table$sample_id))
   # results with no sample table present
-  expect_warning(hash_sce_nosample <- add_demux_hashedDrops(sce))
+  expect_warning({hash_sce_nosample <- add_demux_hashedDrops(sce)})
   expect_true(all(hash_sce_nosample$hashedDrops_sampleid[!is.na(hash_sce_nosample$hashedDrops_sampleid)] %in% rownames(altExp(hash_sce_nosample))))
 
   # test seurat functions
@@ -62,7 +65,7 @@ test_that("cellhash functions work", {
   # check the results are by sample_id
   expect_true(all(hto_sce$HTODemux_sampleid[!is.na(hto_sce$HTODemux_sampleid)] %in% hashsample_table$sample_id))
   # results with no sample table present
-  expect_warning(hto_sce_nosample <- add_demux_seurat(sce))
+  expect_warning({hto_sce_nosample <- add_demux_seurat(sce)})
   expect_true(all(hto_sce_nosample$hashedDrops_sampleid[!is.na(hto_sce_nosample$hashedDrops_sampleid)] %in% rownames(altExp(hto_sce_nosample))))
 
 })
