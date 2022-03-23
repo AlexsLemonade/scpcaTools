@@ -8,8 +8,7 @@ add_cellhash_ids(
   sce,
   hashsample_table,
   altexp_id = "cellhash",
-  remove_unlabeled = FALSE,
-  replace_rownames = FALSE
+  remove_unlabeled = FALSE
 )
 }
 \arguments{

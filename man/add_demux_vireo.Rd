@@ -4,26 +4,26 @@
 \alias{add_demux_vireo}
 \title{Add genetic demultiplexing results to a SCE object from Vireo}
 \usage{
-add_demux_vireo(sce, vireo_df)
+add_demux_vireo(sce, vireo_table)
 }
 \arguments{
 \item{sce}{SingleCellExperiment object.}
 
-\item{vireo_df}{A data frame of vireo results.
+\item{vireo_table}{A data frame of vireo results.
 The expected format is that of the vireo `donor_ids.tsv` file, minimally containing columns
 'cell' and 'donor_id' (but likely to contain other statistics as well).}
 }
 \value{
-SingleCellExperiment with a `colData` column `hashedDrops_sampleid` containing the confident demultiplexing calls.
-  Other results from `DropletUtils::hashedDrops()` are included in the `rowData` for the cellhash `altExp`,
-  with the prefix `hashedDrops_`. See [DropletUtils::hashedDrops()] for the contents of these fields.
+SingleCellExperiment with a `colData` column `vireo_sampleid` containing the confident demultiplexing calls.
+  Other results imported from the vireo data frame are included in `colData` as well,
+  with the prefix `vireo_`. See https://vireosnp.readthedocs.io/ for more information.
 }
 \description{
 Add genetic demultiplexing results to a SCE object from Vireo
 }
 \examples{
 \dontrun{
-  # add cell calls from DropletUtils::hashedDrops()
-  add_demux_hashedDrops(sce = sce)
+  # add cell calls from a vireo data frame
+  add_demux_vireo(sce, vireo_table = vireo_df)
 }
 }

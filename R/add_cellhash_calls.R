@@ -24,8 +24,7 @@
 #' }
 add_cellhash_ids <- function(sce, hashsample_table,
                              altexp_id = "cellhash",
-                             remove_unlabeled = FALSE,
-                             replace_rownames = FALSE){
+                             remove_unlabeled = FALSE){
   # check that input is a SingleCellExperiment
   if(!is(sce, "SingleCellExperiment")){
     stop("sce must be a SingleCellExperiment object")
@@ -37,10 +36,6 @@ add_cellhash_ids <- function(sce, hashsample_table,
   if(!(is(hashsample_table, "data.frame") &
      all(c("barcode_id", "sample_id") %in% colnames(hashsample_table)))){
     stop("hashsample_table must be a data frame with columns `barcode_id` and `sample_id`")
-  }
-  # check requirements for replace_rownames
-  if(replace_rownames & !remove_unlabeled){
-    stop("replace_rownames = TRUE requires remove_unlabeled to be TRUE")
   }
 
   # get rowData from sce and add barcode_id column if needed
