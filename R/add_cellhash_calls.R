@@ -212,11 +212,11 @@ add_demux_seurat <- function(sce, altexp_id = "cellhash", ...){
   rownames(alt_counts) <- seurat_features
 
   # Seurat will not like zero count cells or HTOs
-  sce_sum <- colSums(sce_counts)
-  alt_sum <- colSums(alt_counts)
-  seurat_cells <- colnames(sce_sum)[sce_sum > 0 & alt_sum > 0]
-  sce_counts <- sce_counts[,sce_sum > 0 & alt_sum > 0]
-  alt_counts <- alt_counts[,sce_sum > 0 & alt_sum > 0]
+  sce_sum <- Matrix::colSums(sce_counts)
+  alt_sum <- Matrix::colSums(alt_counts)
+  seurat_cells <- names(sce_sum)[sce_sum > 0 & alt_sum > 0]
+  sce_counts <- sce_counts[, seurat_cells]
+  alt_counts <- alt_counts[, seurat_cells]
 
 
   # convert to Seurat object (quietly)
