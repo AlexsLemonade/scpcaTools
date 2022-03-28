@@ -206,15 +206,24 @@ add_demux_seurat <- function(sce, altexp_id = "cellhash", ...){
     stringr::str_replace_all("_", "-") # seurat doesn't like underscores
   names(sample_ids) <- seurat_features
 
+  # Seurat counts need to be integers
+  sce_counts <- round(counts(sce))
+  alt_counts <- round(counts(altExp(sce, altexp_id)))
+  rownames(alt_counts) <- seurat_features
+
+  # Seurat will not like zero count cells or HTOs
+  sce_sum <- colSums(sce_counts)
+  alt_sum <- colSums(alt_counts)
+  seurat_cells <- colnames(sce_sum)[sce_sum > 0 & alt_sum > 0]
+  sce_counts <- sce_counts[,sce_sum > 0 & alt_sum > 0]
+  alt_counts <- alt_counts[,sce_sum > 0 & alt_sum > 0]
+
 
   # convert to Seurat object (quietly)
   suppressMessages({
-    seurat_obj <- Seurat::CreateSeuratObject(counts(sce))
-    # counts need to be integers
-    alt_counts <- round(counts(altExp(sce, altexp_id)))
-    rownames(alt_counts) <- seurat_features
+    seurat_obj <- Seurat::CreateSeuratObject(sce_counts)
     seurat_obj[["HTODemux"]] <- Seurat::CreateAssayObject(counts = alt_counts)
-    rm(alt_counts)
+    rm(sce_counts, alt_counts)
     # seurat requires normalized HTO data
     seurat_obj <- Seurat::NormalizeData(seurat_obj, assay = "HTODemux", normalization.method = "CLR")
     # calculate cellhash results
@@ -230,9 +239,9 @@ add_demux_seurat <- function(sce, altexp_id = "cellhash", ...){
                                              sample_ids[as.character(.data$HTODemux_hash.ID)]))
 
     ## add htodemux columns to altExp
-    colData(altExp(sce, altexp_id))[, colnames(seurat_demux)] <- seurat_demux
+    colData(altExp(sce, altexp_id))[seurat_cells, colnames(seurat_demux)] <- seurat_demux
     # add id to main sce table
-    sce$HTODemux_sampleid <- seurat_demux$HTODemux_sampleid
+    sce$HTODemux_sampleid[seurat_cells] <- seurat_demux$HTODemux_sampleid
 
     return(sce)
 }
