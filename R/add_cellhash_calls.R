@@ -211,7 +211,12 @@ add_demux_seurat <- function(sce, altexp_id = "cellhash", ...){
   alt_counts <- round(counts(altExp(sce, altexp_id)))
   rownames(alt_counts) <- seurat_features
 
-  # Seurat will not like zero count cells or HTOs
+  # remove HTOs that are not seen in many cells
+  hto_detected <- Matrix::rowSums(alt_counts > 1) / ncol(alt_counts)
+  alt_counts <- alt_counts[hto_detected > 0.001, ]
+
+
+  # Seurat will not like zero count cells
   sce_sum <- Matrix::colSums(sce_counts)
   alt_sum <- Matrix::colSums(alt_counts)
   seurat_cells <- names(sce_sum)[sce_sum > 0 & alt_sum > 0]
@@ -227,21 +232,29 @@ add_demux_seurat <- function(sce, altexp_id = "cellhash", ...){
     # seurat requires normalized HTO data
     seurat_obj <- Seurat::NormalizeData(seurat_obj, assay = "HTODemux", normalization.method = "CLR")
     # calculate cellhash results
-    seurat_obj <- Seurat::HTODemux(seurat_obj, assay = "HTODemux", ...)
-  })
+    # use try because this may well fail
+    try({
+      seurat_obj <- Seurat::HTODemux(seurat_obj, assay = "HTODemux", ...)
+    })
 
-  seurat_demux <- seurat_obj@meta.data |>
-    dplyr::rename("HTODemux_hash.ID" = "hash.ID") |>
-    dplyr::select(dplyr::starts_with("HTOdemux_"))|>
-    dplyr::mutate(HTODemux_maxsample = sample_ids[as.character(.data$HTODemux_maxID)],
-                  HTODemux_sampleid = ifelse(.data$HTODemux_hash.ID %in% c("Doublet","Negative"),
-                                             NA_character_,
-                                             sample_ids[as.character(.data$HTODemux_hash.ID)]))
+  })
+  if(is.null(seurat_obj@meta.data$hash.ID)){
+    warning("HTODemux failed")
+    sce$HTODemux_sampleid <- NA
+  } else {
+    seurat_demux <- seurat_obj@meta.data |>
+      dplyr::rename("HTODemux_hash.ID" = "hash.ID") |>
+      dplyr::select(dplyr::starts_with("HTOdemux_"))|>
+      dplyr::mutate(HTODemux_maxsample = sample_ids[as.character(.data$HTODemux_maxID)],
+                    HTODemux_sampleid = ifelse(.data$HTODemux_hash.ID %in% c("Doublet","Negative"),
+                                               NA_character_,
+                                               sample_ids[as.character(.data$HTODemux_hash.ID)]))
 
     ## add htodemux columns to altExp
     colData(altExp(sce, altexp_id))[seurat_cells, colnames(seurat_demux)] <- seurat_demux
     # add id to main sce table
-    sce$HTODemux_sampleid[seurat_cells] <- seurat_demux$HTODemux_sampleid
+    colData(sce)[seurat_cells, "HTODemux_sampleid"] <- seurat_demux$HTODemux_sampleid
+  }
 
-    return(sce)
+  return(sce)
 }
