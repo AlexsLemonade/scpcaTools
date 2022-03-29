@@ -123,7 +123,7 @@ add_demux_hashedDrops <- function(sce, altexp_id = "cellhash", ...){
   if(is.null(sample_ids)){
     sample_ids <- rowData(altExp(sce, altexp_id))$barcode_id
   }
-  if (is.null(sample_ids)){
+  if(is.null(sample_ids)){
     warning("No sample ids are present for demux results, using row names")
     sample_ids <- rownames(altExp(sce, altexp_id))
   }
@@ -197,7 +197,7 @@ add_demux_seurat <- function(sce, altexp_id = "cellhash", ...){
   if(is.null(sample_ids)){
     sample_ids <- rowData(altExp(sce, altexp_id))$barcode_id
   }
-  if (is.null(sample_ids)){
+  if(is.null(sample_ids)){
     warning("No sample ids are present for demux results, using row names")
     sample_ids <- rownames(altExp(sce, altexp_id))
   }

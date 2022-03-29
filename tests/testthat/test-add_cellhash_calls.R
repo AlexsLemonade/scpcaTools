@@ -40,7 +40,7 @@ test_that("cellhash functions work", {
                             sample_id = paste0("other", 1:4))
   expect_warning(add_cellhash_ids(sce, wrong_table))
 
-
+  ## test hasheddrops functions
   hashdrops_sce <- add_demux_hashedDrops(sce_hashtable)
   hash_cols <- c("hashedDrops_sampleid",
                  "hashedDrops_bestsample",
@@ -70,5 +70,4 @@ test_that("cellhash functions work", {
   expect_true(all(hto_sce_nosample$hashedDrops_sampleid[!is.na(hto_sce_nosample$hashedDrops_sampleid)] %in% rownames(altExp(hto_sce_nosample))))
 
 })
-
 
