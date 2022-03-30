@@ -123,7 +123,7 @@ add_demux_hashedDrops <- function(sce, altexp_id = "cellhash", ...){
   if(is.null(sample_ids)){
     sample_ids <- rowData(altExp(sce, altexp_id))$barcode_id
   }
-  if (is.null(sample_ids)){
+  if(is.null(sample_ids)){
     warning("No sample ids are present for demux results, using row names")
     sample_ids <- rownames(altExp(sce, altexp_id))
   }
@@ -197,7 +197,7 @@ add_demux_seurat <- function(sce, altexp_id = "cellhash", ...){
   if(is.null(sample_ids)){
     sample_ids <- rowData(altExp(sce, altexp_id))$barcode_id
   }
-  if (is.null(sample_ids)){
+  if(is.null(sample_ids)){
     warning("No sample ids are present for demux results, using row names")
     sample_ids <- rownames(altExp(sce, altexp_id))
   }
@@ -206,33 +206,55 @@ add_demux_seurat <- function(sce, altexp_id = "cellhash", ...){
     stringr::str_replace_all("_", "-") # seurat doesn't like underscores
   names(sample_ids) <- seurat_features
 
+  # Seurat counts need to be integers
+  sce_counts <- round(counts(sce))
+  alt_counts <- round(counts(altExp(sce, altexp_id)))
+  rownames(alt_counts) <- seurat_features
+
+  # remove HTOs that are not seen in many cells
+  hto_detected <- Matrix::rowSums(alt_counts > 1) / ncol(alt_counts)
+  alt_counts <- alt_counts[hto_detected > 0.001, ]
+
+
+  # Seurat will not like zero count cells
+  sce_sum <- Matrix::colSums(sce_counts)
+  alt_sum <- Matrix::colSums(alt_counts)
+  seurat_cells <- names(sce_sum)[sce_sum > 0 & alt_sum > 0]
+  sce_counts <- sce_counts[, seurat_cells]
+  alt_counts <- alt_counts[, seurat_cells]
+
 
   # convert to Seurat object (quietly)
   suppressMessages({
-    seurat_obj <- Seurat::CreateSeuratObject(counts(sce))
-    # counts need to be integers
-    alt_counts <- round(counts(altExp(sce, altexp_id)))
-    rownames(alt_counts) <- seurat_features
+    seurat_obj <- Seurat::CreateSeuratObject(sce_counts)
     seurat_obj[["HTODemux"]] <- Seurat::CreateAssayObject(counts = alt_counts)
-    rm(alt_counts)
+    rm(sce_counts, alt_counts)
     # seurat requires normalized HTO data
     seurat_obj <- Seurat::NormalizeData(seurat_obj, assay = "HTODemux", normalization.method = "CLR")
     # calculate cellhash results
-    seurat_obj <- Seurat::HTODemux(seurat_obj, assay = "HTODemux", ...)
-  })
+    # use try because this may well fail
+    try({
+      seurat_obj <- Seurat::HTODemux(seurat_obj, assay = "HTODemux", ...)
+    })
 
-  seurat_demux <- seurat_obj@meta.data |>
-    dplyr::rename("HTODemux_hash.ID" = "hash.ID") |>
-    dplyr::select(dplyr::starts_with("HTOdemux_"))|>
-    dplyr::mutate(HTODemux_maxsample = sample_ids[as.character(.data$HTODemux_maxID)],
-                  HTODemux_sampleid = ifelse(.data$HTODemux_hash.ID %in% c("Doublet","Negative"),
-                                             NA_character_,
-                                             sample_ids[as.character(.data$HTODemux_hash.ID)]))
+  })
+  if(is.null(seurat_obj@meta.data$hash.ID)){
+    warning("HTODemux failed")
+    sce$HTODemux_sampleid <- NA
+  } else {
+    seurat_demux <- seurat_obj@meta.data |>
+      dplyr::rename("HTODemux_hash.ID" = "hash.ID") |>
+      dplyr::select(dplyr::starts_with("HTOdemux_"))|>
+      dplyr::mutate(HTODemux_maxsample = sample_ids[as.character(.data$HTODemux_maxID)],
+                    HTODemux_sampleid = ifelse(.data$HTODemux_hash.ID %in% c("Doublet","Negative"),
+                                               NA_character_,
+                                               sample_ids[as.character(.data$HTODemux_hash.ID)]))
 
     ## add htodemux columns to altExp
-    colData(altExp(sce, altexp_id))[, colnames(seurat_demux)] <- seurat_demux
+    colData(altExp(sce, altexp_id))[seurat_cells, colnames(seurat_demux)] <- seurat_demux
     # add id to main sce table
-    sce$HTODemux_sampleid <- seurat_demux$HTODemux_sampleid
+    colData(sce)[seurat_cells, "HTODemux_sampleid"] <- seurat_demux$HTODemux_sampleid
+  }
 
-    return(sce)
+  return(sce)
 }

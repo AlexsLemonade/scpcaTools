@@ -7,9 +7,11 @@ intron_dir <- file.path(dir, "Breast_Cancer_3p_LT/alevinfry_intron_filtered")
 sce_alevin_size <- c(60275, 10378)
 # expected alevin-fry matrix size
 sce_af_size <- c(60321, 614)
+sample_ids = c("A1", "A2")
 
 test_that("reading salmon alevin data works", {
-  sce <- read_alevin(alevin_dir)
+  sce <- read_alevin(alevin_dir,
+                     sample_id = sample_ids )
   expect_s4_class(sce, "SingleCellExperiment")
   expect_equal(dim(sce), sce_alevin_size)
   # check that column names are barcodes
@@ -19,13 +21,14 @@ test_that("reading salmon alevin data works", {
   expect_false(is.null(sce@metadata$salmon_version))
   expect_false(is.null(sce@metadata$reference_index))
   expect_null(sce@metadata$alevinfry_version)
-
+  expect_equal(sce@metadata$sample_id, sample_ids)
 })
 
 test_that("reading alevin-fry USA mode works", {
   sce <- read_alevin(usa_dir,
                      usa_mode = TRUE,
-                     which_counts = "spliced")
+                     which_counts = "spliced",
+                     sample_id = sample_ids)
   expect_s4_class(sce, "SingleCellExperiment")
   expect_equal(dim(sce), sce_af_size)
   # check that column names are barcodes
@@ -37,6 +40,7 @@ test_that("reading alevin-fry USA mode works", {
   expect_false(is.null(sce@metadata$salmon_version))
   expect_false(is.null(sce@metadata$reference_index))
   expect_false(is.null(sce@metadata$alevinfry_version))
+  expect_equal(sce@metadata$sample_id, sample_ids)
 
   # no remaining unspliced
   unmerged_genes <- str_subset(rownames(sce), "-[IUA]$")
@@ -63,5 +67,4 @@ test_that("reading alevin-fry intron mode works", {
   # no remaining unspliced
   unmerged_genes <- str_subset(rownames(sce), "-[IUA]$")
   expect_length(unmerged_genes, 0)
-
 })
