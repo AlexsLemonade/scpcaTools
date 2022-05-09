@@ -45,6 +45,7 @@ test_that("adding cellhash ids works", {
 
 test_that("hashedDrops functions work", {
   ## test hasheddrops functions
+  sce_hashtable <- add_cellhash_ids(sce, hashsample_table, altexp_id = "cellhash")
   hashdrops_sce <- add_demux_hashedDrops(sce_hashtable)
   hash_cols <- c("hashedDrops_sampleid",
                  "hashedDrops_bestsample",
@@ -65,6 +66,7 @@ test_that("seurat functions work", {
     skip("The Seurat package was not installed. Skipping tests")
   }
   # test seurat functions
+  sce_hashtable <- add_cellhash_ids(sce, hashsample_table, altexp_id = "cellhash")
   hto_sce <- add_demux_seurat(sce_hashtable)
   hto_cols <- c("HTODemux_maxID",
                 "HTODemux_secondID",
