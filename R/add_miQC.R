@@ -33,29 +33,37 @@ add_miQC <- function(sce, posterior_cutoff = 0.75, seed = NULL){
   # set seed
   set.seed(seed)
 
+  model <- NA
+  pass_cells <- NA
+  model_attempt <- 0
   # generate linear mixture model of probability of cells being compromised
-  model <- tryCatch(
-    miQC::mixtureModel(sce),
-    error = function(x){NA}
-  )
-  if (is(model, "flexmix")  && length(model@components) < 2){
-    # first model fit gave only one component, give it one more chance.
-    model <- miQC::mixtureModel(sce)
+  while(model_attempt < 3 &&
+        (!is(model, "flexmix") || length(model@components) < 2 ) &&
+        is.na(pass_cells)){
+    model_attempt <- model_attempt + 1
+    try({
+      model <- miQC::mixtureModel(sce)
+      # filter step can fail, so we will try this too, keeping the passing cell ids
+      pass_cells <- colnames(
+        miQC::filterCells(sce,
+                          model = model,
+                          posterior_cutoff = posterior_cutoff,
+                          verbose = FALSE)
+      )
+    })
   }
+
   if (!is(model, "flexmix") || length(model@components) < 2){
     # no good fit, fill prob_compromised with NA
     sce$prob_compromised <- NA_real_
   }else{
+    # add the prob_compromised, but do not filter
     sce <- miQC::filterCells(sce,
                              model = model,
                              posterior_cutoff = 1,
                              enforce_left_cutoff = FALSE,
                              verbose = FALSE)
-    # test whether cells would pass filtering
-    pass_cells <- colnames(miQC::filterCells(sce,
-                                             model = model,
-                                             posterior_cutoff = posterior_cutoff,
-                                             verbose = FALSE))
+    # test whether cells passed filtering
     sce$miQC_pass <- colnames(sce) %in% pass_cells
     metadata(sce)$miQC_model <- model
   }
