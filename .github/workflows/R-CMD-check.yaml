@@ -30,6 +30,7 @@ jobs:
       - name: Install R dependencies
         run: |
           options(repos = c(CRAN = "https://packagemanager.rstudio.com/cran/__linux__/focal/latest"))
+          options(BioC_mirror = "https://packagemanager.rstudio.com/bioconductor")
           install.packages(c("remotes", "rcmdcheck"))
           remotes::install_cran("BiocManager")
           remotes::install_deps(dependencies = TRUE, repos = BiocManager::repositories())
