@@ -52,7 +52,7 @@ add_miQC <- function(sce, posterior_cutoff = 0.75, seed = NULL){
                           posterior_cutoff = posterior_cutoff,
                           verbose = FALSE)
       )
-    })
+    }, silent = TRUE)
   }
 
   if (!is(model, "flexmix") || length(model@components) < 2){
