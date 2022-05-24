@@ -52,14 +52,24 @@ knitr::kable(hto_tags, digits = 2) |>
 ```
 ## Demultiplexing Cell Calls 
 
-Here we use a variety of methods for demultiplexing and assignment of each...  
+Demultiplexing was performed using both [DropletUtils::hashedDrops](https://rdrr.io/github/MarioniLab/DropletUtils/man/hashedDrops.html) and [Seurat::HTOdemux](https://rdrr.io/github/satijalab/seurat/man/HTODemux.html) only on the _filtered_ cells, using default parameters for each.
+
+For multiplex libraries where bulk RNA-seq data is available for the individual samples, we also performed demultiplexing analysis using genotype data following the methods described in [Weber _et al._ (2021)](https://doi.org/10.1093/gigascience/giab062). 
+The genetic demultiplexing results are reported under the `vireo` column in the below table.   
+
+:warning: We have reported the demultiplexed sample calls for each of the above mentioned algorithms, but the multiplexed library has not been separated into individual samples. 
 
 ```{r}
-demux_calls <- data.frame(
-  hashedDrops = filtered_sce$hashedDrops_sampleid,
-  HTODemux = filtered_sce$HTODemux_sampleid,
-  vireo = filtered_sce$vireo_sampleid
-) |>
+# grab columns that have demuxing results as not all methods could be present
+# e.g. vireo is only used if a matching bulk RNA seq library is there, 
+# otherwise those calls will not be present
+demux_methods <- c("hashedDrops_sampleid", "HTODemux_sampleid", "vireo_sampleid")
+demux_columns <- colnames(colData(filtered_sce)) %in% demux_methods
+
+# create a table summarizing demuxing calls for each method used 
+demux_calls <- as.data.frame(colData(filtered_sce)[, demux_columns]) |>
+  # remove _sampleid at the end of the column names
+  dplyr::rename_with(~stringr::str_remove(., "_sampleid")) |>
   tidyr::pivot_longer(cols = everything(),
                       names_to = "demux_method",
                       values_to = "Sample") |>
