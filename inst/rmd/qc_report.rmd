@@ -72,9 +72,29 @@ has_cite <- "CITEseq" %in% altExpNames(filtered_sce)
 if (has_cite){
   modalities <- c(modalities, "CITE-seq")
 }
+
+has_multiplex <- "cellhash" %in% altExpNames(filtered_sce)
+if(has_multiplex){
+  modalities <- c(modalities, "Multiplex")
+  multiplex_samples <- paste(metadata(filtered_sce)$sample_id, collapse = ", ")
+}
 ```
 
 # Processing Information for `r sample_id`
+
+```{r, results='asis'}
+if(has_multiplex){
+  glue::glue("
+    <div class=\"alert alert-warning\">
+    
+    This library is multiplexed and contains data from more than one sample.  
+    Data from the following samples are included in this library: 
+    {multiplex_samples}
+    
+    </div>
+  ")
+}
+```
 
 ## Raw Sample Metrics
 
@@ -109,6 +129,21 @@ if (has_cite){
         paste0(round(cite_meta$mapped_reads/cite_meta$total_reads * 100, digits = 2), "%")
     )
 }
+if (has_multiplex){
+  multiplex_exp <- altExp(filtered_sce, "cellhash")
+  multiplex_meta <- metadata(multiplex_exp)
+  
+  sample_information <- sample_information |>
+    mutate(
+      "Number of HTOs assayed" = 
+        format(nrow(multiplex_exp), big.mark = ',', scientific = FALSE),
+      "Multiplex reads sequenced" = 
+        format(multiplex_meta$total_reads, big.mark = ',', scientific = FALSE),
+      "Percent of multiplex reads mapped to HTOs" = 
+        paste0(round(multiplex_meta$mapped_reads/multiplex_meta$total_reads * 100, digits = 2), "%")
+    )
+}
+
 
 sample_information <- sample_information |>
   mutate(across(.fns = ~ifelse(.x == "NULL", "N/A", .x))) |> # reformat nulls
@@ -308,6 +343,11 @@ In such situations, the calculated probability of compromise may not be valid (s
 
 <!-- Next section included only if CITE-seq data is present -->
 ```{r, child='cite_qc.rmd', eval = has_cite}
+```
+
+<!-- Next section only included if multiplex data is present --> 
+```{r, child='multiplex_qc.rmd', eval = has_multiplex}
+
 ```
 
 
