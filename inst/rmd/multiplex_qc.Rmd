@@ -1,0 +1,81 @@
+# Multiplexing Experiment Summary
+
+## Multiplexing Statistics
+
+```{r}
+# add rowData if missing
+if (is.null(rowData(multiplex_exp)$detected)){
+  multiplex_exp <- scuttle::addPerFeatureQCMetrics(multiplex_exp)
+}
+
+cell_hto_counts <- Matrix::colSums(counts(multiplex_exp))
+
+hto_information <- tibble::tibble(
+  "Number of HTOs assayed" = 
+    format(nrow(multiplex_exp), big.mark = ',', scientific = FALSE),
+  "Multiplex reads sequenced" = 
+    format(multiplex_meta$total_reads, big.mark = ',', scientific = FALSE),
+  "Percent multiplex reads mapped to ADTs" = 
+    paste0(round(multiplex_meta$mapped_reads/multiplex_meta$total_reads * 100, digits = 2), "%"),
+  "Percent of HTOs in cells" = 
+    paste0(round(sum(cell_hto_counts)/multiplex_meta$mapped_reads * 100, digits = 2), "%"),
+  "Percent of cells with HTOs" = 
+    paste0(round(sum(cell_hto_counts > 0)/length(cell_hto_counts) * 100, digits = 2), "%"),
+  "Median HTO UMIs per cell" = 
+    format(median(cell_hto_counts), big.mark = ',', scientific = FALSE)
+  )|>
+  t()
+
+knitr::kable(hto_information, align = 'r') |>
+  kableExtra::kable_styling(bootstrap_options = "striped",
+                            full_width = FALSE,
+                            position = "left") |>
+  kableExtra::column_spec(2, monospace = TRUE)
+```
+
+## Hashtag Oligos (HTOs) Statistics
+
+```{r}
+hto_tags <- as.data.frame(rowData(multiplex_exp)) |>
+  tibble::rownames_to_column("Hashtag Oligo (HTO)") |>
+  arrange(desc(mean)) |>
+  select("Hashtag Oligo (HTO)",
+         "Mean UMI count per cell" = mean,
+         "Percent of cells detected" = detected)
+
+knitr::kable(hto_tags, digits = 2) |>
+  kableExtra::kable_styling(bootstrap_options = c("striped", "condensed"),
+                            full_width = FALSE,
+                            position = "left",
+                            ) |>
+  kableExtra::column_spec(2:3, monospace = TRUE) 
+```
+## Demultiplexing Cell Calls 
+
+Here we use a variety of methods for demultiplexing and assignment of each...  
+
+```{r}
+demux_calls <- data.frame(
+  hashedDrops = filtered_sce$hashedDrops_sampleid,
+  HTODemux = filtered_sce$HTODemux_sampleid,
+  vireo = filtered_sce$vireo_sampleid
+) |>
+  tidyr::pivot_longer(cols = everything(),
+                      names_to = "demux_method",
+                      values_to = "Sample") |>
+  dplyr::count(Sample, demux_method) |>
+  tidyr::pivot_wider(names_from = demux_method,
+                     values_from = n)
+  
+  
+knitr::kable(demux_calls, digits = 2) |>
+  kableExtra::kable_styling(bootstrap_options = c("striped", "condensed"),
+                            full_width = FALSE,
+                            position = "left",
+                            ) |>
+  kableExtra::column_spec(2:3, monospace = TRUE) 
+
+
+```
+
+
