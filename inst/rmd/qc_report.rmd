@@ -1,11 +1,11 @@
 ---
 params:
-  sample: Example
+  library: Example
   unfiltered_sce: !r scpcaTools:::sim_sce()
   filtered_sce: NULL
   date: !r Sys.Date()
 
-title: "`r glue::glue('ScPCA QC report for {params$sample}')`"
+title: "`r glue::glue('ScPCA QC report for {params$library}')`"
 author: "Childhood Cancer Data Lab"
 date: "`r params$date`"
 output: 
@@ -35,17 +35,24 @@ theme_set(theme_bw() +
 
 ```{r sce_setup}
 # save some typing later
-sample_id <- params$sample
+library_id <- params$library
 unfiltered_sce <- params$unfiltered_sce
 filtered_sce <- params$filtered_sce
 
 has_filtered <- !is.null(filtered_sce)
 
+# grab sample id from filtered sce, if missing use library id for both
+if(is.null(metadata(filtered_sce)$sample_id)){
+  sample_id <- library_id
+} else {
+  sample_id <- metadata(filtered_sce)$sample_id
+}
 
 # if there is no filtered sce, use the unfiltered for both
 if (!has_filtered){
   filtered_sce <- unfiltered_sce
 }
+
 # add cell stats if missing
 if (is.null(unfiltered_sce$sum)){
   unfiltered_sce <- scuttle::addPerCellQCMetrics(unfiltered_sce)
@@ -76,11 +83,12 @@ if (has_cite){
 has_multiplex <- "cellhash" %in% altExpNames(filtered_sce)
 if(has_multiplex){
   modalities <- c(modalities, "Multiplex")
-  multiplex_samples <- paste(metadata(filtered_sce)$sample_id, collapse = ", ")
+  # convert sample ID to bullet separated list 
+  multiplex_samples <- paste0("<li>", paste(sample_id, collapse = '</li><li>', "</li>"))
 }
 ```
 
-# Processing Information for `r sample_id`
+# Processing Information for `r library_id`
 
 ```{r, results='asis'}
 if(has_multiplex){
@@ -88,12 +96,14 @@ if(has_multiplex){
     <div class=\"alert alert-warning\">
     
     This library is multiplexed and contains data from more than one sample.  
-    Data from the following samples are included in this library: 
+    Data from the following samples are included in this library:
+    
     {multiplex_samples}
     
     </div>
   ")
 }
+
 ```
 
 ## Raw Sample Metrics
@@ -103,7 +113,8 @@ if(has_multiplex){
 unfiltered_meta <- metadata(unfiltered_sce) 
 
 sample_information <- tibble::tibble(
-  "Sample id" = sample_id,
+  "Library id" = library_id,
+  "Sample id" = paste(sample_id, collapse = ", "),
   "Tech version" = format(unfiltered_meta$tech_version), # format to keep nulls
   "Data modalities" = paste(modalities, collapse = ", "),
   "Cells reported by alevin-fry" = 
