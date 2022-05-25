@@ -83,7 +83,7 @@ knitr::kable(demux_calls, digits = 2) |>
                             full_width = FALSE,
                             position = "left",
                             ) |>
-  kableExtra::column_spec(2:3, monospace = TRUE) 
+  kableExtra::column_spec(2:ncol(demux_calls), monospace = TRUE) 
 
 
 ```
