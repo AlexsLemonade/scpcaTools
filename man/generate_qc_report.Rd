@@ -5,14 +5,14 @@
 \title{Generate a QC report from a SingleCellExperiment object}
 \usage{
 generate_qc_report(
-  sample_name,
+  library_id,
   unfiltered_sce,
   filtered_sce = NULL,
   output = NULL
 )
 }
 \arguments{
-\item{sample_name}{The name of the sample for report headers}
+\item{library_id}{The name of the library_id for report headers}
 
 \item{unfiltered_sce}{A SingleCellExperiment object that the report will describe}
 
@@ -30,7 +30,7 @@ Generate a QC report from a SingleCellExperiment object
 }
 \examples{
 \dontrun{
-generate_qc_report("Sample 1", my_sce, output = "reports/sample1_report.html")
+generate_qc_report("Library 1", my_sce, output = "reports/sample1_report.html")
 }
 
 }

@@ -1,6 +1,6 @@
 #' Generate a QC report from a SingleCellExperiment object
 #'
-#' @param sample_name The name of the sample for report headers
+#' @param library_id The name of the library_id for report headers
 #' @param unfiltered_sce A SingleCellExperiment object that the report will describe
 #' @param filtered_sce An optional filtered single cell experiment derived from first
 #' @param output The output file path that will be created.
@@ -13,10 +13,10 @@
 #'
 #' @examples
 #' \dontrun{
-#' generate_qc_report("Sample 1", my_sce, output = "reports/sample1_report.html")
+#' generate_qc_report("Library 1", my_sce, output = "reports/sample1_report.html")
 #' }
 #'
-generate_qc_report <- function(sample_name,
+generate_qc_report <- function(library_id,
                                unfiltered_sce,
                                filtered_sce = NULL,
                                output = NULL){
@@ -37,7 +37,7 @@ generate_qc_report <- function(sample_name,
   }
 
   if(is.null(output)){
-    output_file = glue::glue("{sample_name}_qc_report")
+    output_file = glue::glue("{library_id}_qc_report")
     output_dir = "."
   } else {
     output_file = basename(output)
@@ -50,7 +50,7 @@ generate_qc_report <- function(sample_name,
     output_file = output_file,
     output_dir = output_dir,
     params = list(
-      sample = sample_name,
+      library = library_id,
       unfiltered_sce = unfiltered_sce,
       filtered_sce = filtered_sce
     ),
