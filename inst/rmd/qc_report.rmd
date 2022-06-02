@@ -43,9 +43,9 @@ has_filtered <- !is.null(filtered_sce)
 
 # grab sample id from filtered sce, if missing set sample ID to NA
 if(is.null(metadata(filtered_sce)$sample_id)){
-  sample_id <- library_id
-} else {
   sample_id <- NA
+} else {
+  sample_id <- metadata(filtered_sce)$sample_id
 }
 
 # if there is no filtered sce, use the unfiltered for both
