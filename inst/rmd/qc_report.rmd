@@ -357,7 +357,7 @@ In such situations, the calculated probability of compromise may not be valid (s
 ```
 
 <!-- Next section only included if multiplex data is present --> 
-```{r, child='multiplex_qc.Rmd', eval = has_multiplex}
+```{r, child='multiplex_qc.rmd', eval = has_multiplex}
 
 ```
 
