@@ -81,7 +81,7 @@ if (has_cite){
 }
 
 # only print out multiplexed warning if more than one sample is present
-has_multiplex = if (length(sample_id) > 1){TRUE} else {FALSE}
+has_multiplex <- length(sample_id) > 1
 if(has_multiplex){
   # convert sample ID to bullet separated list 
   multiplex_samples <- paste0("<li>", paste(sample_id, collapse = '</li><li>', "</li>"))
