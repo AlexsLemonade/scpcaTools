@@ -80,13 +80,6 @@ if (has_cite){
   modalities <- c(modalities, "CITE-seq")
 }
 
-# only print out multiplexed warning if more than one sample is present
-has_multiplex <- length(sample_id) > 1
-if(has_multiplex){
-  # convert sample ID to bullet separated list 
-  multiplex_samples <- paste0("<li>", paste(sample_id, collapse = '</li><li>', "</li>"))
-}
-
 # check for cellhash to add to list of modalities
 has_cellhash <- "cellhash" %in% altExpNames(filtered_sce)
 if(has_cellhash){
@@ -97,7 +90,12 @@ if(has_cellhash){
 # Processing Information for `r library_id`
 
 ```{r, results='asis'}
+# only print out multiplexed warning if more than one sample is present
+has_multiplex <- length(sample_id) > 1
+
 if(has_multiplex){
+  # convert sample ID to bullet separated list 
+  multiplex_samples <- paste0("<li>", paste(sample_id, collapse = '</li><li>', "</li>"))
   glue::glue("
     <div class=\"alert alert-warning\">
     
