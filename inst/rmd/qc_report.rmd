@@ -80,18 +80,22 @@ if (has_cite){
   modalities <- c(modalities, "CITE-seq")
 }
 
-has_multiplex <- "cellhash" %in% altExpNames(filtered_sce)
-if(has_multiplex){
+# check for cellhash to add to list of modalities
+has_cellhash <- "cellhash" %in% altExpNames(filtered_sce)
+if(has_cellhash){
   modalities <- c(modalities, "Multiplex")
-  # convert sample ID to bullet separated list 
-  multiplex_samples <- paste0("<li>", paste(sample_id, collapse = '</li><li>', "</li>"))
 }
 ```
 
 # Processing Information for `r library_id`
 
 ```{r, results='asis'}
+# only print out multiplexed warning if more than one sample is present
+has_multiplex <- length(sample_id) > 1
+
 if(has_multiplex){
+  # convert sample ID to bullet separated list 
+  multiplex_samples <- paste0("<li>", paste(sample_id, collapse = '</li><li>', "</li>"))
   glue::glue("
     <div class=\"alert alert-warning\">
     
@@ -140,7 +144,7 @@ if (has_cite){
         paste0(round(cite_meta$mapped_reads/cite_meta$total_reads * 100, digits = 2), "%")
     )
 }
-if (has_multiplex){
+if (has_cellhash){
   multiplex_exp <- altExp(filtered_sce, "cellhash")
   multiplex_meta <- metadata(multiplex_exp)
   
@@ -357,7 +361,7 @@ In such situations, the calculated probability of compromise may not be valid (s
 ```
 
 <!-- Next section only included if multiplex data is present --> 
-```{r, child='multiplex_qc.rmd', eval = has_multiplex}
+```{r, child='multiplex_qc.rmd', eval = has_cellhash}
 
 ```
 
