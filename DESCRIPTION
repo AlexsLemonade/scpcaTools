@@ -22,6 +22,7 @@ RoxygenNote: 7.2.0
 Depends: 
     R (>= 4.1.0)
 Imports: 
+    basilisk,
     BiocGenerics,
     dplyr,
     DropletUtils,
@@ -33,6 +34,7 @@ Imports:
     Matrix.utils,
     methods,
     miQC (>= 1.2.0),
+    reticulate,
     rlang,
     rmarkdown,
     S4Vectors,
@@ -42,7 +44,8 @@ Imports:
     SummarizedExperiment,
     tibble,
     tidyr,
-    tximport
+    tximport,
+    zellkonverter
 Suggests: 
     Seurat,
     scpcaData,
