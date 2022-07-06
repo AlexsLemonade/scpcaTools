@@ -18,6 +18,16 @@
 #' }
 sce_to_anndata <- function(sce, anndata_file){
 
+  if (!requireNamespace("zellkonverter", quietly = TRUE)) {
+    warning("The zellkonverter package must be installed to convert objects to AnnData. Returning unmodified sce object")
+    return(sce)
+  }
+
+  if (!requireNamespace("basilisk", quietly = TRUE)) {
+    warning("The basilisk package must be installed to convert objects to AnnData. Returning unmodified sce object")
+    return(sce)
+  }
+
   if(!is(sce,"SingleCellExperiment")){
     stop("Input must be a SingleCellExperiment object.")
   }
