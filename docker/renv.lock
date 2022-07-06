@@ -11,6 +11,11 @@
   "Bioconductor": {
     "Version": "3.14"
   },
+  "Python": {
+    "Version": "3.7.12",
+    "Type": "conda",
+    "Name": "./renv/python/condaenvs/renv-python"
+  },
   "Packages": {
     "AnnotationDbi": {
       "Package": "AnnotationDbi",

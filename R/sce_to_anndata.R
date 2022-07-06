@@ -47,7 +47,7 @@ sce_to_anndata <- function(sce, anndata_file){
     # return adata object
     rna_adata
 
-  }, env = zellkonverter::zellkonverterAnnDataEnv,
+  }, env = "./renv/python/condaenvs/zell-anndata",
   sce = sce,
   anndata_file = anndata_file)
 
