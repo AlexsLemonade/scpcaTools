@@ -33,6 +33,11 @@ sce_to_anndata <- function(sce, anndata_file){
     warning("miQC model cannot be converted between SCE and AnnData.")
   }
 
+  # create basilisk environment object from conda environment stored in package
+  basilisk_env <- basilisk::BasiliskEnvironment("./renv/python/condaenvs/zell-anndata",
+                                                pkgname = "scpcaTools",
+                                                packages = zellkonverter::.AnnDataDependencies)
+
   anndata_object <- basilisk::basiliskRun(fun = function(sce,
                                                          anndata_file = NULL){
     # import anndata as adata
@@ -47,9 +52,10 @@ sce_to_anndata <- function(sce, anndata_file){
     # return adata object
     rna_adata
 
-  }, env = "./renv/python/condaenvs/zell-anndata",
+  }, env = basilisk_env,
   sce = sce,
   anndata_file = anndata_file)
 
   return(anndata_object)
+
 }
