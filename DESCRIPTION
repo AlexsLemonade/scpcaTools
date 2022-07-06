@@ -22,7 +22,6 @@ RoxygenNote: 7.2.0
 Depends: 
     R (>= 4.1.0)
 Imports: 
-    basilisk,
     BiocGenerics,
     dplyr,
     DropletUtils,
@@ -44,10 +43,11 @@ Imports:
     SummarizedExperiment,
     tibble,
     tidyr,
-    tximport,
-    zellkonverter
+    tximport
 Suggests: 
     Seurat,
     scpcaData,
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    zellkonverter,
+    basilisk
 Config/testthat/edition: 3
