@@ -2,7 +2,7 @@
 #' Convert SingleCellExperiment objects to AnnData file stored as HDF5 file
 #'
 #' @param sce SingleCellExperiment object to be converted to AnnData
-#' @param anndata_file Name of
+#' @param anndata_file Path to output AnnData file. Must be an `.h5` or `.hdf5`
 #'
 #' @return Converted AnnData object
 #'
@@ -28,7 +28,7 @@ sce_to_anndata <- function(sce, anndata_file){
 
   # check that filename is in the proper format for writing h5
   if(!(stringr::str_ends(anndata_file, ".hdf5|.h5"))){
-    stop("anndata file must end in either `.hdf5` or .`h5`")
+    stop("`anndata_file` must end in either '.hdf5' or '.h5'")
   }
 
   # remove miQC model from metadata
