@@ -7,12 +7,13 @@
 sce_to_anndata(sce, anndata_file)
 }
 \arguments{
-\item{sce}{SingleCellExperiment object to be converted to AnnData}
+\item{sce}{SingleCellExperiment object to be converted to AnnData as an HDF5 file}
 
-\item{anndata_file}{Name of}
+\item{anndata_file}{Path to output AnnData file. Must be an `.h5` or `.hdf5`}
 }
 \value{
-Converted AnnData object
+SingleCellExperiment object equivalent to the AnnData object found in the
+  HDF5 file produced.
 }
 \description{
 Convert SingleCellExperiment objects to AnnData file stored as HDF5 file
