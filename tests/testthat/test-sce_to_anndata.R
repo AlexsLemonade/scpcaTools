@@ -10,7 +10,7 @@ test_that("Conversion of SCE to AnnData works as expected", {
   expect_snapshot(sce_to_anndata(sce, anndata_file))
 
   # some tests that the converted object contains col/rowData found in original SCE
-  converted_sce <- sce_to_anndata(sce, anndata_file)
+  converted_sce <- zellkonverter::readH5AD(anndata_file)
   expect_equal(dim(sce), dim(converted_sce))
   expect_equal(colnames(colData(sce)), colnames(colData(converted_sce)))
   expect_equal(colnames(rowData(sce)), colnames(rowData(converted_sce)))

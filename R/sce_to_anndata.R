@@ -4,8 +4,7 @@
 #' @param sce SingleCellExperiment object to be converted to AnnData as an HDF5 file
 #' @param anndata_file Path to output AnnData file. Must be an `.h5` or `.hdf5`
 #'
-#' @return SingleCellExperiment object equivalent to the AnnData object found in the
-#'   HDF5 file produced.
+#' @return original SingleCellExperiment object used as input
 #'
 #' @import SingleCellExperiment
 #'
@@ -31,18 +30,18 @@ sce_to_anndata <- function(sce, anndata_file){
     stop("`anndata_file` must end in either '.hdf5' or '.h5'")
   }
 
+  # assign SCE to new variable to avoid modifying input SCE
+  sce_to_convert <- sce
+
   # remove miQC model from metadata
-  if(!is.null(metadata(sce)$miQC_model)){
-    metadata(sce)$miQC_model <- NA
+  if(!is.null(metadata(sce_to_convert)$miQC_model)){
+    metadata(sce_to_convert)$miQC_model <- NA
     warning("miQC model cannot be converted between SCE and AnnData.")
   }
 
   # export SCE object as AnnData to HDF5 file
-  zellkonverter::writeH5AD(sce, file = anndata_file)
+  zellkonverter::writeH5AD(sce_to_convert, file = anndata_file)
 
-  # read HDF5 file back in to create SCE
-  converted_sce <- zellkonverter::readH5AD(anndata_file)
-
-  invisible(converted_sce)
+  invisible(sce)
 
 }
