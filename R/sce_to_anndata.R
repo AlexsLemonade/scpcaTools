@@ -7,7 +7,6 @@
 #' @return Converted AnnData object
 #'
 #' @import SingleCellExperiment
-#' @import reticulate
 #'
 #' @export
 #'
@@ -20,11 +19,6 @@ sce_to_anndata <- function(sce, anndata_file){
 
   if (!requireNamespace("zellkonverter", quietly = TRUE)) {
     warning("The zellkonverter package must be installed to convert objects to AnnData. Returning unmodified sce object")
-    return(sce)
-  }
-
-  if (!requireNamespace("basilisk", quietly = TRUE)) {
-    warning("The basilisk package must be installed to convert objects to AnnData. Returning unmodified sce object")
     return(sce)
   }
 
@@ -42,31 +36,6 @@ sce_to_anndata <- function(sce, anndata_file){
     metadata(sce)$miQC_model <- NA
     warning("miQC model cannot be converted between SCE and AnnData.")
   }
-
-  # create basilisk environment object from conda environment stored in package
-  # basilisk_env <- basilisk::BasiliskEnvironment("./renv/python/condaenvs/zell-anndata",
-  #                                               pkgname = "zell-anndata",
-  #                                               packages = zellkonverter::.AnnDataDependencies)
-  #
-  # anndata_object <- basilisk::basiliskRun(fun = function(sce,
-  #                                                        anndata_file = NULL){
-  #   # import anndata as adata
-  #   adata <- reticulate::import("anndata")
-  #
-  #   # create anndata object from SCE
-  #   rna_adata <- zellkonverter::SCE2AnnData(sce)
-  #
-  #   # write out adata object
-  #   rna_adata$write(filename = anndata_file)
-  #
-  #   # return adata object
-  #   rna_adata
-  #
-  # }, env = basilisk_env,
-  # sce = sce,
-  # anndata_file = anndata_file)
-  #
-  # return(anndata_object)
 
   zellkonverter::writeH5AD(sce, file = anndata_file)
 
