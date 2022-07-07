@@ -18,8 +18,8 @@
 sce_to_anndata <- function(sce, anndata_file){
 
   if (!requireNamespace("zellkonverter", quietly = TRUE)) {
-    warning("The zellkonverter package must be installed to convert objects to AnnData. Returning unmodified sce object")
-    return(sce)
+    warning("The zellkonverter package must be installed to convert objects to AnnData. No output file written.")
+    return()
   }
 
   if(!is(sce,"SingleCellExperiment")){
