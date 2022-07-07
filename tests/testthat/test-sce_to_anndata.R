@@ -9,6 +9,12 @@ test_that("Conversion of SCE to AnnData works as expected", {
   # test that the H5 file is created
   expect_snapshot(sce_to_anndata(sce, anndata_file))
 
+  # some tests that the converted object contains col/rowData found in original SCE
+  converted_sce <- sce_to_anndata(sce, anndata_file)
+  expect_equal(dim(sce), dim(converted_sce))
+  expect_equal(colnames(colData(sce)), colnames(colData(converted_sce)))
+  expect_equal(colnames(rowData(sce)), colnames(rowData(converted_sce)))
+
   # check that inputting an improper file name causes a failure
   anndata_bad_file <- "test_anndata"
   expect_error(sce_to_anndata(sce, anndata_bad_file))
