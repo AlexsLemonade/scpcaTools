@@ -4,7 +4,7 @@
 #' @param sce SingleCellExperiment object to be converted to AnnData as an HDF5 file
 #' @param anndata_file Path to output AnnData file. Must be an `.h5` or `.hdf5`
 #'
-#' @return original SingleCellExperiment object used as input
+#' @return original SingleCellExperiment object used as input (invisibly)
 #'
 #' @import SingleCellExperiment
 #'
@@ -35,7 +35,7 @@ sce_to_anndata <- function(sce, anndata_file){
 
   # remove miQC model from metadata
   if(!is.null(metadata(sce_to_convert)$miQC_model)){
-    metadata(sce_to_convert)$miQC_model <- NA
+    metadata(sce_to_convert)$miQC_model <- NULL
     warning("miQC model cannot be converted between SCE and AnnData.")
   }
 
