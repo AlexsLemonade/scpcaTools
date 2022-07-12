@@ -37,11 +37,11 @@ sce_to_seurat <- function(sce){
 
   # create seurat object
   seurat_obj <- Seurat::CreateSeuratObject(counts = sce_counts,
-                                           meta.data = coldata,
-                                           var.features = rowdata)
+                                           meta.data = coldata)
 
-  # add metadata separately adding it while creating leaves the misc slot empty without warning
-  seurat_obj@misc = metadata(sce)
+  # add rowdata and metadata separately adding it while creating leaves the slots empty without warning
+  seurat_obj[["RNA"]]@var.features <- rowdata
+  seurat_obj@misc <- metadata(sce)
 
   # grab names of altExp, if any
   alt_names <- altExpNames(sce)
@@ -71,7 +71,7 @@ sce_to_seurat <- function(sce){
     seurat_obj[[name]]@var.features <- rowdata
 
     # check that altExp data is present as a new assay, since Seurat sometimes fails without warning
-    if(!is.null(seurat_obj[[name]])){
+    if(is.null(seurat_obj[[name]])){
       warning("Unable to convert altExp data found in SCE to Seurat.")
     }
 
