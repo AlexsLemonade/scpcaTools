@@ -31,11 +31,15 @@ sce_to_seurat <- function(sce){
   coldata <- as.data.frame(colData(sce))
   rowdata <- as.data.frame(rowData(sce))
 
+
   # create seurat object
   seurat_obj <- Seurat::CreateSeuratObject(counts = sce_counts,
                                            meta.data = coldata,
-                                           var.features = rowdata,
-                                           misc = metadata(sce))
+                                           var.features = rowdata)
+
+  # add metadata separately adding it while creating leaves the misc slot empty without warning
+  seruat_obj@misc = metadata(sce)
+
   # grab names of altExp, if any
   alt_names <- altExpNames(sce)
 
