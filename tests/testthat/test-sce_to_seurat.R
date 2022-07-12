@@ -1,14 +1,24 @@
 set.seed(1665)
 sce <- sim_sce(n_cells = 100, n_genes = 200, n_empty = 0)
-colData(sce) <- DataFrame("test_column" = sample(0:10, 100, rep= TRUE))
-rowData(sce) <- DataFrame("test_row" = sample(0:10, 200, rep = TRUE))
+colData(sce) <- data.frame("test_column" = sample(0:10, 100, rep= TRUE),
+                          "barcodes" = colnames(sce)) %>%
+  tibble::column_to_rownames("barcodes") %>%
+  DataFrame()
+rowData(sce) <- data.frame("test_row" = sample(0:10, 200, rep = TRUE),
+                           "gene_id" = rownames(sce)) %>%
+  tibble::column_to_rownames("gene_id") %>%
+  DataFrame()
 metadata(sce)$test <- "test"
 alt_sce <- sim_sce(n_cells = 100, n_genes = 10, n_empty = 0)
 # rename the alt_exp so it has the same column names as the base sce
-colnames(alt_sce) <- c(colnames(sce))
+colnames(alt_sce) <- colnames(sce)
 # merge alt into main
 alt_name = "alt"
 sce <- merge_altexp(sce, alt_sce, alt_name)
+rowData(altExp(sce, alt_name)) <- data.frame("alt_test_row" = sample(0:5, 10, rep = TRUE),
+                                             "alt_id" = rownames(altExp(sce, alt_name))) %>%
+  tibble::column_to_rownames("alt_id") %>%
+  DataFrame()
 
 test_that("Converting SCE to Seurat objects works as expected", {
 
