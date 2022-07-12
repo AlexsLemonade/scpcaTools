@@ -22,6 +22,10 @@ rowData(altExp(sce, alt_name)) <- data.frame("alt_test_row" = sample(0:5, 10, re
 
 test_that("Converting SCE to Seurat objects works as expected", {
 
+  if (!requireNamespace("Seurat", quietly = TRUE)) {
+    skip("The Seurat package was not installed. Skipping tests")
+  }
+
   seurat_object <- sce_to_seurat(sce)
 
   # check that column names of Seurat object are derived from SCE object
