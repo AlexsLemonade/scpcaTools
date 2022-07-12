@@ -4,6 +4,9 @@
 #' @param sce SingleCellExperiment object
 #'
 #' @return Seurat object
+#'
+#' @import SingleCellExperiment
+#'
 #' @export
 #'
 #' @examples
