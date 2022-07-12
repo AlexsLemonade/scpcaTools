@@ -67,6 +67,11 @@ sce_to_seurat <- function(sce){
     seurat_obj[[name]] <- Seurat::CreateAssayObject(counts = alt_counts)
     seurat_obj[[name]]@var.features <- rowdata
 
+    # check that altExp data is present as a new assay, since Seurat sometimes fails without warning
+    if(!is.null(seurat_obj[[name]])){
+      warning("Unable to convert altExp data found in SCE to Seurat.")
+    }
+
   }
 
   return(seurat_obj)
