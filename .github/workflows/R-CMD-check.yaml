@@ -30,7 +30,4 @@ jobs:
       #       libglpk-dev \
       #       pandoc
       - uses: r-lib/actions/setup-r-dependencies@v2
-        with:
-          extra-packages: AlexsLemonade/scpcaData
-
       - uses: r-lib/actions/check-r-package@v2
