@@ -42,7 +42,7 @@ test_that("Converting SCE to Seurat objects works as expected", {
   expect_equal(metadata(sce), seurat_object@misc)
 
   # check that altExp data was converted and rowData
-  expect_false(is.null(seurat_object[[alt_name]]))
+  expect_s4_class(seurat_object[[alt_name]], 'Assay')
   alt_rowdata_sce <- as.data.frame(rowData(altExp(sce, alt_name)))
   expect_equal(alt_rowdata_sce, seurat_object[[alt_name]]@var.features)
 

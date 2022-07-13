@@ -59,7 +59,7 @@ sce_to_seurat <- function(sce){
 
     # identify cells with > 0 counts and intersect with cells already in seurat
     alt_seurat_cells <- names(alt_sum)[alt_sum > 0]
-    cells_to_keep <- intersect(seurat_obj_cells, seurat_obj_cells)
+    cells_to_keep <- intersect(seurat_obj_cells, alt_seurat_cells)
     alt_counts <- alt_counts[, cells_to_keep]
 
     # subset seurat object to only have cells that will be in alt_counts before adding new assay
