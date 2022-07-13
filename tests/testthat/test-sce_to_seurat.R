@@ -30,14 +30,14 @@ test_that("Converting SCE to Seurat objects works as expected", {
 
   # check that column names of Seurat object are derived from SCE object
   # they won't necessarily be equal if some cells with 0 counts were removed
-  expect_true(any(colnames(seurat_object) %in% colnames(sce)))
+  expect_true(all(colnames(seurat_object) %in% colnames(sce)))
 
   # check that attached metadata/coldata/rowdata in SCE are present in seurat object
   coldata_sce <- as.data.frame(colData(sce))
   rowdata_sce <- as.data.frame(rowData(sce))
 
   # can't directly check that coldata is equal because of added columns in seurat object
-  expect_true(any(colnames(coldata_sce) %in% colnames(seurat_object@meta.data)))
+  expect_true(all(colnames(coldata_sce) %in% colnames(seurat_object@meta.data)))
   expect_equal(rowdata_sce, seurat_object[["RNA"]]@var.features)
   expect_equal(metadata(sce), seurat_object@misc)
 

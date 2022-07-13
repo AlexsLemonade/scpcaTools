@@ -23,12 +23,15 @@ sce_to_seurat <- function(sce){
     stop("Input must be a SingleCellExperiment object.")
   }
 
+  # remove miQC model from metadata
+  if(!is.null(metadata(sce)$miQC_model)){
+    metadata(sce)$miQC_model <- NULL
+    warning("miQC model will not be included in Seurat object.")
+  }
+
+
   # Seurat counts need to be integers
   sce_counts <- round(counts(sce))
-  # Seurat will not like zero count cells
-  sce_sum <- Matrix::colSums(sce_counts)
-  seurat_cells <- names(sce_sum)[sce_sum > 0]
-  sce_counts <- sce_counts[, seurat_cells]
 
   # convert metadata to Seurat compatible formats
   coldata <- as.data.frame(colData(sce))
@@ -55,10 +58,9 @@ sce_to_seurat <- function(sce){
 
     # round counts and calculate total counts
     alt_counts <- round(counts(altExp(sce, name)))
-    alt_sum <- Matrix::colSums(alt_counts)
 
-    # identify cells with > 0 counts and intersect with cells already in seurat
-    alt_seurat_cells <- names(alt_sum)[alt_sum > 0]
+    # subset altExp counts and seurat object to shared cells
+    alt_seurat_cells <- names(alt_sum)
     cells_to_keep <- intersect(seurat_obj_cells, alt_seurat_cells)
     alt_counts <- alt_counts[, cells_to_keep]
 
@@ -66,8 +68,8 @@ sce_to_seurat <- function(sce){
     seurat_obj <- seurat_obj[, cells_to_keep]
 
     # add new assay along with associated row data, if any
-    rowdata <- as.data.frame(rowData(altExp(sce, name)))
     seurat_obj[[name]] <- Seurat::CreateAssayObject(counts = alt_counts)
+    rowdata <- as.data.frame(rowData(altExp(sce, name)))
     seurat_obj[[name]]@var.features <- rowdata
 
     # check that altExp data is present as a new assay, since Seurat sometimes fails without warning
