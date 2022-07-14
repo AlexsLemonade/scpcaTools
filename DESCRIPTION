@@ -46,6 +46,9 @@ Imports:
 Suggests: 
     Seurat,
     scpcaData,
+    sessioninfo,
     testthat (>= 3.0.0),
     zellkonverter
+Remotes:
+    AlexsLemonade/scpcaData
 Config/testthat/edition: 3
