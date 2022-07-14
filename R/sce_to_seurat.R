@@ -33,6 +33,11 @@ sce_to_seurat <- function(sce){
   # Seurat counts need to be integers
   sce_counts <- round(counts(sce))
 
+  # Seurat will not like zero count calls
+  sce_sum <- Matrix::colSums(sce_counts)
+  seurat_cells <- names(sce_sum)[sce_sum > 0]
+  sce_counts <- sce_counts[, seurat_cells]
+
   # convert metadata to Seurat compatible formats
   coldata <- as.data.frame(colData(sce))
   rowdata <- as.data.frame(rowData(sce))
@@ -60,8 +65,7 @@ sce_to_seurat <- function(sce){
     alt_counts <- round(counts(altExp(sce, name)))
 
     # subset altExp counts and seurat object to shared cells
-    alt_seurat_cells <- names(alt_sum)
-    cells_to_keep <- intersect(seurat_obj_cells, alt_seurat_cells)
+    cells_to_keep <- intersect(seurat_obj_cells, colnames(alt_counts))
     alt_counts <- alt_counts[, cells_to_keep]
 
     # subset seurat object to only have cells that will be in alt_counts before adding new assay
