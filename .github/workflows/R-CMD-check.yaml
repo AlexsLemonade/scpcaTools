@@ -23,12 +23,6 @@ jobs:
       - name: Remove renv
         run: rm -f renv.lock .Rprofile
       - uses: r-lib/actions/setup-pandoc@v2
-      # - name: Install system dependencies
-      #   run: |
-      #     sudo apt-get update
-      #     sudo apt-get -y --no-install-recommends install \
-      #       libglpk-dev \
-      #       pandoc
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           extra-packages: any::rcmdcheck
