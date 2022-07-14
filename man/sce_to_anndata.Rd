@@ -12,7 +12,7 @@ sce_to_anndata(sce, anndata_file)
 \item{anndata_file}{Path to output AnnData file. Must be an `.h5` or `.hdf5`}
 }
 \value{
-original SingleCellExperiment object used as input
+original SingleCellExperiment object used as input (invisibly)
 }
 \description{
 Convert SingleCellExperiment objects to AnnData file stored as HDF5 file
