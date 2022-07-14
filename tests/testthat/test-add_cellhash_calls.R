@@ -62,9 +62,6 @@ test_that("hashedDrops functions work", {
 })
 
 test_that("seurat functions work", {
-  if (!requireNamespace("Seurat", quietly = TRUE)) {
-    skip("The Seurat package was not installed. Skipping tests")
-  }
   # test seurat functions
   sce_hashtable <- add_cellhash_ids(sce, hashsample_table, altexp_id = "cellhash")
   hto_sce <- add_demux_seurat(sce_hashtable)
