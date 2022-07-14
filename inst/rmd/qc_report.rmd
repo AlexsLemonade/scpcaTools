@@ -370,7 +370,12 @@ In such situations, the calculated probability of compromise may not be valid (s
 <details>
 <summary>R session information</summary>
 ```{r session_info}
-sessioninfo::session_info()
+if (requireNamespace("sessioninfo", quietly = TRUE)) {
+  sessioninfo::session_info()
+} else {
+  sessionInfo()
+}
+
 ```
 </details>
 
