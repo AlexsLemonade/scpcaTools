@@ -13,6 +13,7 @@ sce_to_anndata(sce, anndata_file)
 }
 \value{
 original SingleCellExperiment object used as input (invisibly)
+**Note that any columns present in the `rowData` of an SCE object that contains
 }
 \description{
 Convert SingleCellExperiment objects to AnnData file stored as HDF5 file

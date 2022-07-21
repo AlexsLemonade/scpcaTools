@@ -26,7 +26,7 @@ sce_to_seurat <- function(sce){
   # remove miQC model from metadata
   if(!is.null(metadata(sce)$miQC_model)){
     metadata(sce)$miQC_model <- NULL
-    warning("miQC model will not be included in Seurat object.")
+    message("miQC model will not be included in Seurat object.")
   }
 
 

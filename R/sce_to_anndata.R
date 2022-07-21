@@ -5,6 +5,9 @@
 #' @param anndata_file Path to output AnnData file. Must be an `.h5` or `.hdf5`
 #'
 #' @return original SingleCellExperiment object used as input (invisibly)
+#' **Note that any columns present in the `rowData` of an SCE object that contains
+# duplicated information, e.g. duplicate gene identifiers, are converted to
+# categorical data by the `anndata` package.
 #'
 #' @import SingleCellExperiment
 #'
@@ -36,7 +39,7 @@ sce_to_anndata <- function(sce, anndata_file){
   # remove miQC model from metadata
   if(!is.null(metadata(sce_to_convert)$miQC_model)){
     metadata(sce_to_convert)$miQC_model <- NULL
-    warning("miQC model cannot be converted between SCE and AnnData.")
+    message("miQC model cannot be converted between SCE and AnnData.")
   }
 
   # export SCE object as AnnData to HDF5 file
