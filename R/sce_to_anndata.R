@@ -6,8 +6,8 @@
 #'
 #' @return original SingleCellExperiment object used as input (invisibly)
 #' **Note that any columns present in the `rowData` of an SCE object that contains
-# duplicated information, e.g. duplicate gene identifiers, are converted to
-# categorical data by the `anndata` package.
+#' duplicated information, e.g. duplicate gene identifiers, are converted to
+#' categorical data by the `anndata` package.
 #'
 #' @import SingleCellExperiment
 #'
