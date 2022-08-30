@@ -2,6 +2,8 @@
 #' Convert SingleCellExperiment object to Seurat object
 #'
 #' @param sce SingleCellExperiment object
+#' @param assay_name The assay name (default "counts") to include in
+#'   the Seurat object
 #'
 #' @return Seurat object
 #'
@@ -13,7 +15,8 @@
 #' \dontrun{
 #' sce_to_seurat(sce = sce_object)
 #' }
-sce_to_seurat <- function(sce){
+sce_to_seurat <- function(sce,
+                          assay_name = "counts") {
 
   if (!requireNamespace("Seurat", quietly = TRUE)) {
     stop("The Seurat package must be installed to create a Seurat object. No output returned.")
@@ -21,6 +24,10 @@ sce_to_seurat <- function(sce){
 
   if(!is(sce,"SingleCellExperiment")){
     stop("Input must be a SingleCellExperiment object.")
+  }
+
+  if (!assay_name %in% assayNames(sce)) {
+    stop("Provided assay name is not present in the SingleCellExperiment object.")
   }
 
   # remove miQC model from metadata
@@ -31,7 +38,8 @@ sce_to_seurat <- function(sce){
 
 
   # Seurat counts need to be integers
-  sce_counts <- round(counts(sce))
+  # extract the given `assay_name`
+  sce_counts <- round(assay(sce, assay_name))
 
   # Seurat will not like zero count calls
   sce_sum <- Matrix::colSums(sce_counts)
