@@ -3,7 +3,9 @@
 #'
 #' @param sce SingleCellExperiment object
 #' @param assay_name The assay name (default "counts") to include in
-#'   the Seurat object
+#'   the Seurat object. This name will be applied as the assay name in
+#'   the Seurat object. If the default "count" assay is used, then the
+#'   assay name will instead be "RNA".
 #'
 #' @return Seurat object
 #'
@@ -51,12 +53,13 @@ sce_to_seurat <- function(sce,
   rowdata <- as.data.frame(rowData(sce))
 
 
-  # create seurat object
+  # create seurat object, with new assay name
   seurat_obj <- Seurat::CreateSeuratObject(counts = sce_counts,
-                                           meta.data = coldata)
+                                           meta.data = coldata,
+                                           assay = assay_name)
 
   # add rowdata and metadata separately adding it while creating leaves the slots empty without warning
-  seurat_obj[["RNA"]]@var.features <- rowdata
+  seurat_obj[[assay_name]]@var.features <- rowdata
   seurat_obj@misc <- metadata(sce)
 
   # grab names of altExp, if any
