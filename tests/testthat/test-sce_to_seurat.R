@@ -20,6 +20,8 @@ rowData(altExp(sce, alt_name)) <- data.frame("alt_test_row" = sample(0:5, 10, re
   tibble::column_to_rownames("alt_id") %>%
   DataFrame()
 
+logcounts(sce) <- counts(sce) # dummy logcounts to test the assay_name argument
+
 test_that("Converting SCE to Seurat objects works as expected", {
 
   seurat_object <- sce_to_seurat(sce)
@@ -27,6 +29,7 @@ test_that("Converting SCE to Seurat objects works as expected", {
   # check that column names of Seurat object are derived from SCE object
   # they won't necessarily be equal if some cells with 0 counts were removed
   expect_true(all(colnames(seurat_object) %in% colnames(sce)))
+  expect_true("RNA" %in% names(seurat_object@assays))
 
   # check that attached metadata/coldata/rowdata in SCE are present in seurat object
   coldata_sce <- as.data.frame(colData(sce))
@@ -34,7 +37,33 @@ test_that("Converting SCE to Seurat objects works as expected", {
 
   # can't directly check that coldata is equal because of added columns in seurat object
   expect_true(all(colnames(coldata_sce) %in% colnames(seurat_object@meta.data)))
-  expect_equal(rowdata_sce, seurat_object[["RNA"]]@var.features)
+  expect_equal(rowdata_sce, seurat_object[["RNA"]]@var.features) # since default "counts" is used, RNA name is expected here
+  expect_equal(metadata(sce), seurat_object@misc)
+
+  # check that altExp data was converted and rowData
+  expect_s4_class(seurat_object[[alt_name]], 'Assay')
+  alt_rowdata_sce <- as.data.frame(rowData(altExp(sce, alt_name)))
+  expect_equal(alt_rowdata_sce, seurat_object[[alt_name]]@var.features)
+
+})
+
+
+test_that("Converting SCE to Seurat objects works as expected for a non-default assay of 'logcounts'", {
+
+  seurat_object <- sce_to_seurat(sce, assay_name = "logcounts")
+
+  # check that column names of Seurat object are derived from SCE object
+  # they won't necessarily be equal if some cells with 0 counts were removed
+  expect_true(all(colnames(seurat_object) %in% colnames(sce)))
+  expect_true("logcounts" %in% names(seurat_object@assays))
+
+  # check that attached metadata/coldata/rowdata in SCE are present in seurat object
+  coldata_sce <- as.data.frame(colData(sce))
+  rowdata_sce <- as.data.frame(rowData(sce))
+
+  # can't directly check that coldata is equal because of added columns in seurat object
+  expect_true(all(colnames(coldata_sce) %in% colnames(seurat_object@meta.data)))
+  expect_equal(rowdata_sce, seurat_object[["logcounts"]]@var.features)
   expect_equal(metadata(sce), seurat_object@misc)
 
   # check that altExp data was converted and rowData

@@ -2,6 +2,10 @@
 #' Convert SingleCellExperiment object to Seurat object
 #'
 #' @param sce SingleCellExperiment object
+#' @param assay_name The assay name (default "counts") to include in
+#'   the Seurat object. This name will be applied as the assay name in
+#'   the Seurat object. If the default "count" assay is used, then the
+#'   assay name will instead be "RNA".
 #'
 #' @return Seurat object
 #'
@@ -13,7 +17,8 @@
 #' \dontrun{
 #' sce_to_seurat(sce = sce_object)
 #' }
-sce_to_seurat <- function(sce){
+sce_to_seurat <- function(sce,
+                          assay_name = "counts") {
 
   if (!requireNamespace("Seurat", quietly = TRUE)) {
     stop("The Seurat package must be installed to create a Seurat object. No output returned.")
@@ -21,6 +26,10 @@ sce_to_seurat <- function(sce){
 
   if(!is(sce,"SingleCellExperiment")){
     stop("Input must be a SingleCellExperiment object.")
+  }
+
+  if (!assay_name %in% assayNames(sce)) {
+    stop("Provided assay name is not present in the SingleCellExperiment object.")
   }
 
   # remove miQC model from metadata
@@ -31,7 +40,8 @@ sce_to_seurat <- function(sce){
 
 
   # Seurat counts need to be integers
-  sce_counts <- round(counts(sce))
+  # extract the given `assay_name`
+  sce_counts <- round(assay(sce, assay_name))
 
   # Seurat will not like zero count calls
   sce_sum <- Matrix::colSums(sce_counts)
@@ -43,12 +53,17 @@ sce_to_seurat <- function(sce){
   rowdata <- as.data.frame(rowData(sce))
 
 
-  # create seurat object
+  # create seurat object, with new assay name
+  # use "RNA" as assay name if `counts` is being used from SCE
+  if (assay_name == "counts") {
+    assay_name <- "RNA"
+  }
   seurat_obj <- Seurat::CreateSeuratObject(counts = sce_counts,
-                                           meta.data = coldata)
+                                           meta.data = coldata,
+                                           assay = assay_name)
 
   # add rowdata and metadata separately adding it while creating leaves the slots empty without warning
-  seurat_obj[["RNA"]]@var.features <- rowdata
+  seurat_obj[[assay_name]]@var.features <- rowdata
   seurat_obj@misc <- metadata(sce)
 
   # grab names of altExp, if any

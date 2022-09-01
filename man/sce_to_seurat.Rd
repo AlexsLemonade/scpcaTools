@@ -4,10 +4,13 @@
 \alias{sce_to_seurat}
 \title{Convert SingleCellExperiment object to Seurat object}
 \usage{
-sce_to_seurat(sce)
+sce_to_seurat(sce, assay_name = "counts")
 }
 \arguments{
 \item{sce}{SingleCellExperiment object}
+
+\item{assay_name}{The assay name (default "counts") to include in
+the Seurat object}
 }
 \value{
 Seurat object

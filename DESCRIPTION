@@ -10,7 +10,11 @@ Authors@R: c(
     person(c("Joshua", "A."), "Shapiro", 
            email = "josh.shapiro@ccdatalab.org",
            comment = list(ORCID = "0000-0002-6224-0347"),
-           role = c("aut"))
+           role = c("aut")),
+    person(c("Stephanie", "J."), "Spielman", 
+           email = "stephanie.spielman@ccdatalab.org",
+           comment = list(ORCID = "0000-0002-9090-4788"),
+           role = c("aut"))           
     )
 Maintainer: Ally Hawkins <ally.hawkins@ccdatalab.org>
 Description: Tools for processing single cell data associated with the 
@@ -18,7 +22,7 @@ Description: Tools for processing single cell data associated with the
 License: BSD_3_clause + file LICENSE
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.2.0
+RoxygenNote: 7.2.1
 Depends: 
     R (>= 4.1.0)
 Imports: 

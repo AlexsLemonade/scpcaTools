@@ -14,6 +14,8 @@ sce_to_anndata(sce, anndata_file)
 \value{
 original SingleCellExperiment object used as input (invisibly)
 **Note that any columns present in the `rowData` of an SCE object that contains
+duplicated information, e.g. duplicate gene identifiers, are converted to
+categorical data by the `anndata` package.
 }
 \description{
 Convert SingleCellExperiment objects to AnnData file stored as HDF5 file
