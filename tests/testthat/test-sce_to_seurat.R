@@ -47,7 +47,7 @@ test_that("Converting SCE to Seurat objects works as expected", {
 })
 
 
-test_that("Converting SCE to Seurat objects works as expected for custom assay name", {
+test_that("Converting SCE to Seurat objects works as expected for a non-default assay of 'logcounts'", {
 
   seurat_object <- sce_to_seurat(sce, assay_name = "logcounts")
 
@@ -61,7 +61,7 @@ test_that("Converting SCE to Seurat objects works as expected for custom assay n
 
   # can't directly check that coldata is equal because of added columns in seurat object
   expect_true(all(colnames(coldata_sce) %in% colnames(seurat_object@meta.data)))
-  expect_equal(rowdata_sce, seurat_object[["logcounts"]]@var.features) # since default "counts" is used, RNA name is expected here
+  expect_equal(rowdata_sce, seurat_object[["logcounts"]]@var.features)
   expect_equal(metadata(sce), seurat_object@misc)
 
   # check that altExp data was converted and rowData
