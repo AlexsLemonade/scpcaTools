@@ -54,6 +54,10 @@ sce_to_seurat <- function(sce,
 
 
   # create seurat object, with new assay name
+  # use "RNA" as assay name if `counts` is being used from SCE
+  if (assay_name == "counts") {
+    assay_name <- "RNA"
+  }
   seurat_obj <- Seurat::CreateSeuratObject(counts = sce_counts,
                                            meta.data = coldata,
                                            assay = assay_name)
