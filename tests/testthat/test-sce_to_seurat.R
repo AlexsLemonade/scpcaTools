@@ -54,6 +54,7 @@ test_that("Converting SCE to Seurat objects works as expected for a non-default 
   # check that column names of Seurat object are derived from SCE object
   # they won't necessarily be equal if some cells with 0 counts were removed
   expect_true(all(colnames(seurat_object) %in% colnames(sce)))
+  expect_true("logcounts" %in% seurat_object@assays)
 
   # check that attached metadata/coldata/rowdata in SCE are present in seurat object
   coldata_sce <- as.data.frame(colData(sce))
