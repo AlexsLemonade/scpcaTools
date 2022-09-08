@@ -6,6 +6,7 @@
 #' @param output The output file path that will be created.
 #'   If the file name does not include an extension, ".html" will be added automatically.
 #'   Any directories in the path will be created as needed.
+#' @param ... Additional arguments to pass to rmarkdown::render()
 #'
 #' @return The full path of the output file
 #' @export
@@ -19,7 +20,8 @@
 generate_qc_report <- function(library_id,
                                unfiltered_sce,
                                filtered_sce = NULL,
-                               output = NULL){
+                               output = NULL,
+                               ...){
   if(!inherits(unfiltered_sce, "SingleCellExperiment")){
     stop("`unfiltered_sce` must be a SingleCellExperiment object.")
   }
@@ -44,6 +46,7 @@ generate_qc_report <- function(library_id,
     output_dir = dirname(output)
   }
 
+
   rmd <- system.file(file.path("rmd", "qc_report.rmd"), package = "scpcaTools")
   suppressPackageStartupMessages(rmarkdown::render(
     rmd,
@@ -54,7 +57,10 @@ generate_qc_report <- function(library_id,
       unfiltered_sce = unfiltered_sce,
       filtered_sce = filtered_sce
     ),
+    intermediates_dir = tempdir(),
+    knit_root_dir = tempdir(),
     envir = new.env(),
-    quiet = TRUE
+    quiet = TRUE,
+    ...
   ))
 }
