@@ -8,7 +8,8 @@ generate_qc_report(
   library_id,
   unfiltered_sce,
   filtered_sce = NULL,
-  output = NULL
+  output = NULL,
+  ...
 )
 }
 \arguments{
@@ -21,6 +22,8 @@ generate_qc_report(
 \item{output}{The output file path that will be created.
 If the file name does not include an extension, ".html" will be added automatically.
 Any directories in the path will be created as needed.}
+
+\item{...}{Additional arguments to pass to rmarkdown::render()}
 }
 \value{
 The full path of the output file

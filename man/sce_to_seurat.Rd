@@ -10,7 +10,9 @@ sce_to_seurat(sce, assay_name = "counts")
 \item{sce}{SingleCellExperiment object}
 
 \item{assay_name}{The assay name (default "counts") to include in
-the Seurat object}
+the Seurat object. This name will be applied as the assay name in
+the Seurat object. If the default "count" assay is used, then the
+assay name will instead be "RNA".}
 }
 \value{
 Seurat object
