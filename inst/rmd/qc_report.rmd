@@ -381,6 +381,53 @@ This can be the result of a low-quality library or may occur if there is no mito
 In such situations, the calculated probability of compromise may not be valid (see [miQC vignette](https://bioconductor.org/packages/3.13/bioc/vignettes/miQC/inst/doc/miQC.html#when-not-to-use-miqc) for more details).
 
 
+```{r}
+if(has_processed){
+  
+  has_var_genes <- !is.null(processed_meta$highly_variable_genes)
+  
+  if(!"UMAP" %in% reducedDimNames(processed_sce)){
+    if(!"PCA" %in% reducedDimNames(processed_sce)){
+      
+      if(has_var_genes){
+        subset_genes <- processed_meta$highly_variable_genes
+      }else{
+        subset_genes <- rownames(processed_sce)
+      }
+      processed_sce <- scater::runPCA(processed_sce,
+                                      subset_row = subset_genes)
+    }
+    
+    processed_sce <- scater::runUMAP(processed_sce, 
+                                     dimred = "PCA")
+  }
+  
+  if(has_var_genes){
+    max_gene <- processed_meta$highly_variable_genes[1]
+    var_gene_exp <- counts(processed_sce[max_gene,]) %>%
+      as.matrix() %>%
+      t() %>%
+      as.data.frame() %>%
+      tibble::rownames_to_column("barcode")
+    
+    coldata_df <- colData(processed_sce) %>%
+      as.data.frame() %>%
+      tibble::rownames_to_column("barcode") %>%
+      dplyr::left_join(var_gene_exp, by = "barcode")
+    
+    colData(processed_sce) <- DataFrame(coldata_df, row.names = coldata_df$barcode)
+  }
+  
+ scater::plotReducedDim(processed_sce, 
+                                dimred = "UMAP", 
+                                point_size = 0.1, 
+                                colour_by = max_gene) +
+  theme_bw() 
+
+}
+```
+
+
 <!-- Next section included only if CITE-seq data is present -->
 ```{r, child='cite_qc.rmd', eval = has_cite}
 ```
