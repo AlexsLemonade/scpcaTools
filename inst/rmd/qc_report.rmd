@@ -384,12 +384,12 @@ In such situations, the calculated probability of compromise may not be valid (s
 ```{r}
 if(has_processed){
   
-  has_var_genes <- !is.null(processed_meta$highly_variable_genes)
-  
+  # check that processed SCE contains UMAP and PCA
   if(!"UMAP" %in% reducedDimNames(processed_sce)){
     if(!"PCA" %in% reducedDimNames(processed_sce)){
       
-      if(has_var_genes){
+      # if PCA is missing, check for HVG, if no HVG use all genes 
+      if(!is.null(processed_meta$highly_variable_genes)){
         subset_genes <- processed_meta$highly_variable_genes
       }else{
         subset_genes <- rownames(processed_sce)
@@ -402,26 +402,11 @@ if(has_processed){
                                      dimred = "PCA")
   }
   
-  if(has_var_genes){
-    max_gene <- processed_meta$highly_variable_genes[1]
-    var_gene_exp <- counts(processed_sce[max_gene,]) %>%
-      as.matrix() %>%
-      t() %>%
-      as.data.frame() %>%
-      tibble::rownames_to_column("barcode")
-    
-    coldata_df <- colData(processed_sce) %>%
-      as.data.frame() %>%
-      tibble::rownames_to_column("barcode") %>%
-      dplyr::left_join(var_gene_exp, by = "barcode")
-    
-    colData(processed_sce) <- DataFrame(coldata_df, row.names = coldata_df$barcode)
-  }
-  
+  # create UMAP colored by number of genes detected 
  scater::plotReducedDim(processed_sce, 
                                 dimred = "UMAP", 
                                 point_size = 0.1, 
-                                colour_by = max_gene) +
+                                colour_by = "detected") +
   theme_bw() 
 
 }
