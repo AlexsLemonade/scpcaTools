@@ -3,6 +3,8 @@
 #' @param library_id The name of the library_id for report headers
 #' @param unfiltered_sce A SingleCellExperiment object that the report will describe
 #' @param filtered_sce An optional filtered single cell experiment derived from first
+#' @param processed_sce An optional single cell experiment that has been normalized and
+#'   contains PCA and UMAP embeddings
 #' @param output The output file path that will be created.
 #'   If the file name does not include an extension, ".html" will be added automatically.
 #'   Any directories in the path will be created as needed.
@@ -20,6 +22,7 @@
 generate_qc_report <- function(library_id,
                                unfiltered_sce,
                                filtered_sce = NULL,
+                               processed_sce = NULL,
                                output = NULL,
                                ...){
   if(!inherits(unfiltered_sce, "SingleCellExperiment")){
@@ -55,7 +58,8 @@ generate_qc_report <- function(library_id,
     params = list(
       library = library_id,
       unfiltered_sce = unfiltered_sce,
-      filtered_sce = filtered_sce
+      filtered_sce = filtered_sce,
+      processed_sce = processed_sce
     ),
     intermediates_dir = tempdir(),
     knit_root_dir = tempdir(),
