@@ -407,7 +407,10 @@ if(has_processed){
                          dimred = "UMAP", 
                          point_size = 0.1, 
                          colour_by = "detected") +
-    theme_bw() 
+    theme_bw() + 
+    labs(
+      color = "Number of genes detected"
+    )
 
 }
 ```
