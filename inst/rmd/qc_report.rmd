@@ -405,17 +405,16 @@ if(has_processed){
   }
   
   # create UMAP colored by number of genes detected 
-  scater::plotReducedDim(processed_sce,
-                         dimred = "UMAP",
-                         point_size = 0.3,
-                         point_alpha = 0.5,
-                         colour_by = "detected") +
+  scater::plotUMAP(processed_sce,
+                   point_size = 0.3,
+                   point_alpha = 0.5,
+                   colour_by = "detected") +
     scale_color_viridis_c()+
     theme_bw() + 
     guides(
       color = guide_colorbar(title = "Number of \ngenes detected")
     )
-
+  
 }
 ```
 
