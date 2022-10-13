@@ -40,6 +40,8 @@ Imports:
     rlang,
     rmarkdown,
     S4Vectors,
+    scater,
+    scran,
     scuttle,
     SingleCellExperiment,
     stringr,
