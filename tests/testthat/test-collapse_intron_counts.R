@@ -1,8 +1,9 @@
 intron_mat <- Matrix::Matrix(
-  data = c(1,1,  3,100,10,
+  data = c(1.0,1,  3,100,10,
            2,1,100,  0,10
            ),
-  ncol = 2
+  ncol = 2,
+  sparse = TRUE
 )
 rownames(intron_mat) <- c("a", "a-I", "b", "b-I", "c")
 
@@ -10,7 +11,8 @@ usa_mat <- Matrix::Matrix(
   data = c(0,1,1,  2,100, 1,10,
            1,1,1, 80,  0,20,10
   ),
-  ncol = 2
+  ncol = 2,
+  sparse = TRUE
 )
 rownames(usa_mat) <- c("a", "a-U", "a-A", "b", "b-U","b-A", "c")
 
@@ -18,7 +20,8 @@ spliced_mat <- Matrix::Matrix(
   data = c(1,  3,10,
            2,100,10
   ),
-  ncol = 2
+  ncol = 2,
+  sparse = TRUE
 )
 rownames(spliced_mat) <- c("a", "b", "c")
 
@@ -26,7 +29,8 @@ unspliced_mat <- Matrix::Matrix(
   data = c(2,103,10,
            3,100,10
   ),
-  ncol = 2
+  ncol = 2,
+  sparse = TRUE
 )
 rownames(unspliced_mat) <- c("a", "b", "c")
 
