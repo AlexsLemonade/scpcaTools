@@ -3,6 +3,7 @@ params:
   library: Example
   unfiltered_sce: !r scpcaTools:::sim_sce()
   filtered_sce: NULL
+  processed_sce: NULL
   date: !r Sys.Date()
 
 title: "`r glue::glue('ScPCA QC report for {params$library}')`"
@@ -38,8 +39,10 @@ theme_set(theme_bw() +
 library_id <- params$library
 unfiltered_sce <- params$unfiltered_sce
 filtered_sce <- params$filtered_sce
+processed_sce <- params$processed_sce
 
 has_filtered <- !is.null(filtered_sce)
+has_processed <- !is.null(processed_sce)
 
 # grab sample id from filtered sce, if missing set sample ID to NA
 if(is.null(metadata(filtered_sce)$sample_id)){
@@ -204,16 +207,38 @@ knitr::kable(processing_info, align = 'r') |>
 
 ```{r}
 basic_statistics <- tibble::tibble(
-  "Filtering method"                   = metadata(filtered_sce)$filtering_method, 
-  "Number of cells post filtering"     = format(ncol(filtered_sce), big.mark = ","),
-  "Percent of reads in cells"          = paste0(round((sum(filtered_sce$sum)/sum(unfiltered_sce$sum))*100,2),"%"),
-  "Median UMI count per cell"          = format(median(filtered_sce$sum), big.mark = ","),
-  "Median genes detected per cell"     = format(median(filtered_sce$detected), big.mark = ","),
-  "Median percent reads mitochondrial" = paste0(round(median(filtered_sce$subsets_mito_percent), 2), "%")
-  ) |>
-  mutate(across(.fns = ~ifelse(.x == "NULL", "N/A", .x))) |>
-  t()
+  "Method used to filter empty droplets"          = metadata(filtered_sce)$filtering_method, 
+  "Number of cells post filtering empty droplets" = format(ncol(filtered_sce), big.mark = ","),
+  "Percent of reads in cells"                     = paste0(round((sum(filtered_sce$sum)/sum(unfiltered_sce$sum))*100,2),"%"),
+  "Median UMI count per cell"                     = format(median(filtered_sce$sum), big.mark = ","),
+  "Median genes detected per cell"                = format(median(filtered_sce$detected), big.mark = ","),
+  "Median percent reads mitochondrial"            = paste0(round(median(filtered_sce$subsets_mito_percent), 2), "%")
+  )
 
+# if processed sce exists add filtering and normalization table
+if(has_processed){
+  processed_meta <- metadata(processed_sce)
+  
+  basic_statistics <- basic_statistics |>
+    mutate(
+      "Method used to filter low quality cells" = format(processed_meta$ccdl_filter_method),
+      "Cells after filtering low quality cells" = format(dim(processed_sce)[2], big.mark = ',', scientific = FALSE),
+      "Normalization method"                    = format(processed_meta$normalization),
+      "Minimum genes per cell cutoff"           = format(processed_meta$min_gene_cutoff)
+    
+    )
+  if(processed_meta$ccdl_filter_method == "miQC") {
+    basic_statistics <- basic_statistics |>
+      mutate(
+        "Probability of compromised cell cutoff" = format(processed_meta$prob_compromised_cutoff, big.mark = ",", scientific = FALSE)
+      )
+  }
+}
+
+
+basic_statistics <- basic_statistics |>
+  mutate(across(.fns = ~ifelse(.x == "NULL", "N/A", .x))) |> # reformat nulls
+  t()
 
 # make table with basic statistics
 knitr::kable(basic_statistics, align = 'r') |>
@@ -286,7 +311,7 @@ ggplot(grouped_celldata, aes(x = med_rank, y = med_sum, color = pct_passed)) +
 ```
 
 The total UMI count of each droplet (barcode) plotted against the rank of that droplet allows visualization of the distribution of sequencing depth across droplets. 
-The droplets that are expected to contain cells were identified with [`DropletUtils::emptyDrops()`](https://bioconductor.org/packages/release/bioc/html/DropletUtils.html), which uses both the total UMI counts and expressed gene content ([Lun  _et al._ 2019](https://doi.org/10.1186/s13059-019-1662-y)).
+The droplets that are expected to contain cells were identified with [`DropletUtils::emptyDropsCellRanger()`](https://bioconductor.org/packages/release/bioc/html/DropletUtils.html), unless otherwise specified in the `Cell Statistics` table, which uses both the total UMI counts and expressed gene content (adapted from [Lun  _et al._ 2019](https://doi.org/10.1186/s13059-019-1662-y)).
 As the boundary between droplets passing and failing this filter is not solely dependent on total UMI count, some regions contain droplets in both categories.
 The color in this plot indicates the percentage of droplets in a region passing the filter.
 
@@ -355,6 +380,47 @@ If the model has failed to fit properly, the pattern of cells may differ, and th
 This can be the result of a low-quality library or may occur if there is no mitochondrial content, as in the case of a high-quality single-nucleus sample.
 In such situations, the calculated probability of compromise may not be valid (see [miQC vignette](https://bioconductor.org/packages/3.13/bioc/vignettes/miQC/inst/doc/miQC.html#when-not-to-use-miqc) for more details).
 
+
+## Dimensionality Reduction 
+
+```{r message=FALSE}
+if(has_processed){
+  
+  # check that processed SCE contains UMAP and PCA
+  if(!"UMAP" %in% reducedDimNames(processed_sce)){
+    if(!"PCA" %in% reducedDimNames(processed_sce)){
+      
+      # if PCA is missing, check for HVG, if no HVG use all genes 
+      if(!is.null(processed_meta$highly_variable_genes)){
+        subset_genes <- processed_meta$highly_variable_genes
+      }else{
+        subset_genes <- rownames(processed_sce)
+      }
+      processed_sce <- scater::runPCA(processed_sce,
+                                      subset_row = subset_genes)
+    }
+    
+    processed_sce <- scater::runUMAP(processed_sce, 
+                                     dimred = "PCA")
+  }
+  
+  # create UMAP colored by number of genes detected 
+  scater::plotUMAP(processed_sce,
+                   point_size = 0.3,
+                   point_alpha = 0.5,
+                   colour_by = "detected") +
+    scale_color_viridis_c()+
+    theme_bw() + 
+    guides(
+      color = guide_colorbar(title = "Number of \ngenes detected")
+    )
+  
+}
+```
+
+Compromised cells, calculated using `miQC` described above, are filtered and removed from the library prior to downstream analyses. 
+The raw counts from all remaining cells are then normalized prior to selection of highly variable genes and dimensionality reduction. 
+Here we show the UMAP (Uniform Manifold Approximation and Projection) embeddings for each cell, coloring each cell by the total number of genes detected per cell.
 
 <!-- Next section included only if CITE-seq data is present -->
 ```{r, child='cite_qc.rmd', eval = has_cite}

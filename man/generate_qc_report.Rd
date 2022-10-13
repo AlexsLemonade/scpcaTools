@@ -8,6 +8,7 @@ generate_qc_report(
   library_id,
   unfiltered_sce,
   filtered_sce = NULL,
+  processed_sce = NULL,
   output = NULL,
   ...
 )
@@ -18,6 +19,9 @@ generate_qc_report(
 \item{unfiltered_sce}{A SingleCellExperiment object that the report will describe}
 
 \item{filtered_sce}{An optional filtered single cell experiment derived from first}
+
+\item{processed_sce}{An optional single cell experiment that has been normalized and
+contains PCA and UMAP embeddings}
 
 \item{output}{The output file path that will be created.
 If the file name does not include an extension, ".html" will be added automatically.
