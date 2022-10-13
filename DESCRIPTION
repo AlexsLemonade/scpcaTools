@@ -30,18 +30,14 @@ Imports:
     dplyr,
     DelayedArray,
     DropletUtils,
-    ggplot2,
     glue,
     jsonlite,
-    kableExtra,
     Matrix,
     methods,
     miQC (>= 1.2.0),
     rlang,
     rmarkdown,
     S4Vectors,
-    scater,
-    scran,
     scuttle,
     SingleCellExperiment,
     stringr,
@@ -50,9 +46,13 @@ Imports:
     tidyr,
     tximport
 Suggests: 
-    Seurat,
+    ggplot2,
+    kableExtra,
+    scater,
+    scran,
     scpcaData,
     sessioninfo,
+    Seurat,
     testthat (>= 3.0.0),
     zellkonverter
 Remotes:

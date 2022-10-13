@@ -25,6 +25,21 @@ generate_qc_report <- function(library_id,
                                processed_sce = NULL,
                                output = NULL,
                                ...){
+  ### Check dependencies in report template
+  required_packages <- c("ggplot2", "kableExtra", "scater", "scran")
+
+  installed_status <- sapply(required_packages,
+                             requireNamespace,
+                             quietly = TRUE)
+
+  if(!all(installed_status)){
+    missing_packages <- required_packages[!installed_status]|>
+      paste(collapse = ", ")
+    stop(paste("The following packages are required for generating a QC report:",
+               missing_packages,
+               sep = "\n       "))
+  }
+
   if(!inherits(unfiltered_sce, "SingleCellExperiment")){
     stop("`unfiltered_sce` must be a SingleCellExperiment object.")
   }
@@ -37,7 +52,7 @@ generate_qc_report <- function(library_id,
       stop("`filtered_sce` should have fewer cells than `unfiltered_sce`")
     }
     if (!all(colnames(filtered_sce) %in% colnames(unfiltered_sce))){
-      "Some cells in `filtered_sce` are not present in `unfiltered_sce`, from which it should be derived."
+      stop("Some cells in `filtered_sce` are not present in `unfiltered_sce`, from which it should be derived.")
     }
   }
 
