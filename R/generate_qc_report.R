@@ -25,8 +25,10 @@ generate_qc_report <- function(library_id,
                                processed_sce = NULL,
                                output = NULL,
                                ...){
-  ### Check dependencies in report template
-  required_packages <- c("ggplot2", "kableExtra", "scater", "scran")
+
+  ### Check dependencies for generating report
+  required_packages <- c("ggplot2", "kableExtra", "rmarkdown",
+                         "scater", "scran")
 
   installed_status <- sapply(required_packages,
                              requireNamespace,
