@@ -513,17 +513,6 @@
         "lattice"
       ]
     },
-    "Matrix.utils": {
-      "Package": "Matrix.utils",
-      "Version": "0.9.8",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "74d1586cef483fdd0703316240ed8c1e",
-      "Requirements": [
-        "Matrix",
-        "grr"
-      ]
-    },
     "MatrixGenerics": {
       "Package": "MatrixGenerics",
       "Version": "1.6.0",
@@ -1850,14 +1839,6 @@
       "Requirements": [
         "gtable"
       ]
-    },
-    "grr": {
-      "Package": "grr",
-      "Version": "0.9.5",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "195f3206842ea5ae11968e8d462bb828",
-      "Requirements": []
     },
     "gtable": {
       "Package": "gtable",

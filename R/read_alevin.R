@@ -166,7 +166,7 @@ read_tximport <- function(quant_dir){
     file.path(quant_dir, "alevin", "quants_mat.gz"),
     type = "alevin"
   ))
-  counts <- txi$counts
+  counts <- as(txi$counts, "dgCMatrix")
 }
 
 #' Read alevin metadata from json files
