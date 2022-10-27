@@ -386,12 +386,15 @@ In such situations, the calculated probability of compromise may not be valid (s
 ```{r message=FALSE}
 if(has_processed){
   
+  # use to check if variable genes are present, need for plotting later
+  has_var_genes <- !is.null(processed_meta$highly_variable_genes)
+
   # check that processed SCE contains UMAP and PCA
   if(!"UMAP" %in% reducedDimNames(processed_sce)){
     if(!"PCA" %in% reducedDimNames(processed_sce)){
       
       # if PCA is missing, check for HVG, if no HVG use all genes 
-      if(!is.null(processed_meta$highly_variable_genes)){
+      if(has_var_genes){
         subset_genes <- processed_meta$highly_variable_genes
       }else{
         subset_genes <- rownames(processed_sce)
@@ -420,7 +423,83 @@ if(has_processed){
 
 Compromised cells, calculated using `miQC` described above, are filtered and removed from the library prior to downstream analyses. 
 The raw counts from all remaining cells are then normalized prior to selection of highly variable genes and dimensionality reduction. 
-Here we show the UMAP (Uniform Manifold Approximation and Projection) embeddings for each cell, coloring each cell by the total number of genes detected per cell.
+The above plot shows the UMAP (Uniform Manifold Approximation and Projection) embeddings for each cell, coloring each cell by the total number of genes detected per cell.
+The below plots show the same UMAP embeddings, coloring each cell by the gene expression of the gene indicated in the label for each panel. The genes chosen for plotting are the top 12 highly variable genes identified in the library.
+
+```{r message=FALSE}
+if(has_processed){
+  
+  if(has_var_genes){
+    
+    # select top genes to plot 
+    top_genes <- processed_meta$highly_variable_genes %>%
+      head(n=12)
+    
+    # grab expression for top genes from counts
+    var_gene_exp <- logcounts(processed_sce[top_genes,]) %>%
+      as.matrix() %>%
+      t() %>%
+      as.data.frame() %>%
+      tibble::rownames_to_column("barcode")
+    
+    # grab rowdata as data frame to later combine with gene expression data
+    # rowdata contains the mapped gene symbol so can use that to label plots instead of ensembl gene id from rownames 
+    rowdata_df <- rowData(processed_sce) %>%
+      as.data.frame() %>%
+      tibble::rownames_to_column("ensembl_id") %>%
+      dplyr::select(ensembl_id, gene_symbol) %>%
+      dplyr::filter(ensembl_id %in% top_genes)
+    
+    # extract umap embeddings as a dataframe to join with gene expression and coldata for plotting
+    umap_df <- reducedDim(processed_sce, "UMAP") %>%
+      as.data.frame() %>%
+      tibble::rownames_to_column("barcode") %>%
+      dplyr::rename("UMAP1" = "V1",
+                    "UMAP2" = "V2")
+    
+    # combine gene expression with coldata, umap embeddings, and rowdata and create data frame to use for plotting
+    coldata_df <- colData(processed_sce) %>%
+      as.data.frame() %>%
+      tibble::rownames_to_column("barcode") %>%
+      # combine with gene expression
+      dplyr::left_join(var_gene_exp, by = "barcode") %>%
+      # combine with umap embeddings 
+      dplyr::left_join(umap_df, by = "barcode") %>%
+      # combine all genes into a single column for easy faceting 
+      tidyr::pivot_longer(cols = starts_with("ENSG"),
+                          names_to = "ensembl_id",
+                          values_to = "gene_expression") %>%
+      # join with row data to add in gene symbols 
+      dplyr::left_join(rowdata_df)
+    
+    
+  }
+  
+  ggplot(coldata_df, aes(x = UMAP1, y = UMAP2, color = gene_expression)) + 
+    geom_point(alpha = 0.1, size = 0.001) + 
+    facet_wrap(~ gene_symbol) +
+    scale_color_viridis_c() +
+    labs(
+      color = "Log-normalized \ngene expression"
+    ) +
+    theme(legend.position = "top", 
+          axis.text = element_text(size = 8, color = "black"),
+          axis.title = element_text(size = 8, color = "black"),
+          legend.title = element_text(size = 8),
+          legend.text = element_text(size = 6)) + 
+    guides(colour = guide_colorbar(title.position = "top", title.hjust = 0.5))
+
+} else {
+   glue::glue("
+    <div class=\"alert alert-warning\">
+    
+    This library does not contain a set of highly variable genes. 
+    
+    </div>
+  ")
+}
+```
+
 
 <!-- Next section included only if CITE-seq data is present -->
 ```{r, child='cite_qc.rmd', eval = has_cite}
