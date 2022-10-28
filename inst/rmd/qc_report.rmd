@@ -444,11 +444,15 @@ if(has_processed){
     
     # grab rowdata as data frame to later combine with gene expression data
     # rowdata contains the mapped gene symbol so can use that to label plots instead of ensembl gene id from rownames 
-    rowdata_df <- rowData(processed_sce) %>%
-      as.data.frame() %>%
-      tibble::rownames_to_column("ensembl_id") %>%
-      dplyr::select(ensembl_id, gene_symbol) %>%
-      dplyr::filter(ensembl_id %in% top_genes)
+    rowdata_df <- rowData(processed_sce) |>
+      as.data.frame() |>
+      tibble::rownames_to_column("ensembl_id") |>
+      select(ensembl_id, gene_symbol) |>
+      filter(ensembl_id %in% top_genes) |>
+      mutate(ensembl_id = factor(ensembl_id, levels = top_genes)) |>
+      arrange(ensembl_id) |>
+      mutate(gene_symbol = factor(gene_symbol, levels = gene_symbol))
+      
     
     # extract umap embeddings as a dataframe to join with gene expression and coldata for plotting
     umap_df <- reducedDim(processed_sce, "UMAP") %>%
