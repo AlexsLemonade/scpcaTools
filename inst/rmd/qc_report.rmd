@@ -432,14 +432,14 @@ if(has_processed){
   if(has_var_genes){
     
     # select top genes to plot 
-    top_genes <- processed_meta$highly_variable_genes %>%
+    top_genes <- processed_meta$highly_variable_genes |>
       head(n=12)
     
     # grab expression for top genes from counts
-    var_gene_exp <- logcounts(processed_sce[top_genes,]) %>%
-      as.matrix() %>%
-      t() %>%
-      as.data.frame() %>%
+    var_gene_exp <- logcounts(processed_sce[top_genes,]) |>
+      as.matrix() |>
+      t() |>
+      as.data.frame() |>
       tibble::rownames_to_column("barcode")
     
     # grab rowdata as data frame to later combine with gene expression data
@@ -455,26 +455,26 @@ if(has_processed){
       
     
     # extract umap embeddings as a dataframe to join with gene expression and coldata for plotting
-    umap_df <- reducedDim(processed_sce, "UMAP") %>%
-      as.data.frame() %>%
-      tibble::rownames_to_column("barcode") %>%
-      dplyr::rename("UMAP1" = "V1",
-                    "UMAP2" = "V2")
+    umap_df <- reducedDim(processed_sce, "UMAP") |>
+      as.data.frame() |>
+      tibble::rownames_to_column("barcode") |>
+      rename("UMAP1" = "V1",
+             "UMAP2" = "V2")
     
     # combine gene expression with coldata, umap embeddings, and rowdata and create data frame to use for plotting
-    coldata_df <- colData(processed_sce) %>%
-      as.data.frame() %>%
-      tibble::rownames_to_column("barcode") %>%
+    coldata_df <- colData(processed_sce) |>
+      as.data.frame() |>
+      tibble::rownames_to_column("barcode") |>
       # combine with gene expression
-      dplyr::left_join(var_gene_exp, by = "barcode") %>%
+      left_join(var_gene_exp, by = "barcode") |>
       # combine with umap embeddings 
-      dplyr::left_join(umap_df, by = "barcode") %>%
+      left_join(umap_df, by = "barcode") |>
       # combine all genes into a single column for easy faceting 
       tidyr::pivot_longer(cols = starts_with("ENSG"),
                           names_to = "ensembl_id",
-                          values_to = "gene_expression") %>%
+                          values_to = "gene_expression") |>
       # join with row data to add in gene symbols 
-      dplyr::left_join(rowdata_df)
+      left_join(rowdata_df)
     
     
   }
