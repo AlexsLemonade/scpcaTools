@@ -384,10 +384,10 @@ In such situations, the calculated probability of compromise may not be valid (s
 ## Dimensionality Reduction 
 
 ```{r message=FALSE}
+# use to check if variable genes are present, need for both UMAPs
+has_var_genes <- !is.null(processed_meta$highly_variable_genes)
+
 if(has_processed){
-  
-  # use to check if variable genes are present, need for plotting later
-  has_var_genes <- !is.null(processed_meta$highly_variable_genes)
 
   # check that processed SCE contains UMAP and PCA
   if(!"UMAP" %in% reducedDimNames(processed_sce)){
@@ -428,57 +428,53 @@ The plots below show the same UMAP embeddings, coloring each cell by the express
 The genes chosen for plotting are the 12 most variable genes identified in the library.
 
 ```{r message=FALSE}
-if(has_processed){
+if(has_var_genes){
   
-  if(has_var_genes){
-    
-    # select top genes to plot 
-    top_genes <- processed_meta$highly_variable_genes |>
-      head(n=12)
-    
-    # grab expression for top genes from counts
-    var_gene_exp <- logcounts(processed_sce[top_genes,]) |>
-      as.matrix() |>
-      t() |>
-      as.data.frame() |>
-      tibble::rownames_to_column("barcode")
-    
-    # grab rowdata as data frame to later combine with gene expression data
-    # rowdata contains the mapped gene symbol so can use that to label plots instead of ensembl gene id from rownames 
-    rowdata_df <- rowData(processed_sce) |>
-      as.data.frame() |>
-      tibble::rownames_to_column("ensembl_id") |>
-      select(ensembl_id, gene_symbol) |>
-      filter(ensembl_id %in% top_genes) |>
-      mutate(ensembl_id = factor(ensembl_id, levels = top_genes)) |>
-      arrange(ensembl_id) |>
-      mutate(gene_symbol = factor(gene_symbol, levels = gene_symbol))
-      
-    
-    # extract umap embeddings as a dataframe to join with gene expression and coldata for plotting
-    umap_df <- reducedDim(processed_sce, "UMAP") |>
-      as.data.frame() |>
-      tibble::rownames_to_column("barcode") |>
-      rename("UMAP1" = "V1",
-             "UMAP2" = "V2")
-    
-    # combine gene expression with coldata, umap embeddings, and rowdata and create data frame to use for plotting
-    coldata_df <- colData(processed_sce) |>
-      as.data.frame() |>
-      tibble::rownames_to_column("barcode") |>
-      # combine with gene expression
-      left_join(var_gene_exp, by = "barcode") |>
-      # combine with umap embeddings 
-      left_join(umap_df, by = "barcode") |>
-      # combine all genes into a single column for easy faceting 
-      tidyr::pivot_longer(cols = starts_with("ENSG"),
-                          names_to = "ensembl_id",
-                          values_to = "gene_expression") |>
-      # join with row data to add in gene symbols 
-      left_join(rowdata_df)
-    
-    
-  }
+  # select top genes to plot 
+  top_genes <- processed_meta$highly_variable_genes |>
+    head(n=12)
+  
+  # grab expression for top genes from counts
+  var_gene_exp <- logcounts(processed_sce[top_genes,]) |>
+    as.matrix() |>
+    t() |>
+    as.data.frame() |>
+    tibble::rownames_to_column("barcode")
+  
+  # grab rowdata as data frame to later combine with gene expression data
+  # rowdata contains the mapped gene symbol so can use that to label plots instead of ensembl gene id from rownames 
+  rowdata_df <- rowData(processed_sce) |>
+    as.data.frame() |>
+    tibble::rownames_to_column("ensembl_id") |>
+    select(ensembl_id, gene_symbol) |>
+    filter(ensembl_id %in% top_genes) |>
+    mutate(ensembl_id = factor(ensembl_id, levels = top_genes)) |>
+    arrange(ensembl_id) |>
+    mutate(gene_symbol = factor(gene_symbol, levels = gene_symbol))
+  
+  
+  # extract umap embeddings as a dataframe to join with gene expression and coldata for plotting
+  umap_df <- reducedDim(processed_sce, "UMAP") |>
+    as.data.frame() |>
+    tibble::rownames_to_column("barcode") |>
+    rename("UMAP1" = "V1",
+           "UMAP2" = "V2")
+  
+  # combine gene expression with coldata, umap embeddings, and rowdata and create data frame to use for plotting
+  coldata_df <- colData(processed_sce) |>
+    as.data.frame() |>
+    tibble::rownames_to_column("barcode") |>
+    # combine with gene expression
+    left_join(var_gene_exp, by = "barcode") |>
+    # combine with umap embeddings 
+    left_join(umap_df, by = "barcode") |>
+    # combine all genes into a single column for easy faceting 
+    tidyr::pivot_longer(cols = starts_with("ENSG"),
+                        names_to = "ensembl_id",
+                        values_to = "gene_expression") |>
+    # join with row data to add in gene symbols 
+    left_join(rowdata_df)
+  
   
   ggplot(coldata_df, aes(x = UMAP1, y = UMAP2, color = gene_expression)) + 
     geom_point(alpha = 0.1, size = 0.001) + 
@@ -490,12 +486,14 @@ if(has_processed){
     theme(legend.position = "bottom", 
           axis.text = element_text(size = 8, color = "black"),
           axis.title = element_text(size = 8, color = "black"),
+          strip.text = element_text(size = 8),
+          strip.background = element_rect(fill = 'transparent'),
           legend.title = element_text(size = 8),
-          legend.text = element_text(size = 6)) + 
+          legend.text = element_text(size = 8)) + 
     guides(colour = guide_colorbar(title.position = "bottom", title.hjust = 0.5))
-
+  
 } else {
-   glue::glue("
+  glue::glue("
     <div class=\"alert alert-warning\">
     
     This library does not contain a set of highly variable genes. 
