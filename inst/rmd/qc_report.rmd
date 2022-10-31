@@ -424,7 +424,8 @@ if(has_processed){
 Compromised cells, calculated using `miQC` described above, are filtered and removed from the library prior to downstream analyses. 
 The raw counts from all remaining cells are then normalized prior to selection of highly variable genes and dimensionality reduction. 
 The above plot shows the UMAP (Uniform Manifold Approximation and Projection) embeddings for each cell, coloring each cell by the total number of genes detected per cell.
-The below plots show the same UMAP embeddings, coloring each cell by the gene expression of the gene indicated in the label for each panel. The genes chosen for plotting are the top 12 highly variable genes identified in the library.
+The plots below show the same UMAP embeddings, coloring each cell by the expression level of the labeled gene.
+The genes chosen for plotting are the 12 most variable genes identified in the library.
 
 ```{r message=FALSE}
 if(has_processed){
@@ -484,14 +485,14 @@ if(has_processed){
     facet_wrap(~ gene_symbol) +
     scale_color_viridis_c() +
     labs(
-      color = "Log-normalized \ngene expression"
+      color = "Log-normalized gene expression"
     ) +
-    theme(legend.position = "top", 
+    theme(legend.position = "bottom", 
           axis.text = element_text(size = 8, color = "black"),
           axis.title = element_text(size = 8, color = "black"),
           legend.title = element_text(size = 8),
           legend.text = element_text(size = 6)) + 
-    guides(colour = guide_colorbar(title.position = "top", title.hjust = 0.5))
+    guides(colour = guide_colorbar(title.position = "bottom", title.hjust = 0.5))
 
 } else {
    glue::glue("
