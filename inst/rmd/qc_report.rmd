@@ -384,10 +384,10 @@ In such situations, the calculated probability of compromise may not be valid (s
 ## Dimensionality Reduction 
 
 ```{r message=FALSE}
-# use to check if variable genes are present, need for both UMAPs
-has_var_genes <- !is.null(processed_meta$highly_variable_genes)
-
 if(has_processed){
+  
+  # use to check if variable genes are present, need for both UMAPs
+  has_var_genes <- !is.null(processed_meta$highly_variable_genes)
 
   # check that processed SCE contains UMAP and PCA
   if(!"UMAP" %in% reducedDimNames(processed_sce)){
@@ -428,7 +428,7 @@ The plots below show the same UMAP embeddings, coloring each cell by the express
 The genes chosen for plotting are the 12 most variable genes identified in the library.
 
 ```{r message=FALSE}
-if(has_var_genes){
+if(has_processed & has_var_genes){
   
   # select top genes to plot 
   top_genes <- processed_meta$highly_variable_genes |>
