@@ -418,6 +418,9 @@ if(has_processed){
       color = guide_colorbar(title = "Number of \ngenes detected")
     )
   
+} else {
+  # if processed is missing, set to null to skip next UMAPs
+  has_var_genes <- NULL
 }
 ```
 
