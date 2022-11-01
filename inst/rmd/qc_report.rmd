@@ -397,10 +397,12 @@ The dotted vertical line indicates the minimum gene cutoff used for filtering.
 ```{r}
 if(has_filtered & has_processed){
   
+  # grab cutoffs and filtering method from processed sce
   min_gene_cutoff <- processed_meta$min_gene_cutoff
   prob_compromised_cutoff <- processed_meta$prob_compromised_cutoff
   filter_method <- processed_meta$ccdl_filter_method
   
+  # add column to coldata labeling cells to keep/remove based on filtering method
   if(filter_method == "miQC"){
     
     filtered_coldata_df <- filtered_coldata_df %>%
