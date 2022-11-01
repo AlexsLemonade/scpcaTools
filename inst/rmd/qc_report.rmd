@@ -348,6 +348,10 @@ Cells with low UMI counts and high mitochondrial percentages may require further
 if(skip_miQC){
   cat("miQC model not created, skipping miQC plot. Usually this is because mitochondrial gene data was not available.")
 }else{
+  # grab coldata as dataframe for plotting later otherwise we lose the prob compromised values we need to plot filtering 
+  filtered_coldata_df <- colData(filtered_sce) %>%
+    as.data.frame()
+  
   # remove prob_compromised if it exists, as this will cause errors with plotModel
   filtered_sce$prob_compromised <- NULL
   miQC_model <- metadata(filtered_sce)$miQC_model
@@ -380,6 +384,63 @@ Compromised cells are likely to have a fewer genes detected and higher percentag
 If the model has failed to fit properly, the pattern of cells may differ, and there may not be model fit lines.
 This can be the result of a low-quality library or may occur if there is no mitochondrial content, as in the case of a high-quality single-nucleus sample.
 In such situations, the calculated probability of compromise may not be valid (see [miQC vignette](https://bioconductor.org/packages/3.13/bioc/vignettes/miQC/inst/doc/miQC.html#when-not-to-use-miqc) for more details).
+
+## Removing low quality cells
+
+The below plot highlights cells that were removed prior to normalization and dimensionality reduction.
+Cells that should be removed are those that are identified to be low quality cells, such as cells with high probability of being compromised, calculated by `miQC`.
+The method of filtering is indicated above the plot as either `miQC` or `Minimum gene cutoff`. 
+If `miQC`, cells below the specified probability compromised cutoff and above the minimum number of unique genes identified are kept for downstream analyses. 
+If only a `Minimum gene cutoff` is used, then `miQC` is not used and only those cells that pass the minimum number of unique genes identified threshold are retained. 
+The dotted vertical line indicates the minimum gene cutoff used for filtering. 
+
+```{r}
+if(has_filtered & has_processed){
+  
+  min_gene_cutoff <- processed_meta$min_gene_cutoff
+  prob_compromised_cutoff <- processed_meta$prob_compromised_cutoff
+  filter_method <- processed_meta$ccdl_filter_method
+  
+  if(filter_method == "miQC"){
+    
+    filtered_coldata_df <- filtered_coldata_df %>%
+      dplyr::mutate(ccdl_filter = ifelse(prob_compromised <= prob_compromised_cutoff & 
+                                           detected >= min_gene_cutoff, 
+                                         "Keep", 
+                                         "Remove"))
+    
+  } else if(filter_method == "Minimum_gene_cutoff") {
+    
+    filtered_coldata_df <- filtered_coldata_df %>%
+      dplyr::mutate(ccdl_filter = ifelse(detected >= min_gene_cutoff, 
+                                         "Keep", 
+                                         "Remove"))
+    
+  }
+  
+  ggplot(filtered_coldata_df, aes(x = detected, y = subsets_mito_percent, color = ccdl_filter)) + 
+      geom_point(alpha = 0.5, size = 1) +
+      geom_vline(xintercept = min_gene_cutoff, linetype = "dashed") +
+      labs(x = "Number of genes detected",
+           y = "Mitochondrial percentage",
+           color = "Filter") +
+    ggtitle(stringr::str_replace(filter_method, "_", " ")) +
+    theme(plot.title = element_text(hjust = 0.5),
+          legend.position = c(1, 1),
+          legend.justification = c(1,1),
+          legend.background = element_rect(color = "grey20", size= 0.25),
+          legend.title = element_text(hjust = 0.5))
+} else {
+  glue::glue("
+    <div class=\"alert alert-warning\">
+    
+    No filtering was performed on this library.
+    
+    </div>
+  ")
+}
+```
+
 
 
 ## Dimensionality Reduction 
