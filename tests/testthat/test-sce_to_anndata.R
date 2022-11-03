@@ -5,9 +5,14 @@ rowData(sce) <- DataFrame("test_row" = sample(0:10, 200, rep = TRUE))
 
 test_that("Conversion of SCE to AnnData works as expected", {
   anndata_file <- "test_anndata.h5"
+  # quiet messages that will come with zellkonverter
+  suppressPackageStartupMessages(library(zellkonverter))
 
   # test that the H5 file is created
-  expect_snapshot(sce_to_anndata(sce, anndata_file))
+  expect_snapshot_file({
+    sce_to_anndata(sce, anndata_file)
+    anndata_file
+  })
 
   # some tests that the converted object contains col/rowData found in original SCE
   converted_sce <- zellkonverter::readH5AD(anndata_file)

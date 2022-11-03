@@ -4,7 +4,7 @@
 \alias{miQC_nofilter}
 \title{miQC_nofilter}
 \usage{
-miQC_nofilter(sce, model = NULL, verbose = TRUE)
+miQC_nofilter(sce, model = NULL)
 }
 \arguments{
 \item{sce}{(SingleCellExperiment) Input data object.}
@@ -22,15 +22,4 @@ Add statistics from miQC without filtering.
 Derived from miQC::filterCells
 https://github.com/greenelab/miQC/blob/main/R/filterCells.R
 Copyright (c) 2021, Greene Laboratory
-}
-\examples{
-library(scRNAseq)
-library(scater)
-sce <- ZeiselBrainData()
-mt_genes <- grepl("^mt-",  rownames(sce))
-feature_ctrls <- list(mito = rownames(sce)[mt_genes])
-sce <- addPerCellQC(sce, subsets = feature_ctrls)
-model <- mixtureModel(sce)
-sce <- miQC_nofilter(sce, model)
-
 }

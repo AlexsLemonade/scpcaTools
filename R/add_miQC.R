@@ -91,23 +91,12 @@ add_miQC <- function(sce, posterior_cutoff = 0.75, seed = NULL){
 #'
 #' @import SingleCellExperiment
 #'
-#'
-#' @examples
-#' library(scRNAseq)
-#' library(scater)
-#' sce <- ZeiselBrainData()
-#' mt_genes <- grepl("^mt-",  rownames(sce))
-#' feature_ctrls <- list(mito = rownames(sce)[mt_genes])
-#' sce <- addPerCellQC(sce, subsets = feature_ctrls)
-#' model <- mixtureModel(sce)
-#' sce <- miQC_nofilter(sce, model)
-#'
-miQC_nofilter <- function(sce, model = NULL, verbose = TRUE) {
+miQC_nofilter <- function(sce, model = NULL) {
   metrics <- as.data.frame(colData(sce))
 
   if (is.null(model)) {
-    warning("call 'mixtureModel' explicitly to get stable model features")
-    model <- mixtureModel(sce)
+    warning("call 'miQC::mixtureModel' explicitly to get stable model features")
+    model <- miQC::mixtureModel(sce)
   }
 
   intercept1 <- flexmix::parameters(model, component = 1)[1]

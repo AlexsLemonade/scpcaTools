@@ -30,6 +30,7 @@ Imports:
     dplyr,
     DelayedArray,
     DropletUtils,
+    flexmix,
     glue,
     jsonlite,
     Matrix,
