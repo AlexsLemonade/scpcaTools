@@ -399,16 +399,15 @@ if(has_filtered & has_processed){
   
   # add column to coldata labeling cells to keep/remove based on filtering method
   filtered_coldata_df <- colData(filtered_sce) |>
-    as.data.frame()
-    
-  filtered_coldata_df <- filtered_coldata_df |>
-    dplyr::mutate(ccdl_filter = ifelse(rownames(filtered_coldata_df) %in%  colnames(processed_sce), 
+    as.data.frame() |>
+    tibble::rownames_to_column("barcode") |>
+    dplyr::mutate(ccdl_filter = ifelse(barcode %in%  colnames(processed_sce), 
                                        "Keep", 
                                        "Remove")) 
   
   ggplot(filtered_coldata_df, aes(x = detected, y = subsets_mito_percent, color = ccdl_filter)) + 
     geom_point(alpha = 0.5, size = 1) +
-    geom_vline(xintercept = dmin_gene_cutoff, linetype = "dashed") +
+    geom_vline(xintercept = min_gene_cutoff, linetype = "dashed") +
     labs(x = "Number of genes detected",
          y = "Mitochondrial percentage",
          color = "Filter",
