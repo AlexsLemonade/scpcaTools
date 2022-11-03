@@ -407,12 +407,12 @@ if(has_filtered & has_processed){
                                        "Remove")) 
   
   ggplot(filtered_coldata_df, aes(x = detected, y = subsets_mito_percent, color = ccdl_filter)) + 
-      geom_point(alpha = 0.5, size = 1) +
-      geom_vline(xintercept = min_gene_cutoff, linetype = "dashed") +
-      labs(x = "Number of genes detected",
-           y = "Mitochondrial percentage",
-           color = "Filter"
-           title = stringr::str_replace(filter_method, "_", " ")) +
+    geom_point(alpha = 0.5, size = 1) +
+    geom_vline(xintercept = dmin_gene_cutoff, linetype = "dashed") +
+    labs(x = "Number of genes detected",
+         y = "Mitochondrial percentage",
+         color = "Filter",
+         title = stringr::str_replace(filter_method, "_", " ")) +
     theme(plot.title = element_text(hjust = 0.5),
           legend.position = c(1, 1),
           legend.justification = c(1,1),
