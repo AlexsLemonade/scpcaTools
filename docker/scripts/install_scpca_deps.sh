@@ -15,9 +15,11 @@ apt-get -y --no-install-recommends install \
     libbz2-dev \
     libcairo2-dev \
     libcurl4-openssl-dev \
+    libfribidi-dev \
     libgdal-dev \
     libgit2-dev \
     libglpk-dev \
+    libharfbuzz-dev \
     liblzma-dev \
     libreadline-dev \
     libsqlite3-dev \
@@ -25,5 +27,6 @@ apt-get -y --no-install-recommends install \
     libudunits2-dev \
     libxml2-dev \
     libxtst6 \
+    libxt-dev \
     pandoc \
   && rm -rf /var/lib/apt/lists/*

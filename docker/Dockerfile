@@ -20,6 +20,10 @@ RUN Rscript -e "renv::consent(provided = TRUE); \
       rm -rf /tmp/downloaded_packages && \
       rm -rf /tmp/Rtmp*
 
+# Complete installation of zellkonverter conda env
+RUN Rscript -e "proc <- basilisk::basiliskStart(env = zellkonverter::zellkonverterAnnDataEnv(), testload = 'anndata'); \
+                basilisk::basiliskStop(proc)"
+
 ##########################
 # Install scpcaTools package (& test loading)
 RUN Rscript -e "remotes::install_github('AlexsLemonade/scpcaTools'); \
