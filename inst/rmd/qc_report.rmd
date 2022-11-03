@@ -422,7 +422,7 @@ if(has_filtered & has_processed){
   glue::glue("
     <div class=\"alert alert-warning\">
     
-    No filtering was performed on this library.
+    No filtering of low quality cells was performed on this library.
     
     </div>
   ")
