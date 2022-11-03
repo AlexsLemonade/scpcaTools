@@ -60,11 +60,7 @@ add_miQC <- function(sce, posterior_cutoff = 0.75, seed = NULL){
     sce$prob_compromised <- NA_real_
   }else{
     # add the prob_compromised value for all cells
-    sce <- miQC::filterCells(sce,
-                             model = model,
-                             posterior_cutoff = 1,
-                             enforce_left_cutoff = FALSE,
-                             verbose = FALSE)
+    sce <- miQC_nofilter(sce, model = model)
     # test whether cells passed filtering
     if(is.null(pass_cells)){
       sce$miQC_pass <- NA
@@ -75,3 +71,60 @@ add_miQC <- function(sce, posterior_cutoff = 0.75, seed = NULL){
   }
   return(sce)
 }
+
+
+#' miQC_nofilter
+#'
+#' Add statistics from miQC without filtering.
+#' Derived from miQC::filterCells
+#' https://github.com/greenelab/miQC/blob/main/R/filterCells.R
+#' Copyright (c) 2021, Greene Laboratory
+#'
+#' @param sce (SingleCellExperiment) Input data object.
+#'
+#' @param model (flexmix) Output of mixtureModel function, which should be
+#'   explicitly called first to ensure stability of model parameters.
+#'   Default = NULL.
+#'
+#' @return Returns a SingleCellExperiment object, the same as the input except
+#'   with a new column in colData, prob_compromised.
+#'
+#' @import SingleCellExperiment
+#'
+#'
+#' @examples
+#' library(scRNAseq)
+#' library(scater)
+#' sce <- ZeiselBrainData()
+#' mt_genes <- grepl("^mt-",  rownames(sce))
+#' feature_ctrls <- list(mito = rownames(sce)[mt_genes])
+#' sce <- addPerCellQC(sce, subsets = feature_ctrls)
+#' model <- mixtureModel(sce)
+#' sce <- miQC_nofilter(sce, model)
+#'
+miQC_nofilter <- function(sce, model = NULL, verbose = TRUE) {
+  metrics <- as.data.frame(colData(sce))
+
+  if (is.null(model)) {
+    warning("call 'mixtureModel' explicitly to get stable model features")
+    model <- mixtureModel(sce)
+  }
+
+  intercept1 <- flexmix::parameters(model, component = 1)[1]
+  intercept2 <- flexmix::parameters(model, component = 2)[1]
+  if (intercept1 > intercept2) {
+    compromised_dist <- 1
+    intact_dist <- 2
+  } else {
+    intact_dist <- 1
+    compromised_dist <- 2
+  }
+
+  post <- flexmix::posterior(model)
+  metrics$prob_compromised <- post[, compromised_dist]
+  sce$prob_compromised <- metrics$prob_compromised
+
+  return(sce)
+}
+
+
