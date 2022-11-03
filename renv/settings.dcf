@@ -1,4 +1,4 @@
-bioconductor.version: 3.14
+bioconductor.version: 3.16
 external.libraries:
 ignored.packages: scpcaData
 package.dependency.fields: Imports, Depends, LinkingTo
