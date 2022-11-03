@@ -348,10 +348,6 @@ Cells with low UMI counts and high mitochondrial percentages may require further
 if(skip_miQC){
   cat("miQC model not created, skipping miQC plot. Usually this is because mitochondrial gene data was not available.")
 }else{
-  # grab coldata as dataframe for plotting later otherwise we lose the prob compromised values we need to plot filtering 
-  filtered_coldata_df <- colData(filtered_sce) %>%
-    as.data.frame()
-  
   # remove prob_compromised if it exists, as this will cause errors with plotModel
   filtered_sce$prob_compromised <- NULL
   miQC_model <- metadata(filtered_sce)$miQC_model
@@ -399,7 +395,6 @@ if(has_filtered & has_processed){
   
   # grab cutoffs and filtering method from processed sce
   min_gene_cutoff <- processed_meta$min_gene_cutoff
-  prob_compromised_cutoff <- processed_meta$prob_compromised_cutoff
   filter_method <- processed_meta$ccdl_filter_method
   
   # add column to coldata labeling cells to keep/remove based on filtering method
