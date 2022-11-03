@@ -52,7 +52,7 @@ sim_sce <- function(n_genes = 200, n_cells = 100, n_empty = 1000, n_groups = 3){
     head(n_cells + n_empty)
 
   # combine matrices and build SCE
-  all_expr <- as(cbind(cell_expr, empty_expr), "dgCMatrix")
+  all_expr <- as(cbind(cell_expr, empty_expr), "CsparseMatrix")
   dimnames(all_expr) <- list(genes, cell_barcodes)
   SingleCellExperiment(list(counts = all_expr))
 }
