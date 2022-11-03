@@ -53,8 +53,16 @@ collapse_intron_counts <- function(counts,
   }
   # remove -I -U -A at the end of the gene names
   genes <- str_remove(rownames(counts), "-[IUA]$")
-  # aggregate Matrix counts by gene name
-  counts <- DelayedArray::rowsum(counts, genes) |> as("dgCMatrix")
+
+  # aggregate Matrix counts by gene name using matrix math
+  # get unique gene names, encode genes as factors
+  ugenes <- unique(genes)
+  fgenes <- factor(genes, levels = ugenes)
+  # create a transformer matrix, with 1s at positions that correspond to old/new names, zeros elsewhere
+  transformer <- Matrix::sparseMatrix(as.integer(fgenes), 1:length(fgenes), x =1)
+  rownames(transformer) <- ugenes
+  # matrix multiplication to collapse
+  counts <- transformer %*% counts
   # drop extra slots silently
   counts <- suppressWarnings(BiocGenerics::updateObject(counts))
   return(counts)
