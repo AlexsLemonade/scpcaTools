@@ -403,30 +403,21 @@ if(has_filtered & has_processed){
   filter_method <- processed_meta$ccdl_filter_method
   
   # add column to coldata labeling cells to keep/remove based on filtering method
-  if(filter_method == "miQC"){
+  filtered_coldata_df <- colData(filtered_sce) |>
+    as.data.frame()
     
-    filtered_coldata_df <- filtered_coldata_df %>%
-      dplyr::mutate(ccdl_filter = ifelse(prob_compromised <= prob_compromised_cutoff & 
-                                           detected >= min_gene_cutoff, 
-                                         "Keep", 
-                                         "Remove"))
-    
-  } else if(filter_method == "Minimum_gene_cutoff") {
-    
-    filtered_coldata_df <- filtered_coldata_df %>%
-      dplyr::mutate(ccdl_filter = ifelse(detected >= min_gene_cutoff, 
-                                         "Keep", 
-                                         "Remove"))
-    
-  }
+  filtered_coldata_df <- filtered_coldata_df |>
+    dplyr::mutate(ccdl_filter = ifelse(rownames(filtered_coldata_df) %in%  colnames(processed_sce), 
+                                       "Keep", 
+                                       "Remove")) 
   
   ggplot(filtered_coldata_df, aes(x = detected, y = subsets_mito_percent, color = ccdl_filter)) + 
       geom_point(alpha = 0.5, size = 1) +
       geom_vline(xintercept = min_gene_cutoff, linetype = "dashed") +
       labs(x = "Number of genes detected",
            y = "Mitochondrial percentage",
-           color = "Filter") +
-    ggtitle(stringr::str_replace(filter_method, "_", " ")) +
+           color = "Filter"
+           title = stringr::str_replace(filter_method, "_", " ")) +
     theme(plot.title = element_text(hjust = 0.5),
           legend.position = c(1, 1),
           legend.justification = c(1,1),
