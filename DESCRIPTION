@@ -28,7 +28,6 @@ Depends:
 Imports: 
     BiocGenerics,
     dplyr,
-    DelayedArray,
     DropletUtils,
     flexmix,
     glue,
