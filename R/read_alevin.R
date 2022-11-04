@@ -137,7 +137,7 @@ read_alevin_mtx <- function(quant_dir){
   # read in .mtx files
   counts <- Matrix::readMM(file = file.path(quant_dir, "alevin", "quants_mat.mtx"))|>
     Matrix::t() |>
-    as("dgCMatrix")
+    as("CsparseMatrix")
   cols <- readLines(file.path(quant_dir, "alevin", "quants_mat_cols.txt"))
   rows <- readLines(file.path(quant_dir, "alevin", "quants_mat_rows.txt"))
   dimnames(counts) <- list(cols, rows)
@@ -166,7 +166,7 @@ read_tximport <- function(quant_dir){
     file.path(quant_dir, "alevin", "quants_mat.gz"),
     type = "alevin"
   ))
-  counts <- as(txi$counts, "dgCMatrix")
+  counts <- as(txi$counts, "CsparseMatrix")
 }
 
 #' Read alevin metadata from json files

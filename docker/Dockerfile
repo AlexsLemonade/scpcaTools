@@ -1,4 +1,4 @@
-FROM rocker/r-ver:4.1.3
+FROM rocker/r-ver:4.2.1
 LABEL maintainer="ccdl@alexslemonade.org"
 LABEL org.opencontainers.image.source https://github.com/AlexsLemonade/scpcaTools
 
@@ -7,7 +7,7 @@ COPY scripts/install_scpca_deps.sh .
 RUN bash ./install_scpca_deps.sh
 
 # Use renv for R packages
-ENV RENV_VERSION 0.15.5
+ENV RENV_VERSION 0.16.0
 ENV RENV_CONFIG_CACHE_ENABLED FALSE
 RUN Rscript -e "install.packages('remotes'); \
       remotes::install_github('rstudio/renv@${RENV_VERSION}')"
@@ -19,6 +19,10 @@ RUN Rscript -e "renv::consent(provided = TRUE); \
       rm -rf ~/.local/share/renv && \
       rm -rf /tmp/downloaded_packages && \
       rm -rf /tmp/Rtmp*
+
+# Complete installation of zellkonverter conda env
+RUN Rscript -e "proc <- basilisk::basiliskStart(env = zellkonverter::zellkonverterAnnDataEnv(), testload = 'anndata'); \
+                basilisk::basiliskStop(proc)"
 
 ##########################
 # Install scpcaTools package (& test loading)

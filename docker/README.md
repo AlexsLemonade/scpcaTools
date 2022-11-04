@@ -5,7 +5,7 @@ The image is built from a versioned Rocker image, with additional R packages and
 It can be built with the following command run in this directory:
 
 ```
-docker build . -t scpca-tools
+docker buildx build . -t scpca-tools --platform linux/amd64
 ```
 
 Note that this image does not include RStudio, in attempt to make the image smaller. 
