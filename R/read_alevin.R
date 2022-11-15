@@ -8,12 +8,13 @@
 #' @param usa_mode Logical indicating if Alevin-fry was used, if USA mode was invoked.
 #'   Implies the input data is in matrix market format.
 #'   Default is FALSE.
-#' @param which_counts Which type of counts should be included,
-#'   only counts aligned to spliced cDNA ("spliced") or all spliced and unspliced cDNA ("unspliced").
+#' @param include_unspliced Which type of counts should be included. If set to TRUE, all spliced and
+#'   unspliced cDNA will be stored in the "counts" assay and only counts aligned to
+#'   spliced cDNA stored as the "spliced" assay. If FALSE, spliced cDNA only will be in the "counts" assay.
 #'   Applies if `intron_mode` or `usa_mode` is TRUE.
-#'   Default is "spliced".
+#'   Default is FALSE.
 #' @param round_counts Logical indicating in the count matrix should be rounded to integers on import.
-#'   Default is TRUE.
+#'   Only used if `usa_mode` is FALSE. Default is TRUE.
 #' @param library_id Optional library identifier
 #' @param sample_id Optional sample identifier.
 #'   If multiplexed samples are included in a library, this may be a vector.
@@ -88,29 +89,61 @@ read_alevin <- function(quant_dir,
     library_id = library_id,
     sample_id = sample_id)
 
-  # Read the count data
-  if(mtx_format | usa_mode) {
+  # if alevin-fry, check for format and create assay list
+  # directly create SCE object
+  # if not alevin fry, use `read_tximport` and then collapse intron counts and read in
+  if(mtx_format & usa_mode) {
     if(usa_mode & meta$usa_mode != TRUE){
       stop("Output files not in USA mode")
     }
-    counts <- read_alevin_mtx(quant_dir)
-  } else {
-    counts <- read_tximport(quant_dir)
-  }
-  if (intron_mode | usa_mode) {
-    counts <- collapse_intron_counts(counts, which_counts)
-    meta$transcript_type <- which_counts
+
+    if(include_unspliced){
+      assay_formats <- list("counts" = c("S", "A", "U"), "spliced" = c("S", "A"))
+      meta$transcript_type <- c("unspliced", "spliced")
+    } else {
+      assay_formats <- list("counts" = c("S", "A"))
+      meta$transcript_type <- "spliced"
+    }
+
+    # must be both alevin-fry and usa mode to use fishpond
+    sce <- fishpond::loadFry(fryDir = quant_dir,
+                             outputFormat = assay_formats)
   }
 
-  if (round_counts){
-    counts <- round(counts)
+  if(!usa_mode) {
+
+    # read in any non-USA formatted alevin-fry data or Alevin data
+    counts <- read_tximport(non_usa_dir)
+
+    if(intron_mode & include_unspliced) {
+      unspliced <- collapse_intron_counts(counts, which_counts = c("unspliced"))
+      spliced <- collapse_intron_counts(counts, which_counts = c("spliced"))
+      assay_list <- list(counts = unspliced,
+                         spliced = spliced)
+      meta$transcript_type <- c("unspliced", "spliced")
+    } else {
+      spliced <- collapse_intron_counts(counts, which_counts = c("spliced"))
+      assay_list <- list(counts = spliced)
+      meta$transcript_type <- "spliced"
+    }
+
+    sce <- SingleCellExperiment(assays = assay_list)
+
+    if (round_counts){
+      counts <- round(counts)
+      sce <- purrr::map(assays(sce), round)
+    }
+
   }
 
-  # make the SCE object
-  sce <- SingleCellExperiment(assays = list(counts = counts),
-                              metadata = meta)
+  # add the metadata to the SCE
+  meta$include_unspliced <- include_unspliced
+  metadata(sce) <- meta
+
   return(sce)
 }
+
+
 
 #' Read in counts data processed with Alevin-fry in with mtx output.
 #'
