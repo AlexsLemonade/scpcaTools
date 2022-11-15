@@ -127,12 +127,11 @@ read_alevin <- function(quant_dir,
       meta$transcript_type <- "spliced"
     }
 
-    sce <- SingleCellExperiment(assays = assay_list)
-
     if (round_counts){
-      counts <- round(counts)
-      sce <- purrr::map(assays(sce), round)
+      assay_list <- purrr::map(assay_list, round)
     }
+
+    sce <- SingleCellExperiment(assays = assay_list)
 
   }
 
