@@ -16,6 +16,17 @@
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#'
+#' # build a SCE object with only spliced cDNA as the main counts assay
+#' build_sce(counts)
+#'
+#' # build a SCE object with unspliced cDNA as the main counts assay and spliced
+#' # counts as a second assay
+#' build_sce(counts,
+#'           intron_mode = TRUE)
+#'
+#'}
 build_sce <- function(counts,
                       intron_mode = FALSE,
                       round_counts= TRUE){

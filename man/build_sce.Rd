@@ -27,3 +27,16 @@ SingleCellExperiment object containing either just a counts assay with spliced c
 \description{
 Build the SCE object from the counts matrix
 }
+\examples{
+\dontrun{
+
+# build a SCE object with only spliced cDNA as the main counts assay
+build_sce(counts)
+
+# build a SCE object with unspliced cDNA as the main counts assay and spliced
+# counts as a second assay
+build_sce(counts,
+          intron_mode = TRUE)
+
+}
+}
