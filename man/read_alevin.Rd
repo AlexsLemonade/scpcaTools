@@ -9,7 +9,6 @@ read_alevin(
   mtx_format = FALSE,
   intron_mode = FALSE,
   usa_mode = FALSE,
-  which_counts = c("spliced", "unspliced"),
   round_counts = TRUE,
   library_id = NULL,
   sample_id = NULL,
@@ -23,19 +22,16 @@ read_alevin(
 Default is FALSE.}
 
 \item{intron_mode}{Logical indicating if the files included alignment to intronic regions.
+If TRUE, the main "counts" assay will contain counts aligned to introns and an additional "spliced"
+assay will contain counts aligned to spliced cDNA only.
 Default is FALSE.}
 
 \item{usa_mode}{Logical indicating if Alevin-fry was used, if USA mode was invoked.
 Implies the input data is in matrix market format.
 Default is FALSE.}
 
-\item{which_counts}{Which type of counts should be included,
-only counts aligned to spliced cDNA ("spliced") or all spliced and unspliced cDNA ("unspliced").
-Applies if `intron_mode` or `usa_mode` is TRUE.
-Default is "spliced".}
-
 \item{round_counts}{Logical indicating in the count matrix should be rounded to integers on import.
-Default is TRUE.}
+Only used if `usa_mode` is FALSE. Default is TRUE.}
 
 \item{library_id}{Optional library identifier}
 
@@ -60,14 +56,13 @@ read_alevin(quant_dir)
 # Import output files processed with either Alevin or Alevin-fry with alignment to
 # cDNA + introns and including all unspliced cDNA in final counts matrix
 read_alevin(quant_dir,
-            intron_mode = TRUE,
-            which_counts = "unspliced")
+            intron_mode = TRUE)
 
 # Import output files processed with alevin-fry USA mode
 # including all unspliced cDNA in final counts matrix
 read_alevin(quant_dir,
             usa_mode = TRUE,
-            which_counts = "unspliced")
+            intron_mode = TRUE)
 
 }
 }
