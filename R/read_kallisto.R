@@ -3,9 +3,8 @@
 #' @param quant_dir Path to directory where output files are located.
 #' @param intron_mode Logical indicating if the files included alignment to intronic regions.
 #'   Default is FALSE.
-#' @param which_counts If intron_mode is TRUE, which type of counts should be included,
-#'   only counts aligned to spliced cDNA ("spliced") or all spliced and unspliced cDNA ("unspliced").
-#'   Default is "spliced".
+#' @param round_counts Logical indicating in the count matrix should be rounded to integers on import.
+#'   Default is TRUE.
 #'
 #' @return SingleCellExperiment of unfiltered gene x cell counts matrix
 #' @export
@@ -21,12 +20,14 @@
 #' }
 read_kallisto <- function(quant_dir,
                           intron_mode = FALSE,
-                          which_counts = c("spliced", "unspliced")) {
-
-  which_counts <- match.arg(which_counts)
+                          round_counts = TRUE) {
 
   if(!is.logical(intron_mode)){
     stop("intron_mode must be set as TRUE or FALSE")
+  }
+
+  if(!is.logical(round_counts)){
+    stop("round_counts must be set as TRUE or FALSE")
   }
 
   kallisto_files <- c("gene_count.mtx", "gene_count.genes.txt", "gene_count.barcodes.txt")
@@ -48,10 +49,10 @@ read_kallisto <- function(quant_dir,
   dimnames(counts) <- list(readLines(file.path(kallisto_dir, "gene_count.genes.txt")),
                            readLines(file.path(kallisto_dir, "gene_count.barcodes.txt")))
 
-  if(intron_mode) {
-    counts <- collapse_intron_counts(counts, which_counts)
-  }
-  sce <- SingleCellExperiment(list(counts = counts))
+  # generate the SCE object containing either counts and spliced assays or just counts assay
+  sce <- build_sce(counts,
+                   intron_mode,
+                   round_counts)
 
   return(sce)
 }

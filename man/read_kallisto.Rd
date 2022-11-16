@@ -4,11 +4,7 @@
 \alias{read_kallisto}
 \title{Read in counts data processed with Kallisto}
 \usage{
-read_kallisto(
-  quant_dir,
-  intron_mode = FALSE,
-  which_counts = c("spliced", "unspliced")
-)
+read_kallisto(quant_dir, intron_mode = FALSE, round_counts = TRUE)
 }
 \arguments{
 \item{quant_dir}{Path to directory where output files are located.}
@@ -16,9 +12,8 @@ read_kallisto(
 \item{intron_mode}{Logical indicating if the files included alignment to intronic regions.
 Default is FALSE.}
 
-\item{which_counts}{If intron_mode is TRUE, which type of counts should be included,
-only counts aligned to spliced cDNA ("spliced") or all spliced and unspliced cDNA ("unspliced").
-Default is "spliced".}
+\item{round_counts}{Logical indicating in the count matrix should be rounded to integers on import.
+Default is TRUE.}
 }
 \value{
 SingleCellExperiment of unfiltered gene x cell counts matrix
