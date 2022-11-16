@@ -221,13 +221,13 @@ if(has_processed){
   
   basic_statistics <- basic_statistics |>
     mutate(
-      "Method used to filter low quality cells" = format(processed_meta$ccdl_filter_method),
+      "Method used to filter low quality cells" = format(processed_meta$scpca_filter_method),
       "Cells after filtering low quality cells" = format(dim(processed_sce)[2], big.mark = ',', scientific = FALSE),
       "Normalization method"                    = format(processed_meta$normalization),
       "Minimum genes per cell cutoff"           = format(processed_meta$min_gene_cutoff)
     
     )
-  if(processed_meta$ccdl_filter_method == "miQC") {
+  if(processed_meta$scpca_filter_method == "miQC") {
     basic_statistics <- basic_statistics |>
       mutate(
         "Probability of compromised cell cutoff" = format(processed_meta$prob_compromised_cutoff, big.mark = ",", scientific = FALSE)
@@ -395,17 +395,17 @@ if(has_filtered & has_processed){
   
   # grab cutoffs and filtering method from processed sce
   min_gene_cutoff <- processed_meta$min_gene_cutoff
-  filter_method <- processed_meta$ccdl_filter_method
+  filter_method <- processed_meta$scpca_filter_method
   
   # add column to coldata labeling cells to keep/remove based on filtering method
   filtered_coldata_df <- colData(filtered_sce) |>
     as.data.frame() |>
     tibble::rownames_to_column("barcode") |>
-    dplyr::mutate(ccdl_filter = ifelse(barcode %in%  colnames(processed_sce), 
+    dplyr::mutate(scpca_filter = ifelse(barcode %in%  colnames(processed_sce), 
                                        "Keep", 
                                        "Remove")) 
   
-  ggplot(filtered_coldata_df, aes(x = detected, y = subsets_mito_percent, color = ccdl_filter)) + 
+  ggplot(filtered_coldata_df, aes(x = detected, y = subsets_mito_percent, color = scpca_filter)) + 
     geom_point(alpha = 0.5, size = 1) +
     geom_vline(xintercept = min_gene_cutoff, linetype = "dashed") +
     labs(x = "Number of genes detected",
