@@ -13,7 +13,6 @@
 #' @return SingleCellExperiment object containing either just a counts assay with spliced cDNA only if
 #'   `intron_mode` is FALSE. If `intron_mode` is TRUE, the counts assay will contain both spliced and unspliced
 #'    counts and the spliced assay will contain the counts for just the spliced cDNA.
-#' @export
 #'
 #' @examples
 #' \dontrun{
@@ -80,7 +79,7 @@ build_sce <- function(counts,
 
   if (round_counts){
 
-    assay_list <- purrr::map(assay_list, round)
+    assay_list <- lapply(assay_list, round)
 
   }
 
