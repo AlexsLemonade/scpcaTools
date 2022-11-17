@@ -89,7 +89,7 @@ read_alevin <- function(quant_dir,
     # define assays to include in SCE object based on include_unspliced
     if(include_unspliced){
       assay_formats <- list("counts" = c("S", "A", "U"), "spliced" = c("S", "A"))
-      meta$transcript_type <- c("unspliced", "spliced")
+      meta$transcript_type <- c("total", "spliced")
     } else {
       assay_formats <- list("counts" = c("S", "A"))
       meta$transcript_type <- "spliced"
@@ -107,7 +107,7 @@ read_alevin <- function(quant_dir,
 
     # set transcript type based on including unspliced or not
     if(include_unspliced){
-      meta$transcript_type <- c("unspliced", "spliced")
+      meta$transcript_type <- c("total", "spliced")
 
     } else {
       meta$transcript_type <- "spliced"

@@ -38,7 +38,7 @@ test_that("reading alevin-fry USA mode works", {
   expect_true(all(col_barcode))
   # check metadata
   expect_equal(sce@metadata$mapping_tool, "alevin-fry")
-  expect_equal(sce@metadata$transcript_type, c("unspliced", "spliced"))
+  expect_equal(sce@metadata$transcript_type, c("total", "spliced"))
   expect_false(is.null(sce@metadata$salmon_version))
   expect_false(is.null(sce@metadata$reference_index))
   expect_false(is.null(sce@metadata$alevinfry_version))
@@ -61,7 +61,7 @@ test_that("reading alevin-fry intron mode works", {
   expect_true(all(col_barcode))
   # check metadata
   expect_equal(sce@metadata$mapping_tool, "alevin-fry")
-  expect_equal(sce@metadata$transcript_type, c("unspliced", "spliced"))
+  expect_equal(sce@metadata$transcript_type, c("total", "spliced"))
   expect_false(is.null(sce@metadata$salmon_version))
   expect_false(is.null(sce@metadata$reference_index))
   expect_false(is.null(sce@metadata$alevinfry_version))
