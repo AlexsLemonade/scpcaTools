@@ -34,18 +34,17 @@
 #' # Import output files processed with either Alevin or Alevin-fry with alignment to
 #' # cDNA + introns and including all unspliced cDNA in final counts matrix
 #' read_alevin(quant_dir,
-#'             intron_mode = TRUE)
+#'             include_unspliced = TRUE)
 #'
 #' # Import output files processed with alevin-fry USA mode
 #' # including all unspliced cDNA in final counts matrix
 #' read_alevin(quant_dir,
 #'             usa_mode = TRUE,
-#'             intron_mode = TRUE)
+#'             include_unspliced = TRUE)
 #'
 #'}
 read_alevin <- function(quant_dir,
                         mtx_format = FALSE,
-                        intron_mode = TRUE,
                         usa_mode = FALSE,
                         include_unspliced = TRUE,
                         round_counts = TRUE,
@@ -57,9 +56,6 @@ read_alevin <- function(quant_dir,
   if(!is.logical(mtx_format)){
     stop("mtx_format must be set as TRUE or FALSE")
   }
-  if(!is.logical(intron_mode)){
-    stop("intron_mode must be set as TRUE or FALSE")
-  }
   if(!is.logical(usa_mode)){
     stop("usa_mode must be set as TRUE or FALSE")
   }
@@ -68,9 +64,6 @@ read_alevin <- function(quant_dir,
   }
   if(!is.logical(round_counts)){
     stop("round_counts must be set as TRUE or FALSE")
-  }
-  if(include_unspliced & !intron_mode){
-    stop("include_unspliced can only be TRUE if intron_mode is TRUE")
   }
 
   # check that the expected quant directory exists
@@ -112,7 +105,7 @@ read_alevin <- function(quant_dir,
     # read in any non-USA formatted alevin-fry data or Alevin data
     counts <- read_tximport(quant_dir)
 
-    # set transcript type based on intron mode
+    # set transcript type based on including unspliced or not
     if(include_unspliced){
       meta$transcript_type <- c("unspliced", "spliced")
 

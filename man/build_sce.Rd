@@ -4,24 +4,25 @@
 \alias{build_sce}
 \title{Build the SCE object from the counts matrix}
 \usage{
-build_sce(counts, intron_mode = FALSE, round_counts = TRUE)
+build_sce(counts, include_unspliced = TRUE, round_counts = TRUE)
 }
 \arguments{
 \item{counts}{Counts matrix with rownames corresponding to gene names and colnames corresponding to cell barcodes.
 Can be a counts matrix with intron counts specified by -I or an alevin-fry "USA" matrix,
 with intron counts marked by "-U" and ambiguous counts "-A".}
 
-\item{intron_mode}{Logical indicating if the files included alignment to intronic regions.
-If TRUE, the main "counts" assay will contain counts aligned to introns and an additional "spliced"
-assay will contain counts aligned to spliced cDNA only.
-Default is FALSE.}
+\item{include_unspliced}{Whether or not to include the unspliced reads in the counts matrix.
+If TRUE, the main "counts" assay will contain unspliced reads and spliced reads and an additional "spliced"
+assay will contain spliced reads only. If TRUE, requires that data has been aligned to a reference contianing
+spliced and unspliced reads.
+Default is TRUE.}
 
 \item{round_counts}{Logical indicating in the count matrix should be rounded to integers on import.
 Default is TRUE.}
 }
 \value{
 SingleCellExperiment object containing either just a counts assay with spliced cDNA only if
-  `intron_mode` is FALSE. If `intron_mode` is TRUE, the counts assay will contain both spliced and unspliced
+  `include_unspliced` is FALSE. If `include_unspliced` is TRUE, the counts assay will contain both spliced and unspliced
    counts and the spliced assay will contain the counts for just the spliced cDNA.
 }
 \description{
@@ -36,7 +37,7 @@ build_sce(counts)
 # build a SCE object with unspliced cDNA as the main counts assay and spliced
 # counts as a second assay
 build_sce(counts,
-          intron_mode = TRUE)
+          include_unspliced = TRUE)
 
 }
 }
