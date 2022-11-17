@@ -3,13 +3,14 @@
 #' @param quant_dir Path to directory where output files are located.
 #' @param mtx_format Logical indicating if input data is in matrix market format.
 #'   Default is FALSE.
-#' @param intron_mode Logical indicating if the files included alignment to intronic regions.
-#'   If TRUE, the main "counts" assay will contain counts aligned to introns and an additional "spliced"
-#'   assay will contain counts aligned to spliced cDNA only.
-#'   Default is FALSE.
 #' @param usa_mode Logical indicating if Alevin-fry was used, if USA mode was invoked.
 #'   Implies the input data is in matrix market format.
 #'   Default is FALSE.
+#' @param include_unspliced Whether or not to include the unspliced reads in the counts matrix.
+#'   If TRUE, the main "counts" assay will contain unspliced reads and spliced reads and an additional "spliced"
+#'   assay will contain spliced reads only. If TRUE, requires that data has been aligned to a reference contianing
+#'   spliced and unspliced reads.
+#'   Default is TRUE.
 #' @param round_counts Logical indicating in the count matrix should be rounded to integers on import.
 #'   Only used if `usa_mode` is FALSE. Default is TRUE.
 #' @param library_id Optional library identifier
@@ -44,8 +45,9 @@
 #'}
 read_alevin <- function(quant_dir,
                         mtx_format = FALSE,
-                        intron_mode = FALSE,
+                        intron_mode = TRUE,
                         usa_mode = FALSE,
+                        include_unspliced = TRUE,
                         round_counts = TRUE,
                         library_id = NULL,
                         sample_id = NULL,
@@ -61,8 +63,14 @@ read_alevin <- function(quant_dir,
   if(!is.logical(usa_mode)){
     stop("usa_mode must be set as TRUE or FALSE")
   }
+  if(!is.logical(include_unspliced)){
+    stop("include_unspliced must be set as TRUE or FALSE")
+  }
   if(!is.logical(round_counts)){
     stop("round_counts must be set as TRUE or FALSE")
+  }
+  if(include_unspliced & !intron_mode){
+    stop("include_unspliced can only be TRUE if intron_mode is TRUE")
   }
 
   # check that the expected quant directory exists
@@ -86,7 +94,7 @@ read_alevin <- function(quant_dir,
     }
 
     # define assays to include in SCE object based on include_unspliced
-    if(intron_mode){
+    if(include_unspliced){
       assay_formats <- list("counts" = c("S", "A", "U"), "spliced" = c("S", "A"))
       meta$transcript_type <- c("unspliced", "spliced")
     } else {
@@ -105,21 +113,22 @@ read_alevin <- function(quant_dir,
     counts <- read_tximport(quant_dir)
 
     # set transcript type based on intron mode
-    if(intron_mode){
+    if(include_unspliced){
       meta$transcript_type <- c("unspliced", "spliced")
+
     } else {
       meta$transcript_type <- "spliced"
     }
 
     # generate the SCE object containing either counts and spliced assays or just counts assay
     sce <- build_sce(counts,
-                     intron_mode,
+                     include_unspliced,
                      round_counts)
 
   }
 
   # add the metadata to the SCE
-  meta$include_unspliced <- intron_mode
+  meta$include_unspliced <- include_unspliced
   metadata(sce) <- meta
 
   return(sce)
