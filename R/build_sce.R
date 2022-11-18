@@ -48,20 +48,20 @@ build_sce <- function(counts,
           If `include_unspliced` is TRUE a reference with spliced and unspliced reads must be used.")
   }
 
-  # if using intron mode and want to include the unspliced data get counts for both unspliced and spliced
+  # if has unspliced data get counts for both unspliced and spliced
   if(include_unspliced & has_unspliced) {
 
-    unspliced <- collapse_intron_counts(counts, which_counts = c("unspliced"))
+    total <- collapse_intron_counts(counts, which_counts = c("total"))
     spliced <- collapse_intron_counts(counts, which_counts = c("spliced"))
 
     # before creating the SCE object we need to make sure that the dimensions of
     # spliced and unspliced counts matrix match up
     # first get spliced only genes, unspliced only genes and common genes
     spliced_genes <- rownames(spliced)
-    unspliced_genes <- rownames(unspliced)
+    unspliced_genes <- rownames(total)
     common_genes <- intersect(spliced_genes, unspliced_genes)
     spliced_only_genes <- setdiff(spliced_genes, unspliced_genes)
-    unspliced_only_genes <- setdiff(unspliced_genes, spliced_genes)
+    unspliced_genes <- setdiff(unspliced_genes, spliced_genes)
 
     # build similar matrices that will all have common genes, spliced only genes, unspliced only genes
     spliced <- rbind(

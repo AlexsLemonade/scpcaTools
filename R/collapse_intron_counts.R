@@ -4,7 +4,7 @@
 #'   Can be a counts matrix with intron counts specified by -I or an alevin-fry "USA" matrix,
 #'   with intron counts marked by "-U" and ambiguous counts "-A".
 #' @param which_counts If intron_mode is TRUE, which type of counts should be included:
-#'   Only counts aligned to spliced cDNA ("spliced") or all spliced and unspliced cDNA ("unspliced").
+#'   Only counts aligned to spliced cDNA ("spliced") or all spliced and unspliced cDNA ("unspliced" or "total").
 #'   Ambiguous counts in USA mode are always included.
 #'   Default is "spliced".
 #'
@@ -19,13 +19,14 @@
 #'
 #' # include unspliced cDNA in final counts matrix
 #' collapse_intron_counts(counts,
-#'                        which_counts = "unspliced")
+#'                        which_counts = "total")
 #' }
 #'
 #'
 #'
 collapse_intron_counts <- function(counts,
-                                   which_counts = c("spliced", "unspliced")){
+                                   which_counts = c("total", "spliced", "unspliced")){
+
   which_counts <- match.arg(which_counts)
 
   introns <- str_detect(rownames(counts), "-I$")
@@ -66,4 +67,5 @@ collapse_intron_counts <- function(counts,
   # drop extra slots silently
   counts <- suppressWarnings(BiocGenerics::updateObject(counts))
   return(counts)
+
 }
