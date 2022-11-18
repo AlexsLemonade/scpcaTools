@@ -61,7 +61,7 @@ build_sce <- function(counts,
     unspliced_genes <- rownames(total)
     common_genes <- intersect(spliced_genes, unspliced_genes)
     spliced_only_genes <- setdiff(spliced_genes, unspliced_genes)
-    unspliced_genes <- setdiff(unspliced_genes, spliced_genes)
+    unspliced_only_genes <- setdiff(unspliced_genes, spliced_genes)
 
     # build similar matrices that will all have common genes, spliced only genes, unspliced only genes
     spliced <- rbind(
@@ -74,18 +74,18 @@ build_sce <- function(counts,
                      sparse = TRUE, doDiag = FALSE)
     )
 
-    unspliced <- rbind(
-      unspliced[common_genes,],
+    total <- rbind(
+      total[common_genes,],
       Matrix::Matrix(0,
                      nrow = length(spliced_only_genes),
-                     ncol = ncol(unspliced),
-                     dimnames = list(spliced_only_genes, colnames(unspliced)),
+                     ncol = ncol(total),
+                     dimnames = list(spliced_only_genes, colnames(total)),
                      sparse = TRUE, doDiag = FALSE),
-      unspliced[unspliced_only_genes,]
+      total[unspliced_only_genes,]
     )
 
     # create list of assays to use as input to create SCE object
-    assay_list <- list(counts = unspliced,
+    assay_list <- list(counts = total,
                        spliced = spliced)
 
   } else if(!include_unspliced & has_unspliced) {
