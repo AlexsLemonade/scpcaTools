@@ -1,8 +1,6 @@
 #' Read in counts data processed with Alevin or Alevin-fry
 #'
 #' @param quant_dir Path to directory where output files are located.
-#' @param mtx_format Logical indicating if input data is in matrix market format.
-#'   Default is FALSE.
 #' @param usa_mode Logical indicating if Alevin-fry was used, if USA mode was invoked.
 #'   Implies the input data is in matrix market format.
 #'   Default is FALSE.
@@ -44,7 +42,6 @@
 #'
 #'}
 read_alevin <- function(quant_dir,
-                        mtx_format = FALSE,
                         usa_mode = FALSE,
                         include_unspliced = TRUE,
                         round_counts = TRUE,
@@ -127,39 +124,6 @@ read_alevin <- function(quant_dir,
   return(sce)
 }
 
-
-
-#' Read in counts data processed with Alevin-fry in with mtx output.
-#'
-#' @param quant_dir Path to alevin output directory.
-#'
-#' @return unfiltered and uncollapsed gene x cell counts matrix
-#'
-read_alevin_mtx <- function(quant_dir){
-
-  # check that all files exist in quant_dir
-  alevin_files <- c("quants_mat_cols.txt", "quants_mat_rows.txt", "quants_mat.mtx")
-
-  # check that all files exist in quant directory
-  if(!dir.exists(file.path(quant_dir, "alevin"))){
-    stop("Missing alevin directory with output files")
-  }
-
-  missing <- !file.exists(file.path(quant_dir, "alevin", alevin_files))
-  if(any(missing)) {
-    missing_files <- paste(alevin_files[missing], collapse = ", ")
-    stop(paste0("Missing Alevin output file(s): ", missing_files))
-  }
-
-  # read in .mtx files
-  counts <- Matrix::readMM(file = file.path(quant_dir, "alevin", "quants_mat.mtx"))|>
-    Matrix::t() |>
-    as("CsparseMatrix")
-  cols <- readLines(file.path(quant_dir, "alevin", "quants_mat_cols.txt"))
-  rows <- readLines(file.path(quant_dir, "alevin", "quants_mat_rows.txt"))
-  dimnames(counts) <- list(cols, rows)
-  return(counts)
-}
 
 #' Read in counts data processed with Alevin or alevin-fry in tximport-compatible formats
 #'
