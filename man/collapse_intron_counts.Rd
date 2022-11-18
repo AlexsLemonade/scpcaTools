@@ -6,7 +6,7 @@
 \usage{
 collapse_intron_counts(
   counts,
-  which_counts = c("total", "spliced", "unspliced")
+  which_counts = c("spliced", "unspliced", "total")
 )
 }
 \arguments{
@@ -14,7 +14,7 @@ collapse_intron_counts(
 Can be a counts matrix with intron counts specified by -I or an alevin-fry "USA" matrix,
 with intron counts marked by "-U" and ambiguous counts "-A".}
 
-\item{which_counts}{If intron_mode is TRUE, which type of counts should be included:
+\item{which_counts}{Which type of counts should be included:
 Only counts aligned to spliced cDNA ("spliced") or all spliced and unspliced cDNA ("unspliced" or "total").
 Ambiguous counts in USA mode are always included.
 Default is "spliced".}

@@ -3,7 +3,7 @@
 #' @param counts Counts matrix with rownames corresponding to gene names and colnames corresponding to cell barcodes.
 #'   Can be a counts matrix with intron counts specified by -I or an alevin-fry "USA" matrix,
 #'   with intron counts marked by "-U" and ambiguous counts "-A".
-#' @param which_counts If intron_mode is TRUE, which type of counts should be included:
+#' @param which_counts Which type of counts should be included:
 #'   Only counts aligned to spliced cDNA ("spliced") or all spliced and unspliced cDNA ("unspliced" or "total").
 #'   Ambiguous counts in USA mode are always included.
 #'   Default is "spliced".
@@ -25,7 +25,7 @@
 #'
 #'
 collapse_intron_counts <- function(counts,
-                                   which_counts = c("total", "spliced", "unspliced")){
+                                   which_counts = c("spliced", "unspliced", "total")){
 
   which_counts <- match.arg(which_counts)
 
