@@ -28,7 +28,6 @@ test_that("reading salmon alevin data works", {
 test_that("reading alevin-fry USA mode works", {
   sce <- read_alevin(usa_dir,
                      usa_mode = TRUE,
-                     mtx_format = TRUE,
                      include_unspliced = TRUE,
                      sample_id = sample_ids)
   expect_s4_class(sce, "SingleCellExperiment")
