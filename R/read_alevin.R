@@ -50,9 +50,6 @@ read_alevin <- function(quant_dir,
                         tech_version = NULL){
 
   # checks for *_mode
-  if(!is.logical(mtx_format)){
-    stop("mtx_format must be set as TRUE or FALSE")
-  }
   if(!is.logical(usa_mode)){
     stop("usa_mode must be set as TRUE or FALSE")
   }
