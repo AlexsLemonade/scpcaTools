@@ -7,9 +7,7 @@
 import_quant_data(
   quant_dir,
   tool = c("cellranger", "alevin", "alevin-fry", "kallisto"),
-  which_counts = c("spliced", "unspliced"),
-  mtx_format = FALSE,
-  intron_mode = FALSE,
+  include_unspliced = TRUE,
   usa_mode = FALSE,
   filter = FALSE,
   fdr_cutoff = 0.01,
@@ -22,15 +20,11 @@ import_quant_data(
 
 \item{tool}{Type of tool used to create files (alevin, alevin-fry, cellranger, or kallisto).}
 
-\item{which_counts}{If intron_mode is TRUE, which type of counts should be included,
-only counts aligned to spliced cDNA ("spliced") or all spliced and unspliced cDNA ("unspliced").
-Default is "spliced".}
-
-\item{mtx_format}{Logical indicating if input data is in matrix market format.
-Default is FALSE.}
-
-\item{intron_mode}{Logical indicating if the files included alignment to intronic regions.
-Default is FALSE.}
+\item{include_unspliced}{Whether or not to include the unspliced reads in the counts matrix.
+If TRUE, the main "counts" assay will contain unspliced reads and spliced reads and an additional "spliced"
+assay will contain spliced reads only. If TRUE, requires that data has been aligned to a reference contianing
+spliced and unspliced reads.
+Default is TRUE.}
 
 \item{usa_mode}{Logical indicating if Alevin-fry was used, if the USA mode was invoked.
 Default is FALSE.}
@@ -61,7 +55,7 @@ tool = "cellranger")
 # with alignment to cDNA only and including counts for spliced cDNA only
 import_quant_data(quant_dir,
                   tool = "alevin-fry",
-                  intron_mode = FALSE,
+                  include_unspliced = FALSE,
                   usa_mode = TRUE)
 
 # read in single-nuclei RNA-seq data processed using alevin-fry in
@@ -70,7 +64,6 @@ import_quant_data(quant_dir,
 import_quant_data(quant_dir,
                   tool = "alevin-fry",
                   usa_mode = TRUE,
-                  which_counts = "unspliced",
                   filter = TRUE)
 
 # read in single-nuclei RNA-seq data processed using kallisto with
@@ -78,8 +71,6 @@ import_quant_data(quant_dir,
 # and perform filtering
 import_quant_data(quant_dir,
                   tool = "kallisto",
-                  intron_mode = TRUE,
-                  which_counts = "unspliced",
                   filter = TRUE)
 }
 

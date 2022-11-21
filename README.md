@@ -6,10 +6,12 @@
   <!-- badges: end --> 
 
 The `scpcaTools` package contains a set of tools for working with single-cell and single-nuclei RNA-seq counts data.
-Mainly, this package can work with data that has been produced using Alevin, Alevin-Fry, Cellranger, or Kallisto. 
+Mainly, this package can work with data that has been produced using Alevin, Alevin-Fry, Cell Ranger, or Kallisto. 
 Counts matrices from either of these pre-processing tools can be imported into R using the `import_quant_data` function to return a `SingleCellExperiment` object to be used for downstream analysis. 
 
-Currently, the `import_quant_data` function can support single-nuclei RNA seq counts data that has been aligned to a pre-mRNA index by using the `intron_mode=TRUE` and `which_counts=intron` options. There is also support to import data processed using Alevin-fry's USA mode by using the `usa_mode=TRUE` option. 
+Currently, by default the `import_quant_data` function will return a `SingleCellExperiment` object with two assays, the `counts` assay will contain the total counts from both unspliced and spliced reads and the `spliced` assay will contain only reads from the spliced reads.
+Input data must be aligned to a reference containing both spliced and unspliced transcripts, otherwise the `include_unspliced=FALSE` option can be used to return just the spliced reads only as the main `counts` assay.
+Note that this option is only for reading in data from Alevin, Alevin-fry, and Kallisto and is not used for Cell Ranger.
 
 ## Installation 
 

@@ -29,6 +29,7 @@ Imports:
     BiocGenerics,
     dplyr,
     DropletUtils,
+    fishpond,
     flexmix,
     glue,
     jsonlite,

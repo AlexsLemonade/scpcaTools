@@ -1,11 +1,13 @@
 #' Read in counts data processed with Kallisto
 #'
 #' @param quant_dir Path to directory where output files are located.
-#' @param intron_mode Logical indicating if the files included alignment to intronic regions.
-#'   Default is FALSE.
-#' @param which_counts If intron_mode is TRUE, which type of counts should be included,
-#'   only counts aligned to spliced cDNA ("spliced") or all spliced and unspliced cDNA ("unspliced").
-#'   Default is "spliced".
+#' @param include_unspliced Whether or not to include the unspliced reads in the counts matrix.
+#'   If TRUE, the main "counts" assay will contain unspliced reads and spliced reads and an additional "spliced"
+#'   assay will contain spliced reads only. If TRUE, requires that data has been aligned to a reference contianing
+#'   spliced and unspliced reads.
+#'   Default is TRUE.
+#' @param round_counts Logical indicating in the count matrix should be rounded to integers on import.
+#'   Default is TRUE.
 #'
 #' @return SingleCellExperiment of unfiltered gene x cell counts matrix
 #' @export
@@ -16,17 +18,19 @@
 #' # import output files processed with kallisto with alignment to cDNA + introns,
 #' # including all unspliced cDNA counts in final counts matrix
 #' read_kallisto(quant_dir,
-#'               intron_mode = TRUE,
+#'               include_unspliced = TRUE,
 #'               which_counts = "unspliced")
 #' }
 read_kallisto <- function(quant_dir,
-                          intron_mode = FALSE,
-                          which_counts = c("spliced", "unspliced")) {
+                          include_unspliced = TRUE,
+                          round_counts = TRUE) {
 
-  which_counts <- match.arg(which_counts)
+  if(!is.logical(include_unspliced)){
+    stop("include_unspliced must be set as TRUE or FALSE")
+  }
 
-  if(!is.logical(intron_mode)){
-    stop("intron_mode must be set as TRUE or FALSE")
+  if(!is.logical(round_counts)){
+    stop("round_counts must be set as TRUE or FALSE")
   }
 
   kallisto_files <- c("gene_count.mtx", "gene_count.genes.txt", "gene_count.barcodes.txt")
@@ -48,10 +52,36 @@ read_kallisto <- function(quant_dir,
   dimnames(counts) <- list(readLines(file.path(kallisto_dir, "gene_count.genes.txt")),
                            readLines(file.path(kallisto_dir, "gene_count.barcodes.txt")))
 
-  if(intron_mode) {
-    counts <- collapse_intron_counts(counts, which_counts)
+  # get kallisto version
+  run_info_path <- file.path(quant_dir, "run_info.json")
+  if(file.exists(run_info_path)){
+    run_info <- jsonlite::read_json(run_info_path)
+  } else {
+    stop("run_info.json is missing")
   }
-  sce <- SingleCellExperiment(list(counts = counts))
+
+  # initiate metadata
+  meta <- list(
+    mapping_tool = "kallisto",
+    kallisto_version = run_info[["kallisto_version"]],
+    include_unspliced = include_unspliced
+  )
+
+  # generate the SCE object containing either counts and spliced assays or just counts assay
+  sce <- build_sce(counts,
+                   include_unspliced,
+                   round_counts)
+
+  # set transcript type based on including unspliced or not
+  if(include_unspliced){
+    meta$transcript_type <- c("total", "spliced")
+
+  } else {
+    meta$transcript_type <- "spliced"
+  }
+
+  # add metadata to sce
+  metadata(sce) <- meta
 
   return(sce)
 }

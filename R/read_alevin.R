@@ -1,19 +1,16 @@
 #' Read in counts data processed with Alevin or Alevin-fry
 #'
 #' @param quant_dir Path to directory where output files are located.
-#' @param mtx_format Logical indicating if input data is in matrix market format.
-#'   Default is FALSE.
-#' @param intron_mode Logical indicating if the files included alignment to intronic regions.
-#'   Default is FALSE.
 #' @param usa_mode Logical indicating if Alevin-fry was used, if USA mode was invoked.
 #'   Implies the input data is in matrix market format.
 #'   Default is FALSE.
-#' @param which_counts Which type of counts should be included,
-#'   only counts aligned to spliced cDNA ("spliced") or all spliced and unspliced cDNA ("unspliced").
-#'   Applies if `intron_mode` or `usa_mode` is TRUE.
-#'   Default is "spliced".
-#' @param round_counts Logical indicating in the count matrix should be rounded to integers on import.
+#' @param include_unspliced Whether or not to include the unspliced reads in the counts matrix.
+#'   If TRUE, the main "counts" assay will contain unspliced reads and spliced reads and an additional "spliced"
+#'   assay will contain spliced reads only. If TRUE, requires that data has been aligned to a reference contianing
+#'   spliced and unspliced reads.
 #'   Default is TRUE.
+#' @param round_counts Logical indicating in the count matrix should be rounded to integers on import.
+#'   Only used if `usa_mode` is FALSE. Default is TRUE.
 #' @param library_id Optional library identifier
 #' @param sample_id Optional sample identifier.
 #'   If multiplexed samples are included in a library, this may be a vector.
@@ -35,45 +32,32 @@
 #' # Import output files processed with either Alevin or Alevin-fry with alignment to
 #' # cDNA + introns and including all unspliced cDNA in final counts matrix
 #' read_alevin(quant_dir,
-#'             intron_mode = TRUE,
-#'             which_counts = "unspliced")
+#'             include_unspliced = TRUE)
 #'
 #' # Import output files processed with alevin-fry USA mode
 #' # including all unspliced cDNA in final counts matrix
 #' read_alevin(quant_dir,
 #'             usa_mode = TRUE,
-#'             which_counts = "unspliced")
+#'             include_unspliced = TRUE)
 #'
 #'}
 read_alevin <- function(quant_dir,
-                        mtx_format = FALSE,
-                        intron_mode = FALSE,
                         usa_mode = FALSE,
-                        which_counts = c("spliced", "unspliced"),
+                        include_unspliced = TRUE,
                         round_counts = TRUE,
                         library_id = NULL,
                         sample_id = NULL,
                         tech_version = NULL){
 
-  which_counts <- match.arg(which_counts)
-
   # checks for *_mode
-  if(!is.logical(mtx_format)){
-    stop("mtx_format must be set as TRUE or FALSE")
-  }
-  if(!is.logical(intron_mode)){
-    stop("intron_mode must be set as TRUE or FALSE")
-  }
   if(!is.logical(usa_mode)){
     stop("usa_mode must be set as TRUE or FALSE")
   }
+  if(!is.logical(include_unspliced)){
+    stop("include_unspliced must be set as TRUE or FALSE")
+  }
   if(!is.logical(round_counts)){
     stop("round_counts must be set as TRUE or FALSE")
-  }
-
-  # check that usa_mode and intron_mode are not used together
-  if(usa_mode & intron_mode){
-    stop("Can only read counts using either usa mode or intron mode.")
   }
 
   # check that the expected quant directory exists
@@ -88,61 +72,55 @@ read_alevin <- function(quant_dir,
     library_id = library_id,
     sample_id = sample_id)
 
-  # Read the count data
-  if(mtx_format | usa_mode) {
-    if(usa_mode & meta$usa_mode != TRUE){
+  # if alevin-fry USA and MTX format directly create SCE object with fishpond
+  if(usa_mode) {
+
+    # actually check that files are in usa mode
+    if(meta$usa_mode != TRUE){
       stop("Output files not in USA mode")
     }
-    counts <- read_alevin_mtx(quant_dir)
-  } else {
+
+    # define assays to include in SCE object based on include_unspliced
+    if(include_unspliced){
+      assay_formats <- list("counts" = c("S", "A", "U"), "spliced" = c("S", "A"))
+      meta$transcript_type <- c("total", "spliced")
+    } else {
+      assay_formats <- list("counts" = c("S", "A"))
+      meta$transcript_type <- "spliced"
+    }
+
+    # must be both alevin-fry and usa mode to use fishpond
+    sce <- fishpond::loadFry(fryDir = quant_dir,
+                             outputFormat = assay_formats)
+  }
+
+  if(!usa_mode) {
+
+    # read in any non-USA formatted alevin-fry data or Alevin data
     counts <- read_tximport(quant_dir)
-  }
-  if (intron_mode | usa_mode) {
-    counts <- collapse_intron_counts(counts, which_counts)
-    meta$transcript_type <- which_counts
+
+    # set transcript type based on including unspliced or not
+    if(include_unspliced){
+      meta$transcript_type <- c("total", "spliced")
+
+    } else {
+      meta$transcript_type <- "spliced"
+    }
+
+    # generate the SCE object containing either counts and spliced assays or just counts assay
+    sce <- build_sce(counts,
+                     include_unspliced,
+                     round_counts)
+
   }
 
-  if (round_counts){
-    counts <- round(counts)
-  }
+  # add the metadata to the SCE
+  meta$include_unspliced <- include_unspliced
+  metadata(sce) <- meta
 
-  # make the SCE object
-  sce <- SingleCellExperiment(assays = list(counts = counts),
-                              metadata = meta)
   return(sce)
 }
 
-#' Read in counts data processed with Alevin-fry in with mtx output.
-#'
-#' @param quant_dir Path to alevin output directory.
-#'
-#' @return unfiltered and uncollapsed gene x cell counts matrix
-#'
-read_alevin_mtx <- function(quant_dir){
-
-  # check that all files exist in quant_dir
-  alevin_files <- c("quants_mat_cols.txt", "quants_mat_rows.txt", "quants_mat.mtx")
-
-  # check that all files exist in quant directory
-  if(!dir.exists(file.path(quant_dir, "alevin"))){
-    stop("Missing alevin directory with output files")
-  }
-
-  missing <- !file.exists(file.path(quant_dir, "alevin", alevin_files))
-  if(any(missing)) {
-    missing_files <- paste(alevin_files[missing], collapse = ", ")
-    stop(paste0("Missing Alevin output file(s): ", missing_files))
-  }
-
-  # read in .mtx files
-  counts <- Matrix::readMM(file = file.path(quant_dir, "alevin", "quants_mat.mtx"))|>
-    Matrix::t() |>
-    as("CsparseMatrix")
-  cols <- readLines(file.path(quant_dir, "alevin", "quants_mat_cols.txt"))
-  rows <- readLines(file.path(quant_dir, "alevin", "quants_mat_rows.txt"))
-  dimnames(counts) <- list(cols, rows)
-  return(counts)
-}
 
 #' Read in counts data processed with Alevin or alevin-fry in tximport-compatible formats
 #'
