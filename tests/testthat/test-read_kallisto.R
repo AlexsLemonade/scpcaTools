@@ -12,4 +12,8 @@ test_that("Check that kallisto import works", {
   # check that column names are barcodes
   col_barcode <- str_detect(colnames(sce), "^[ACGT]+$")
   expect_true(all(col_barcode))
+  expect_equal(sce@metadata$mapping_tool, "kallisto")
+  expect_equal(sce@metadata$transcript_type, c("spliced"))
+  expect_false(is.null(sce@metadata$kallisto_version))
+  expect_false(sce@metadata$include_unspliced)
 })

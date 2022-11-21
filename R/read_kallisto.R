@@ -52,10 +52,36 @@ read_kallisto <- function(quant_dir,
   dimnames(counts) <- list(readLines(file.path(kallisto_dir, "gene_count.genes.txt")),
                            readLines(file.path(kallisto_dir, "gene_count.barcodes.txt")))
 
+  # get kallisto version
+  run_info_path <- file.path(quant_dir, "run_info.json")
+  if(file.exists(run_info_path)){
+    run_info <- jsonlite::read_json(run_info_path)
+  } else {
+    stop("run_info.json is missing")
+  }
+
+  # initiate metadata
+  meta <- list(
+    mapping_tool = "kallisto",
+    kallisto_version = run_info[["kallisto_version"]],
+    include_unspliced = include_unspliced
+  )
+
   # generate the SCE object containing either counts and spliced assays or just counts assay
   sce <- build_sce(counts,
                    include_unspliced,
                    round_counts)
+
+  # set transcript type based on including unspliced or not
+  if(include_unspliced){
+    meta$transcript_type <- c("total", "spliced")
+
+  } else {
+    meta$transcript_type <- "spliced"
+  }
+
+  # add metadata to sce
+  metadata(sce) <- meta
 
   return(sce)
 }

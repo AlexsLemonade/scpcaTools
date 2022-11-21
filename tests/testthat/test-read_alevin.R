@@ -19,6 +19,8 @@ test_that("reading salmon alevin data works", {
   col_barcode <- str_detect(colnames(sce), "^[ACGT]+$")
   expect_true(all(col_barcode))
   expect_equal(sce@metadata$mapping_tool, "alevin")
+  expect_equal(sce@metadata$transcript_type, c("spliced"))
+  expect_false(sce@metadata$include_unspliced)
   expect_false(is.null(sce@metadata$salmon_version))
   expect_false(is.null(sce@metadata$reference_index))
   expect_null(sce@metadata$alevinfry_version)
@@ -38,6 +40,7 @@ test_that("reading alevin-fry USA mode works", {
   # check metadata
   expect_equal(sce@metadata$mapping_tool, "alevin-fry")
   expect_equal(sce@metadata$transcript_type, c("total", "spliced"))
+  expect_true(sce@metadata$include_unspliced)
   expect_false(is.null(sce@metadata$salmon_version))
   expect_false(is.null(sce@metadata$reference_index))
   expect_false(is.null(sce@metadata$alevinfry_version))
@@ -61,6 +64,7 @@ test_that("reading alevin-fry intron mode works", {
   # check metadata
   expect_equal(sce@metadata$mapping_tool, "alevin-fry")
   expect_equal(sce@metadata$transcript_type, c("total", "spliced"))
+  expect_true(sce@metadata$include_unspliced)
   expect_false(is.null(sce@metadata$salmon_version))
   expect_false(is.null(sce@metadata$reference_index))
   expect_false(is.null(sce@metadata$alevinfry_version))
