@@ -6,7 +6,7 @@
 \usage{
 collapse_intron_counts(
   counts,
-  which_counts = c("spliced", "unspliced", "total")
+  which_counts = c("spliced", "total", "unspliced")
 )
 }
 \arguments{
