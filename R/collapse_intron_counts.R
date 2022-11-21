@@ -25,10 +25,12 @@
 #'
 #'
 collapse_intron_counts <- function(counts,
-                                   which_counts = c("spliced", "unspliced", "total")){
+                                   which_counts = c("spliced", "total", "unspliced")){
 
   which_counts <- match.arg(which_counts)
 
+  if (which_counts ==  "unspliced"){
+    warn("which_counts = 'unspliced' is deprecated, as its behavior is ambiguous (and included both spliced and unspliced counts) in previous versions"
   introns <- str_detect(rownames(counts), "-I$")
   usa_introns <- str_detect(rownames(counts), "-U$")
   usa_ambiguous <- str_detect(rownames(counts), "-A$")
