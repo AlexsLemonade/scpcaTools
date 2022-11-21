@@ -55,14 +55,24 @@ build_sce <- function(counts,
     spliced <- collapse_intron_counts(counts, which_counts = c("spliced"))
 
     # before creating the SCE object we need to make sure that the dimensions of
-    # spliced and unspliced counts matrix match up as there may be more spliced only
+    # spliced and unspliced counts matrix match up
     # first get spliced only genes, unspliced only genes and common genes
     spliced_genes <- rownames(spliced)
     total_genes <- rownames(total)
     common_genes <- intersect(spliced_genes, total_genes)
     spliced_only_genes <- setdiff(spliced_genes, total_genes)
+    total_only_genes <- setdiff(total_genes, spliced_genes)
 
     # build similar matrices that will all have common genes, spliced only genes, unspliced only genes
+    spliced <- rbind(
+      spliced[common_genes,],
+      spliced[spliced_only_genes,],
+      Matrix::Matrix(0,
+                     nrow = length(total_only_genes),
+                     ncol = ncol(spliced),
+                     dimnames = list(total_only_genes, colnames(spliced)),
+                     sparse = TRUE, doDiag = FALSE)
+    )
 
     total <- rbind(
       total[common_genes,],
@@ -70,7 +80,8 @@ build_sce <- function(counts,
                      nrow = length(spliced_only_genes),
                      ncol = ncol(total),
                      dimnames = list(spliced_only_genes, colnames(total)),
-                     sparse = TRUE, doDiag = FALSE)
+                     sparse = TRUE, doDiag = FALSE),
+      total[total_only_genes,]
     )
 
     # create list of assays to use as input to create SCE object
