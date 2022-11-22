@@ -18,7 +18,7 @@ read_alevin(
 \arguments{
 \item{quant_dir}{Path to directory where output files are located.}
 
-\item{fry_mode}{Logical indicating if Alevin-fry was used, if USA mode was invoked.
+\item{fry_mode}{Logical indicating if Alevin-fry was used for quantification.
 Implies the input data is in matrix market format.
 Default is FALSE.}
 
