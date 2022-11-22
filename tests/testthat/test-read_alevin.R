@@ -29,7 +29,7 @@ test_that("reading salmon alevin data works", {
 
 test_that("reading alevin-fry USA mode works", {
   sce <- read_alevin(usa_dir,
-                     usa_mode = TRUE,
+                     fry_mode = TRUE,
                      include_unspliced = TRUE,
                      sample_id = sample_ids)
   expect_s4_class(sce, "SingleCellExperiment")
@@ -55,7 +55,7 @@ test_that("reading alevin-fry USA mode works", {
 test_that("reading alevin-fry intron mode works", {
   sce <- read_alevin(intron_dir,
                      include_unspliced = TRUE,
-                     usa_mode = FALSE)
+                     fry_mode = FALSE)
   expect_s4_class(sce, "SingleCellExperiment")
   expect_equal(dim(sce), sce_af_size)
   # check that column names are barcodes
