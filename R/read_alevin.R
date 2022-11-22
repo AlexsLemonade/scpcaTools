@@ -1,7 +1,7 @@
 #' Read in counts data processed with Alevin or Alevin-fry
 #'
 #' @param quant_dir Path to directory where output files are located.
-#' @param fry_mode Logical indicating if Alevin-fry was used, if USA mode was invoked.
+#' @param fry_mode Logical indicating if Alevin-fry was used for quantification.
 #'   Implies the input data is in matrix market format.
 #'   Default is FALSE.
 #' @param include_unspliced Whether or not to include the unspliced reads in the counts matrix.
@@ -96,7 +96,7 @@ read_alevin <- function(quant_dir,
     if(include_unspliced){
       assay_formats <- list("counts" = c("S", "A", "U"), "spliced" = c("S", "A"))
       meta$transcript_type <- c("total", "spliced")
-    } else if(!include_unspliced & !feature_data) {
+    } else if(!feature_data) {
       assay_formats <- list("counts" = c("S", "A"))
       meta$transcript_type <- "spliced"
     } else {
@@ -119,7 +119,7 @@ read_alevin <- function(quant_dir,
     if(include_unspliced){
       meta$transcript_type <- c("total", "spliced")
 
-    } else if(!include_unspliced & !feature_data) {
+    } else if(!feature_data) {
       meta$transcript_type <- "spliced"
     } else {
       meta$transcript_type <- "feature_counts"
