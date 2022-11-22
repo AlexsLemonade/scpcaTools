@@ -76,8 +76,6 @@ merge_sce_list <- function(sce_list = list(),
     ##### colData #####
     # Retain only the columns present in `retain_columns`
     coldata_names <- names(colData(sce))
-    print(retain_columns)
-    print(coldata_names)
     if (!(all(retain_columns %in% coldata_names))) {
       stop("Error: Provided columns in `retain_coldata_columns` are not present
             in all SCE objects.")
@@ -100,9 +98,9 @@ merge_sce_list <- function(sce_list = list(),
     # helper function for preparing SCE for merging
 
     # If specified, remove altExps
-    if (retain_altexps == FALSE) {
+    #if (retain_altexps == FALSE) {
       sce <- removeAltExps(sce)
-    }
+    #}
 
     # Subset to shared features
     sce <- sce[shared_features,]
@@ -124,30 +122,14 @@ merge_sce_list <- function(sce_list = list(),
   }
 
 
-
-
-
   sce_list <- purrr::map2(sce_list,
                           names(sce_list),
                           prepare_sce_for_merge)
 
 
   # Create the merged SCE from the processed list ------------------
+  # TODO: Fails when altExps are present
   merged_sce <- do.call(cbind, sce_list)
-
-
-  # TODO: ARE WE STILL DOING THIS?
-  # Retain only colData names that are the `batch_column` or columns added by
-  #  scuttle::addPerCellQC() during the scpca-downstream-analyses processing
-  #mito_names <- names(colData(merged_sce)) %>%
-  #  stringr::str_subset("^subsets_mito")
-#
-#  retain_cols <-  c(batch_column,
-#                    "celltype",
-#                    # scuttle::addPerCellQC() columns
-#                    "sum", "detected", mito_names)
-#  retain_pos <- which(names(colData(merged_sce)) %in% retain_cols)
-#  colData(merged_sce) <- colData(merged_sce)[, retain_pos]
 
 
   # Return merged SCE object ----------------------------
