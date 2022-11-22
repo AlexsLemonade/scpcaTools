@@ -84,9 +84,12 @@ read_alevin <- function(quant_dir,
   # if alevin-fry USA and MTX format directly create SCE object with fishpond
   if(fry_mode) {
 
-    # actually check that files are in usa mode
-    if(meta$usa_mode != TRUE){
-      stop("Output files not in USA mode")
+    # only check for usa mode for non-feature data
+    if(!feature_data){
+      # actually check that files are in usa mode
+      if(meta$usa_mode != TRUE){
+        stop("Output files not in USA mode")
+      }
     }
 
     # define assays to include in SCE object based on include_unspliced
