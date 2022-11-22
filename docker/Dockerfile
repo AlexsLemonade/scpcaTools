@@ -25,6 +25,8 @@ RUN Rscript -e "proc <- basilisk::basiliskStart(env = zellkonverter::zellkonvert
                 basilisk::basiliskStop(proc)"
 
 ##########################
+# bust cache if needed
+ADD "https://api.github.com/repos/AlexsLemonade/scpcaTools/commits?per_page=1" latest_commit
 # Install scpcaTools package (& test loading)
 RUN Rscript -e "remotes::install_github('AlexsLemonade/scpcaTools'); \
   require(scpcaTools)"
