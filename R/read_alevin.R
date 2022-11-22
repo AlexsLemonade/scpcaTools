@@ -1,7 +1,7 @@
 #' Read in counts data processed with Alevin or Alevin-fry
 #'
 #' @param quant_dir Path to directory where output files are located.
-#' @param usa_mode Logical indicating if Alevin-fry was used, if USA mode was invoked.
+#' @param fry_mode Logical indicating if Alevin-fry was used for quantification.
 #'   Implies the input data is in matrix market format.
 #'   Default is FALSE.
 #' @param include_unspliced Whether or not to include the unspliced reads in the counts matrix.
@@ -9,8 +9,11 @@
 #'   assay will contain spliced reads only. If TRUE, requires that data has been aligned to a reference contianing
 #'   spliced and unspliced reads.
 #'   Default is TRUE.
+#' @param feature_data Logical indicating if the data being read in contains feature data.
+#'   Default is FALSE. If feature data is being read in there are no spliced or unspliced reads.
+#'   All reads will be counted and stored in the `counts` assay.
 #' @param round_counts Logical indicating in the count matrix should be rounded to integers on import.
-#'   Only used if `usa_mode` is FALSE. Default is TRUE.
+#'   Only used if `fry_mode` is FALSE. Default is TRUE.
 #' @param library_id Optional library identifier
 #' @param sample_id Optional sample identifier.
 #'   If multiplexed samples are included in a library, this may be a vector.
@@ -37,27 +40,33 @@
 #' # Import output files processed with alevin-fry USA mode
 #' # including all unspliced cDNA in final counts matrix
 #' read_alevin(quant_dir,
-#'             usa_mode = TRUE,
+#'             fry_mode = TRUE,
 #'             include_unspliced = TRUE)
 #'
 #'}
 read_alevin <- function(quant_dir,
-                        usa_mode = FALSE,
+                        fry_mode = FALSE,
                         include_unspliced = TRUE,
+                        feature_data = FALSE,
                         round_counts = TRUE,
                         library_id = NULL,
                         sample_id = NULL,
                         tech_version = NULL){
 
   # checks for *_mode
-  if(!is.logical(usa_mode)){
-    stop("usa_mode must be set as TRUE or FALSE")
+  if(!is.logical(fry_mode)){
+    stop("fry_mode must be set as TRUE or FALSE")
   }
   if(!is.logical(include_unspliced)){
     stop("include_unspliced must be set as TRUE or FALSE")
   }
   if(!is.logical(round_counts)){
     stop("round_counts must be set as TRUE or FALSE")
+  }
+
+  # make sure that include unspliced and feature data are not both set as TRUE
+  if(include_unspliced & feature_data){
+    stop("Feature data does not have unspliced reads, cannot use `include_unspliced=TRUE`")
   }
 
   # check that the expected quant directory exists
@@ -73,20 +82,27 @@ read_alevin <- function(quant_dir,
     sample_id = sample_id)
 
   # if alevin-fry USA and MTX format directly create SCE object with fishpond
-  if(usa_mode) {
+  if(fry_mode) {
 
-    # actually check that files are in usa mode
-    if(meta$usa_mode != TRUE){
-      stop("Output files not in USA mode")
+    # only check for usa mode for non-feature data
+    if(!feature_data){
+      # actually check that files are in usa mode
+      if(meta$usa_mode != TRUE){
+        stop("Output files not in USA mode")
+      }
     }
 
     # define assays to include in SCE object based on include_unspliced
     if(include_unspliced){
       assay_formats <- list("counts" = c("S", "A", "U"), "spliced" = c("S", "A"))
       meta$transcript_type <- c("total", "spliced")
-    } else {
+    } else if(!feature_data) {
       assay_formats <- list("counts" = c("S", "A"))
       meta$transcript_type <- "spliced"
+    } else {
+      # if using feature data, use default output format for loadFry of scRNA
+      assay_formats <- "scrna"
+      meta$transcript_type <- "feature_counts"
     }
 
     # must be both alevin-fry and usa mode to use fishpond
@@ -94,7 +110,7 @@ read_alevin <- function(quant_dir,
                              outputFormat = assay_formats)
   }
 
-  if(!usa_mode) {
+  if(!fry_mode) {
 
     # read in any non-USA formatted alevin-fry data or Alevin data
     counts <- read_tximport(quant_dir)
@@ -103,8 +119,10 @@ read_alevin <- function(quant_dir,
     if(include_unspliced){
       meta$transcript_type <- c("total", "spliced")
 
-    } else {
+    } else if(!feature_data) {
       meta$transcript_type <- "spliced"
+    } else {
+      meta$transcript_type <- "feature_counts"
     }
 
     # generate the SCE object containing either counts and spliced assays or just counts assay
