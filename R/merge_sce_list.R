@@ -41,7 +41,7 @@ merge_sce_list <- function(sce_list = list(),
                                                            "miQC_pass"),
                            retain_coldata_columns_altexps = c(),
                            preserve_rowdata_columns = NULL) {
-  # Ensure `sce_list` is named (according to library IDs) ----------------------
+  # Ensure `sce_list` is named  ----------------------
   if (is.null(names(sce_list))) {
     stop("Individual SingleCellExperiment objects in `sce_list` must be named.")
   }
