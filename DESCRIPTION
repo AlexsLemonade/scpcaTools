@@ -36,6 +36,7 @@ Imports:
     Matrix,
     methods,
     miQC (>= 1.2.0),
+    purrr,
     rlang,
     S4Vectors,
     scuttle,
