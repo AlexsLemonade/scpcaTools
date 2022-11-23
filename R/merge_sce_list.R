@@ -60,54 +60,13 @@ merge_sce_list <- function(sce_list = list(),
     purrr::map(rownames) |>
     purrr::reduce(intersect)
 
-
-  prepare_sce_for_merge <- function(sce, sce_name, batch_column) {
-    # helper function for preparing SCE for merging
-
-    # Current functionality does not retain any present altExps
-    sce <- removeAltExps(sce)
-
-    # Subset to shared features
-    sce <- sce[shared_features,]
-
-    # Add `sce_name` to colData row names so cell barcodes can be mapped to originating SCE
-    rownames(colData(sce)) <- glue::glue("{rownames(colData(sce))}-{sce_name}")
-
-    ##### rowData #####
-    # Add `sce_name` ID to rowData column names except for those
-    #  present in `preserve_rowdata_cols`
-    original_colnames <- colnames(rowData(sce))
-
-    colnames(rowData(sce)) <- ifelse(
-      original_colnames %in% preserve_rowdata_cols,
-      original_colnames,
-      glue::glue("{original_colnames}-{sce_name}")
-    )
-
-    ##### colData #####
-    # Retain only the columns present in `retain_coldata_cols`
-    coldata_names <- names(colData(sce))
-    if (!(all(retain_coldata_cols %in% coldata_names))) {
-      stop("Error: Provided columns to retain are not present
-            in all SCE objects.")
-    }
-    colData(sce) <- colData(sce) |>
-      as.data.frame() |>
-      dplyr::select( dplyr::all_of(retain_coldata_cols) ) |>
-      S4Vectors::DataFrame()
-
-    # Add batch column
-    sce[[batch_column]] <- sce_name
-
-
-    # return the processed SCE
-    return(sce)
-  }
-
-
+  # Prepare SCEs
   sce_list <- purrr::imap(sce_list,
                           prepare_sce_for_merge,
-                          batch_column)
+                          batch_column,
+                          shared_features,
+                          retain_coldata_cols,
+                          preserve_rowdata_cols)
 
 
   # Create the merged SCE from the processed list ------------------
@@ -117,4 +76,66 @@ merge_sce_list <- function(sce_list = list(),
   # Return merged SCE object ----------------------------
   return(merged_sce)
 
+}
+
+
+
+#' Helper function to prepare an SCE object for merging
+#'
+#' @param sce The SCE object to be prepared
+#' @param sce_name The name of the SCE object
+#' @param batch_column The name of the batch column will which be added to the
+#'   colData slot
+#' @param shared_features A vector of features (genes) that all SCEs to be merged
+#'   have in common
+#' @param retain_coldata_cols A vector of columns to retain in the colData slot
+#' @param preserve_rowdata_cols A vector of rowData columns which should not be
+#'   renamed
+#'
+#' @return An updated SCE that is prepared for merging
+prepare_sce_for_merge <- function(sce,
+                                  sce_name,
+                                  batch_column,
+                                  shared_features,
+                                  retain_coldata_cols,
+                                  preserve_rowdata_cols) {
+
+  # Current functionality does not retain any present altExps
+  sce <- removeAltExps(sce)
+
+  # Subset to shared features
+  sce <- sce[shared_features,]
+
+  # Add `sce_name` to colData row names so cell barcodes can be mapped to originating SCE
+  rownames(colData(sce)) <- glue::glue("{rownames(colData(sce))}-{sce_name}")
+
+  ##### rowData #####
+  # Add `sce_name` ID to rowData column names except for those
+  #  present in `preserve_rowdata_cols`
+  original_colnames <- colnames(rowData(sce))
+
+  colnames(rowData(sce)) <- ifelse(
+    original_colnames %in% preserve_rowdata_cols,
+    original_colnames,
+    glue::glue("{original_colnames}-{sce_name}")
+  )
+
+  ##### colData #####
+  # Retain only the columns present in `retain_coldata_cols`
+  coldata_names <- names(colData(sce))
+  if (!(all(retain_coldata_cols %in% coldata_names))) {
+    stop("Error: Provided columns to retain are not present
+            in all SCE objects.")
+  }
+  colData(sce) <- colData(sce) |>
+    as.data.frame() |>
+    dplyr::select( dplyr::all_of(retain_coldata_cols) ) |>
+    S4Vectors::DataFrame()
+
+  # Add batch column
+  sce[[batch_column]] <- sce_name
+
+
+  # return the processed SCE
+  return(sce)
 }
