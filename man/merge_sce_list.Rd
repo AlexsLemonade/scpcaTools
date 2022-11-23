@@ -6,30 +6,30 @@
 \usage{
 merge_sce_list(
   sce_list = list(),
-  batch_column = "batch",
-  retain_altexps = TRUE,
-  retain_coldata_columns_main = c("sum", "detected", "total", "subsets_mito_sum",
-    "subsets_mito_detected", "subsets_mito_percent", "miQC_pass"),
-  retain_coldata_columns_altexps = c(),
-  preserve_rowdata_columns = NULL
+  batch_column = "library_id",
+  barcode_column = "barcode",
+  retain_coldata_cols = c("sum", "detected", "total", "subsets_mito_sum",
+    "subsets_mito_detected", "subsets_mito_percent", "miQC_pass", "prob_compromised"),
+  preserve_rowdata_cols = NULL
 )
 }
 \arguments{
 \item{sce_list}{A named list of SingleCellExperiment objects}
 
 \item{batch_column}{A character value giving the resulting colData column name
-to differentiate originating SingleCellExperiment objects Default value is `batch`.}
+to differentiate originating SingleCellExperiment objects. Often these values
+are library IDs. Default value is `library_id`.}
 
-\item{retain_altexps}{A logical indicating whether any present altExp slots should
-be retained in the merged SCE. Default is `TRUE`.}
+\item{barcode_column}{A character value giving the colData column name that
+stores cell barcodes. If this column does not yet exist it will be created. Default
+is `barcode`.
+The name of the column to be created (or not if it
+ already exists) in the colData slot to store cell barcodes}
 
-\item{retain_coldata_columns_main}{A vector of colData columns which should be retained
+\item{retain_coldata_cols}{A vector of colData columns which should be retained
 in the main experiment of the final merged SCE object.}
 
-\item{retain_coldata_columns_altexps}{A vector of colData columns which should be retained
-in the altExps experiments of the final merged SCE object.}
-
-\item{preserve_rowdata_columns}{A vector of column names that appear in originating
+\item{preserve_rowdata_cols}{A vector of column names that appear in originating
 SingleCellExperiment objects' rowData slots which should not be renamed with
 the given SingleCellExperiment object name. These are generally columns which are
 not specific to the given library's preparation or statistics. For example,
@@ -47,5 +47,6 @@ This function takes a named (ideally by a form of library ID) list of
  to differentiate originating SCE objects. Only features (genes) that are present
  in all provided SCE objects will be retained. To preserve original feature-level
  information, all final rowData slot column names will be appended with the
- given SCE's name, as `<column_name>-<sce_name>`.
+ given SCE's name, as `<column_name>-<sce_name>`. Currently any present altExps
+ are not retained.
 }
