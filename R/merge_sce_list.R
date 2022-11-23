@@ -7,18 +7,15 @@
 #'  to differentiate originating SCE objects. Only features (genes) that are present
 #'  in all provided SCE objects will be retained. To preserve original feature-level
 #'  information, all final rowData slot column names will be appended with the
-#'  given SCE's name, as `<column_name>-<sce_name>`.
+#'  given SCE's name, as `<column_name>-<sce_name>`. Currently any present altExps
+#'  are not retained.
 #'
 #' @param sce_list A named list of SingleCellExperiment objects
 #' @param batch_column A character value giving the resulting colData column name
 #'  to differentiate originating SingleCellExperiment objects Default value is `batch`.
-#' @param retain_coldata_columns_main A vector of colData columns which should be retained
+#' @param retain_coldata_cols A vector of colData columns which should be retained
 #'  in the main experiment of the final merged SCE object.
-#' @param retain_coldata_columns_altexps A vector of colData columns which should be retained
-#'  in the altExps experiments of the final merged SCE object.
-#' @param retain_altexps A logical indicating whether any present altExp slots should
-#'   be retained in the merged SCE. Default is `TRUE`.
-#' @param preserve_rowdata_columns A vector of column names that appear in originating
+#' @param preserve_rowdata_cols A vector of column names that appear in originating
 #'  SingleCellExperiment objects' rowData slots which should not be renamed with
 #'  the given SingleCellExperiment object name. These are generally columns which are
 #'  not specific to the given library's preparation or statistics. For example,
@@ -31,34 +28,31 @@
 #' @import SingleCellExperiment
 merge_sce_list <- function(sce_list = list(),
                            batch_column = "batch",
-                           retain_altexps = TRUE,
-                           retain_coldata_columns_main = c("sum",
-                                                           "detected",
-                                                           "total",
-                                                           "subsets_mito_sum",
-                                                           "subsets_mito_detected",
-                                                           "subsets_mito_percent",
-                                                           "miQC_pass"),
-                           retain_coldata_columns_altexps = c(),
-                           preserve_rowdata_columns = NULL) {
+                           retain_coldata_cols = c("sum",
+                                                   "detected",
+                                                   "total",
+                                                   "subsets_mito_sum",
+                                                   "subsets_mito_detected",
+                                                   "subsets_mito_percent",
+                                                   "miQC_pass"),
+                           preserve_rowdata_cols = NULL) {
 
   # Check `sce_list`----------------------
   if (is.null(names(sce_list))) {
     stop("Individual SingleCellExperiment objects in `sce_list` must be named.")
   }
   if (length(sce_list) < 2) {
-    stop("The `sce_list` must contain 2 or more SingleCellExperiment objects to merge.")
+    warning("There are fewer than two SCE objects in the provided `sce_list` so there is nothing to merge.")
+    # Early return:
+    return(sce_list)
   }
 
   # Check input vectors ----------------
-  if(length(retain_coldata_columns_main) == 0) {
-    warning("All colData will be removed from the main experiment in the merged SCE.
-            Please check that `retain_coldata_columns_main` was correctly specified.")
+  if(length(retain_coldata_cols) == 0) {
+    warning("All colData will be removed from the the merged SCE.
+            Please check that `retain_coldata_cols` was correctly specified.")
   }
-  if(length(retain_coldata_columns_altexps) == 0) {
-    warning("All colData will be removed from altExp experiment(s) in the merged SCE.
-            Please check that `retain_coldata_columns_altexps` was correctly specified.")
-  }
+
   # Subset SCEs to shared features and ensure appropriate naming ------------------
 
   # First, obtain intersection among all SCE objects
@@ -67,67 +61,44 @@ merge_sce_list <- function(sce_list = list(),
     purrr::reduce(intersect)
 
 
-  process_columns <- function(sce, sce_name, retain_columns) {
-    # helper function to rename and subset columns in an SCE object when
-    # formatting for merging
-
-    ##### rowData #####
-    # Add `sce_name` ID to rowData column names except for those
-    #  present in `preserve_rowdata_columns`
-    original_colnames <- colnames(rowData(sce))
-
-    colnames(rowData(sce)) <- ifelse(
-      original_colnames %in% preserve_rowdata_columns,
-      original_colnames,
-      glue::glue("{original_colnames}-{sce_name}")
-    )
-
-    ##### colData #####
-    # Retain only the columns present in `retain_columns`
-    coldata_names <- names(colData(sce))
-    if (!(all(retain_columns %in% coldata_names))) {
-      stop("Error: Provided columns to retain are not present
-            in all SCE objects.")
-    }
-    colData(sce) <- colData(sce) |>
-      as.data.frame() |>
-      dplyr::select( dplyr::all_of(retain_columns) ) |>
-      S4Vectors::DataFrame()
-
-    # Update rownames to include the sce_name
-    rownames(colData(sce)) <- glue::glue("{rownames(colData(sce))}-{sce_name}")
-
-    # Add batch column
-    sce[[batch_column]] <- sce_name
-
-
-    return(sce)
-  }
-
-
-
-  prepare_sce_for_merge <- function(sce, sce_name) {
+  prepare_sce_for_merge <- function(sce, sce_name, batch_column) {
     # helper function for preparing SCE for merging
 
-    # If specified, remove altExps
-    #if (retain_altexps == FALSE) {
-      sce <- removeAltExps(sce)
-    #}
+    # Current functionality does not retain any present altExps
+    sce <- removeAltExps(sce)
 
     # Subset to shared features
     sce <- sce[shared_features,]
 
     # Add `sce_name` to colData row names so cell barcodes can be mapped to originating SCE
-    # Note that this will also affect altExps
-    colnames(sce) <- glue::glue("{colnames(sce)}-{sce_name}")
+    rownames(colData(sce)) <- glue::glue("{rownames(colData(sce))}-{sce_name}")
 
-    # Rename rowData and subset colData columns for both main and any present altExps
-    sce <- process_columns(sce, sce_name, retain_coldata_columns_main)
-    for (altexp_name in altExpNames(sce)) {
-      altExp(sce, altexp_name) <- process_columns( altExp(sce, altexp_name),
-                                                   sce_name,
-                                                   retain_coldata_columns_altexps)
+    ##### rowData #####
+    # Add `sce_name` ID to rowData column names except for those
+    #  present in `preserve_rowdata_cols`
+    original_colnames <- colnames(rowData(sce))
+
+    colnames(rowData(sce)) <- ifelse(
+      original_colnames %in% preserve_rowdata_cols,
+      original_colnames,
+      glue::glue("{original_colnames}-{sce_name}")
+    )
+
+    ##### colData #####
+    # Retain only the columns present in `retain_coldata_cols`
+    coldata_names <- names(colData(sce))
+    if (!(all(retain_coldata_cols %in% coldata_names))) {
+      stop("Error: Provided columns to retain are not present
+            in all SCE objects.")
     }
+    colData(sce) <- colData(sce) |>
+      as.data.frame() |>
+      dplyr::select( dplyr::all_of(retain_coldata_cols) ) |>
+      S4Vectors::DataFrame()
+
+    # Add batch column
+    sce[[batch_column]] <- sce_name
+
 
     # return the processed SCE
     return(sce)
@@ -135,11 +106,11 @@ merge_sce_list <- function(sce_list = list(),
 
 
   sce_list <- purrr::imap(sce_list,
-                          prepare_sce_for_merge)
+                          prepare_sce_for_merge,
+                          batch_column)
 
 
   # Create the merged SCE from the processed list ------------------
-  # TODO: Fails when altExps are present
   merged_sce <- do.call(cbind, sce_list)
 
 
