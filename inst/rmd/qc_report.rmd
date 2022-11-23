@@ -390,7 +390,7 @@ If `miQC`, cells below the specified probability compromised cutoff and above th
 If only a `Minimum gene cutoff` is used, then `miQC` is not used and only those cells that pass the minimum number of unique genes identified threshold are retained. 
 The dotted vertical line indicates the minimum gene cutoff used for filtering. 
 
-```{r}
+```{r results='asis'}
 if(has_filtered & has_processed){
   
   # grab cutoffs and filtering method from processed sce
@@ -479,7 +479,7 @@ The above plot shows the UMAP (Uniform Manifold Approximation and Projection) em
 The plots below show the same UMAP embeddings, coloring each cell by the expression level of the labeled gene.
 The genes chosen for plotting are the 12 most variable genes identified in the library.
 
-```{r message=FALSE}
+```{r message=FALSE, results='asis'}
 if(has_processed & has_var_genes){
   
   # select top genes to plot 
