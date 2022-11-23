@@ -35,7 +35,14 @@ expected_coldata_names <- c("sum", "detected", "total")
 sce1 <- sim_sce(n_cells = total_cells/3, n_genes = total_genes, n_empty = 0)
 sce2 <- sim_sce(n_cells = total_cells/3, n_genes = total_genes, n_empty = 0)
 sce3 <- sim_sce(n_cells = total_cells/3, n_genes = total_genes, n_empty = 0)
-
+sce_list <- purrr::map(
+  list(
+    "sce1" = sce1,
+    "sce2" = sce2,
+    "sce3" = sce3
+  ),
+  add_sce_data
+)
 
 
 
@@ -128,19 +135,8 @@ test_that("`prepare_sce_for_merge` works as expected when barcode column already
 
 test_that("merging SCEs with matching genes works as expected", {
 
-  # Set up list for input to function
-  sce_list <- purrr::map(
-    list(
-      "sce1" = sce1,
-      "sce2" = sce2,
-      "sce3" = sce3
-    ),
-    add_sce_data
-  )
-
-  # First expect some errors or warnings:
-  expect_error(merge_sce_list(sce_list = unname(sce_list))) # List must be named
-  expect_warning(merge_sce_list(sce_list = list("sce1" = sce1))) # this is an early return situation- List must have >=2 SCEs for no warning
+  # First a warning for this early-return scenario
+  expect_warning(merge_sce_list(sce_list = list("sce1" = sce1)))
 
   # Works as expected:
   merged_sce <- merge_sce_list(sce_list,
@@ -202,20 +198,10 @@ test_that("merging SCEs with different genes among input SCEs works as expected"
 
   # rename sce2 and sce3 genes so that only 1-6 are overlapping
   # hence, we started with 12 genes.
-  rownames(sce2) <- c(rownames(sce2)[1:6],
+  rownames(sce_list[[2]]) <- c(rownames(sce_list[[2]])[1:6],
                       month.name[1:6])
-  rownames(sce3) <- c(rownames(sce3)[1:6],
+  rownames(sce_list[[3]]) <- c(rownames(sce_list[[3]])[1:6],
                       month.name[7:12])
-
-  # Set up list for input to function
-  sce_list <- purrr::map(
-    list(
-      "sce1" =  sce1,
-      "sce2" = sce2,
-      "sce3" = sce3
-    ),
-    add_sce_data
-  )
 
   # Works as expected:
   merged_sce <- merge_sce_list(sce_list,
@@ -235,17 +221,40 @@ test_that("merging SCEs with different genes among input SCEs works as expected"
 
 test_that("merging SCEs with no matching genes fails as expected", {
 
-  rownames(sce1) <- month.name # ensure different gene names entirely
+  rownames(sce_list[[1]]) <- month.name # ensure different gene names entirely
 
-  # Set up list for input to function
-  sce_list <- purrr::map(
-    list(
-      "sce1" = sce1,
-      "sce2" = sce2),
-    add_sce_data
-  )
-
-  expect_error(merge_sce_list(sce_list = sce_list,
+  expect_error(merge_sce_list(sce_list = list("sce1" = sce_list[[1]],
+                                              "sce2" = sce_list[[2]]),
                               # use this arg to prevent other errors
                               retain_coldata_cols = "sum"))
+})
+
+
+
+test_that("merging SCEs without names works as expected", {
+
+
+
+  # First make sure it generates a warning -
+  expect_warning(
+    merged_sce <- merge_sce_list(unname(sce_list),
+                                 # use a non-default batch and barcode column names
+                                 batch_column = batch_column,
+                                 barcode_column = barcode_column,
+                                 retain_coldata_cols = c("sum"),
+                                 # this row name should not be modified:
+                                 preserve_rowdata_cols = c("gene_names")
+    )
+  )
+
+  # The resulting batch names should be 1,2,3
+  expect_equal(
+    colData(merged_sce)[,batch_column],
+    c(
+      rep("1", total_cells/3),
+      rep("2", total_cells/3),
+      rep("3", total_cells/3)
+    )
+  )
+
 })

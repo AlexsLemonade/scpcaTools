@@ -47,8 +47,14 @@ merge_sce_list <- function(sce_list = list(),
 
   # Check `sce_list`----------------------
   if (is.null(names(sce_list))) {
-    stop("Individual SingleCellExperiment objects in `sce_list` must be named.")
+    warning(
+      glue::glue(
+        "Individual SCE objects in `sce_list` are not named, so batches will be
+        named based on their list index in the merged SCE object.")
+    )
+    names(sce_list) <- 1:length(sce_list)
   }
+
   if (length(sce_list) < 2) {
     warning("There are fewer than two SCE objects in the provided `sce_list` so there is nothing to merge.")
     # Early return:
@@ -58,7 +64,7 @@ merge_sce_list <- function(sce_list = list(),
   # Check `retain_coldata_cols` ----------------
   if (length(retain_coldata_cols) == 0) {
     warning("All colData will be removed from the the merged SCE.
-            Please check that `retain_coldata_cols` was correctly specified.")
+     Please check that `retain_coldata_cols` was correctly specified.")
   }
 
   # Subset SCEs to shared features and ensure appropriate naming ------------------
@@ -179,12 +185,7 @@ prepare_sce_for_merge <- function(sce,
   }
 
   # Retain only the columns present in `retain_coldata_cols`
-  colData(sce) <- colData(sce) |>
-    as.data.frame() |>
-    dplyr::select( dplyr::all_of(retain_coldata_cols) ) |>
-    S4Vectors::DataFrame()
-  # this approach doesn't work when retain is length 1:
-  #colData(sce) <- colData(sce)[, retain_coldata_cols]
+  colData(sce) <- colData(sce)[, retain_coldata_cols, drop=FALSE]
 
   # Add `sce_name` to colData row names so cell barcodes can be mapped to originating SCE
   original_rownames <- rownames(colData(sce))
