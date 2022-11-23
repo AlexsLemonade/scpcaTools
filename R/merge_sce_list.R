@@ -134,8 +134,7 @@ merge_sce_list <- function(sce_list = list(),
   }
 
 
-  sce_list <- purrr::map2(sce_list,
-                          names(sce_list),
+  sce_list <- purrr::imap(sce_list,
                           prepare_sce_for_merge)
 
 
