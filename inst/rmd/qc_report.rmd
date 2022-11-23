@@ -185,9 +185,9 @@ processing_info <- tibble::tibble(
   "Alevin-fry droplet detection"  = format(unfiltered_meta$af_permit_type),
   "Resolution"           = format(unfiltered_meta$af_resolution), 
   "Transcripts included" = dplyr::case_when(
+      format(unfiltered_meta$transcript_type) == c("total", "spliced") ~ "Total, spliced only",
       format(unfiltered_meta$transcript_type) == "spliced" ~ "Spliced only",
-      format(unfiltered_meta$transcript_type) == "unspliced" ~ "Spliced and unspliced",
-      TRUE ~ format(unfiltered_meta$transcript_type))
+      TRUE ~ paste(unfiltered_meta$transcript_type, collapse = " "))
   ) |>
   mutate(across(.fns = ~ifelse(.x == "NULL", "N/A", .x))) |>
   t()
