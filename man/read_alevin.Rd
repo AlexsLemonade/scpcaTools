@@ -6,8 +6,9 @@
 \usage{
 read_alevin(
   quant_dir,
-  usa_mode = FALSE,
+  fry_mode = FALSE,
   include_unspliced = TRUE,
+  feature_data = FALSE,
   round_counts = TRUE,
   library_id = NULL,
   sample_id = NULL,
@@ -17,7 +18,7 @@ read_alevin(
 \arguments{
 \item{quant_dir}{Path to directory where output files are located.}
 
-\item{usa_mode}{Logical indicating if Alevin-fry was used, if USA mode was invoked.
+\item{fry_mode}{Logical indicating if Alevin-fry was used for quantification.
 Implies the input data is in matrix market format.
 Default is FALSE.}
 
@@ -27,8 +28,12 @@ assay will contain spliced reads only. If TRUE, requires that data has been alig
 spliced and unspliced reads.
 Default is TRUE.}
 
+\item{feature_data}{Logical indicating if the data being read in contains feature data.
+Default is FALSE. If feature data is being read in there are no spliced or unspliced reads.
+All reads will be counted and stored in the `counts` assay.}
+
 \item{round_counts}{Logical indicating in the count matrix should be rounded to integers on import.
-Only used if `usa_mode` is FALSE. Default is TRUE.}
+Only used if `fry_mode` is FALSE. Default is TRUE.}
 
 \item{library_id}{Optional library identifier}
 
@@ -58,7 +63,7 @@ read_alevin(quant_dir,
 # Import output files processed with alevin-fry USA mode
 # including all unspliced cDNA in final counts matrix
 read_alevin(quant_dir,
-            usa_mode = TRUE,
+            fry_mode = TRUE,
             include_unspliced = TRUE)
 
 }
