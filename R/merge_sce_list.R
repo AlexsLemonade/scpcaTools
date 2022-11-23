@@ -41,15 +41,24 @@ merge_sce_list <- function(sce_list = list(),
                                                            "miQC_pass"),
                            retain_coldata_columns_altexps = c(),
                            preserve_rowdata_columns = NULL) {
-  # Ensure `sce_list` is named  ----------------------
+
+  # Check `sce_list`----------------------
   if (is.null(names(sce_list))) {
     stop("Individual SingleCellExperiment objects in `sce_list` must be named.")
   }
-  # Ensure `sce_list` has >=2 items --------------------------------------------
   if (length(sce_list) < 2) {
     stop("The `sce_list` must contain 2 or more SingleCellExperiment objects to merge.")
   }
 
+  # Check input vectors ----------------
+  if(length(retain_coldata_columns_main) == 0) {
+    warning("All colData will be removed from the main experiment in the merged SCE.
+            Please check that `retain_coldata_columns_main` was correctly specified.")
+  }
+  if(length(retain_coldata_columns_altexps) == 0) {
+    warning("All colData will be removed from altExp experiment(s) in the merged SCE.
+            Please check that `retain_coldata_columns_altexps` was correctly specified.")
+  }
   # Subset SCEs to shared features and ensure appropriate naming ------------------
 
   # First, obtain intersection among all SCE objects
@@ -77,13 +86,16 @@ merge_sce_list <- function(sce_list = list(),
     # Retain only the columns present in `retain_columns`
     coldata_names <- names(colData(sce))
     if (!(all(retain_columns %in% coldata_names))) {
-      stop("Error: Provided columns in `retain_coldata_columns` are not present
+      stop("Error: Provided columns to retain are not present
             in all SCE objects.")
     }
     colData(sce) <- colData(sce) |>
       as.data.frame() |>
       dplyr::select( dplyr::all_of(retain_columns) ) |>
-      DataFrame()
+      S4Vectors::DataFrame()
+
+    # Update rownames to include the sce_name
+    rownames(colData(sce)) <- glue::glue("{rownames(colData(sce))}-{sce_name}")
 
     # Add batch column
     sce[[batch_column]] <- sce_name
