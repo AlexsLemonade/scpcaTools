@@ -233,8 +233,6 @@ test_that("merging SCEs with no matching genes fails as expected", {
 
 test_that("merging SCEs without names works as expected", {
 
-
-
   # First make sure it generates a warning -
   expect_warning(
     merged_sce <- merge_sce_list(unname(sce_list),
