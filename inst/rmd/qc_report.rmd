@@ -503,7 +503,8 @@ if(has_processed & has_var_genes){
     tibble::rownames_to_column("ensembl_id") |>
     select(ensembl_id, gene_symbol) |>
     filter(ensembl_id %in% top_genes) |>
-    mutate(ensembl_id = factor(ensembl_id, levels = top_genes)) |>
+    mutate(gene_symbol = ifelse(!is.na(gene_symbol), gene_symbol, ensembl_id),
+         ensembl_id = factor(ensembl_id, levels = top_genes)) |>
     arrange(ensembl_id) |>
     mutate(gene_symbol = factor(gene_symbol, levels = gene_symbol))
   
