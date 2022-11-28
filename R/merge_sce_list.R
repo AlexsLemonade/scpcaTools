@@ -188,9 +188,8 @@ prepare_sce_for_merge <- function(sce,
   # Retain only the columns present in `retain_coldata_cols`
   colData(sce) <- colData(sce)[, retain_coldata_cols, drop=FALSE]
 
-  # Add `sce_name` to colData row names so cell barcodes can be mapped to originating SCE
-  original_rownames <- rownames(colData(sce))
-  rownames(colData(sce)) <- glue::glue("{rownames(colData(sce))}-{sce_name}")
+  # Add `sce_name` to colnames so cell ids can be mapped to originating SCE
+  colnames(sce) <- glue::glue("{colnames(sce)}-{sce_name}")
 
   # Add batch column
   sce[[batch_column]] <- sce_name
