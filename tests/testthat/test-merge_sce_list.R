@@ -27,9 +27,8 @@ sce_name <- "sce_object"
 batch_column <- "batch" # not the default
 barcode_column <- "barcode_col" # not the default
 shared_features <- rownames(sce)[1:10]
-retain_coldata_cols <- c("sum", "detected")
+retain_coldata_cols <- c(barcode_column, "sum", "detected")
 preserve_rowdata_cols <- "gene_names"
-expected_coldata_names <- c("sum", "detected", "total")
 
 # Generate some shared data for testing `merge_sce_list()` ------
 sce1 <- sim_sce(n_cells = total_cells/3, n_genes = total_genes, n_empty = 0)
@@ -46,10 +45,6 @@ sce_list <- purrr::map(
 
 
 
-
-
-
-
 test_that("`prepare_sce_for_merge` works as expected when all columns are present", {
 
   # Barcode is NOT explicitly included in `retain_coldata_cols` or `expected_coldata_names`
@@ -59,8 +54,7 @@ test_that("`prepare_sce_for_merge` works as expected when all columns are presen
                                       barcode_column,
                                       shared_features,
                                       retain_coldata_cols,
-                                      preserve_rowdata_cols,
-                                      expected_coldata_names)
+                                      preserve_rowdata_cols)
 
   expect_equal(ncol(result_sce), total_cells) # cells
   expect_equal(nrow(result_sce), length(shared_features)) # genes
@@ -68,7 +62,7 @@ test_that("`prepare_sce_for_merge` works as expected when all columns are presen
   # colData names and contents:
   expect_equal(
     sort(names(colData(result_sce))),
-    sort(c(batch_column, barcode_column, retain_coldata_cols))
+    sort(c(batch_column, retain_coldata_cols))
   )
   expect_equal(unique(result_sce[[batch_column]]), sce_name)
   expect_equal(
@@ -88,7 +82,8 @@ test_that("`prepare_sce_for_merge` works as expected when all columns are presen
 
 test_that("`prepare_sce_for_merge` works as expected when all an expected column is missing", {
 
-  # REMOVE "detected" column first -
+  # REMOVE "detected" column first
+  # It should get re-added in as all NAs
   colData(sce)$detected <- NULL
 
   result_sce <- prepare_sce_for_merge(sce,
@@ -97,8 +92,7 @@ test_that("`prepare_sce_for_merge` works as expected when all an expected column
                                       barcode_column,
                                       shared_features,
                                       retain_coldata_cols,
-                                      preserve_rowdata_cols,
-                                      expected_coldata_names)
+                                      preserve_rowdata_cols)
 
   # `detected` column should exist as all NA:
   expect_true(all(is.na(colData(result_sce)$detected)))
@@ -119,8 +113,7 @@ test_that("`prepare_sce_for_merge` works as expected when barcode column already
                                       barcode_column,
                                       shared_features,
                                       retain_coldata_cols,
-                                      preserve_rowdata_cols,
-                                      expected_coldata_names)
+                                      preserve_rowdata_cols)
 
   # `barcode_col` column should have been added
   expect_equal(colData(result_sce)$barcode_col,
@@ -144,7 +137,7 @@ test_that("merging SCEs with matching genes works as expected", {
                                batch_column = batch_column,
                                barcode_column = barcode_column,
                                # "detected" should get removed:
-                               retain_coldata_cols = c("sum", "total"),
+                               retain_coldata_cols = c(barcode_column, "sum", "total"),
                                # this row name should not be modified:
                                preserve_rowdata_cols = c("gene_names"))
 
@@ -221,7 +214,9 @@ test_that("merging SCEs with different genes among input SCEs works as expected"
 
 test_that("merging SCEs with no matching genes fails as expected", {
 
-  rownames(sce_list[[1]]) <- month.name # ensure different gene names entirely
+  # ensure different gene names entirely
+  rownames(sce_list[[1]]) <- rownames(sce_list[[2]])
+  rownames(sce_list[[1]]) <- paste0(rownames(sce_list[[1]]), "-new")
 
   expect_error(merge_sce_list(sce_list = list("sce1" = sce_list[[1]],
                                               "sce2" = sce_list[[2]]),

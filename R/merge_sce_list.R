@@ -18,8 +18,8 @@
 #'  to differentiate originating SingleCellExperiment objects. Often these values
 #'  are library IDs. Default value is `library_id`.
 #' @param barcode_column A character value giving the colData column name that
-#'  stores cell barcodes. If this column does not yet exist it will be created.
-#'  Default value is  `barcode`.
+#'  stores cell barcodes or analogous identifying information. If this column
+#' does not yet exist it will be created. Default value is  `barcode`.
 #' @param retain_coldata_cols A vector of colData columns which should be retained
 #'  in the the final merged SCE object.
 #' @param preserve_rowdata_cols A vector of column names that appear in originating
@@ -36,8 +36,7 @@
 merge_sce_list <- function(sce_list = list(),
                            batch_column = "library_id",
                            barcode_column = "barcode",
-                           retain_coldata_cols = c("barcode,
-                                                   "sum",
+                           retain_coldata_cols = c("sum",
                                                    "detected",
                                                    "total",
                                                    "subsets_mito_sum",
@@ -68,6 +67,23 @@ merge_sce_list <- function(sce_list = list(),
     warning("All colData will be removed from the the merged SCE.
      Please check that `retain_coldata_cols` was correctly specified.")
   }
+
+  ##############################################################################
+  ####################### Options for barcode: #################################
+
+  # We can simply warn if it's not part of the provided retained columns
+  if (!(barcode_column %in% retain_coldata_cols)) {
+    warning("Barcodes will not be retained. Please ensure the barcode column is
+            present in the provided `retain_coldata_cols` vector if you wish to
+            retain it.")
+  }
+  # Or we can always make sure it is retained, if not NULL (I think I prefer this now)
+  if (!(is.null(barcode_column)) & !(barcode_column %in% retain_coldata_cols)) {
+    retain_coldata_cols <- c(barcode_column, retain_coldata_cols)
+  }
+  ##############################################################################
+  ##############################################################################
+
 
   # Subset SCEs to shared features and ensure appropriate naming ------------------
 
@@ -101,8 +117,7 @@ merge_sce_list <- function(sce_list = list(),
                 barcode_column =  barcode_column,
                 shared_features = shared_features,
                 retain_coldata_cols = retain_coldata_cols,
-                preserve_rowdata_cols = preserve_rowdata_cols,
-                expected_coldata_names = all_colnames) 
+                preserve_rowdata_cols = preserve_rowdata_cols)
 
 
   # Create the merged SCE from the processed list ------------------
@@ -126,11 +141,12 @@ merge_sce_list <- function(sce_list = list(),
 #'   already exists) in the colData slot to store cell barcodes
 #' @param shared_features A vector of features (genes) that all SCEs to be merged
 #'   have in common
-#' @param retain_coldata_cols A vector of columns to retain in the colData slot
+#' @param retain_coldata_cols A vector of columns to retain in the colData slot.
+#'   If columns are missing from the data, they will be filled with `NA` values.
+#'   The exceptions to this are `barcode_column` and `batch_column` which will be
+#'   populated with respective information.
 #' @param preserve_rowdata_cols A vector of rowData columns which should not be
 #'   renamed
-#' @param expected_coldata_names A vector of column names that are expected to be
-#'   present in the SCE. Any missing columns will be created with `NA` values.
 #'
 #' @return An updated SCE that is prepared for merging
 prepare_sce_for_merge <- function(sce,
@@ -139,11 +155,19 @@ prepare_sce_for_merge <- function(sce,
                                   barcode_column,
                                   shared_features,
                                   retain_coldata_cols,
-                                  preserve_rowdata_cols,
-                                  expected_coldata_names) {
+                                  preserve_rowdata_cols) {
 
   # Current functionality does not retain any present altExps
   sce <- removeAltExps(sce)
+
+  # Check that the barcode column is present, if not NULL
+  if (!(is.null(barcode_column))) {
+    # Make sure it exists:
+    if (!(barcode_column %in% names(colData(sce)))) {
+      stop(glue::glue("The provided provided barcode column is not present in
+                      the following SCE object: {sce_name}."))
+    }
+  }
 
   # Subset to shared features
   sce <- sce[shared_features,]
@@ -162,24 +186,11 @@ prepare_sce_for_merge <- function(sce,
   ##### colData #####
   observed_coldata_names <- names(colData(sce))
 
-  # If the barcode column is not already present, create it
-  if (!(barcode_column %in% observed_coldata_names)) {
-    colData(sce)[,barcode_column] <- rownames(colData(sce))
-    observed_coldata_names <- c(observed_coldata_names, barcode_column)
-  }
-
-  # Ensure barcode_column is expected and retained
-  if (!(barcode_column %in% expected_coldata_names)) {
-    expected_coldata_names <- c(expected_coldata_names, barcode_column)
-  }
-  if (!(barcode_column %in% retain_coldata_cols)) {
-    retain_coldata_cols <- c(retain_coldata_cols, barcode_column)
-  }
-
   # Ensure all columns are present in all SCEs by adding `NA` columns as needed
-  missing_columns <- setdiff(expected_coldata_names, observed_coldata_names)
+  missing_columns <- setdiff(retain_coldata_cols, observed_coldata_names)
   for (missing_col in missing_columns) {
-    # Create the missing column only if it should be retained
+    # Create the missing column only if it should be retained, and it is NOT the
+    # barcode column
     if (missing_col %in% retain_coldata_cols) {
       colData(sce)[[missing_col]] <- NA
     }
