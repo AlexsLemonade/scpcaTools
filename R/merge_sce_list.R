@@ -18,7 +18,7 @@
 #'  - The resulting colData rownames will be updated to match `cell_id`.
 #'  - The resulting rowData slot column names will be appended with the given
 #'    SCE's name, as `{column_name}-{sce_name}` except for columns whose names
-#'    are indicated to preserve wiht the `preserve_rowdata_cols` argument.
+#'    are indicated to preserve with the `preserve_rowdata_cols` argument.
 #'  - The resulting rowData slot rownames will be updated to `{rowname}-{sce_name}`.
 #'
 #'
