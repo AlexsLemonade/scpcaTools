@@ -25,10 +25,11 @@ sce <- add_sce_data(
 )
 sce_name <- "sce_object"
 batch_column <- "batch" # not the default
+cell_id_column <- "cell_id"
 shared_features <- rownames(sce)[1:10]
 retain_coldata_cols <- c("sum", "detected")
 preserve_rowdata_cols <- "gene_names"
-expected_coldata_cols <- sort(c("sum", "detected", batch_column, "cell_id"))
+expected_coldata_cols <- sort(c("sum", "detected", batch_column, cell_id_column))
 
 # Generate some shared data for testing `merge_sce_list()` ------
 sce1 <- sim_sce(n_cells = total_cells/3, n_genes = total_genes, n_empty = 0)
@@ -51,6 +52,7 @@ test_that("`prepare_sce_for_merge` works as expected when all columns are presen
   result_sce <- prepare_sce_for_merge(sce,
                                       sce_name,
                                       batch_column,
+                                      cell_id_column,
                                       shared_features,
                                       retain_coldata_cols,
                                       preserve_rowdata_cols)
@@ -96,6 +98,7 @@ test_that("`prepare_sce_for_merge` works as expected when all an expected column
   result_sce <- prepare_sce_for_merge(sce,
                                       sce_name,
                                       batch_column,
+                                      cell_id_column,
                                       shared_features,
                                       retain_coldata_cols,
                                       preserve_rowdata_cols)

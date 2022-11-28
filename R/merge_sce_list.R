@@ -10,11 +10,11 @@
 #'    `batch_column` (default "library_id") that either holds the originating SCE
 #'    object's name (referred to as `sce_name` here), of if it is unnamed then
 #'    its index in the provided `sce_list`.
-#'  - The resulting colData slot will include another new column `cell_id` that
-#'    is formatted as `{sce_name}-{rowname}`, where `sce_name` is the given batch
-#'    (library) value and `rowname` is the colData row's rowname which often, but
-#'    not always, holds a unique cell barcode. This column serves to match cells
-#'    back to both originating batch and cell name.
+#'  - The resulting colData slot will include another new column `cell_id_column`
+#'    (default "cell_id") that is formatted as `{sce_name}-{rowname}`, where
+#'    `sce_name` is the given batch (library) value and `rowname` is the colData
+#'    row's rowname which often, but not always, holds a unique cell barcode.
+#'    This column serves to match cells back to both originating batch and cell name.
 #'  - The resulting colData rownames will be updated to match `cell_id`.
 #'  - The resulting rowData slot column names will be appended with the given
 #'    SCE's name, as `{column_name}-{sce_name}` except for columns whose names
@@ -28,6 +28,9 @@
 #' @param batch_column A character value giving the resulting colData column name
 #'  to differentiate originating SingleCellExperiment objects. Often these values
 #'  are library IDs. Default value is `library_id`.
+#'  @param cell_id_column A character value giving the resulting colData colum name
+#'  to hold unique cell IDs formatted as their batch and original rowname. Default
+#'  value is `cell_id`.
 #' @param retain_coldata_cols A vector of colData columns which should be retained
 #'  in the the final merged SCE object.
 #' @param preserve_rowdata_cols A vector of column names that appear in originating
@@ -43,6 +46,7 @@
 #' @import SingleCellExperiment
 merge_sce_list <- function(sce_list = list(),
                            batch_column = "library_id",
+                           cell_id_column = "cell_id",
                            retain_coldata_cols = c("sum",
                                                    "barcode",
                                                    "detected",
@@ -105,6 +109,7 @@ merge_sce_list <- function(sce_list = list(),
   sce_list <- sce_list |>
     purrr::imap(prepare_sce_for_merge,
                 batch_column = batch_column,
+                cell_id_column = cell_id_column,
                 shared_features = shared_features,
                 retain_coldata_cols = retain_coldata_cols,
                 preserve_rowdata_cols = preserve_rowdata_cols)
@@ -127,6 +132,8 @@ merge_sce_list <- function(sce_list = list(),
 #' @param sce_name The name of the SCE object
 #' @param batch_column The name of the batch column will which be added to the
 #'   colData slot
+#' @param cell_id_column The name of the cell_id column will which be added to the
+#'   colData slot
 #' @param shared_features A vector of features (genes) that all SCEs to be merged
 #'   have in common
 #' @param retain_coldata_cols A vector of columns to retain in the colData slot.
@@ -140,6 +147,7 @@ merge_sce_list <- function(sce_list = list(),
 prepare_sce_for_merge <- function(sce,
                                   sce_name,
                                   batch_column,
+                                  cell_id_column,
                                   shared_features,
                                   retain_coldata_cols,
                                   preserve_rowdata_cols) {
@@ -184,8 +192,8 @@ prepare_sce_for_merge <- function(sce,
   # Add batch column
   sce[[batch_column]] <- sce_name
 
-  # Add `cell_id` column
-  sce[["cell_id"]] <- colnames(sce)
+  # Add cell_id column
+  sce[[cell_id_column]] <- colnames(sce)
 
   # return the processed SCE
   return(sce)
