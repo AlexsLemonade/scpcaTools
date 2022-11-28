@@ -94,15 +94,14 @@ merge_sce_list <- function(sce_list = list(),
   }
 
   # Prepare SCEs
-  sce_list <- purrr::imap(sce_list,
-                          prepare_sce_for_merge,
-                          batch_column,
-                          barcode_column,
-                          shared_features,
-                          # ensure that barcodes are retained
-                          c(barcode_column, retain_coldata_cols),
-                          preserve_rowdata_cols,
-                          all_colnames)
+  sce_list <- sce_list |>
+    purrr::imap(prepare_sce_for_merge,
+                batch_column = batch_column,
+                barcode_column =  barcode_column,
+                shared_features = shared_features,
+                retain_coldata_cols = retain_coldata_cols,
+                preserve_rowdata_cols = preserve_rowdata_cols,
+                expected_coldata_names = all_colnames) 
 
 
   # Create the merged SCE from the processed list ------------------
