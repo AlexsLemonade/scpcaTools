@@ -25,10 +25,10 @@ sce <- add_sce_data(
 )
 sce_name <- "sce_object"
 batch_column <- "batch" # not the default
-barcode_column <- "barcode_col" # not the default
 shared_features <- rownames(sce)[1:10]
-retain_coldata_cols <- c(barcode_column, "sum", "detected")
+retain_coldata_cols <- c("sum", "detected")
 preserve_rowdata_cols <- "gene_names"
+expected_coldata_cols <- sort(c("sum", "detected", batch_column, "cell_id"))
 
 # Generate some shared data for testing `merge_sce_list()` ------
 sce1 <- sim_sce(n_cells = total_cells/3, n_genes = total_genes, n_empty = 0)
@@ -51,7 +51,6 @@ test_that("`prepare_sce_for_merge` works as expected when all columns are presen
   result_sce <- prepare_sce_for_merge(sce,
                                       sce_name,
                                       batch_column,
-                                      barcode_column,
                                       shared_features,
                                       retain_coldata_cols,
                                       preserve_rowdata_cols)
@@ -62,13 +61,21 @@ test_that("`prepare_sce_for_merge` works as expected when all columns are presen
   # colData names and contents:
   expect_equal(
     sort(names(colData(result_sce))),
-    sort(c(batch_column, retain_coldata_cols))
+    expected_coldata_cols
   )
   expect_equal(unique(result_sce[[batch_column]]), sce_name)
+
   expect_equal(
-    sort(rownames(colData(result_sce))),
-    sort(c(glue::glue("{rownames(colData(sce))}-{sce_name}")))
+    rownames(colData(result_sce)),
+    c(glue::glue("{sce_name}-{rownames(colData(sce))}"))
   )
+
+  expect_equal(
+    rownames(colData(result_sce)),
+    colData(result_sce)$cell_id
+  )
+
+
 
   # rowData names and contents:
   expect_equal(
@@ -89,35 +96,12 @@ test_that("`prepare_sce_for_merge` works as expected when all an expected column
   result_sce <- prepare_sce_for_merge(sce,
                                       sce_name,
                                       batch_column,
-                                      barcode_column,
                                       shared_features,
                                       retain_coldata_cols,
                                       preserve_rowdata_cols)
 
   # `detected` column should exist as all NA:
   expect_true(all(is.na(colData(result_sce)$detected)))
-
-})
-
-
-
-test_that("`prepare_sce_for_merge` works as expected when barcode column already exists", {
-
-  # create barcode
-  barcodes <- rownames(colData(sce))
-  colData(sce)$barcode_col <- barcodes
-
-  result_sce <- prepare_sce_for_merge(sce,
-                                      sce_name,
-                                      batch_column,
-                                      barcode_column,
-                                      shared_features,
-                                      retain_coldata_cols,
-                                      preserve_rowdata_cols)
-
-  # `barcode_col` column should have been added
-  expect_equal(colData(result_sce)$barcode_col,
-               barcodes)
 
 })
 
@@ -133,11 +117,9 @@ test_that("merging SCEs with matching genes works as expected", {
 
   # Works as expected:
   merged_sce <- merge_sce_list(sce_list,
-                               # use a non-default batch and barcode column names
                                batch_column = batch_column,
-                               barcode_column = barcode_column,
                                # "detected" should get removed:
-                               retain_coldata_cols = c(barcode_column, "sum", "total"),
+                               retain_coldata_cols = c("sum", "detected"),
                                # this row name should not be modified:
                                preserve_rowdata_cols = c("gene_names"))
 
@@ -148,8 +130,8 @@ test_that("merging SCEs with matching genes works as expected", {
 
   # colData names and contents:
   expect_equal(
-    sort(names(colData(merged_sce))),
-    sort(c(batch_column, barcode_column, "sum", "total"))
+   sort(names(colData(merged_sce))),
+   expected_coldata_cols
   )
   expect_equal(merged_sce[[batch_column]],
                c(rep("sce1", total_cells/3),
@@ -160,9 +142,9 @@ test_that("merging SCEs with matching genes works as expected", {
     sort(rownames(colData(merged_sce))),
     sort(
       c(
-      glue::glue("{rownames(colData(sce1))}-sce1"),
-      glue::glue("{rownames(colData(sce2))}-sce2"),
-      glue::glue("{rownames(colData(sce3))}-sce3")
+      glue::glue("sce1-{rownames(colData(sce1))}"),
+      glue::glue("sce2-{rownames(colData(sce2))}"),
+      glue::glue("sce3-{rownames(colData(sce3))}")
     ))
 )
 
@@ -231,9 +213,7 @@ test_that("merging SCEs without names works as expected", {
   # First make sure it generates a warning -
   expect_warning(
     merged_sce <- merge_sce_list(unname(sce_list),
-                                 # use a non-default batch and barcode column names
                                  batch_column = batch_column,
-                                 barcode_column = barcode_column,
                                  retain_coldata_cols = c("sum"),
                                  # this row name should not be modified:
                                  preserve_rowdata_cols = c("gene_names")
