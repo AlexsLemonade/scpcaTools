@@ -2,13 +2,13 @@
 add_sce_data <- function(sce) {
 
   # add some coldata columns
-  colData(sce)[["sum"]] <- runif(nrow(colData(sce)))
-  colData(sce)[["detected"]] <- runif(nrow(colData(sce)))
-  colData(sce)[["total"]] <- runif(nrow(colData(sce)))
+  colData(sce)[["sum"]] <- runif(ncol(sce))
+  colData(sce)[["detected"]] <- runif(ncol(sce))
+  colData(sce)[["total"]] <- runif(ncol(sce))
 
   # add some rowdata columns
-  rowData(sce)[["gene_names"]] <- rownames(rowData(sce))
-  rowData(sce)[["other_column"]] <- runif(nrow(rowData(sce)))
+  rowData(sce)[["gene_names"]] <- rownames(sce)
+  rowData(sce)[["other_column"]] <- runif(nrow(sce))
 
   # Copy counts -> logcounts just to make sure the assay is retained
   logcounts(sce) <- counts(sce)
