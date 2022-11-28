@@ -481,6 +481,8 @@ The raw counts from all remaining cells are then normalized prior to selection o
 The above plot shows the UMAP (Uniform Manifold Approximation and Projection) embeddings for each cell, coloring each cell by the total number of genes detected per cell.
 The plots below show the same UMAP embeddings, coloring each cell by the expression level of the labeled gene.
 The genes chosen for plotting are the 12 most variable genes identified in the library.
+Gene symbols are used when available to label the UMAP plots.
+If gene symbols are not available, the Ensembl ID will be shown.
 
 ```{r message=FALSE, results='asis'}
 if(has_processed & has_var_genes){
