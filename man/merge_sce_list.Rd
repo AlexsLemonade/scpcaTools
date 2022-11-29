@@ -29,8 +29,9 @@ in the the final merged SCE object.}
 SCE objects' rowData slots which should not be renamed with
 the given SCE object name or index is name is not given. These are generally
 columns which are not specific to the given library's preparation or statistics.
-For example, such a vector might contain items like "Gene", "ensembl_ids", etc.
-@param cell_id_column A character value giving the resulting colData colum name
+For example, such a vector might contain items like "Gene", "ensembl_ids", etc.}
+
+\item{cell_id_column}{A character value giving the resulting colData colum name
 to hold unique cell IDs formatted as their batch and original rowname. Default
 value is `cell_id`.}
 }
