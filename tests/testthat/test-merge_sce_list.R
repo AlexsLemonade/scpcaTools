@@ -48,7 +48,6 @@ sce_list <- purrr::map(
 
 test_that("`prepare_sce_for_merge` works as expected when all columns are present", {
 
-  # Barcode is NOT explicitly included in `retain_coldata_cols` or `expected_coldata_names`
   result_sce <- prepare_sce_for_merge(sce,
                                       sce_name,
                                       batch_column,
@@ -73,7 +72,7 @@ test_that("`prepare_sce_for_merge` works as expected when all columns are presen
   )
 
   expect_equal(
-    rownames(colData(result_sce)),
+    colnames(sce),
     colData(result_sce)$cell_id
   )
 
@@ -82,7 +81,7 @@ test_that("`prepare_sce_for_merge` works as expected when all columns are presen
   # rowData names and contents:
   expect_equal(
     sort(names(rowData(result_sce))),
-    c("gene_names", paste("other_column", sce_name, sep = "-"))
+    c("gene_names", paste(sce_name, "other_column", sep = "-"))
   )
 
 })
@@ -154,7 +153,7 @@ test_that("merging SCEs with matching genes works as expected", {
   # rowData names and contents:
   expect_equal(
     sort(names(rowData(merged_sce))),
-    c("gene_names", "other_column-sce1", "other_column-sce2", "other_column-sce3")
+    c("gene_names", "sce1-other_column", "sce2-other_column", "sce3-other_column")
   )
   expect_equal(merged_sce[[batch_column]],
                c(rep("sce1", total_cells/3),

@@ -7,10 +7,10 @@
 merge_sce_list(
   sce_list = list(),
   batch_column = "library_id",
-  cell_id_column = "cell_id",
   retain_coldata_cols = c("sum", "barcode", "detected", "total", "subsets_mito_sum",
     "subsets_mito_detected", "subsets_mito_percent", "miQC_pass", "prob_compromised"),
-  preserve_rowdata_cols = NULL
+  preserve_rowdata_cols = NULL,
+  cell_id_column = "cell_id"
 )
 }
 \arguments{
@@ -20,10 +20,7 @@ based on the SCE's index.}
 
 \item{batch_column}{A character value giving the resulting colData column name
 to differentiate originating SingleCellExperiment objects. Often these values
-are unique library IDs. Default value is `library_id`.
-@param cell_id_column A character value giving the resulting colData colum name
-to hold unique cell IDs formatted as their batch and original rowname. Default
-value is `cell_id`.}
+are unique library IDs. Default value is `library_id`.}
 
 \item{retain_coldata_cols}{A vector of colData columns which should be retained
 in the the final merged SCE object.}
@@ -32,7 +29,10 @@ in the the final merged SCE object.}
 SCE objects' rowData slots which should not be renamed with
 the given SCE object name or index is name is not given. These are generally
 columns which are not specific to the given library's preparation or statistics.
-For example, such a vector might contain items like "Gene", "ensembl_ids", etc.}
+For example, such a vector might contain items like "Gene", "ensembl_ids", etc.
+@param cell_id_column A character value giving the resulting colData colum name
+to hold unique cell IDs formatted as their batch and original rowname. Default
+value is `cell_id`.}
 }
 \value{
 A SingleCellExperiment object containing all SingleCellExperiment objects
@@ -51,13 +51,11 @@ Original SCE contents are modified or retained as follows:
    object's name (referred to as `sce_name` here), of if it is unnamed then
    its index in the provided `sce_list`.
  - The resulting colData slot will include another new column `cell_id_column`
-   (default "cell_id") that is formatted as `{sce_name}-{rowname}`, where
-   `sce_name` is the given batch (library) value and `rowname` is the colData
-   row's rowname which often, but not always, holds a unique cell barcode.
+   (default "cell_id") that is will contain the SCE's column names (i.e. colData
+   rownames). Often, but not always, the rowname holds a unique cell barcode.
    This column serves to match cells back to both originating batch and cell name.
  - The resulting colData rownames will be updated to match `cell_id`.
  - The resulting rowData slot column names will be appended with the given
-   SCE's name, as `{column_name}-{sce_name}` except for columns whose names
+   SCE's name, as `{sce_name}-{column_name}` except for columns whose names
    are indicated to preserve with the `preserve_rowdata_cols` argument.
- - The resulting rowData slot rownames will be updated to `{rowname}-{sce_name}`.
 }
