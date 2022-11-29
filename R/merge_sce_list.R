@@ -76,7 +76,7 @@ merge_sce_list <- function(sce_list = list(),
 
   # Check `retain_coldata_cols` ----------------
   if (length(retain_coldata_cols) == 0) {
-    warning("All colData will be removed from the the merged SCE.
+    warning("All pre-existing colData will be removed from the the merged SCE.
      Please check that `retain_coldata_cols` was correctly specified.")
   }
 
@@ -130,9 +130,9 @@ merge_sce_list <- function(sce_list = list(),
 #'
 #' @param sce The SCE object to be prepared
 #' @param sce_name The name of the SCE object
-#' @param batch_column The name of the batch column will which be added to the
+#' @param batch_column The name of the batch column which will be added to the
 #'   colData slot
-#' @param cell_id_column The name of the cell_id column will which be added to the
+#' @param cell_id_column The name of the cell_id column which will be added to the
 #'   colData slot
 #' @param shared_features A vector of features (genes) that all SCEs to be merged
 #'   have in common
