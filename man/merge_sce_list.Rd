@@ -7,8 +7,8 @@
 merge_sce_list(
   sce_list = list(),
   batch_column = "library_id",
-  barcode_column = "barcode",
-  retain_coldata_cols = c("sum", "detected", "total", "subsets_mito_sum",
+  cell_id_column = "cell_id",
+  retain_coldata_cols = c("sum", "barcode", "detected", "total", "subsets_mito_sum",
     "subsets_mito_detected", "subsets_mito_percent", "miQC_pass", "prob_compromised"),
   preserve_rowdata_cols = NULL
 )
@@ -20,11 +20,10 @@ based on the SCE's index.}
 
 \item{batch_column}{A character value giving the resulting colData column name
 to differentiate originating SingleCellExperiment objects. Often these values
-are library IDs. Default value is `library_id`.}
-
-\item{barcode_column}{A character value giving the colData column name that
-stores cell barcodes. If this column does not yet exist it will be created.
-Default value is  `barcode`.}
+are unique library IDs. Default value is `library_id`.
+@param cell_id_column A character value giving the resulting colData colum name
+to hold unique cell IDs formatted as their batch and original rowname. Default
+value is `cell_id`.}
 
 \item{retain_coldata_cols}{A vector of colData columns which should be retained
 in the the final merged SCE object.}
@@ -42,12 +41,23 @@ A SingleCellExperiment object containing all SingleCellExperiment objects
 \description{
 This function takes an optionally-named (if named, ideally by a form of
  library ID) list of SingleCellExperiment (SCE) objects and merges them into
- one SCE object. The resulting colData slot will contain information in the
- given batch column to differentiate originating SCE objects based on the SCE
- names, or index if no names are provided. If not already present, cell barcodes
- will also be created as a colData column. Only features (genes) that are
- present in all provided SCE objects will be retained. To preserve original
- feature-level information, all final rowData slot column names will be
- appended with the given SCE's name, as `<column_name>-<sce_name>` sxcept for
- columns indicated to preserve. Currently any present altExps are not retained.
+ one SCE object. At least some genes must be present in all SCEs in order to
+ merge them. Currently any present altExps are not retained.
+}
+\details{
+Original SCE contents are modified or retained as follows:
+ - The resulting colData slot will include a new column specified by
+   `batch_column` (default "library_id") that either holds the originating SCE
+   object's name (referred to as `sce_name` here), of if it is unnamed then
+   its index in the provided `sce_list`.
+ - The resulting colData slot will include another new column `cell_id_column`
+   (default "cell_id") that is formatted as `{sce_name}-{rowname}`, where
+   `sce_name` is the given batch (library) value and `rowname` is the colData
+   row's rowname which often, but not always, holds a unique cell barcode.
+   This column serves to match cells back to both originating batch and cell name.
+ - The resulting colData rownames will be updated to match `cell_id`.
+ - The resulting rowData slot column names will be appended with the given
+   SCE's name, as `{column_name}-{sce_name}` except for columns whose names
+   are indicated to preserve with the `preserve_rowdata_cols` argument.
+ - The resulting rowData slot rownames will be updated to `{rowname}-{sce_name}`.
 }

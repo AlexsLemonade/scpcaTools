@@ -8,11 +8,10 @@ prepare_sce_for_merge(
   sce,
   sce_name,
   batch_column,
-  barcode_column,
+  cell_id_column,
   shared_features,
   retain_coldata_cols,
-  preserve_rowdata_cols,
-  expected_coldata_names
+  preserve_rowdata_cols
 )
 }
 \arguments{
@@ -20,22 +19,22 @@ prepare_sce_for_merge(
 
 \item{sce_name}{The name of the SCE object}
 
-\item{batch_column}{The name of the batch column will which be added to the
+\item{batch_column}{The name of the batch column which will be added to the
 colData slot}
 
-\item{barcode_column}{The name of the column to be created (or not if it
-already exists) in the colData slot to store cell barcodes}
+\item{cell_id_column}{The name of the cell_id column which will be added to the
+colData slot}
 
 \item{shared_features}{A vector of features (genes) that all SCEs to be merged
 have in common}
 
-\item{retain_coldata_cols}{A vector of columns to retain in the colData slot}
+\item{retain_coldata_cols}{A vector of columns to retain in the colData slot.
+If columns are missing from the data, they will be filled with `NA` values.
+The exceptions to this are `barcode_column` and `batch_column` which will be
+populated with respective information.}
 
 \item{preserve_rowdata_cols}{A vector of rowData columns which should not be
 renamed}
-
-\item{expected_coldata_names}{A vector of column names that are expected to be
-present in the SCE. Any missing columns will be created with `NA` values.}
 }
 \value{
 An updated SCE that is prepared for merging
