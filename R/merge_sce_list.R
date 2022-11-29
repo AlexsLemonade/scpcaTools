@@ -27,7 +27,7 @@
 #'  based on the SCE's index.
 #' @param batch_column A character value giving the resulting colData column name
 #'  to differentiate originating SingleCellExperiment objects. Often these values
-#'  are library IDs. Default value is `library_id`.
+#'  are unique library IDs. Default value is `library_id`.
 #'  @param cell_id_column A character value giving the resulting colData colum name
 #'  to hold unique cell IDs formatted as their batch and original rowname. Default
 #'  value is `cell_id`.
