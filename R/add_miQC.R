@@ -3,6 +3,8 @@
 #'
 #' @param sce SingleCellExperiment object.
 #' @param posterior_cutoff Optional posterior cutoff used for the miQC filtering calculation (default 0.75)
+#' @param keep_all_below_boundary Option to be passed to miQC::filterCells() (default TRUE)
+#' @param enforce_left_cutoff Option to be passed to miQC::filterCells() (default TRUE)
 #' @param seed An optional random seed for reproducibility.
 #'
 #' @return SingleCellExperiment with prob_compromised column added to colData
@@ -12,7 +14,11 @@
 #'
 #' @export
 #'
-add_miQC <- function(sce, posterior_cutoff = 0.75, seed = NULL){
+add_miQC <- function(sce,
+                     posterior_cutoff = 0.75,
+                     keep_all_below_boundary = TRUE,
+                     enforce_left_cutoff = TRUE,
+                     seed = NULL){
   # check that input is a SingleCellExperiment
   if(!is(sce, "SingleCellExperiment")){
     stop("sce must be a SingleCellExperiment object")
@@ -50,6 +56,8 @@ add_miQC <- function(sce, posterior_cutoff = 0.75, seed = NULL){
         miQC::filterCells(sce,
                           model = model,
                           posterior_cutoff = posterior_cutoff,
+                          keep_all_below_boundary = keep_all_below_boundary,
+                          enforce_left_cutoff = enforce_left_cutoff,
                           verbose = FALSE)
       )
     }, silent = TRUE)

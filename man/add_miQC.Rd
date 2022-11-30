@@ -4,12 +4,22 @@
 \alias{add_miQC}
 \title{Add miQC model and probability compromised to a SingleCellExperiment object}
 \usage{
-add_miQC(sce, posterior_cutoff = 0.75, seed = NULL)
+add_miQC(
+  sce,
+  posterior_cutoff = 0.75,
+  keep_all_below_boundary = TRUE,
+  enforce_left_cutoff = TRUE,
+  seed = NULL
+)
 }
 \arguments{
 \item{sce}{SingleCellExperiment object.}
 
 \item{posterior_cutoff}{Optional posterior cutoff used for the miQC filtering calculation (default 0.75)}
+
+\item{keep_all_below_boundary}{Option to be passed to miQC::filterCells() (default TRUE)}
+
+\item{enforce_left_cutoff}{Option to be passed to miQC::filterCells() (default TRUE)}
 
 \item{seed}{An optional random seed for reproducibility.}
 }
