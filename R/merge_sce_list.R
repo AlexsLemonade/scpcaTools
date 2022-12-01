@@ -11,7 +11,7 @@
 #'    object's name (referred to as `sce_name` here), of if it is unnamed then
 #'    its index in the provided `sce_list`.
 #'  - The resulting colData slot will include another new column `cell_id_column`
-#'    (default "cell_id") that is will contain the SCE's column names (i.e. colData
+#'    (default "cell_id") that will contain the SCE's column names (i.e. colData
 #'    rownames). Often, but not always, the rowname holds a unique cell barcode.
 #'    This column serves to match cells back to both originating batch and cell name.
 #'  - The resulting colData rownames will be updated to match `cell_id`.
