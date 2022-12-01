@@ -169,8 +169,7 @@ prepare_sce_for_merge <- function(sce,
   # Ensure all columns are present in all SCEs by adding `NA` columns as needed
   missing_columns <- setdiff(retain_coldata_cols, observed_coldata_names)
   for (missing_col in missing_columns) {
-    # Create the missing column only if it should be retained, and it is NOT the
-    # barcode column
+    # Create the missing column only if it should be retained
     if (missing_col %in% retain_coldata_cols) {
       colData(sce)[[missing_col]] <- NA
     }
