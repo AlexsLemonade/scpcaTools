@@ -11,10 +11,10 @@
 #'    object's name (referred to as `sce_name` here), or if it is unnamed then
 #'    its index in the provided `sce_list`.
 #'  - The resulting colData slot will include another new column `cell_id_column`
-#'    (default "cell_id") that will contain the SCE's column names (i.e. colData
-#'    rownames). Often, but not always, the rowname holds a unique cell barcode.
-#'    This column serves to match cells back to both originating batch and cell name.
-#'  - The resulting colData rownames will be updated to match `cell_id`.
+#'    (default "cell_id") that will contain the SCE's original column names (i.e.
+#'    original colData rownames). Often, but not always, this rowname holds a
+#'    unique cell barcode.
+#'  - The resulting colData rownames will be be prefixed with `{sce_name-}`.
 #'  - The resulting rowData slot column names will be appended with the given
 #'    SCE's name, as `{sce_name}-{column_name}` except for columns whose names
 #'    are indicated to preserve with the `preserve_rowdata_cols` argument.
@@ -33,8 +33,8 @@
 #'  the given SCE object name or index is name is not given. These are generally
 #'  columns which are not specific to the given library's preparation or statistics.
 #'  For example, such a vector might contain items like "Gene", "ensembl_ids", etc.
-#' @param cell_id_column A character value giving the resulting colData colum name
-#'  to hold unique cell IDs formatted as their batch and original rowname. Default
+#' @param cell_id_column A character value giving the resulting colData column name
+#'  to hold unique cell IDs formatted as their original row name. Default
 #'  value is `cell_id`.
 #'
 #' @return A SingleCellExperiment object containing all SingleCellExperiment objects
@@ -45,14 +45,14 @@
 merge_sce_list <- function(sce_list = list(),
                            batch_column = "library_id",
                            retain_coldata_cols = c("sum",
-                                                   "barcode",
                                                    "detected",
                                                    "total",
                                                    "subsets_mito_sum",
                                                    "subsets_mito_detected",
                                                    "subsets_mito_percent",
                                                    "miQC_pass",
-                                                   "prob_compromised"),
+                                                   "prob_compromised",
+                                                   "barcode"),
                            preserve_rowdata_cols = NULL,
                            cell_id_column = "cell_id") {
 
@@ -100,7 +100,7 @@ merge_sce_list <- function(sce_list = list(),
   # Check that the `retain_coldata_cols` are present in at least one SCE, and
   #  error if the column exists nowhere.
   if (!(any(retain_coldata_cols %in% all_colnames))) {
-    stop("Error: The provided `retain_coldata_cols` are not present in any SCEs.")
+    warning("The provided `retain_coldata_cols` are not present in any SCEs.")
   }
 
   # Prepare SCEs
@@ -112,14 +112,10 @@ merge_sce_list <- function(sce_list = list(),
                 retain_coldata_cols = retain_coldata_cols,
                 preserve_rowdata_cols = preserve_rowdata_cols)
 
-
   # Create the merged SCE from the processed list ------------------
   merged_sce <- do.call(cbind, sce_list)
 
-
-  # Return merged SCE object ----------------------------
   return(merged_sce)
-
 }
 
 
@@ -173,8 +169,7 @@ prepare_sce_for_merge <- function(sce,
   # Ensure all columns are present in all SCEs by adding `NA` columns as needed
   missing_columns <- setdiff(retain_coldata_cols, observed_coldata_names)
   for (missing_col in missing_columns) {
-    # Create the missing column only if it should be retained, and it is NOT the
-    # barcode column
+    # Create the missing column only if it should be retained
     if (missing_col %in% retain_coldata_cols) {
       colData(sce)[[missing_col]] <- NA
     }
