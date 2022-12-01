@@ -31,8 +31,8 @@ the given SCE object name or index is name is not given. These are generally
 columns which are not specific to the given library's preparation or statistics.
 For example, such a vector might contain items like "Gene", "ensembl_ids", etc.}
 
-\item{cell_id_column}{A character value giving the resulting colData colum name
-to hold unique cell IDs formatted as their batch and original rowname. Default
+\item{cell_id_column}{A character value giving the resulting colData column name
+to hold unique cell IDs formatted as their original row name. Default
 value is `cell_id`.}
 }
 \value{
@@ -49,13 +49,13 @@ This function takes an optionally-named (if named, ideally by a form of
 Original SCE contents are modified or retained as follows:
  - The resulting colData slot will include a new column specified by
    `batch_column` (default "library_id") that either holds the originating SCE
-   object's name (referred to as `sce_name` here), of if it is unnamed then
+   object's name (referred to as `sce_name` here), or if it is unnamed then
    its index in the provided `sce_list`.
  - The resulting colData slot will include another new column `cell_id_column`
-   (default "cell_id") that is will contain the SCE's column names (i.e. colData
-   rownames). Often, but not always, the rowname holds a unique cell barcode.
-   This column serves to match cells back to both originating batch and cell name.
- - The resulting colData rownames will be updated to match `cell_id`.
+   (default "cell_id") that will contain the SCE's original column names (i.e.
+   original colData rownames). Often, but not always, this rowname holds a
+   unique cell barcode.
+ - The resulting colData rownames will be be prefixed with `{sce_name-}`.
  - The resulting rowData slot column names will be appended with the given
    SCE's name, as `{sce_name}-{column_name}` except for columns whose names
    are indicated to preserve with the `preserve_rowdata_cols` argument.
