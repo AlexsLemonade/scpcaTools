@@ -7,8 +7,9 @@
 merge_sce_list(
   sce_list = list(),
   batch_column = "library_id",
-  retain_coldata_cols = c("sum", "barcode", "detected", "total", "subsets_mito_sum",
-    "subsets_mito_detected", "subsets_mito_percent", "miQC_pass", "prob_compromised"),
+  retain_coldata_cols = c("sum", "detected", "total", "subsets_mito_sum",
+    "subsets_mito_detected", "subsets_mito_percent", "miQC_pass", "prob_compromised",
+    "barcode"),
   preserve_rowdata_cols = NULL,
   cell_id_column = "cell_id"
 )
