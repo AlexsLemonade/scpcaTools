@@ -8,7 +8,7 @@
 #'  Original SCE contents are modified or retained as follows:
 #'  - The resulting colData slot will include a new column specified by
 #'    `batch_column` (default "library_id") that either holds the originating SCE
-#'    object's name (referred to as `sce_name` here), of if it is unnamed then
+#'    object's name (referred to as `sce_name` here), or if it is unnamed then
 #'    its index in the provided `sce_list`.
 #'  - The resulting colData slot will include another new column `cell_id_column`
 #'    (default "cell_id") that will contain the SCE's column names (i.e. colData
