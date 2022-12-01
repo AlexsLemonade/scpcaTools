@@ -10,7 +10,7 @@
 #'  `harmony` (case-insensitive)
 #' @param batch_column The column in the combined SCE object indicating batches
 #'  being integrated. Default is "sample".
-#' @param retain_uncorrected_assays A character vector of uncorrected assays to retain in
+#' @param retain_assays A character vector of uncorrected assays to retain in
 #'   the integrated SCE object. By default, both "counts" and "logcounts" are retained.
 #' @param return_corrected_expression A boolean indicating whether corrected expression
 #'   values determined by the given integration method should be included in the
@@ -27,11 +27,14 @@
 #' @param ... Any additional parameters to be passed to the given integration method
 #'
 #' @return An update combined SCE object containing
+#'
+#' @import SingleCellExperiment
+#'
 #' @export
 integrate_sces <- function(combined_sce,
                            integration_method,
                            batch_column = "sample",
-                           retain_uncorrected_assays = c("counts", "logcounts"),
+                           retain_assays = c("counts", "logcounts"),
                            return_corrected_expression = TRUE,
                            harmony_do_PCA = FALSE,
                            harmony_covariate_cols = c(),
@@ -41,6 +44,11 @@ integrate_sces <- function(combined_sce,
   # Set seed
   if (!(is.null(seed))) {
     set.seed(seed)
+  }
+
+  # make sure that input is a SingleCellExperiment
+  if(!is(combined_sce, "SingleCellExperiment")){
+    stop("The `combined_sce` must be a SingleCellExperiment object created with `scpcaTools::merge_sce_list().`")
   }
 
   # Check integration_method
@@ -62,12 +70,16 @@ integrate_sces <- function(combined_sce,
                                         ...)
     # Add corrected expression to combined_sce if specified
     if (return_corrected_expression) {
-      assay(combined_sce, "fastMNN_corrected") <- assay(integrated_sce, "reconstructed")
+      assay_name <- "fastmnn_corrected"
+      assay(combined_sce, assay_name) <- assay(integrated_sce, "reconstructed")
+      # ensure that this assay is retained as lowercase
+      retain_assays <- c(retain_assays, assay_name)
     }
     # define PCs
     integrated_pcs <- reducedDim(integrated_sce, "corrected")
   }
   if (integration_method == "harmony") {
+
     # here the result is the PCs:
     integrated_pcs <- integrate_harmony(combined_sce,
                                         batch_column,
@@ -76,16 +88,15 @@ integrate_sces <- function(combined_sce,
                                         ...)
   }
 
-
   # Filter assays
   assays_to_remove <- setdiff(assayNames(combined_sce),
-                              retain_uncorrected_assays)
+                              retain_assays)
   for (assay_name in assays_to_remove) {
     assay(combined_sce, assay_name) <- NULL
   }
 
-  # Add PCs from integration into combined_sce
-  reducedDim(integrated_sce, glue::glue("{integration_method}_PCA")) <- integrated_pcs
+  # Add PCs from integration into combined_sce (name is lowercase)
+  reducedDim(combined_sce, glue::glue("{integration_method}_PCA")) <- integrated_pcs
 
   # Return the combined_sce with integration results included
   return(combined_sce)

@@ -20,7 +20,9 @@ colData(combined_sce)$sample <- batches
 # Add "cell_id" to colData to ensure it doesn't interfere during harmony
 colData(combined_sce)$cell_id <- barcodes
 # Add in a "covariate" column for testing
-colData(combined_sce)$covariate <- runif(300)
+colData(combined_sce)$covariate <- sample(c("patient-a", "patient-b", "patient-c", "patient-d"),
+                                            size = 300,
+                                            replace = TRUE)
 
 # add a logcounts assay for testing (numbers don't matter)
 logcounts(combined_sce) <- counts(combined_sce)
@@ -114,3 +116,152 @@ test_that("`integrate_harmony` fails when PCs are missing, do_PCA is FALSE", {
                                 )
   )
 })
+
+test_that("`integrate_harmony` fails when covariate columns are missing", {
+  expect_error(
+    integrate_harmony(combined_sce,
+                      batch_column,
+                      harmony_do_PCA = FALSE,
+                      harmony_covariate_cols = "not_a_column"
+                      )
+    )
+})
+
+
+################################################################################
+################################################################################
+
+
+test_that("`integrate_sces` fail as expected", {
+
+
+  # bad sce
+  expect_error(
+    integrate_sces(batch_column, batch_column)
+  )
+
+  # bad integration method
+  expect_error(
+    integrate_sces(combined_sce, "not_a_real_method")
+  )
+
+  # missing batch column
+  expect_error(
+    integrate_sces(combined_sce,
+                   "fastmnn",
+                   batch_column = "not_a_column")
+  )
+
+})
+
+
+test_that("`integrate_sces` works as expected for fastmnn defaults", {
+
+  suppressWarnings({
+    # simulated-data related numerical warnings
+    integrated_sce <- integrate_sces(combined_sce,
+                                 "fastMNN")
+  })
+
+  expect_equal(assayNames(integrated_sce),
+               c("counts", "logcounts", "fastmnn_corrected")
+  )
+
+  expect_true(
+    "fastmnn_PCA" %in% reducedDimNames(integrated_sce)
+  )
+
+})
+
+
+test_that("`integrate_sces` works as expected for fastmnn non-defaults", {
+
+
+  ########  only logcounts is retained  ##############
+  suppressWarnings({
+    # simulated-data related numerical warnings
+    integrated_sce <- integrate_sces(combined_sce,
+                                     "fastMNN",
+                                     retain_assays = "logcounts" )
+  })
+
+  expect_equal(assayNames(integrated_sce),
+               c("logcounts", "fastmnn_corrected")
+  )
+
+
+  ########  corrected expression not returned  ##############
+  suppressWarnings({
+    # simulated-data related numerical warnings
+    integrated_sce <- integrate_sces(combined_sce,
+                                     "fastMNN",
+                                     return_corrected_expression = FALSE)
+  })
+
+  expect_equal(assayNames(integrated_sce),
+               c("counts", "logcounts")
+  )
+
+})
+
+
+
+
+
+test_that("`integrate_sces` works as expected with fastmnn extra arguments", {
+
+  expect_no_error(
+      suppressWarnings({
+      # simulated-data related numerical warnings
+      integrated_sce <- integrate_sces(combined_sce,
+                                       "fastMNN",
+                                       cos.norm = FALSE)
+    })
+  )
+
+})
+
+
+
+test_that("`integrate_sces` works as expected for harmony defaults", {
+
+  ################ do_PCA=TRUE #####################
+  integrated_sce <- integrate_sces(combined_sce,
+                                   "harmony",
+                                   harmony_do_PCA=TRUE)
+  expect_true(
+    "harmony_PCA" %in% reducedDimNames(integrated_sce)
+  )
+
+
+  ################ do_PCA=FALSE #####################
+  integrated_sce <- integrate_sces(combined_sce,
+                                   "harmony",
+                                   harmony_do_PCA=FALSE)
+  expect_true(
+    "harmony_PCA" %in% reducedDimNames(integrated_sce)
+  )
+})
+
+
+test_that("`integrate_sces` works as expected with harmony extra arguments", {
+
+  expect_no_error(
+    integrated_sce <- integrate_sces(combined_sce,
+                                     "harmony",
+                                      lambda = 2)
+  )
+
+})
+
+
+
+test_that("`integrate_sces` works as expected with a harmony covariate", {
+  expect_no_error(
+    integrate_sces(combined_sce,
+                   "harmony",
+                   harmony_do_PCA=TRUE,
+                   harmony_covariate_cols = "covariate")
+  )
+})
+
