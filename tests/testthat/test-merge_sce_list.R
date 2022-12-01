@@ -99,7 +99,7 @@ test_that("`prepare_sce_for_merge` works as expected when all an expected column
                                       batch_column,
                                       cell_id_column,
                                       shared_features,
-                                      retain_coldata_cols,
+                                      retain_coldata_cols, # will add detected back in as NA
                                       preserve_rowdata_cols)
 
   # `detected` column should exist as all NA:

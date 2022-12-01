@@ -100,7 +100,7 @@ merge_sce_list <- function(sce_list = list(),
   # Check that the `retain_coldata_cols` are present in at least one SCE, and
   #  error if the column exists nowhere.
   if (!(any(retain_coldata_cols %in% all_colnames))) {
-    stop("Error: The provided `retain_coldata_cols` are not present in any SCEs.")
+    warning("The provided `retain_coldata_cols` are not present in any SCEs.")
   }
 
   # Prepare SCEs
