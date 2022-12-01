@@ -33,8 +33,8 @@
 #'  the given SCE object name or index is name is not given. These are generally
 #'  columns which are not specific to the given library's preparation or statistics.
 #'  For example, such a vector might contain items like "Gene", "ensembl_ids", etc.
-#' @param cell_id_column A character value giving the resulting colData colum name
-#'  to hold unique cell IDs formatted as their batch and original rowname. Default
+#' @param cell_id_column A character value giving the resulting colData column name
+#'  to hold unique cell IDs formatted as their original row name. Default
 #'  value is `cell_id`.
 #'
 #' @return A SingleCellExperiment object containing all SingleCellExperiment objects
