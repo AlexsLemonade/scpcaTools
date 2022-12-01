@@ -161,36 +161,26 @@ integrate_harmony <- function(combined_sce,
     if (!("logcounts" %in% names(assays(combined_sce)))) {
       stop("The combined_sce object requires a `logcounts` assay for harmony integration when `harmony_do_PCA` is `TRUE`.")
     }
+    # input logcounts to harmony
     input_matrix <- logcounts(combined_sce)
   } else {
     if (!("PCA" %in% reducedDimNames(combined_sce))) {
       stop("The combined_sce object requires a `PCA` reduced dimension for harmony integration when `harmony_do_PCA` is `FALSE`.")
     }
+    # input PCs to harmony
     input_matrix <- reducedDim(combined_sce, "PCA")
   }
 
-  # Setup harmony metadata
-
-  # First, ensure that harmony_covariate_cols are present
+  # Ensure that harmony_covariate_cols are present
   if (!(all(harmony_covariate_cols %in% names(colData(combined_sce))))) {
     stop("The combined_sce object does not contain all columns specified in `harmony_covariate_cols`.")
   }
-  # Second, we need to remove the column `cell_id` if it already exists in the SCE
-  #  since it will conflict with harmony.
-  if ("cell_id" %in% names(colData(combined_sce))) {
-    colData(combined_sce)$cell_id <- NULL
-  }
 
-  # Now we can prepare the metadata such that `cell_id` is the colData rownames per
-  #  harmony's expectation
+  # Setup harmony metadata
   covariate_cols <- unique(c(batch_column, harmony_covariate_cols))
-  harmony_metadata <- tibble::as_tibble(colData(combined_sce),
-                                        rownames = "cell_id") %>%
-    dplyr::select(cell_id,
-                  batch_column,
+  harmony_metadata <- tibble::as_tibble(colData(combined_sce)) %>%
+    dplyr::select(batch_column,
                   dplyr::all_of(covariate_cols))
-
-
 
   # Perform integration
   harmony_results <- harmony::HarmonyMatrix(input_matrix,
