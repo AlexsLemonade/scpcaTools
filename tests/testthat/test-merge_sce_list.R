@@ -120,8 +120,8 @@ test_that("merging SCEs with matching genes works as expected", {
   # Works as expected:
   merged_sce <- merge_sce_list(sce_list,
                                batch_column = batch_column,
-                               # "detected" should get removed:
-                               retain_coldata_cols = c("sum", "detected"),
+                               # "total" should get removed
+                               retain_coldata_cols = retain_coldata_cols,
                                # this row name should not be modified:
                                preserve_rowdata_cols = c("gene_names"))
 
@@ -181,11 +181,7 @@ test_that("merging SCEs with different genes among input SCEs works as expected"
                       month.name[7:12])
 
   # Works as expected:
-  merged_sce <- merge_sce_list(sce_list,
-                               # "detected" should get removed:
-                               retain_coldata_cols = c("sum", "total"),
-                               # this row name should not be modified:
-                               preserve_rowdata_cols = c("gene_names"))
+  merged_sce <- merge_sce_list(sce_list)
 
 
   # correct number of genes and cells:
@@ -203,9 +199,7 @@ test_that("merging SCEs with no matching genes fails as expected", {
   rownames(sce_list[[1]]) <- paste0(rownames(sce_list[[1]]), "-new")
 
   expect_error(merge_sce_list(sce_list = list("sce1" = sce_list[[1]],
-                                              "sce2" = sce_list[[2]]),
-                              # use this arg to prevent other errors
-                              retain_coldata_cols = "sum"))
+                                              "sce2" = sce_list[[2]])))
 })
 
 
@@ -215,10 +209,7 @@ test_that("merging SCEs without names works as expected", {
   # First make sure it generates a warning -
   expect_warning(
     merged_sce <- merge_sce_list(unname(sce_list),
-                                 batch_column = batch_column,
-                                 retain_coldata_cols = c("sum"),
-                                 # this row name should not be modified:
-                                 preserve_rowdata_cols = c("gene_names")
+                                 batch_column = batch_column
     )
   )
 
