@@ -32,7 +32,7 @@ This repository also includes a Dockerfile and associated scripts for building a
 To support this, we use [`renv`](https://rstudio.github.io/renv/index.html) to track the versioned set of packages that will be installed in that Docker image.
 
 Packages that are required for the main `scpcaTools` package should be included in the `renv.lock` file as they are installed and used.
-To keep this up to date, `renv::snapshot()` should be run periodically during development(before submitting PRs), which should add any packages that are used in `scpcaTools` scripts and notebooks to `renv.lock`.  
+To keep this up to date, `renv::snapshot()` should be run periodically during development (before submitting PRs), which should add any packages that are used in `scpcaTools` scripts and notebooks to `renv.lock`.  
 When checking out a branch, `renv::restore()` can be used to keep local package installations in sync.
 
 Packages that are not required for the `scpcaTools` scripts directly, but that should be installed in the Docker image can be added to `docker/dependencies.R` to be sure they are part of the image.
