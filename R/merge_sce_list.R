@@ -44,15 +44,15 @@
 #' @import SingleCellExperiment
 merge_sce_list <- function(sce_list = list(),
                            batch_column = "library_id",
-                           retain_coldata_cols = c("barcode",
-                                                   "sum",
+                           retain_coldata_cols = c("sum",
                                                    "detected",
                                                    "total",
                                                    "subsets_mito_sum",
                                                    "subsets_mito_detected",
                                                    "subsets_mito_percent",
                                                    "miQC_pass",
-                                                   "prob_compromised"),
+                                                   "prob_compromised",
+                                                   "barcode"),
                            preserve_rowdata_cols = NULL,
                            cell_id_column = "cell_id") {
 
