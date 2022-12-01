@@ -44,8 +44,8 @@
 #' @import SingleCellExperiment
 merge_sce_list <- function(sce_list = list(),
                            batch_column = "library_id",
-                           retain_coldata_cols = c("sum",
-                                                   "barcode",
+                           retain_coldata_cols = c("barcode",
+                                                   "sum",
                                                    "detected",
                                                    "total",
                                                    "subsets_mito_sum",
