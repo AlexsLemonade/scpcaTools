@@ -112,14 +112,10 @@ merge_sce_list <- function(sce_list = list(),
                 retain_coldata_cols = retain_coldata_cols,
                 preserve_rowdata_cols = preserve_rowdata_cols)
 
-
   # Create the merged SCE from the processed list ------------------
   merged_sce <- do.call(cbind, sce_list)
 
-
-  # Return merged SCE object ----------------------------
   return(merged_sce)
-
 }
 
 
