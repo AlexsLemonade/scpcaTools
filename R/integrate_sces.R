@@ -146,7 +146,7 @@ integrate_harmony <- function(combined_sce,
                               ...) {
 
   # Check the combined_sce, depending on do_PCA, and define the harmony input_matrix accordingly
-  if (do_PCA) {
+  if (harmony_do_PCA) {
     if (!("logcounts" %in% names(assays(combined_sce)))) {
       stop("The combined_sce object requires a `logcounts` assay for harmony integration when `harmony_do_PCA` is `TRUE`.")
     }
@@ -183,9 +183,9 @@ integrate_harmony <- function(combined_sce,
 
   # Perform integration
   harmony_results <- harmony::HarmonyMatrix(input_matrix,
-                                            batch     = colData(combined_sce)[,batch_column],
                                             meta_data = harmony_metadata,
-                                            do_PCA    = harmony_do_PCA,
+                                            do_pca    = harmony_do_PCA,
+                                            vars_use  = covariate_cols,
                                             ...)
   # return resulting PCs
   return(harmony_results)

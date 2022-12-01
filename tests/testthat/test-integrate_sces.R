@@ -1,0 +1,116 @@
+# generate testing data
+set.seed(1665)
+combined_sce <- sim_sce(n_cells = 300, n_genes = 100, n_empty = 0)
+batches <- c(rep("a", 100),
+            rep("b", 100),
+            rep("c", 100))
+barcodes <- rownames(colData(combined_sce))
+
+# set up colData rownames as batch-barcode
+new_rownames <- tibble::tibble(
+  batches = batches,
+  barcodes = barcodes,
+  ids = glue::glue("{batches}-{barcodes}")) %>%
+  dplyr::pull(ids)
+rownames(colData(combined_sce)) <- new_rownames
+
+# Add some info to colData:
+# Add "sample" to colData
+colData(combined_sce)$sample <- batches
+# Add "cell_id" to colData to ensure it doesn't interfere during harmony
+colData(combined_sce)$cell_id <- barcodes
+# Add in a "covariate" column for testing
+colData(combined_sce)$covariate <- runif(300)
+
+# add a logcounts assay for testing (numbers don't matter)
+logcounts(combined_sce) <- counts(combined_sce)
+
+# add PCs for testing (again numbers don't matter)
+# make a 300x100 matrix
+reducedDim(combined_sce, "PCA") <- matrix(runif(300*100,min=0,max=100),nrow = 300)
+
+# Other variables that will be used in tests:
+batch_column <- "sample"
+
+################################################################################
+
+
+test_that("`integrate_fastmnn` works as expected", {
+  suppressWarnings(
+    # warnings are supressed here b/c simulated data plays poorly enough with
+    # algorithms to trigger warnings like:
+    ### Warning in (function (A, nv = 5, nu = nv, maxit = 1000, work = nv + 7, reorth = TRUE,  :
+    ### You're computing too large a percentage of total singular values, use a standard svd instead.
+    integrated_sce <- integrate_fastmnn(combined_sce,
+                                        batch_column)
+  )
+  # Result should have a `reconstructed` assay
+  expect_true("reconstructed" %in% assayNames(integrated_sce))
+
+  # Result should have a `corrected` reducedDim
+  expect_true("corrected" %in% reducedDimNames(integrated_sce))
+
+})
+
+
+test_that("`integrate_fastmnn` fails as expected when logcounts is missing", {
+  logcounts(combined_sce) <- NULL
+  expect_error(integrate_fastmnn(combined_sce,
+                                 batch_column))
+})
+
+
+test_that("`integrate_harmony` works as expected when do_PCA is TRUE", {
+  harmony_result <- integrate_harmony(combined_sce,
+                                      batch_column,
+                                      harmony_do_PCA = TRUE,
+                                      harmony_covariate_cols = c())
+  # check type
+  expect_true(all(class(harmony_result) == c("matrix", "array")))
+
+  # check dimensions
+  expect_true(nrow(harmony_result) == 300)
+
+  # rownames should equal the cell_id values
+  expect_true(all(rownames(harmony_result) == new_rownames))
+})
+
+
+
+test_that("`integrate_harmony` works as expected when do_PCA is FALSE", {
+  harmony_result <- integrate_harmony(combined_sce,
+                                      batch_column,
+                                      harmony_do_PCA = FALSE,
+                                      harmony_covariate_cols = c())
+  # check type
+  expect_true(all(class(harmony_result) == c("matrix", "array")))
+
+  # check dimensions
+  expect_true(nrow(harmony_result) == 300)
+
+  # rownames should equal the cell_id values
+  expect_true(all(rownames(harmony_result) == new_rownames))
+})
+
+
+
+test_that("`integrate_harmony` fails when logcounts is missing, do_PCA is TRUE", {
+  logcounts(combined_sce) <- NULL
+  expect_error(integrate_harmony(combined_sce,
+                                 batch_column,
+                                 harmony_do_PCA = TRUE,
+                                 harmony_covariate_cols = c()
+                                 )
+               )
+
+})
+
+test_that("`integrate_harmony` fails when PCs are missing, do_PCA is FALSE", {
+  reducedDim(combined_sce, "PCA") <- NULL
+  expect_error(integrate_harmony(combined_sce,
+                                 batch_column,
+                                 harmony_do_PCA = FALSE,
+                                 harmony_covariate_cols = c()
+                                )
+  )
+})
