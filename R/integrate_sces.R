@@ -3,26 +3,21 @@
 
 #' Integrate a combined set of SingleCellExperiment objects using a specified
 #'  integration method. The final SCE object will contain an additional reducedDim
-#'  entitled `{integration_method}_PCA`.
+#'  entitled `{integration_method}_PCA`. All original SCE assays are retained.
+#'  `fastMNN` integration uses all default setting, but additional parameters can be supplied.
+#'  `harmony` integration uses existing PCs, but additional parameters can be supplied.
 #'
 #' @param combined_sce A combined SCE object as prepared by `scpcaTools::merge_sce_list()`.
 #' @param integration_method The integration method to use. One of `fastMNN` or
-#'  `harmony` (case-insensitive)
-#' @param batch_column The column in the combined SCE object indicating batches
-#'  being integrated. Default is "sample".
-#' @param retain_assays A character vector of uncorrected assays to retain in
-#'   the integrated SCE object. By default, both "counts" and "logcounts" are retained.
+#'  `harmony` (case-sensitive)
+#' @param covariate_cols A vector of covariates (e.g. the batches) to consider during integration.
+#'   For both `fastMNN` and `harmony`, this should be SCE column indicating batches.
+#'   For `harmony` specifically, additionally SCE columns may be supplied.
+#'   Default is `c("sample")`.
 #' @param return_corrected_expression A boolean indicating whether corrected expression
 #'   values determined by the given integration method should be included in the
 #'   integrated SCE object. Note that `harmony` does not calculate corrected expression,
 #'   so this argument is ignored for this integration method. Default is `TRUE`.
-#' @param harmony_do_PCA A `harmony`-specific argument (ignored otherwise) indicating whether
-#'   integration should perform PCA. If `FALSE` (default), `harmony` will use the existing PCs to perform
-#'   integration. If `TRUE`, `harmony` will will start from normalized expression when integrating and
-#'   re-calculate PCs.
-#' @param harmony_covariate_cols A `harmony`-specific argument (ignored otherwise)
-#'   providing other columns in the combined SCE besides `batch_column` that `harmony`
-#'   should consider as covariates during integration.
 #' @param seed Random seed to set for integration. This is only set if the value is not `NULL`.
 #' @param ... Any additional parameters to be passed to the given integration method
 #'
@@ -32,12 +27,9 @@
 #'
 #' @export
 integrate_sces <- function(combined_sce,
-                           integration_method,
-                           batch_column = "sample",
-                           retain_assays = c("counts", "logcounts"),
+                           integration_method = c("fastMNN", "harmony"),
+                           covariate_cols = "sample",
                            return_corrected_expression = TRUE,
-                           harmony_do_PCA = FALSE,
-                           harmony_covariate_cols = c(),
                            seed = NULL,
                            ...) {
 
@@ -52,22 +44,26 @@ integrate_sces <- function(combined_sce,
   # Check integration_method
   integration_method <- match.arg(integration_method)
 
-  # Check batch_column
-  if (!(batch_column %in% names(colData(combined_sce)))) {
-    stop("The provided `batch_column` column must be in the `combined_sce` colData.")
+  # Check covariate_cols
+  if (length(covariate_cols) < 1) {
+    stop("Error: You must specify covariate (e.g. batch) columns in `covariate_cols`.")
+  }
+  if (length(covariate_cols) > 1 & integration_method == "fastMNN") {
+    stop("Error: fastMNN can only handle a single covariate (batch).")
+  }
+  if (!(all(covariate_cols %in% names(colData(combined_sce))))) {
+    stop("The provided covariate columns are not all present in the `combined_sce` colData.")
   }
 
   # Perform integration with specified method
-  if (integration_method == "fastmnn") {
+  if (integration_method == "fastMNN") {
+
     integrated_sce <- integrate_fastmnn(combined_sce,
-                                        batch_column,
+                                        covariate_cols,
                                         ...)
     # Add corrected expression to combined_sce if specified
     if (return_corrected_expression) {
-      assay_name <- "fastmnn_corrected"
-      assay(combined_sce, assay_name) <- assay(integrated_sce, "reconstructed")
-      # ensure that this assay is retained as lowercase
-      retain_assays <- c(retain_assays, assay_name)
+      assay(combined_sce, "fastMNN_corrected") <- assay(integrated_sce, "reconstructed")
     }
     # define PCs
     integrated_pcs <- reducedDim(integrated_sce, "corrected")
@@ -76,17 +72,8 @@ integrate_sces <- function(combined_sce,
 
     # here the result is the PCs:
     integrated_pcs <- integrate_harmony(combined_sce,
-                                        batch_column,
-                                        harmony_do_PCA,
-                                        harmony_covariate_cols,
+                                        covariate_cols,
                                         ...)
-  }
-
-  # Filter assays
-  assays_to_remove <- setdiff(assayNames(combined_sce),
-                              retain_assays)
-  for (assay_name in assays_to_remove) {
-    assay(combined_sce, assay_name) <- NULL
   }
 
   # Add PCs from integration into combined_sce (name is lowercase)
@@ -135,53 +122,37 @@ integrate_fastmnn <- function(combined_sce,
 #'
 #' @param combined_sce A combined SCE object as prepared by `scpcaTools::merge_sce_list()`.
 #' @param batch_column The variable in `combined_sce` indicating batches.
-#' @param harmony_do_PCA Whether integration should perform PCA (`TRUE`) and start with logcounts, or
-#'  use existing PCs to start (`FALSE`).
-#' @param harmony_covariate_cols A vector of other columns in the combined SCE besides
-#'  `batch_column` should be considered as covariates during integration.
+#' @param covariate_cols A vector of other columns, including the batch, to
+#'   consider as covariates during integration.
 #' @param ... Additional arguments to pass into `harmony::harmonyMatrix()`
 #'
 #' @return The integrated SCE object
 #'
 #' @import SingleCellExperiment
 integrate_harmony <- function(combined_sce,
-                              batch_column,
-                              harmony_do_PCA,
-                              harmony_covariate_cols,
+                              covariate_cols,
                               ...) {
 
-  # Check the combined_sce, depending on do_PCA, and define the harmony input_matrix accordingly
-  if (harmony_do_PCA) {
-    if (!("logcounts" %in% names(assays(combined_sce)))) {
-      stop("The combined_sce object requires a `logcounts` assay for harmony integration when `harmony_do_PCA` is `TRUE`.")
-    }
-    # input logcounts to harmony
-    input_matrix <- logcounts(combined_sce)
-  } else {
-    if (!("PCA" %in% reducedDimNames(combined_sce))) {
-      stop("The combined_sce object requires a `PCA` reduced dimension for harmony integration when `harmony_do_PCA` is `FALSE`.")
-    }
-    # input PCs to harmony
-    input_matrix <- reducedDim(combined_sce, "PCA")
-  }
-
-  # Ensure that harmony_covariate_cols are present
-  if (!(all(harmony_covariate_cols %in% names(colData(combined_sce))))) {
-    stop("The combined_sce object does not contain all columns specified in `harmony_covariate_cols`.")
+  # Check the combined_sce
+  if (!("PCA" %in% reducedDimNames(combined_sce))) {
+    stop("The combined_sce object requires a `PCA` reduced dimension for harmony integration.")
   }
 
   # Setup harmony metadata
-  covariate_cols <- unique(c(batch_column, harmony_covariate_cols))
   harmony_metadata <- tibble::as_tibble(colData(combined_sce)) %>%
-    dplyr::select(batch_column,
-                  dplyr::all_of(covariate_cols))
+    dplyr::select(dplyr::all_of(covariate_cols))
 
   # Perform integration
-  harmony_results <- harmony::HarmonyMatrix(input_matrix,
+  harmony_results <- harmony::HarmonyMatrix(reducedDim(combined_sce, "PCA"),
                                             meta_data = harmony_metadata,
-                                            do_pca    = harmony_do_PCA,
                                             vars_use  = covariate_cols,
                                             ...)
+  # Ensure PCs have rownames
+  if (is.null(rownames(harmony_results))) {
+    rownames(harmony_results) <- rownames(reducedDim(combined_sce, "PCA"))
+  }
+
+
   # return resulting PCs
   return(harmony_results)
 }
