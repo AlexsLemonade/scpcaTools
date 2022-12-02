@@ -38,7 +38,9 @@ so this argument is ignored for this integration method. Default is `TRUE`.}
 \item{...}{Any additional parameters to be passed to the given integration method}
 }
 \value{
-An update combined SCE object containing
+An update combined SCE object containing a new reduced dimension named
+  `{integration_method}_PCA` containing the corrected PCs. In the case of `fastMNN`
+  integration, the SCE also includes a corrected expression assay (`fastMNN_corrected`)
 }
 \description{
 Integrate a combined set of SingleCellExperiment objects using a specified
