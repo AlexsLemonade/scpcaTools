@@ -42,9 +42,7 @@ integrate_sces <- function(combined_sce,
                            ...) {
 
   # Set seed
-  if (!(is.null(seed))) {
-    set.seed(seed)
-  }
+  set.seed(seed)
 
   # make sure that input is a SingleCellExperiment
   if(!is(combined_sce, "SingleCellExperiment")){
