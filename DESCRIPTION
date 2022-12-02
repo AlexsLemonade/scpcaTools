@@ -7,25 +7,25 @@ Authors@R: c(
            email = "ally.hawkins@ccdatalab.org",
            comment = list(ORCID = "0000-0001-6026-3660"),
            role = c("aut", "cre")),
-    person(c("Joshua", "A."), "Shapiro", 
+    person(c("Joshua", "A."), "Shapiro",
            email = "josh.shapiro@ccdatalab.org",
            comment = list(ORCID = "0000-0002-6224-0347"),
            role = c("aut")),
-    person(c("Stephanie", "J."), "Spielman", 
+    person(c("Stephanie", "J."), "Spielman",
            email = "stephanie.spielman@ccdatalab.org",
            comment = list(ORCID = "0000-0002-9090-4788"),
-           role = c("aut"))           
+           role = c("aut"))
     )
 Maintainer: Ally Hawkins <ally.hawkins@ccdatalab.org>
-Description: Tools for processing single cell data associated with the 
+Description: Tools for processing single cell data associated with the
     Alex's Lemonade Stand Foundation Single Cell Pediatric Cancer Atlas.
 License: BSD_3_clause + file LICENSE
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.2.2
-Depends: 
+Depends:
     R (>= 4.2.0)
-Imports: 
+Imports:
     BiocGenerics,
     dplyr,
     DropletUtils,
@@ -46,8 +46,10 @@ Imports:
     tibble,
     tidyr,
     tximport
-Suggests: 
+Suggests:
+    batchelor,
     ggplot2,
+    harmony,
     kableExtra,
     rmarkdown,
     scater,
