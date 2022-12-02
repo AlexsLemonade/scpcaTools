@@ -4,16 +4,15 @@
 \alias{integrate_sces}
 \title{Integrate a combined set of SingleCellExperiment objects using a specified
  integration method. The final SCE object will contain an additional reducedDim
- entitled `{integration_method}_PCA`.}
+ entitled `{integration_method}_PCA`. All original SCE assays are retained.
+ `fastMNN` integration uses all default setting, but additional parameters can be supplied.
+ `harmony` integration uses existing PCs, but additional parameters can be supplied.}
 \usage{
 integrate_sces(
   combined_sce,
-  integration_method,
-  batch_column = "sample",
-  retain_assays = c("counts", "logcounts"),
+  integration_method = c("fastMNN", "harmony"),
+  covariate_cols = "sample",
   return_corrected_expression = TRUE,
-  harmony_do_PCA = FALSE,
-  harmony_covariate_cols = c(),
   seed = NULL,
   ...
 )
@@ -22,27 +21,17 @@ integrate_sces(
 \item{combined_sce}{A combined SCE object as prepared by `scpcaTools::merge_sce_list()`.}
 
 \item{integration_method}{The integration method to use. One of `fastMNN` or
-`harmony` (case-insensitive)}
+`harmony` (case-sensitive)}
 
-\item{batch_column}{The column in the combined SCE object indicating batches
-being integrated. Default is "sample".}
-
-\item{retain_assays}{A character vector of uncorrected assays to retain in
-the integrated SCE object. By default, both "counts" and "logcounts" are retained.}
+\item{covariate_cols}{A vector of covariates (e.g. the batches) to consider during integration.
+For both `fastMNN` and `harmony`, this should be SCE column indicating batches.
+For `harmony` specifically, additionally SCE columns may be supplied.
+Default is `c("sample")`.}
 
 \item{return_corrected_expression}{A boolean indicating whether corrected expression
 values determined by the given integration method should be included in the
 integrated SCE object. Note that `harmony` does not calculate corrected expression,
 so this argument is ignored for this integration method. Default is `TRUE`.}
-
-\item{harmony_do_PCA}{A `harmony`-specific argument (ignored otherwise) indicating whether
-integration should perform PCA. If `FALSE` (default), `harmony` will use the existing PCs to perform
-integration. If `TRUE`, `harmony` will will start from normalized expression when integrating and
-re-calculate PCs.}
-
-\item{harmony_covariate_cols}{A `harmony`-specific argument (ignored otherwise)
-providing other columns in the combined SCE besides `batch_column` that `harmony`
-should consider as covariates during integration.}
 
 \item{seed}{Random seed to set for integration. This is only set if the value is not `NULL`.}
 
@@ -54,5 +43,7 @@ An update combined SCE object containing
 \description{
 Integrate a combined set of SingleCellExperiment objects using a specified
  integration method. The final SCE object will contain an additional reducedDim
- entitled `{integration_method}_PCA`.
+ entitled `{integration_method}_PCA`. All original SCE assays are retained.
+ `fastMNN` integration uses all default setting, but additional parameters can be supplied.
+ `harmony` integration uses existing PCs, but additional parameters can be supplied.
 }
