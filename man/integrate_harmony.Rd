@@ -15,8 +15,6 @@ integrate_harmony(combined_sce, covariate_cols, ...)
 consider as covariates during integration.}
 
 \item{...}{Additional arguments to pass into `harmony::harmonyMatrix()`}
-
-\item{batch_column}{The variable in `combined_sce` indicating batches.}
 }
 \value{
 The integrated SCE object
