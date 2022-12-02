@@ -50,11 +50,7 @@ integrate_sces <- function(combined_sce,
   }
 
   # Check integration_method
-  integration_method <- tolower(integration_method)
-  allowed_methods <- c("fastMNN", "harmony")
-  if (!(integration_method %in% tolower(allowed_methods))) {
-    stop("Integration method must be one of `fastMNN` or `harmony` (case-insensitive.")
-  }
+  integration_method <- match.arg(integration_method)
 
   # Check batch_column
   if (!(batch_column %in% names(colData(combined_sce)))) {
