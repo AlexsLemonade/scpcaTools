@@ -64,7 +64,7 @@ test_that("`integrate_fastmnn` fails as expected when logcounts is missing", {
 })
 
 
-test_that("`integrate_harmony` works as expected when do_PCA is TRUE", {
+test_that("`integrate_harmony` works as expected", {
   harmony_result <- integrate_harmony(combined_sce,
                                       batch_column)
   # check type
