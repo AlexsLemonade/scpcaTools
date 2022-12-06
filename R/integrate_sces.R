@@ -21,7 +21,7 @@
 #' @param seed Random seed to set for integration. This is only set if the value is not `NULL`.
 #' @param ... Any additional parameters to be passed to the given integration method
 #'
-#' @return An update merged SCE object containing a new reduced dimension named
+#' @return An updated merged SCE object containing a new reduced dimension named
 #'   `{integration_method}_PCA` containing the corrected PCs. In the case of `fastMNN`
 #'   integration, the SCE also includes a corrected expression assay (`fastMNN_corrected`)
 #'
