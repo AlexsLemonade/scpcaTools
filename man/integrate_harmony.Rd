@@ -6,18 +6,21 @@
 approach from the `harmony` package.
 Source: https://cran.r-project.org/web/packages/harmony/index.html}
 \usage{
-integrate_harmony(combined_sce, covariate_cols, ...)
+integrate_harmony(merged_sce, batch_column, harmony_covariate_cols = c(), ...)
 }
 \arguments{
-\item{combined_sce}{A combined SCE object as prepared by `scpcaTools::merge_sce_list()`.}
+\item{merged_sce}{A combined SCE object as prepared by `scpcaTools::merge_sce_list()`.}
 
-\item{covariate_cols}{A vector of other columns, including the batch, to
-consider as covariates during integration.}
+\item{batch_column}{The column in the combined SCE object indicating batches
+being integrated.}
+
+\item{harmony_covariate_cols}{A vector of other columns to consider as
+covariates during integration.}
 
 \item{...}{Additional arguments to pass into `harmony::harmonyMatrix()`}
 }
 \value{
-The integrated SCE object
+Integrated PCs as calculated by `harmony`
 }
 \description{
 Integrate a list of SingleCellExperiment (SCE) objects using the harmony

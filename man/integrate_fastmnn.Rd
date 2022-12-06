@@ -6,17 +6,17 @@
 approach from the `batchelor` package.
 Source: http://www.bioconductor.org/packages/release/bioc/html/batchelor.html}
 \usage{
-integrate_fastmnn(combined_sce, batch_column, ...)
+integrate_fastmnn(merged_sce, batch_column, ...)
 }
 \arguments{
-\item{combined_sce}{A combined SCE object as prepared by `scpcaTools::merge_sce_list()`.}
+\item{merged_sce}{A combined SCE object as prepared by `scpcaTools::merge_sce_list()`.}
 
-\item{batch_column}{The variable in `combined_sce` indicating batches.}
+\item{batch_column}{The variable in `merged_sce` indicating batches.}
 
 \item{...}{Additional arguments to pass into `batchelor::fastMNN()`}
 }
 \value{
-The integrated SCE object
+An integrated SCE object produced by `fastMNN`
 }
 \description{
 Integrate a list of SingleCellExperiment (SCE) objects using the fastMNN

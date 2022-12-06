@@ -2,31 +2,33 @@
 % Please edit documentation in R/integrate_sces.R
 \name{integrate_sces}
 \alias{integrate_sces}
-\title{Integrate a combined set of SingleCellExperiment objects using a specified
+\title{Integrate a merged set of SingleCellExperiment objects using a specified
  integration method. The final SCE object will contain an additional reducedDim
  entitled `{integration_method}_PCA`. All original SCE assays are retained.
  `fastMNN` integration uses all default setting, but additional parameters can be supplied.
  `harmony` integration uses existing PCs, but additional parameters can be supplied.}
 \usage{
 integrate_sces(
-  combined_sce,
+  merged_sce,
   integration_method = c("fastMNN", "harmony"),
-  covariate_cols = "sample",
+  batch_column = "sample",
+  harmony_covariate_cols = c(),
   return_corrected_expression = TRUE,
   seed = NULL,
   ...
 )
 }
 \arguments{
-\item{combined_sce}{A combined SCE object as prepared by `scpcaTools::merge_sce_list()`.}
+\item{merged_sce}{A merged SCE object as prepared by `scpcaTools::merge_sce_list()`.}
 
 \item{integration_method}{The integration method to use. One of `fastMNN` or
 `harmony` (case-sensitive)}
 
-\item{covariate_cols}{A vector of covariates (e.g. the batches) to consider during integration.
-For both `fastMNN` and `harmony`, this should be SCE column indicating batches.
-For `harmony` specifically, additionally SCE columns may be supplied.
-Default is `c("sample")`.}
+\item{batch_column}{The column in the merged SCE object indicating batches}
+
+\item{harmony_covariate_cols}{A `harmony`-specific argument (ignored otherwise)
+providing other columns in the combined SCE besides `batch_column` that `harmony`
+should consider as covariates during integration.}
 
 \item{return_corrected_expression}{A boolean indicating whether corrected expression
 values determined by the given integration method should be included in the
@@ -38,12 +40,12 @@ so this argument is ignored for this integration method. Default is `TRUE`.}
 \item{...}{Any additional parameters to be passed to the given integration method}
 }
 \value{
-An update combined SCE object containing a new reduced dimension named
+An update merged SCE object containing a new reduced dimension named
   `{integration_method}_PCA` containing the corrected PCs. In the case of `fastMNN`
   integration, the SCE also includes a corrected expression assay (`fastMNN_corrected`)
 }
 \description{
-Integrate a combined set of SingleCellExperiment objects using a specified
+Integrate a merged set of SingleCellExperiment objects using a specified
  integration method. The final SCE object will contain an additional reducedDim
  entitled `{integration_method}_PCA`. All original SCE assays are retained.
  `fastMNN` integration uses all default setting, but additional parameters can be supplied.
