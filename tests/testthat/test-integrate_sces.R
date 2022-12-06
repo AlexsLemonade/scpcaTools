@@ -37,6 +37,7 @@ batch_column <- "sample"
 ################################################################################
 
 
+
 test_that("`integrate_fastmnn` works as expected", {
   suppressWarnings(
     # warnings are supressed here b/c simulated data plays poorly enough with
@@ -116,6 +117,13 @@ test_that("`integrate_sces` fail as expected", {
     integrate_sces(combined_sce,
                    "fastMNN",
                    batch_column = "not_a_column")
+  )
+
+  # insufficient batches
+  combined_sce$sample <- "a"
+  expect_error(
+    integrate_sces(combined_sce,
+                   "fastMNN")
   )
 
 })

@@ -44,6 +44,7 @@ integrate_sces <- function(merged_sce,
     stop("The `merged_sce` must be a SingleCellExperiment object created with `scpcaTools::merge_sce_list().`")
   }
 
+
   # Check integration_method
   integration_method <- match.arg(integration_method)
 
@@ -51,7 +52,15 @@ integrate_sces <- function(merged_sce,
   if (!(batch_column %in% names(colData(merged_sce)))) {
     stop("The provided `batch_column` column must be in the `merged_sce` colData.")
   }
-
+  # Ensure there are no NAs
+  batches <- colData(merged_sce)[[batch_column]]
+  if( sum(is.na(batches)) > 0 ) {
+    stop("`NA` values are not allowed in the `batch_column`.")
+  }
+  # Ensure >=2 batches
+  if( length(unique(batches)) < 2 ) {
+    stop("At least two batches are required for integration.")
+  }
 
 
   # Perform integration with specified method
