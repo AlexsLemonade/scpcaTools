@@ -9,9 +9,9 @@ Source: https://cran.r-project.org/web/packages/harmony/index.html}
 integrate_harmony(merged_sce, batch_column, harmony_covariate_cols = c(), ...)
 }
 \arguments{
-\item{merged_sce}{A combined SCE object as prepared by `scpcaTools::merge_sce_list()`.}
+\item{merged_sce}{A merged SCE object as prepared by `scpcaTools::merge_sce_list()`.}
 
-\item{batch_column}{The column in the combined SCE object indicating batches
+\item{batch_column}{The column in the merged SCE object indicating batches
 being integrated.}
 
 \item{harmony_covariate_cols}{A vector of other columns to consider as

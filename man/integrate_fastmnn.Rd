@@ -9,7 +9,7 @@ Source: http://www.bioconductor.org/packages/release/bioc/html/batchelor.html}
 integrate_fastmnn(merged_sce, batch_column, ...)
 }
 \arguments{
-\item{merged_sce}{A combined SCE object as prepared by `scpcaTools::merge_sce_list()`.}
+\item{merged_sce}{A merged SCE object as prepared by `scpcaTools::merge_sce_list()`.}
 
 \item{batch_column}{The variable in `merged_sce` indicating batches.}
 

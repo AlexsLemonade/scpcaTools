@@ -40,7 +40,7 @@ so this argument is ignored for this integration method. Default is `TRUE`.}
 \item{...}{Any additional parameters to be passed to the given integration method}
 }
 \value{
-An update merged SCE object containing a new reduced dimension named
+An updated merged SCE object containing a new reduced dimension named
   `{integration_method}_PCA` containing the corrected PCs. In the case of `fastMNN`
   integration, the SCE also includes a corrected expression assay (`fastMNN_corrected`)
 }
