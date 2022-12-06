@@ -134,7 +134,7 @@ integrate_fastmnn <- function(merged_sce,
 #' Source: https://cran.r-project.org/web/packages/harmony/index.html
 #'
 #' @param merged_sce A merged SCE object as prepared by `scpcaTools::merge_sce_list()`.
-#' @param batch_column The column in the combined SCE object indicating batches
+#' @param batch_column The column in the merged SCE object indicating batches
 #'   being integrated.
 #' @param harmony_covariate_cols A vector of other columns to consider as
 #'   covariates during integration.
