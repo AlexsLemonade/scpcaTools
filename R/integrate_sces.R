@@ -102,7 +102,7 @@ integrate_sces <- function(merged_sce,
 #' approach from the `batchelor` package.
 #' Source: http://www.bioconductor.org/packages/release/bioc/html/batchelor.html
 #'
-#' @param merged_sce A combined SCE object as prepared by `scpcaTools::merge_sce_list()`.
+#' @param merged_sce A merged SCE object as prepared by `scpcaTools::merge_sce_list()`.
 #' @param batch_column The variable in `merged_sce` indicating batches.
 #' @param ... Additional arguments to pass into `batchelor::fastMNN()`
 #'
