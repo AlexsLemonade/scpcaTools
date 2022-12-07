@@ -5,14 +5,14 @@ batches <- rep(c("a", "b", "c"), each = 100)
 barcodes <- rownames(colData(merged_sce))
 
 # set up colData rownames as batch-barcode
-new_rownames <- glue::glue("{batches}-{barcodes}")) 
+new_rownames <- glue::glue("{batches}-{barcodes}")
 rownames(colData(merged_sce)) <- new_rownames
 
 # Add some info to colData:
 # Add "sample" to colData
 colData(merged_sce)$sample <- batches
 # Add in a "covariate" column for testing
-colData(merged_sce)$covariate <- sample(c("patient-a", "patient-b", "patient-c", "patient-d"),
+colData(merged_sce)$covariate <- sample(letters[1:4],
                                           size = 300,
                                           replace = TRUE)
 
@@ -130,7 +130,7 @@ test_that("`integrate_sces` works as expected for fastmnn defaults", {
   })
 
   expect_equal(assayNames(integrated_sce),
-               c("counts", "logcounts", "fastMNN_corrected")
+               c("counts", "logcounts")
   )
 
   expect_true(
@@ -140,17 +140,17 @@ test_that("`integrate_sces` works as expected for fastmnn defaults", {
 })
 
 
-test_that("`integrate_sces` works as expected for return_corrected_expression=FALSE", {
+test_that("`integrate_sces` works as expected for return_corrected_expression=TRUE", {
 
   suppressWarnings({
     # simulated-data related numerical warnings
     integrated_sce <- integrate_sces(merged_sce,
                                      "fastMNN",
-                                     return_corrected_expression = FALSE)
+                                     return_corrected_expression = TRUE)
   })
 
   expect_equal(assayNames(integrated_sce),
-               c("counts", "logcounts")
+               c("counts", "logcounts", "fastMNN_corrected")
   )
 
 })

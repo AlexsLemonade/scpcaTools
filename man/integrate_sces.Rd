@@ -13,7 +13,7 @@ integrate_sces(
   integration_method = c("fastMNN", "harmony"),
   batch_column = "sample",
   covariate_cols = c(),
-  return_corrected_expression = TRUE,
+  return_corrected_expression = FALSE,
   seed = NULL,
   ...
 )
@@ -33,7 +33,7 @@ consider as covariates during integration. Currently, this is used only by
 \item{return_corrected_expression}{A boolean indicating whether corrected expression
 values determined by the given integration method should be included in the
 integrated SCE object. Note that `harmony` does not calculate corrected expression,
-so this argument is ignored for this integration method. Default is `TRUE`.}
+so this argument is ignored for this integration method. Default is `FALSE`.}
 
 \item{seed}{Random seed to set for integration. This is only set if the value is not `NULL`.}
 

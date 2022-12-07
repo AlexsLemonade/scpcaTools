@@ -17,7 +17,7 @@
 #' @param return_corrected_expression A boolean indicating whether corrected expression
 #'   values determined by the given integration method should be included in the
 #'   integrated SCE object. Note that `harmony` does not calculate corrected expression,
-#'   so this argument is ignored for this integration method. Default is `TRUE`.
+#'   so this argument is ignored for this integration method. Default is `FALSE`.
 #' @param seed Random seed to set for integration. This is only set if the value is not `NULL`.
 #' @param ... Any additional parameters to be passed to the given integration method
 #'
@@ -32,7 +32,7 @@ integrate_sces <- function(merged_sce,
                            integration_method = c("fastMNN", "harmony"),
                            batch_column = "sample",
                            covariate_cols = c(),
-                           return_corrected_expression = TRUE,
+                           return_corrected_expression = FALSE,
                            seed = NULL,
                            ...) {
 
@@ -114,8 +114,8 @@ integrate_fastmnn <- function(merged_sce,
                               ...) {
 
   # Check that batchelor is installed
-  if (!requireNamespace("batchelor", quietly = TRUE)) { 
-    stop("The batchelor package must be installed to use fastMNN.") 
+  if (!requireNamespace("batchelor", quietly = TRUE)) {
+    stop("The `batchelor` package must be installed to use fastMNN.")
   }
 
   # Check the merged_sce for logcounts
@@ -152,6 +152,11 @@ integrate_harmony <- function(merged_sce,
                               batch_column,
                               covariate_cols = c(),
                               ...) {
+
+  # Check that harmony is installed
+  if (!requireNamespace("harmony", quietly = TRUE)) {
+    stop("The `harmony` package must be installed to use this integration method.")
+  }
 
   # Check the merged_sce
   if (!("PCA" %in% reducedDimNames(merged_sce))) {
