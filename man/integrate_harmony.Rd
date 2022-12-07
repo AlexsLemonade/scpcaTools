@@ -6,7 +6,7 @@
 approach from the `harmony` package.
 Source: https://cran.r-project.org/web/packages/harmony/index.html}
 \usage{
-integrate_harmony(merged_sce, batch_column, harmony_covariate_cols = c(), ...)
+integrate_harmony(merged_sce, batch_column, covariate_cols = c(), ...)
 }
 \arguments{
 \item{merged_sce}{A merged SCE object as prepared by `scpcaTools::merge_sce_list()`.}
@@ -14,7 +14,7 @@ integrate_harmony(merged_sce, batch_column, harmony_covariate_cols = c(), ...)
 \item{batch_column}{The column in the merged SCE object indicating batches
 being integrated.}
 
-\item{harmony_covariate_cols}{A vector of other columns to consider as
+\item{covariate_cols}{A vector of other columns to consider as
 covariates during integration.}
 
 \item{...}{Additional arguments to pass into `harmony::harmonyMatrix()`}

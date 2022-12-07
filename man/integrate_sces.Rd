@@ -12,7 +12,7 @@ integrate_sces(
   merged_sce,
   integration_method = c("fastMNN", "harmony"),
   batch_column = "sample",
-  harmony_covariate_cols = c(),
+  covariate_cols = c(),
   return_corrected_expression = TRUE,
   seed = NULL,
   ...
@@ -26,9 +26,9 @@ integrate_sces(
 
 \item{batch_column}{The column in the merged SCE object indicating batches}
 
-\item{harmony_covariate_cols}{A `harmony`-specific argument (ignored otherwise)
-providing other columns in the combined SCE besides `batch_column` that `harmony`
-should consider as covariates during integration.}
+\item{covariate_cols}{A vector of additional columns in the merged SCE to
+consider as covariates during integration. Currently, this is used only by
+`harmony`.}
 
 \item{return_corrected_expression}{A boolean indicating whether corrected expression
 values determined by the given integration method should be included in the

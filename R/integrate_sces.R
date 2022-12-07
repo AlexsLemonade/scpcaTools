@@ -11,9 +11,9 @@
 #' @param integration_method The integration method to use. One of `fastMNN` or
 #'  `harmony` (case-sensitive)
 #' @param batch_column The column in the merged SCE object indicating batches
-#' @param harmony_covariate_cols A `harmony`-specific argument (ignored otherwise)
-#'   providing other columns in the combined SCE besides `batch_column` that `harmony`
-#'   should consider as covariates during integration.
+#' @param covariate_cols A vector of additional columns in the merged SCE to
+#'   consider as covariates during integration. Currently, this is used only by
+#'   `harmony`.
 #' @param return_corrected_expression A boolean indicating whether corrected expression
 #'   values determined by the given integration method should be included in the
 #'   integrated SCE object. Note that `harmony` does not calculate corrected expression,
@@ -31,7 +31,7 @@
 integrate_sces <- function(merged_sce,
                            integration_method = c("fastMNN", "harmony"),
                            batch_column = "sample",
-                           harmony_covariate_cols = c(),
+                           covariate_cols = c(),
                            return_corrected_expression = TRUE,
                            seed = NULL,
                            ...) {
@@ -66,8 +66,8 @@ integrate_sces <- function(merged_sce,
   # Perform integration with specified method
   if (integration_method == "fastMNN") {
 
-    if (length(harmony_covariate_cols) >= 1) {
-      warning("fastMNN cannot use additional covariates. `harmony_covariate_cols` will be ignored.")
+    if (length(covariate_cols) >= 1) {
+      warning("fastMNN cannot use additional covariates, so `covariate_cols` will be ignored.")
     }
 
     integrated_sce <- integrate_fastmnn(merged_sce,
@@ -85,7 +85,7 @@ integrate_sces <- function(merged_sce,
     # here the result is the PCs:
     integrated_pcs <- integrate_harmony(merged_sce,
                                         batch_column,
-                                        harmony_covariate_cols,
+                                        covariate_cols,
                                         ...)
   }
 
@@ -136,7 +136,7 @@ integrate_fastmnn <- function(merged_sce,
 #' @param merged_sce A merged SCE object as prepared by `scpcaTools::merge_sce_list()`.
 #' @param batch_column The column in the merged SCE object indicating batches
 #'   being integrated.
-#' @param harmony_covariate_cols A vector of other columns to consider as
+#' @param covariate_cols A vector of other columns to consider as
 #'   covariates during integration.
 #' @param ... Additional arguments to pass into `harmony::harmonyMatrix()`
 #'
@@ -145,7 +145,7 @@ integrate_fastmnn <- function(merged_sce,
 #' @import SingleCellExperiment
 integrate_harmony <- function(merged_sce,
                               batch_column,
-                              harmony_covariate_cols = c(),
+                              covariate_cols = c(),
                               ...) {
 
   # Check the merged_sce
@@ -154,12 +154,12 @@ integrate_harmony <- function(merged_sce,
   }
 
   # Check covariate columns
-  if (!(all(harmony_covariate_cols %in% names(colData(merged_sce))))) {
+  if (!(all(covariate_cols %in% names(colData(merged_sce))))) {
     stop("The provided covariate columns are not all present in the `merged_sce` colData.")
   }
 
   # Setup harmony metadata
-  covariate_cols <- c(batch_column, harmony_covariate_cols)
+  covariate_cols <- c(batch_column, covariate_cols)
   harmony_metadata <- tibble::as_tibble(colData(merged_sce)) %>%
     dplyr::select(
       dplyr::all_of(c(batch_column, covariate_cols))
