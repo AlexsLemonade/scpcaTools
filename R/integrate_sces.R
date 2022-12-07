@@ -82,6 +82,11 @@ integrate_sces <- function(merged_sce,
   }
   else if (integration_method == "harmony") {
 
+    # warn that this is not possible
+    if (return_corrected_expression) {
+      warning("`harmony` does not calculate corrected expression values, so none can be returned.")
+    }
+
     # here the result is the PCs:
     integrated_pcs <- integrate_harmony(merged_sce,
                                         batch_column,

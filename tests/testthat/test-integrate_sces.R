@@ -142,6 +142,8 @@ test_that("`integrate_sces` works as expected for fastmnn defaults", {
 
 test_that("`integrate_sces` works as expected for return_corrected_expression=TRUE", {
 
+
+  # fastmnn:
   suppressWarnings({
     # simulated-data related numerical warnings
     integrated_sce <- integrate_sces(merged_sce,
@@ -151,6 +153,14 @@ test_that("`integrate_sces` works as expected for return_corrected_expression=TR
 
   expect_equal(assayNames(integrated_sce),
                c("counts", "logcounts", "fastMNN_corrected")
+  )
+
+  # harmony should warn:
+  expect_warning(
+    # this needs to be saved to avoid `Error in x$.self$finalize() : attempt to apply non-function`
+    result <- integrate_sces(merged_sce,
+                   "harmony",
+                   return_corrected_expression = TRUE)
   )
 
 })
