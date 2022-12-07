@@ -1,17 +1,11 @@
 # generate testing data
 set.seed(1665)
 merged_sce <- sim_sce(n_cells = 300, n_genes = 100, n_empty = 0)
-batches <- c(rep("a", 100),
-             rep("b", 100),
-             rep("c", 100))
+batches <- rep(c("a", "b", "c"), each = 100)
 barcodes <- rownames(colData(merged_sce))
 
 # set up colData rownames as batch-barcode
-new_rownames <- tibble::tibble(
-  batches = batches,
-  barcodes = barcodes,
-  ids = glue::glue("{batches}-{barcodes}")) %>%
-  dplyr::pull(ids)
+new_rownames <- glue::glue("{batches}-{barcodes}")) 
 rownames(colData(merged_sce)) <- new_rownames
 
 # Add some info to colData:
@@ -87,7 +81,7 @@ test_that("`integrate_harmony` fails when covariate columns are missing", {
   expect_error(
     integrate_harmony(merged_sce,
                       batch_column,
-                      harmony_covariate_cols = "not_a_column"
+                      covariate_cols = "not_a_column"
     )
   )
 })

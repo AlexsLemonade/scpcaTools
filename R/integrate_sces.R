@@ -54,7 +54,7 @@ integrate_sces <- function(merged_sce,
   }
   # Ensure there are no NAs
   batches <- colData(merged_sce)[[batch_column]]
-  if( sum(is.na(batches)) > 0 ) {
+  if( any(is.na(batches)) ) {
     stop("`NA` values are not allowed in the `batch_column`.")
   }
   # Ensure >=2 batches
@@ -66,7 +66,7 @@ integrate_sces <- function(merged_sce,
   # Perform integration with specified method
   if (integration_method == "fastMNN") {
 
-    if (length(covariate_cols) >= 1) {
+    if (length(covariate_cols) > 0) {
       warning("fastMNN cannot use additional covariates, so `covariate_cols` will be ignored.")
     }
 
@@ -80,7 +80,7 @@ integrate_sces <- function(merged_sce,
     # define PCs
     integrated_pcs <- reducedDim(integrated_sce, "corrected")
   }
-  if (integration_method == "harmony") {
+  else if (integration_method == "harmony") {
 
     # here the result is the PCs:
     integrated_pcs <- integrate_harmony(merged_sce,
@@ -112,6 +112,11 @@ integrate_sces <- function(merged_sce,
 integrate_fastmnn <- function(merged_sce,
                               batch_column,
                               ...) {
+
+  # Check that batchelor is installed
+  if (!requireNamespace("batchelor", quietly = TRUE)) { 
+    stop("The batchelor package must be installed to use fastMNN.") 
+  }
 
   # Check the merged_sce for logcounts
   if (!("logcounts" %in% names(assays(merged_sce)))) {
@@ -162,7 +167,7 @@ integrate_harmony <- function(merged_sce,
   covariate_cols <- c(batch_column, covariate_cols)
   harmony_metadata <- tibble::as_tibble(colData(merged_sce)) %>%
     dplyr::select(
-      dplyr::all_of(c(batch_column, covariate_cols))
+      dplyr::all_of(covariate_cols)
     )
 
   # Perform integration
