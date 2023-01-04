@@ -97,37 +97,6 @@ if(has_processed){
 }
 ```
 
-```{r, results='asis'}
-# check for number of filtered cells
-if(has_filtered){
-  if(ncol(filtered_sce) > 100){
-    glue::glue("
-      <div class=\"alert alert-warning\">
-      
-      This library contains fewer than 100 cells post removal of empty droplets.
-      This may affect the interpretation of results.
-      
-      </div>
-    ")
-  } 
-}
-
-# check for number of cells post processing
-if(has_processed){
-  if(ncol(processed_sce) > 50){
-    glue::glue("
-      <div class=\"alert alert-warning\">
-      
-      This library contains fewer than 50 cells post removal of low quality cells.
-      UMAP is unable to be calculated and plots will not be shown.
-      
-      
-      </div>
-    ")
-  }  
-}
-```
-
 
 # Processing Information for `r library_id`
 
@@ -305,6 +274,36 @@ if(has_filtered &&
 }
 ```
 
+```{r, results='asis'}
+# check for number of filtered cells
+if(has_filtered){
+  if(ncol(filtered_sce) < 100){
+    glue::glue("
+      <div class=\"alert alert-warning\">
+      
+      This library contains fewer than 100 cells in the filtered `SingleCellExperiment` object.
+      This may affect the interpretation of results.
+      
+      </div>
+    ")
+  } 
+}
+
+# check for number of cells post processing
+if(has_processed){
+  if(ncol(processed_sce) < 50){
+    glue::glue("
+      <div class=\"alert alert-warning\">
+      
+      This library contains fewer than 50 cells in the processed `SingleCellExperiment` object after removal of low quality cells.
+      UMAP is unable to be calculated and plots will not be shown.
+      
+      
+      </div>
+    ")
+  }  
+}
+```
 
 ## Knee Plot
 
