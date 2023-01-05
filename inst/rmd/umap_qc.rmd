@@ -1,5 +1,7 @@
 ## Dimensionality Reduction 
 
+The below plot shows the UMAP (Uniform Manifold Approximation and Projection) embeddings for each cell, coloring each cell by the total number of genes detected per cell.
+
 ```{r message=FALSE}
 # create UMAP colored by number of genes detected 
 scater::plotUMAP(processed_sce,
@@ -13,9 +15,8 @@ scater::plotUMAP(processed_sce,
   )
 ```
 
-Compromised cells, calculated using `miQC` described above, are filtered and removed from the library prior to downstream analyses. 
-The raw counts from all remaining cells are then normalized prior to selection of highly variable genes and dimensionality reduction. 
-The above plot shows the UMAP (Uniform Manifold Approximation and Projection) embeddings for each cell, coloring each cell by the total number of genes detected per cell.
+### Expression of highly variable genes
+
 The plots below show the same UMAP embeddings, coloring each cell by the expression level of the labeled gene.
 The genes chosen for plotting are the 12 most variable genes identified in the library.
 Gene symbols are used when available to label the UMAP plots.
