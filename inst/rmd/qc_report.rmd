@@ -276,12 +276,13 @@ if(has_filtered &&
 
 ```{r, results='asis'}
 # check for number of filtered cells
+min_filtered <- 100
 if(has_filtered){
-  if(ncol(filtered_sce) < 100){
+  if(ncol(filtered_sce) < min_filtered){
     glue::glue("
       <div class=\"alert alert-warning\">
       
-      This library contains fewer than 100 cells in the filtered `SingleCellExperiment` object.
+      This library contains fewer than {min_filtered} cells in the filtered `SingleCellExperiment` object.
       This may affect the interpretation of results.
       
       </div>
@@ -290,14 +291,14 @@ if(has_filtered){
 }
 
 # check for number of cells post processing
+min_processed <- 50
 if(has_processed){
-  if(ncol(processed_sce) < 50){
+  if(ncol(processed_sce) < min_processed){
     glue::glue("
       <div class=\"alert alert-warning\">
       
-      This library contains fewer than 50 cells in the processed `SingleCellExperiment` object after removal of low quality cells.
+      This library contains fewer than {min_processed} cells in the processed `SingleCellExperiment` object after removal of low quality cells.
       UMAP is unable to be calculated and plots will not be shown.
-      
       
       </div>
     ")
