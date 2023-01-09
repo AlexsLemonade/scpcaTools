@@ -49,7 +49,7 @@ if (!has_filtered){
   filtered_sce <- unfiltered_sce
 }
 
-# grab sample id from filtered sce, if missing set sample ID to NA
+# grab sample id from filtered sce, if missing set sample id to NA
 if(is.null(metadata(filtered_sce)$sample_id)){
   sample_id <- NA
 } else {
@@ -105,7 +105,7 @@ if(has_processed){
 has_multiplex <- length(sample_id) > 1
 
 if(has_multiplex){
-  # convert sample ID to bullet separated list 
+  # convert sample id to bullet separated list 
   multiplex_samples <- paste0("<li>", paste(sample_id, collapse = '</li><li>', "</li>"))
   glue::glue("
     <div class=\"alert alert-warning\">
@@ -470,8 +470,7 @@ if(has_filtered & has_processed){
 }
 ```
 
-Compromised cells, calculated using `miQC` described above, are filtered and removed from the library prior to downstream analyses. 
-The raw counts from all remaining cells are then normalized prior to selection of highly variable genes and dimensionality reduction. 
+The raw counts from all cells that remain after filtering low quality cells are then normalized prior to selection of highly variable genes and dimensionality reduction. 
 
 <!-- Next section include only if UMAP is present -->
 ```{r, child='umap_qc.rmd', eval = has_umap}

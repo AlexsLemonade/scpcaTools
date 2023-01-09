@@ -20,7 +20,7 @@ scater::plotUMAP(processed_sce,
 The plots below show the same UMAP embeddings, coloring each cell by the expression level of the labeled gene.
 The genes chosen for plotting are the 12 most variable genes identified in the library.
 Gene symbols are used when available to label the UMAP plots.
-If gene symbols are not available, the Ensembl ID will be shown.
+If gene symbols are not available, the Ensembl id will be shown.
 
 ```{r message=FALSE, results='asis'}
 # only create plot if variable genes are present
