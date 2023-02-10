@@ -11,6 +11,9 @@
 #' @param integration_method The integration method to use. One of `fastMNN` or
 #'  `harmony` (case-sensitive)
 #' @param batch_column The column in the merged SCE object indicating batches
+#' @param hv_genes A vector specifying which highly variable features to use for correction.
+#'   This argument will only be used if integrating with `fastMNN` and ignored with `harmony`.
+#'   Default is `NULL`.
 #' @param covariate_cols A vector of additional columns in the merged SCE to
 #'   consider as covariates during integration. Currently, this is used only by
 #'   `harmony`.
@@ -31,6 +34,7 @@
 integrate_sces <- function(merged_sce,
                            integration_method = c("fastMNN", "harmony"),
                            batch_column = "sample",
+                           hv_genes = NULL,
                            covariate_cols = c(),
                            return_corrected_expression = FALSE,
                            seed = NULL,
@@ -72,6 +76,7 @@ integrate_sces <- function(merged_sce,
 
     integrated_sce <- integrate_fastmnn(merged_sce,
                                         batch_column,
+                                        subset.row = hv_genes,
                                         ...)
     # Add corrected expression to merged_sce if specified
     if (return_corrected_expression) {
@@ -85,6 +90,10 @@ integrate_sces <- function(merged_sce,
     # warn that this is not possible
     if (return_corrected_expression) {
       warning("`harmony` does not calculate corrected expression values, so none can be returned.")
+    }
+
+    if(!is.null(hv_genes)){
+      warning("`harmony` does not consider highly variable genes and `hv_genes` will be ignroed.")
     }
 
     # here the result is the PCs:
