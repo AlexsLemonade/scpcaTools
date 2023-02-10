@@ -76,7 +76,7 @@ integrate_sces <- function(merged_sce,
 
     integrated_sce <- integrate_fastmnn(merged_sce,
                                         batch_column,
-                                        subset.row = hv_genes,
+                                        hv_genes,
                                         ...)
     # Add corrected expression to merged_sce if specified
     if (return_corrected_expression) {
@@ -118,6 +118,7 @@ integrate_sces <- function(merged_sce,
 #'
 #' @param merged_sce A merged SCE object as prepared by `scpcaTools::merge_sce_list()`.
 #' @param batch_column The variable in `merged_sce` indicating batches.
+#' @param hv_genes A vector specifying which highly variable features to use for correction.
 #' @param ... Additional arguments to pass into `batchelor::fastMNN()`
 #'
 #' @return An integrated SCE object produced by `fastMNN`
@@ -125,6 +126,7 @@ integrate_sces <- function(merged_sce,
 #' @import SingleCellExperiment
 integrate_fastmnn <- function(merged_sce,
                               batch_column,
+                              hv_genes = NULL,
                               ...) {
 
   # Check that batchelor is installed
@@ -140,6 +142,7 @@ integrate_fastmnn <- function(merged_sce,
   # Perform integration
   integrated_sce <- batchelor::fastMNN(merged_sce,
                                        batch = colData(merged_sce)[,batch_column],
+                                       subset.row = hv_genes,
                                        ...)
 
   return(integrated_sce)

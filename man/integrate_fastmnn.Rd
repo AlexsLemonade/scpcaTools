@@ -6,12 +6,14 @@
 approach from the `batchelor` package.
 Source: http://www.bioconductor.org/packages/release/bioc/html/batchelor.html}
 \usage{
-integrate_fastmnn(merged_sce, batch_column, ...)
+integrate_fastmnn(merged_sce, batch_column, hv_genes, ...)
 }
 \arguments{
 \item{merged_sce}{A merged SCE object as prepared by `scpcaTools::merge_sce_list()`.}
 
 \item{batch_column}{The variable in `merged_sce` indicating batches.}
+
+\item{hv_genes}{A vector specifying which highly variable features to use for correction.}
 
 \item{...}{Additional arguments to pass into `batchelor::fastMNN()`}
 }
