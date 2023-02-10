@@ -12,6 +12,7 @@ integrate_sces(
   merged_sce,
   integration_method = c("fastMNN", "harmony"),
   batch_column = "sample",
+  hv_genes = NULL,
   covariate_cols = c(),
   return_corrected_expression = FALSE,
   seed = NULL,
@@ -25,6 +26,10 @@ integrate_sces(
 `harmony` (case-sensitive)}
 
 \item{batch_column}{The column in the merged SCE object indicating batches}
+
+\item{hv_genes}{A vector specifying which highly variable features to use for correction.
+This argument will only be used if integrating with `fastMNN` and ignored with `harmony`.
+Default is `NULL`.}
 
 \item{covariate_cols}{A vector of additional columns in the merged SCE to
 consider as covariates during integration. Currently, this is used only by
