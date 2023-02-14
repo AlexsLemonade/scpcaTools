@@ -5,8 +5,8 @@
 #' @param filtered_sce An optional filtered single cell experiment derived from first
 #' @param processed_sce An optional single cell experiment that has been normalized and
 #'   contains PCA and UMAP embeddings
-#' @param rmd_file An optional path to the rmd file to be rendered, if no file is provided,
-#'   the default `qc_report.rmd` file present in the package will be used.
+#' @param report_template An optional path to a template rmd file to be rendered,
+#'   if no file is provided, the default `qc_report.rmd` file present in the package will be used.
 #' @param extra_params An optional named list of additional parameters to use when
 #'   rendering the provided rmd file.
 #' @param output The output file path that will be created.
@@ -81,8 +81,8 @@ generate_qc_report <- function(library_id,
   )
 
   # define rmd file if none provided
-  if(is.null(rmd_file)){
-    rmd_file <- system.file(file.path("rmd", "qc_report.rmd"), package = "scpcaTools")
+  if(is.null(report_template)){
+    report_template <- system.file(file.path("rmd", "qc_report.rmd"), package = "scpcaTools")
 
     # ignore extra parameters if they exist
     if(!is.null(extra_params)){
@@ -91,7 +91,7 @@ generate_qc_report <- function(library_id,
 
   } else {
     # rmd file is provided, check that it exists
-    if(!file.exists(rmd_file)){
+    if(!file.exists(report_template)){
       stop("Provided template file does not exist.")
     }
 
@@ -101,7 +101,7 @@ generate_qc_report <- function(library_id,
   }
 
   suppressPackageStartupMessages(rmarkdown::render(
-    rmd_file,
+    report_template,
     output_file = output_file,
     output_dir = output_dir,
     params = params_list,
