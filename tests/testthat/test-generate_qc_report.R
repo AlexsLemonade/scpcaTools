@@ -13,7 +13,7 @@ test_that("generating a qc report works", {
 
 test_that("generating a qc report works with a different template", {
 
-  test_template <- system.file(file.path("rmd", "test_report.rmd"), package = "scpcaTools")
+  test_template <- system.file(file.path("inst", "rmd", "test_report.rmd"), package = "scpcaTools")
 
   qc_file <- generate_qc_report(library_id = "TEST",
                                 unfiltered_sce = sce,
