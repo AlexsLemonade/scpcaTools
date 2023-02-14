@@ -9,6 +9,8 @@ generate_qc_report(
   unfiltered_sce,
   filtered_sce = NULL,
   processed_sce = NULL,
+  rmd_file = NULL,
+  extra_params = c(),
   output = NULL,
   ...
 )
@@ -22,6 +24,12 @@ generate_qc_report(
 
 \item{processed_sce}{An optional single cell experiment that has been normalized and
 contains PCA and UMAP embeddings}
+
+\item{rmd_file}{An optional path to the rmd file to be rendered, if no file is provided,
+the default `qc_report.rmd` file present in the package will be used.}
+
+\item{extra_params}{An optional named list of additional parameters to use when
+rendering the provided rmd file.}
 
 \item{output}{The output file path that will be created.
 If the file name does not include an extension, ".html" will be added automatically.
