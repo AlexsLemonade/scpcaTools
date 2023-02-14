@@ -83,6 +83,13 @@ generate_qc_report <- function(library_id,
   # define rmd file if none provided
   if(is.null(rmd_file)){
     rmd_file <- system.file(file.path("rmd", "qc_report.rmd"), package = "scpcaTools")
+
+    # ignore extra parameters if they exist
+    if(!is.null(extra_params)){
+      warning("`extra_params` will only be used if providing an input rmd file,
+              otherwise these will be ignored.")
+    }
+
   } else {
     # rmd file is provided, check that it exists
     if(!file.exists(rmd_file)){
