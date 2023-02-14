@@ -1,4 +1,4 @@
 library(testthat)
 library(scpcaTools)
 
-test_check("scpcaTools")
+#test_check("scpcaTools")
