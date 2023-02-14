@@ -13,12 +13,10 @@ test_that("generating a qc report works", {
 
 test_that("generating a qc report works with a different template", {
 
-  test_template <- system.file(file.path("inst", "rmd", "test_report.rmd"), package = "scpcaTools")
-
   qc_file <- generate_qc_report(library_id = "TEST",
                                 unfiltered_sce = sce,
                                 filtered_sce = filt_sce,
-                                report_template = test_template)
+                                report_template = "test_report.Rmd")
   expect_true(file.exists(qc_file))
   # clean up
   file.remove(qc_file)
