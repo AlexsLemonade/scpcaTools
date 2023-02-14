@@ -27,8 +27,8 @@ generate_qc_report <- function(library_id,
                                unfiltered_sce,
                                filtered_sce = NULL,
                                processed_sce = NULL,
-                               rmd_file = NULL,
-                               extra_params = c(),
+                               report_template = NULL,
+                               extra_params = NULL,
                                output = NULL,
                                ...){
 
@@ -86,14 +86,13 @@ generate_qc_report <- function(library_id,
 
     # ignore extra parameters if they exist
     if(!is.null(extra_params)){
-      warning("`extra_params` will only be used if providing an input rmd file,
-              otherwise these will be ignored.")
+      message("`extra_params` are only used if providing a template file, so will be ignored")
     }
 
   } else {
     # rmd file is provided, check that it exists
     if(!file.exists(rmd_file)){
-      stop("provided rmd file does not exist.")
+      stop("Provided template file does not exist.")
     }
 
     # if additional rmd file is provided, add extra params

@@ -11,11 +11,11 @@ test_that("generating a qc report works", {
   file.remove(qc_file)
 })
 
-test_that("generating a qc report does not work", {
+test_that("generating a qc report fails with a missing template", {
   expect_error(generate_qc_report(library_id = "TEST",
                                 unfiltered_sce = sce,
                                 filtered_sce = filt_sce,
-                                rmd_file = "test.rmd"))
+                                rmd_file = "missing.rmd"))
 })
 
 
