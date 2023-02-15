@@ -1,0 +1,18 @@
+---
+params:
+  library: Example
+  unfiltered_sce: !r scpcaTools:::sim_sce()
+  filtered_sce: NULL
+  processed_sce: NULL
+  date: !r Sys.Date()
+
+title: "Test template report"
+author: "Childhood Cancer Data Lab"
+date: "`r params$date`"
+output: html_document
+---
+
+```{r}
+sessioninfo::session_info()
+```
+

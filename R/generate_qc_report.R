@@ -5,6 +5,10 @@
 #' @param filtered_sce An optional filtered single cell experiment derived from first
 #' @param processed_sce An optional single cell experiment that has been normalized and
 #'   contains PCA and UMAP embeddings
+#' @param report_template An optional path to a template rmd file to be rendered,
+#'   if no file is provided, the default `qc_report.rmd` file present in the package will be used.
+#' @param extra_params An optional named list of additional parameters to use when
+#'   rendering the provided rmd file.
 #' @param output The output file path that will be created.
 #'   If the file name does not include an extension, ".html" will be added automatically.
 #'   Any directories in the path will be created as needed.
@@ -23,6 +27,8 @@ generate_qc_report <- function(library_id,
                                unfiltered_sce,
                                filtered_sce = NULL,
                                processed_sce = NULL,
+                               report_template = NULL,
+                               extra_params = NULL,
                                output = NULL,
                                ...){
 
@@ -66,18 +72,39 @@ generate_qc_report <- function(library_id,
     output_dir = dirname(output)
   }
 
+  # create list of parameters
+  params_list <- list(
+    library = library_id,
+    unfiltered_sce = unfiltered_sce,
+    filtered_sce = filtered_sce,
+    processed_sce = processed_sce
+  )
 
-  rmd <- system.file(file.path("rmd", "qc_report.rmd"), package = "scpcaTools")
+  # define rmd file if none provided
+  if(is.null(report_template)){
+    report_template <- system.file(file.path("rmd", "qc_report.rmd"), package = "scpcaTools")
+
+    # ignore extra parameters if they exist
+    if(!is.null(extra_params)){
+      message("`extra_params` are only used if providing a template file, so will be ignored")
+    }
+
+  } else {
+    # rmd file is provided, check that it exists
+    if(!file.exists(report_template)){
+      stop("Provided template file does not exist.")
+    }
+
+    # if additional rmd file is provided, add extra params
+    params_list <- append(params_list,
+                          extra_params)
+  }
+
   suppressPackageStartupMessages(rmarkdown::render(
-    rmd,
+    report_template,
     output_file = output_file,
     output_dir = output_dir,
-    params = list(
-      library = library_id,
-      unfiltered_sce = unfiltered_sce,
-      filtered_sce = filtered_sce,
-      processed_sce = processed_sce
-    ),
+    params = params_list,
     intermediates_dir = tempdir(),
     knit_root_dir = tempdir(),
     envir = new.env(),
