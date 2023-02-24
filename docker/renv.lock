@@ -899,6 +899,28 @@
         "SummarizedExperiment"
       ]
     },
+    "SingleR": {
+      "Package": "SingleR",
+      "Version": "2.0.0",
+      "Source": "Bioconductor",
+      "git_url": "https://git.bioconductor.org/packages/SingleR",
+      "git_branch": "RELEASE_3_16",
+      "git_last_commit": "f36aaf5",
+      "git_last_commit_date": "2022-11-01",
+      "Hash": "fa89d8c66027e5e424acddcbf2e457ad",
+      "Requirements": [
+        "BiocNeighbors",
+        "BiocParallel",
+        "BiocSingular",
+        "DelayedArray",
+        "DelayedMatrixStats",
+        "Matrix",
+        "Rcpp",
+        "S4Vectors",
+        "SummarizedExperiment",
+        "beachmat"
+      ]
+    },
     "SummarizedExperiment": {
       "Package": "SummarizedExperiment",
       "Version": "1.28.0",
