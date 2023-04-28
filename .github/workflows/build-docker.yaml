@@ -37,9 +37,10 @@ jobs:
             type=semver,pattern={{raw}}
             type=edge,branch=main
 
-      - uses: docker/build-push-action@v3
+      - uses: docker/build-push-action@v4
         with:
           context: "{{defaultContext}}:docker"
+          platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
