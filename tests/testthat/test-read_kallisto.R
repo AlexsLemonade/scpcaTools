@@ -1,4 +1,4 @@
-dir <- system.file("extdata", package="scpcaData")
+dir <- system.file("extdata", package = "scpcaData")
 kallisto_dir <- file.path(dir, "Breast_Cancer_3p_LT/kallisto_txome")
 
 # expected matrix size
@@ -6,7 +6,8 @@ sce_size <- c(60666, 30339)
 
 test_that("Check that kallisto import works", {
   sce <- read_kallisto(kallisto_dir,
-                       include_unspliced = FALSE)
+    include_unspliced = FALSE
+  )
   expect_s4_class(sce, "SingleCellExperiment")
   expect_equal(dim(sce), sce_size)
   # check that column names are barcodes

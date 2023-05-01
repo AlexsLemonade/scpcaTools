@@ -16,29 +16,30 @@
 #' @examples
 #' \dontrun{
 #' # add per cell QC metrics using only genes detected > 5% of cells
-#' add_cell_mito_qc(sce = sce,
-#'                  mito = mito_genes,
-#'                  threshold = 5)
+#' add_cell_mito_qc(
+#'   sce = sce,
+#'   mito = mito_genes,
+#'   threshold = 5
+#' )
 #' }
-add_cell_mito_qc <- function(sce, mito, miQC = FALSE, ...){
-
+add_cell_mito_qc <- function(sce, mito, miQC = FALSE, ...) {
   # check that input is a SingleCellExperiment
-  if(!is(sce, "SingleCellExperiment")){
+  if (!is(sce, "SingleCellExperiment")) {
     stop("sce must be a SingleCellExperiment object")
   }
 
   # check that mito is not empty, otherwise resulting colData will be innacurate
-  if(length(mito) == 0){
+  if (length(mito) == 0) {
     stop("Mitochondrial gene list not used, cannot calculate mitochondrial metrics.")
   }
 
   # check that mito genes are present in sce, otherwise colData will have 0's for mito columns
-  if(length(intersect(mito, rownames(sce))) == 0){
+  if (length(intersect(mito, rownames(sce))) == 0) {
     warning("sce does not contain genes corresponding to the list of mito gene names")
   }
 
   # check that miQC is logical
-  if(!is.logical(miQC)){
+  if (!is.logical(miQC)) {
     stop("miQC must be set as TRUE or FALSE")
   }
 
@@ -50,7 +51,7 @@ add_cell_mito_qc <- function(sce, mito, miQC = FALSE, ...){
   )
 
 
-  if(miQC){
+  if (miQC) {
     sce <- add_miQC(sce)
   }
 

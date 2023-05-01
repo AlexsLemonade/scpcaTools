@@ -18,43 +18,45 @@
 #' # import output files processed with kallisto with alignment to cDNA + introns,
 #' # including all unspliced cDNA counts in final counts matrix
 #' read_kallisto(quant_dir,
-#'               include_unspliced = TRUE,
-#'               which_counts = "unspliced")
+#'   include_unspliced = TRUE,
+#'   which_counts = "unspliced"
+#' )
 #' }
 read_kallisto <- function(quant_dir,
                           include_unspliced = TRUE,
                           round_counts = TRUE) {
-
-  if(!is.logical(include_unspliced)){
+  if (!is.logical(include_unspliced)) {
     stop("include_unspliced must be set as TRUE or FALSE")
   }
 
-  if(!is.logical(round_counts)){
+  if (!is.logical(round_counts)) {
     stop("round_counts must be set as TRUE or FALSE")
   }
 
   kallisto_files <- c("gene_count.mtx", "gene_count.genes.txt", "gene_count.barcodes.txt")
   kallisto_dir <- file.path(quant_dir, "counts")
 
-  if(!dir.exists(file.path(kallisto_dir))){
+  if (!dir.exists(file.path(kallisto_dir))) {
     stop("Missing kallisto directory with output files")
   }
 
   missing <- !file.exists(file.path(kallisto_dir, kallisto_files))
-  if(any(missing)) {
+  if (any(missing)) {
     missing_files <- paste(kallisto_files[missing], collapse = ", ")
     stop(paste0("Missing Kallisto output file(s): ", missing_files))
   }
 
-  counts <- Matrix::readMM(file.path(kallisto_dir, "gene_count.mtx"))|>
+  counts <- Matrix::readMM(file.path(kallisto_dir, "gene_count.mtx")) |>
     BiocGenerics::t() |> # transpose to gene x cell orientation
     as("CsparseMatrix") # compress sparse matrix
-  dimnames(counts) <- list(readLines(file.path(kallisto_dir, "gene_count.genes.txt")),
-                           readLines(file.path(kallisto_dir, "gene_count.barcodes.txt")))
+  dimnames(counts) <- list(
+    readLines(file.path(kallisto_dir, "gene_count.genes.txt")),
+    readLines(file.path(kallisto_dir, "gene_count.barcodes.txt"))
+  )
 
   # get kallisto version
   run_info_path <- file.path(quant_dir, "run_info.json")
-  if(file.exists(run_info_path)){
+  if (file.exists(run_info_path)) {
     run_info <- jsonlite::read_json(run_info_path)
   } else {
     stop("run_info.json is missing")
@@ -68,14 +70,15 @@ read_kallisto <- function(quant_dir,
   )
 
   # generate the SCE object containing either counts and spliced assays or just counts assay
-  sce <- build_sce(counts,
-                   include_unspliced,
-                   round_counts)
+  sce <- build_sce(
+    counts,
+    include_unspliced,
+    round_counts
+  )
 
   # set transcript type based on including unspliced or not
-  if(include_unspliced){
+  if (include_unspliced) {
     meta$transcript_type <- c("total", "spliced")
-
   } else {
     meta$transcript_type <- "spliced"
   }
