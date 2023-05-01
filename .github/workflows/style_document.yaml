@@ -58,7 +58,7 @@ jobs:
         run: styler::style_pkg()
         shell: Rscript {0}
 
-    - name: Document
+      - name: Document
         run: roxygen2::roxygenise()
         shell: Rscript {0}
 
