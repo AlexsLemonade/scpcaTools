@@ -4,10 +4,10 @@ on:
   push:
     paths: ["**.[rR]", "**.[qrR]md", "**.[rR]markdown", "**.[rR]nw", "**.[rR]profile", "**/style_document.yaml"]
 
-name: Style 
+name: Style Package
 
 jobs:
-  style-and-document:
+  style:
     runs-on: ubuntu-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
