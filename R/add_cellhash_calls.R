@@ -19,31 +19,29 @@
 #' @examples
 #' \dontrun{
 #' # add sample information for a cellhash table
-#' add_cellhash_ids(
-#'   sce = sce,
-#'   hashsample_table = barcode_ids
-#' )
+#' add_cellhash_ids(sce = sce,
+#'                  hashsample_table = barcode_ids)
 #' }
 add_cellhash_ids <- function(sce, hashsample_table,
                              altexp_id = "cellhash",
-                             remove_unlabeled = FALSE) {
+                             remove_unlabeled = FALSE){
   # check that input is a SingleCellExperiment
-  if (!is(sce, "SingleCellExperiment")) {
+  if(!is(sce, "SingleCellExperiment")){
     stop("sce must be a SingleCellExperiment object")
   }
-  if (!altexp_id %in% altExpNames(sce)) {
+  if(!altexp_id %in% altExpNames(sce)){
     stop(glue::glue("altexp_id `{altexp_id}` not found as an experiment in sce"))
   }
   # check that hashsample_table is a data frame containing a sample_id and barcode_id column
-  if (!(is(hashsample_table, "data.frame") &
-    all(c("barcode_id", "sample_id") %in% colnames(hashsample_table)))) {
+  if(!(is(hashsample_table, "data.frame") &
+     all(c("barcode_id", "sample_id") %in% colnames(hashsample_table)))){
     stop("hashsample_table must be a data frame with columns `barcode_id` and `sample_id`")
   }
 
   # get rowData from sce and add barcode_id column if needed
   altexp_rowdata <- rowData(altExp(sce, altexp_id)) |>
     as.data.frame()
-  if (!"barcode_id" %in% colnames(altexp_rowdata)) {
+  if (!"barcode_id" %in% colnames(altexp_rowdata)){
     altexp_rowdata <- altexp_rowdata |>
       tibble::rownames_to_column("barcode_id")
   }
@@ -55,7 +53,7 @@ add_cellhash_ids <- function(sce, hashsample_table,
     dplyr::select("barcode_id", "sample_id") |>
     dplyr::distinct()
 
-  if (any(duplicated(barcode_rowdata$barcode_id))) {
+  if (any(duplicated(barcode_rowdata$barcode_id))){
     stop("`barcode_ids` in `hashsample_table` can not be duplicated.")
   }
 
@@ -64,21 +62,19 @@ add_cellhash_ids <- function(sce, hashsample_table,
     dplyr::filter(is.na(.data$sample_id)) |>
     dplyr::pull(.data$barcode_id)
 
-  if (remove_unlabeled) {
+  if (remove_unlabeled){
     missing_rows <- rownames(altExp(sce, altexp_id)) %in% missing_barcodes
-    altExp(sce, altexp_id) <- altExp(sce, altexp_id)[!missing_rows, ]
-    barcode_rowdata <- barcode_rowdata[!missing_rows, ]
-  } else if (length(missing_barcodes) > 0) {
-    warning(paste0(
-      "The following `barcode_id`s do not have corresponding `sample_id`s:",
-      paste0(missing_barcodes, collapse = ", ")
-    ))
+    altExp(sce, altexp_id) <- altExp(sce, altexp_id)[!missing_rows,]
+    barcode_rowdata <- barcode_rowdata[!missing_rows,]
+  } else if (length(missing_barcodes) > 0){
+    warning(paste0("The following `barcode_id`s do not have corresponding `sample_id`s:",
+                   paste0(missing_barcodes, collapse = ", ")))
   }
 
   # if sample_id is present in the SCE metadata, check that sample_ids are are as expected
-  if (!is.null(metadata(sce)$sample_id)) {
+  if(!is.null(metadata(sce)$sample_id)){
     barcode_samples <- unique(barcode_rowdata$sample_id[!is.na(barcode_rowdata$sample_id)])
-    if (!all(barcode_samples %in% metadata(sce)$sample_id)) {
+    if(!all(barcode_samples %in% metadata(sce)$sample_id)){
       warning("Sample IDs in `hashsample_table` do not match those in the `sce` metadata.")
     }
   }
@@ -110,24 +106,24 @@ add_cellhash_ids <- function(sce, hashsample_table,
 #'
 #' @examples
 #' \dontrun{
-#' # add cell calls from DropletUtils::hashedDrops()
-#' add_demux_hashedDrops(sce = sce)
+#'   # add cell calls from DropletUtils::hashedDrops()
+#'   add_demux_hashedDrops(sce = sce)
 #' }
-add_demux_hashedDrops <- function(sce, altexp_id = "cellhash", ...) {
+add_demux_hashedDrops <- function(sce, altexp_id = "cellhash", ...){
   # check that input is a SingleCellExperiment
-  if (!is(sce, "SingleCellExperiment")) {
+  if(!is(sce, "SingleCellExperiment")){
     stop("sce must be a SingleCellExperiment object")
   }
-  if (!altexp_id %in% altExpNames(sce)) {
+  if(!altexp_id %in% altExpNames(sce)){
     stop(glue::glue("altexp_id `{altexp_id}` not found as an experiment in sce"))
   }
   # get ids to use: if sample ids are present, use those,
   #  otherwise barcodes or rownames, in that order
   sample_ids <- rowData(altExp(sce, altexp_id))$sample_id
-  if (is.null(sample_ids)) {
+  if(is.null(sample_ids)){
     sample_ids <- rowData(altExp(sce, altexp_id))$barcode_id
   }
-  if (is.null(sample_ids)) {
+  if(is.null(sample_ids)){
     warning("No sample ids are present for demux results, using row names")
     sample_ids <- rownames(altExp(sce, altexp_id))
   }
@@ -139,9 +135,8 @@ add_demux_hashedDrops <- function(sce, altexp_id = "cellhash", ...) {
   # extract results with sample ids for main rowData table
   hashedDrops_bestsample <- sample_ids[hash_result$Best]
   hashedDrops_sampleid <- ifelse(hash_result$Confident,
-    hashedDrops_bestsample,
-    NA_character_
-  )
+                                 hashedDrops_bestsample,
+                                 NA_character_)
 
 
   ### add all table results to altExp rowData
@@ -180,29 +175,29 @@ add_demux_hashedDrops <- function(sce, altexp_id = "cellhash", ...) {
 #'
 #' @examples
 #' \dontrun{
-#' # add cell calls from Seurat::HTODemux()
-#' add_demux_seurat(sce = sce)
+#'   # add cell calls from Seurat::HTODemux()
+#'   add_demux_seurat(sce = sce)
 #' }
-add_demux_seurat <- function(sce, altexp_id = "cellhash", ...) {
+add_demux_seurat <- function(sce, altexp_id = "cellhash", ...){
   if (!requireNamespace("Seurat", quietly = TRUE)) {
     warning("The Seurat package must be installed to use Seurat::HTODemux(). Returning unmodified sce object")
     return(sce)
   }
 
   # check that input is a SingleCellExperiment
-  if (!is(sce, "SingleCellExperiment")) {
+  if(!is(sce, "SingleCellExperiment")){
     stop("sce must be a SingleCellExperiment object")
   }
-  if (!altexp_id %in% altExpNames(sce)) {
+  if(!altexp_id %in% altExpNames(sce)){
     stop(glue::glue("altexp_id `{altexp_id}` not found as an experiment in sce"))
   }
   # get ids to use: if sample ids are present, use those,
   #  otherwise barcodes or rownames, in that order
   sample_ids <- rowData(altExp(sce, altexp_id))$sample_id
-  if (is.null(sample_ids)) {
+  if(is.null(sample_ids)){
     sample_ids <- rowData(altExp(sce, altexp_id))$barcode_id
   }
-  if (is.null(sample_ids)) {
+  if(is.null(sample_ids)){
     warning("No sample ids are present for demux results, using row names")
     sample_ids <- rownames(altExp(sce, altexp_id))
   }
@@ -241,21 +236,19 @@ add_demux_seurat <- function(sce, altexp_id = "cellhash", ...) {
     try({
       seurat_obj <- Seurat::HTODemux(seurat_obj, assay = "HTODemux", ...)
     })
+
   })
-  if (is.null(seurat_obj@meta.data$hash.ID)) {
+  if(is.null(seurat_obj@meta.data$hash.ID)){
     warning("HTODemux failed")
     sce$HTODemux_sampleid <- NA
   } else {
     seurat_demux <- seurat_obj@meta.data |>
       dplyr::rename("HTODemux_hash.ID" = "hash.ID") |>
-      dplyr::select(dplyr::starts_with("HTOdemux_")) |>
-      dplyr::mutate(
-        HTODemux_maxsample = sample_ids[as.character(.data$HTODemux_maxID)],
-        HTODemux_sampleid = ifelse(.data$HTODemux_hash.ID %in% c("Doublet", "Negative"),
-          NA_character_,
-          sample_ids[as.character(.data$HTODemux_hash.ID)]
-        )
-      )
+      dplyr::select(dplyr::starts_with("HTOdemux_"))|>
+      dplyr::mutate(HTODemux_maxsample = sample_ids[as.character(.data$HTODemux_maxID)],
+                    HTODemux_sampleid = ifelse(.data$HTODemux_hash.ID %in% c("Doublet","Negative"),
+                                               NA_character_,
+                                               sample_ids[as.character(.data$HTODemux_hash.ID)]))
 
     ## add htodemux columns to altExp
     colData(altExp(sce, altexp_id))[seurat_cells, colnames(seurat_demux)] <- seurat_demux
