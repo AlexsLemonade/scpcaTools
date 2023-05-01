@@ -4,7 +4,7 @@ on:
   push:
     paths: ["**.[rR]", "**.[qrR]md", "**.[rR]markdown", "**.[rR]nw", "**.[rR]profile"]
 
-name: Style
+name: Style and Document
 
 jobs:
   style:
@@ -56,6 +56,10 @@ jobs:
 
       - name: Style
         run: styler::style_pkg()
+        shell: Rscript {0}
+
+    - name: Document
+        run: roxygen2::roxygenise()
         shell: Rscript {0}
 
       - name: Commit and push changes
