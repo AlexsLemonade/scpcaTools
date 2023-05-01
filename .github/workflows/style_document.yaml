@@ -4,7 +4,7 @@ on:
   push:
     paths: ["**.[rR]", "**.[qrR]md", "**.[rR]markdown", "**.[rR]nw", "**.[rR]profile", "**/style_document.yaml"]
 
-name: Style and Document
+name: Style 
 
 jobs:
   style-and-document:
@@ -22,11 +22,9 @@ jobs:
         with:
           use-public-rspm: true
 
-      - name: Install dependencies
-        uses: r-lib/actions/setup-r-dependencies@v2
-        with:
-          extra-packages: any::styler, any::roxygen2
-          needs: styler
+      - name: Install styler
+        run: install.packages(c("styler"))
+        shell: Rscript {0}
 
       - name: Enable styler cache
         run: styler::cache_activate()
@@ -56,10 +54,6 @@ jobs:
 
       - name: Style
         run: styler::style_pkg()
-        shell: Rscript {0}
-
-      - name: Document
-        run: roxygen2::roxygenise()
         shell: Rscript {0}
 
       - name: Commit and push changes
