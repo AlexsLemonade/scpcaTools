@@ -17,19 +17,19 @@
 #'
 #' @examples
 #' \dontrun{
-#' # add cell calls from a vireo data frame
-#' add_demux_vireo(sce, vireo_table = vireo_df)
+#'   # add cell calls from a vireo data frame
+#'   add_demux_vireo(sce, vireo_table = vireo_df)
 #' }
-add_demux_vireo <- function(sce, vireo_table) {
+add_demux_vireo <- function(sce, vireo_table){
   # check that input is a SingleCellExperiment
-  if (!is(sce, "SingleCellExperiment")) {
+  if(!is(sce, "SingleCellExperiment")){
     stop("`sce` must be a SingleCellExperiment object")
   }
 
   # check required columns of vireo_table
-  vireo_expected_cols <- c("cell", "donor_id")
-  if (!(is(vireo_table, "data.frame") &
-    all(vireo_expected_cols %in% colnames(vireo_table)))) {
+  vireo_expected_cols = c("cell", "donor_id")
+  if(!(is(vireo_table, "data.frame") &
+       all(vireo_expected_cols %in% colnames(vireo_table)))){
     stop("`vireo_table` must be a data frame with columns `cell` and `donor_id`")
   }
 
@@ -38,18 +38,17 @@ add_demux_vireo <- function(sce, vireo_table) {
     dplyr::rename_with(~ paste0("vireo_", .x)) |>
     # add sampleid with finalized single results
     dplyr::mutate(vireo_sampleid = ifelse(.data$vireo_donor_id %in% c("doublet", "unassigned"),
-      NA_character_,
-      .data$vireo_donor_id
-    )) |>
+                                          NA_character_,
+                                          .data$vireo_donor_id)) |>
     dplyr::relocate("vireo_sampleid") # move vireo_sampleid first
 
-  if (!all(vireo_table$vireo_cell %in% colnames(sce))) {
+  if(!all(vireo_table$vireo_cell %in% colnames(sce))){
     warning("Cell id(s) from `vireo_table` do not match cells in `sce` object.")
   }
   # if sample_id is present in the SCE metadata, check that samples are as expected
-  if (!is.null(metadata(sce)$sample_id)) {
+  if(!is.null(metadata(sce)$sample_id)){
     vireo_samples <- unique(vireo_table$vireo_sampleid[!is.na(vireo_table$vireo_sampleid)])
-    if (!all(vireo_samples %in% metadata(sce)$sample_id)) {
+    if(!all(vireo_samples %in% metadata(sce)$sample_id)){
       warning("Sample IDs in `vireo_table` do not match those in the `sce` metadata.")
     }
   }
