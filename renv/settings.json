@@ -9,7 +9,7 @@
     "Depends",
     "LinkingTo"
   ],
-  "r.version": "4.2.1",
+  "r.version": "4.2.3",
   "snapshot.type": "implicit",
   "use.cache": true,
   "vcs.ignore.cellar": true,
