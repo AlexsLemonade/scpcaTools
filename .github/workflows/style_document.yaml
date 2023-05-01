@@ -7,7 +7,7 @@ on:
 name: Style and Document
 
 jobs:
-  style:
+  style-and-document:
     runs-on: ubuntu-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
