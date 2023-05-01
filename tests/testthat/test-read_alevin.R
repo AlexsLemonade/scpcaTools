@@ -1,4 +1,4 @@
-dir <- system.file("extdata", package="scpcaData")
+dir <- system.file("extdata", package = "scpcaData")
 alevin_dir <- file.path(dir, "Breast_Cancer_3p_LT/alevin_txome")
 usa_dir <- file.path(dir, "Breast_Cancer_3p_LT/alevinfry_usa_filtered")
 intron_dir <- file.path(dir, "Breast_Cancer_3p_LT/alevinfry_intron_filtered")
@@ -7,12 +7,13 @@ intron_dir <- file.path(dir, "Breast_Cancer_3p_LT/alevinfry_intron_filtered")
 sce_alevin_size <- c(60275, 10378)
 # expected alevin-fry matrix size
 sce_af_size <- c(60321, 614)
-sample_ids = c("A1", "A2")
+sample_ids <- c("A1", "A2")
 
 test_that("reading salmon alevin data works", {
   sce <- read_alevin(alevin_dir,
-                     sample_id = sample_ids,
-                     include_unspliced = FALSE)
+    sample_id = sample_ids,
+    include_unspliced = FALSE
+  )
   expect_s4_class(sce, "SingleCellExperiment")
   expect_equal(dim(sce), sce_alevin_size)
   # check that column names are barcodes
@@ -29,9 +30,10 @@ test_that("reading salmon alevin data works", {
 
 test_that("reading alevin-fry USA mode works", {
   sce <- read_alevin(usa_dir,
-                     fry_mode = TRUE,
-                     include_unspliced = TRUE,
-                     sample_id = sample_ids)
+    fry_mode = TRUE,
+    include_unspliced = TRUE,
+    sample_id = sample_ids
+  )
   expect_s4_class(sce, "SingleCellExperiment")
   expect_equal(dim(sce), sce_af_size)
   # check that column names are barcodes
@@ -54,8 +56,9 @@ test_that("reading alevin-fry USA mode works", {
 
 test_that("reading alevin-fry intron mode works", {
   sce <- read_alevin(intron_dir,
-                     include_unspliced = TRUE,
-                     fry_mode = FALSE)
+    include_unspliced = TRUE,
+    fry_mode = FALSE
+  )
   expect_s4_class(sce, "SingleCellExperiment")
   expect_equal(dim(sce), sce_af_size)
   # check that column names are barcodes

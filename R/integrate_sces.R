@@ -35,12 +35,11 @@ integrate_sces <- function(merged_sce,
                            return_corrected_expression = FALSE,
                            seed = NULL,
                            ...) {
-
   # Set seed
   set.seed(seed)
 
   # make sure that input is a SingleCellExperiment
-  if(!is(merged_sce, "SingleCellExperiment")){
+  if (!is(merged_sce, "SingleCellExperiment")) {
     stop("The `merged_sce` must be a SingleCellExperiment object created with `scpcaTools::merge_sce_list().`")
   }
 
@@ -54,44 +53,45 @@ integrate_sces <- function(merged_sce,
   }
   # Ensure there are no NAs
   batches <- colData(merged_sce)[[batch_column]]
-  if( any(is.na(batches)) ) {
+  if (any(is.na(batches))) {
     stop("`NA` values are not allowed in the `batch_column`.")
   }
   # Ensure >=2 batches
-  if( length(unique(batches)) < 2 ) {
+  if (length(unique(batches)) < 2) {
     stop("At least two batches are required for integration.")
   }
 
 
   # Perform integration with specified method
   if (integration_method == "fastMNN") {
-
     if (length(covariate_cols) > 0) {
       warning("fastMNN cannot use additional covariates, so `covariate_cols` will be ignored.")
     }
 
-    integrated_sce <- integrate_fastmnn(merged_sce,
-                                        batch_column,
-                                        ...)
+    integrated_sce <- integrate_fastmnn(
+      merged_sce,
+      batch_column,
+      ...
+    )
     # Add corrected expression to merged_sce if specified
     if (return_corrected_expression) {
       assay(merged_sce, "fastMNN_corrected") <- assay(integrated_sce, "reconstructed")
     }
     # define PCs
     integrated_pcs <- reducedDim(integrated_sce, "corrected")
-  }
-  else if (integration_method == "harmony") {
-
+  } else if (integration_method == "harmony") {
     # warn that this is not possible
     if (return_corrected_expression) {
       warning("`harmony` does not calculate corrected expression values, so none can be returned.")
     }
 
     # here the result is the PCs:
-    integrated_pcs <- integrate_harmony(merged_sce,
-                                        batch_column,
-                                        covariate_cols,
-                                        ...)
+    integrated_pcs <- integrate_harmony(
+      merged_sce,
+      batch_column,
+      covariate_cols,
+      ...
+    )
   }
 
   # Add PCs from integration into merged_sce (name is lowercase)
@@ -117,7 +117,6 @@ integrate_sces <- function(merged_sce,
 integrate_fastmnn <- function(merged_sce,
                               batch_column,
                               ...) {
-
   # Check that batchelor is installed
   if (!requireNamespace("batchelor", quietly = TRUE)) {
     stop("The `batchelor` package must be installed to use fastMNN.")
@@ -130,8 +129,9 @@ integrate_fastmnn <- function(merged_sce,
 
   # Perform integration
   integrated_sce <- batchelor::fastMNN(merged_sce,
-                                       batch = colData(merged_sce)[,batch_column],
-                                       ...)
+    batch = colData(merged_sce)[, batch_column],
+    ...
+  )
 
   return(integrated_sce)
 }
@@ -157,7 +157,6 @@ integrate_harmony <- function(merged_sce,
                               batch_column,
                               covariate_cols = c(),
                               ...) {
-
   # Check that harmony is installed
   if (!requireNamespace("harmony", quietly = TRUE)) {
     stop("The `harmony` package must be installed to use this integration method.")
@@ -182,9 +181,10 @@ integrate_harmony <- function(merged_sce,
 
   # Perform integration
   harmony_results <- harmony::HarmonyMatrix(reducedDim(merged_sce, "PCA"),
-                                            meta_data = harmony_metadata,
-                                            vars_use  = covariate_cols,
-                                            ...)
+    meta_data = harmony_metadata,
+    vars_use  = covariate_cols,
+    ...
+  )
   # Ensure PCs have rownames
   if (is.null(rownames(harmony_results))) {
     rownames(harmony_results) <- rownames(reducedDim(merged_sce, "PCA"))
