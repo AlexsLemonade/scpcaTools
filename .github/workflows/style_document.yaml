@@ -23,7 +23,7 @@ jobs:
           use-public-rspm: true
 
       - name: Install styling and documentation dependencies
-        run: install.packages("styler", "roxygen2")
+        run: install.packages(c("styler", "roxygen2"))
         shell: Rscript {0}
 
       - name: Enable styler cache
