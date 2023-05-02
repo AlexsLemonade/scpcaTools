@@ -48,6 +48,7 @@ Imports:
     tximport
 Suggests:
     batchelor,
+    eds,
     ggplot2,
     harmony,
     kableExtra,
