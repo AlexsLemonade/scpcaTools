@@ -3,4 +3,6 @@
 .RData
 .Ruserdata
 
+.venv
+
 inst/extdata/raw/
