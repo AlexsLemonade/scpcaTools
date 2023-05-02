@@ -9,7 +9,7 @@ RUN bash ./install_scpca_deps.sh
 #### R packages
 # Use renv for R packages
 ENV RENV_CONFIG_CACHE_ENABLED FALSE
-RUN Rscript -e "install.packages(c('renv', 'remotes'))"
+RUN Rscript -e "install.packages(c('remotes', 'renv'))"
 
 WORKDIR /usr/local/renv
 COPY renv.lock renv.lock
