@@ -35,16 +35,15 @@
 #' # Import output files processed with either Alevin or Alevin-fry with alignment to
 #' # cDNA + introns and including all unspliced cDNA in final counts matrix
 #' read_alevin(quant_dir,
-#'   include_unspliced = TRUE
-#' )
+#'             include_unspliced = TRUE)
 #'
 #' # Import output files processed with alevin-fry USA mode
 #' # including all unspliced cDNA in final counts matrix
 #' read_alevin(quant_dir,
-#'   fry_mode = TRUE,
-#'   include_unspliced = TRUE
-#' )
-#' }
+#'             fry_mode = TRUE,
+#'             include_unspliced = TRUE)
+#'
+#'}
 read_alevin <- function(quant_dir,
                         fry_mode = FALSE,
                         include_unspliced = TRUE,
@@ -52,25 +51,26 @@ read_alevin <- function(quant_dir,
                         round_counts = TRUE,
                         library_id = NULL,
                         sample_id = NULL,
-                        tech_version = NULL) {
+                        tech_version = NULL){
+
   # checks for *_mode
-  if (!is.logical(fry_mode)) {
+  if(!is.logical(fry_mode)){
     stop("fry_mode must be set as TRUE or FALSE")
   }
-  if (!is.logical(include_unspliced)) {
+  if(!is.logical(include_unspliced)){
     stop("include_unspliced must be set as TRUE or FALSE")
   }
-  if (!is.logical(round_counts)) {
+  if(!is.logical(round_counts)){
     stop("round_counts must be set as TRUE or FALSE")
   }
 
   # make sure that include unspliced and feature data are not both set as TRUE
-  if (include_unspliced & feature_data) {
+  if(include_unspliced & feature_data){
     stop("Feature data does not have unspliced reads, cannot use `include_unspliced=TRUE`")
   }
 
   # check that the expected quant directory exists
-  if (!dir.exists(file.path(quant_dir, "alevin"))) {
+  if(!dir.exists(file.path(quant_dir, "alevin"))){
     stop("Missing alevin directory with output files")
   }
 
@@ -79,24 +79,24 @@ read_alevin <- function(quant_dir,
     quant_dir,
     tech_version,
     library_id = library_id,
-    sample_id = sample_id
-  )
+    sample_id = sample_id)
 
   # if alevin-fry USA and MTX format directly create SCE object with fishpond
-  if (fry_mode) {
+  if(fry_mode) {
+
     # only check for usa mode for non-feature data
-    if (!feature_data) {
+    if(!feature_data){
       # actually check that files are in usa mode
-      if (meta$usa_mode != TRUE) {
+      if(meta$usa_mode != TRUE){
         stop("Output files not in USA mode")
       }
     }
 
     # define assays to include in SCE object based on include_unspliced
-    if (include_unspliced) {
+    if(include_unspliced){
       assay_formats <- list("counts" = c("S", "A", "U"), "spliced" = c("S", "A"))
       meta$transcript_type <- c("total", "spliced")
-    } else if (!feature_data) {
+    } else if(!feature_data) {
       assay_formats <- list("counts" = c("S", "A"))
       meta$transcript_type <- "spliced"
     } else {
@@ -106,31 +106,30 @@ read_alevin <- function(quant_dir,
     }
 
     # must be both alevin-fry and usa mode to use fishpond
-    sce <- fishpond::loadFry(
-      fryDir = quant_dir,
-      outputFormat = assay_formats
-    )
+    sce <- fishpond::loadFry(fryDir = quant_dir,
+                             outputFormat = assay_formats)
   }
 
-  if (!fry_mode) {
+  if(!fry_mode) {
+
     # read in any non-USA formatted alevin-fry data or Alevin data
     counts <- read_tximport(quant_dir)
 
     # set transcript type based on including unspliced or not
-    if (include_unspliced) {
+    if(include_unspliced){
       meta$transcript_type <- c("total", "spliced")
-    } else if (!feature_data) {
+
+    } else if(!feature_data) {
       meta$transcript_type <- "spliced"
     } else {
       meta$transcript_type <- "feature_counts"
     }
 
     # generate the SCE object containing either counts and spliced assays or just counts assay
-    sce <- build_sce(
-      counts,
-      include_unspliced,
-      round_counts
-    )
+    sce <- build_sce(counts,
+                     include_unspliced,
+                     round_counts)
+
   }
 
   # add the metadata to the SCE
@@ -147,13 +146,14 @@ read_alevin <- function(quant_dir,
 #'
 #' @return unfiltered & uncollapsed gene x cell counts matrix
 #'
-read_tximport <- function(quant_dir) {
+read_tximport <- function(quant_dir){
+
   # check that all files exist in quant_dir
   # use tximport for all non-usa mode
   alevin_files <- c("quants_mat_cols.txt", "quants_mat_rows.txt", "quants_mat.gz")
 
   missing <- !file.exists(file.path(quant_dir, "alevin", alevin_files))
-  if (any(missing)) {
+  if(any(missing)) {
     missing_files <- paste(alevin_files[missing], collapse = ", ")
     stop(paste0("Missing Alevin output file(s): ", missing_files))
   }
@@ -180,7 +180,7 @@ read_tximport <- function(quant_dir) {
 read_alevin_metadata <- function(quant_dir,
                                  tech_version,
                                  library_id = NULL,
-                                 sample_id = NULL) {
+                                 sample_id = NULL){
   cmd_info_path <- file.path(quant_dir, "cmd_info.json")
   permit_json_path <- file.path(quant_dir, "generate_permit_list.json")
   # Unused file, but leaving for future reference
@@ -188,49 +188,47 @@ read_alevin_metadata <- function(quant_dir,
   quant_json_path <- file.path(quant_dir, "quant.json")
   aux_meta_path <- file.path(quant_dir, "aux_info", "meta_info.json")
 
-  if (!file.exists(quant_json_path)) {
+  if(!file.exists(quant_json_path)){
     # file for alevin-fry < 0.4.1
     quant_json_path <- file.path(quant_dir, "meta_info.json")
   }
 
   # get cmd_info and aux_info/meta_info.json, which should always be present
-  if (file.exists(cmd_info_path)) {
+  if (file.exists(cmd_info_path)){
     cmd_info <- jsonlite::read_json(cmd_info_path)
   } else {
     stop("cmd_info.json is missing")
   }
-  if (file.exists(aux_meta_path)) {
+  if (file.exists(aux_meta_path)){
     aux_meta <- jsonlite::read_json(aux_meta_path)
   } else {
     stop("meta_info.json in aux_info folder is missing")
   }
 
   # Read other info files if they exist. Otherwise, create dummy values
-  if (file.exists(permit_json_path)) {
+  if (file.exists(permit_json_path)){
     permit_info <- jsonlite::read_json(permit_json_path)
   } else {
     permit_info <- list()
   }
-  if (file.exists(quant_json_path)) {
+  if (file.exists(quant_json_path)){
     quant_info <- jsonlite::read_json(quant_json_path)
   } else {
     quant_info <- list()
   }
 
   # Create a metadata list
-  meta <- list(
-    library_id = library_id,
-    sample_id = sample_id,
-    salmon_version = cmd_info$salmon_version,
-    reference_index = cmd_info[["index"]],
-    total_reads = aux_meta[["num_processed"]],
-    mapped_reads = aux_meta[["num_mapped"]]
-  )
+  meta <- list(library_id = library_id,
+               sample_id = sample_id,
+               salmon_version = cmd_info$salmon_version,
+               reference_index = cmd_info[['index']],
+               total_reads = aux_meta[['num_processed']],
+               mapped_reads = aux_meta[['num_mapped']])
   # using $ notation  for `salmon_version` to get partial matching due to salmon 1.5.2 bug
   # see https://github.com/COMBINE-lab/salmon/issues/691
 
   # if we have permit_info data, we used alevin-fry, otherwise alevin
-  if (length(permit_info) == 0) {
+  if (length(permit_info) == 0){
     meta$mapping_tool <- "alevin"
   } else {
     meta$mapping_tool <- "alevin-fry"
@@ -238,14 +236,15 @@ read_alevin_metadata <- function(quant_dir,
 
   # Add other metadata
   # assume all alevin-fry tool versions are the same
-  meta$alevinfry_version <- permit_info[["version_str"]]
-  meta$af_permit_type <- permit_info[["permit-list-type"]]
-  meta$af_resolution <- quant_info[["resolution_strategy"]]
-  meta$af_tx2gene <- cmd_info[["tgMap"]]
-  meta$usa_mode <- quant_info[["usa_mode"]]
-  meta$af_num_cells <- quant_info[["num_quantified_cells"]]
+  meta$alevinfry_version <- permit_info[['version_str']]
+  meta$af_permit_type <- permit_info[['permit-list-type']]
+  meta$af_resolution <- quant_info[['resolution_strategy']]
+  meta$af_tx2gene <- cmd_info[['tgMap']]
+  meta$usa_mode <- quant_info[['usa_mode']]
+  meta$af_num_cells <- quant_info[['num_quantified_cells']]
   meta$tech_version <- tech_version
 
 
   return(meta)
 }
+

@@ -24,30 +24,33 @@
 #' # build a SCE object with unspliced cDNA as the main counts assay and spliced
 #' # counts as a second assay
 #' build_sce(counts,
-#'   include_unspliced = TRUE
-#' )
-#' }
+#'           include_unspliced = TRUE)
+#'
+#'}
 build_sce <- function(counts,
                       include_unspliced = TRUE,
-                      round_counts = TRUE) {
-  if (!is.logical(include_unspliced)) {
+                      round_counts= TRUE){
+
+
+  if(!is.logical(include_unspliced)){
     stop("include_unspliced must be set as TRUE or FALSE")
   }
 
-  if (!is.logical(round_counts)) {
+  if(!is.logical(round_counts)){
     stop("round_counts must be set as TRUE or FALSE")
   }
 
   # define if counts matrix has any unspliced reads
   has_unspliced <- any(grep("-[IU]$", rownames(counts)))
 
-  if (include_unspliced & !has_unspliced) {
+  if(include_unspliced & !has_unspliced){
     stop("No counts corresponding to intronic reads detected.
           If `include_unspliced` is TRUE a reference with spliced and unspliced reads must be used.")
   }
 
   # if has unspliced data get counts for both unspliced and spliced
-  if (include_unspliced & has_unspliced) {
+  if(include_unspliced & has_unspliced) {
+
     total <- collapse_intron_counts(counts, which_counts = c("total"))
     spliced <- collapse_intron_counts(counts, which_counts = c("spliced"))
 
@@ -62,46 +65,49 @@ build_sce <- function(counts,
 
     # build similar matrices that will all have common genes, spliced only genes, unspliced only genes
     spliced <- rbind(
-      spliced[common_genes, ],
-      spliced[spliced_only_genes, ],
+      spliced[common_genes,],
+      spliced[spliced_only_genes,],
       Matrix::Matrix(0,
-        nrow = length(total_only_genes),
-        ncol = ncol(spliced),
-        dimnames = list(total_only_genes, colnames(spliced)),
-        sparse = TRUE, doDiag = FALSE
-      )
+                     nrow = length(total_only_genes),
+                     ncol = ncol(spliced),
+                     dimnames = list(total_only_genes, colnames(spliced)),
+                     sparse = TRUE, doDiag = FALSE)
     )
 
     total <- rbind(
-      total[common_genes, ],
+      total[common_genes,],
       Matrix::Matrix(0,
-        nrow = length(spliced_only_genes),
-        ncol = ncol(total),
-        dimnames = list(spliced_only_genes, colnames(total)),
-        sparse = TRUE, doDiag = FALSE
-      ),
-      total[total_only_genes, ]
+                     nrow = length(spliced_only_genes),
+                     ncol = ncol(total),
+                     dimnames = list(spliced_only_genes, colnames(total)),
+                     sparse = TRUE, doDiag = FALSE),
+      total[total_only_genes,]
     )
 
     # create list of assays to use as input to create SCE object
-    assay_list <- list(
-      counts = total,
-      spliced = spliced
-    )
-  } else if (!include_unspliced & has_unspliced) {
+    assay_list <- list(counts = total,
+                       spliced = spliced)
+
+  } else if(!include_unspliced & has_unspliced) {
+
     # still aligned to introns, but want to collapse and just return spliced
     spliced <- collapse_intron_counts(counts, which_counts = c("spliced"))
     assay_list <- list(counts = spliced)
+
   } else {
+
     # aligned to spliced only so just return the counts, no introns to collapse
     assay_list <- list(counts = counts)
   }
 
-  if (round_counts) {
+  if (round_counts){
+
     assay_list <- lapply(assay_list, round)
+
   }
 
   sce <- SingleCellExperiment(assays = assay_list)
 
   return(sce)
+
 }

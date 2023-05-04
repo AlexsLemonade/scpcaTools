@@ -13,23 +13,21 @@
 #' @export
 #'
 
-add_gene_symbols <- function(sce, gene_info) {
-  if (!is(sce, "SingleCellExperiment")) {
+add_gene_symbols <- function(sce, gene_info){
+  if(!is(sce, "SingleCellExperiment")){
     stop("sce must be a SingleCellExperiment object.")
   }
-  if (is.null(gene_info$gene_id)) {
+  if(is.null(gene_info$gene_id)){
     stop("`gene_info` must contain a `gene_id` column.")
   }
-  if (is.null(gene_info$gene_name)) {
+  if (is.null(gene_info$gene_name)){
     stop("`gene_info` must contain a `gene_name` column.")
   }
 
   gene_symbols <- gene_info |>
     as.data.frame() |>
-    dplyr::select(
-      "gene_id" = "gene_id",
-      "gene_symbol" = "gene_name"
-    ) |>
+    dplyr::select("gene_id" = "gene_id",
+                  "gene_symbol" = "gene_name") |>
     dplyr::filter(.data$gene_symbol != "NA") |>
     tidyr::drop_na("gene_symbol") |>
     dplyr::distinct() |>
@@ -38,6 +36,6 @@ add_gene_symbols <- function(sce, gene_info) {
     dplyr::summarise(gene_symbol = paste(.data$gene_symbol, collapse = ";")) |>
     dplyr::pull("gene_symbol", name = .data$gene_id)
 
-  rowData(sce)$gene_symbol <- unname(gene_symbols[rownames(sce)])
+  rowData(sce)$gene_symbol = unname(gene_symbols[rownames(sce)])
   return(sce)
 }

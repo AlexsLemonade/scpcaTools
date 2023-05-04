@@ -1,3 +1,4 @@
+
 #' Convert SingleCellExperiment objects to AnnData file stored as HDF5 file
 #'
 #' @param sce SingleCellExperiment object to be converted to AnnData as an HDF5 file
@@ -14,22 +15,21 @@
 #'
 #' @examples
 #' \dontrun{
-#' sce_to_anndata(
-#'   sce = sce_object,
-#'   anndata_file = "test_anndata.h5"
-#' )
+#' sce_to_anndata(sce = sce_object,
+#'                anndata_file = "test_anndata.h5")
 #' }
-sce_to_anndata <- function(sce, anndata_file) {
+sce_to_anndata <- function(sce, anndata_file){
+
   if (!requireNamespace("zellkonverter", quietly = TRUE)) {
     stop("The zellkonverter package must be installed to convert objects to AnnData. No output file written.")
   }
 
-  if (!is(sce, "SingleCellExperiment")) {
+  if(!is(sce,"SingleCellExperiment")){
     stop("Input must be a SingleCellExperiment object.")
   }
 
   # check that filename is in the proper format for writing h5
-  if (!(stringr::str_ends(anndata_file, ".hdf5|.h5"))) {
+  if(!(stringr::str_ends(anndata_file, ".hdf5|.h5"))){
     stop("`anndata_file` must end in either '.hdf5' or '.h5'")
   }
 
@@ -37,7 +37,7 @@ sce_to_anndata <- function(sce, anndata_file) {
   sce_to_convert <- sce
 
   # remove miQC model from metadata
-  if (!is.null(metadata(sce_to_convert)$miQC_model)) {
+  if(!is.null(metadata(sce_to_convert)$miQC_model)){
     metadata(sce_to_convert)$miQC_model <- NULL
     message("miQC model cannot be converted between SCE and AnnData.")
   }
@@ -46,4 +46,5 @@ sce_to_anndata <- function(sce, anndata_file) {
   zellkonverter::writeH5AD(sce_to_convert, file = anndata_file, X_name = "counts")
 
   invisible(sce)
+
 }

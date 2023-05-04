@@ -1,3 +1,4 @@
+
 #' Convert SingleCellExperiment object to Seurat object
 #'
 #' @param sce SingleCellExperiment object
@@ -18,11 +19,12 @@
 #' }
 sce_to_seurat <- function(sce,
                           assay_name = "counts") {
+
   if (!requireNamespace("Seurat", quietly = TRUE)) {
     stop("The Seurat package must be installed to create a Seurat object. No output returned.")
   }
 
-  if (!is(sce, "SingleCellExperiment")) {
+  if(!is(sce,"SingleCellExperiment")){
     stop("Input must be a SingleCellExperiment object.")
   }
 
@@ -31,7 +33,7 @@ sce_to_seurat <- function(sce,
   }
 
   # remove miQC model from metadata
-  if (!is.null(metadata(sce)$miQC_model)) {
+  if(!is.null(metadata(sce)$miQC_model)){
     metadata(sce)$miQC_model <- NULL
     message("miQC model will not be included in Seurat object.")
   }
@@ -56,11 +58,9 @@ sce_to_seurat <- function(sce,
   if (assay_name == "counts") {
     assay_name <- "RNA"
   }
-  seurat_obj <- Seurat::CreateSeuratObject(
-    counts = sce_counts,
-    meta.data = coldata,
-    assay = assay_name
-  )
+  seurat_obj <- Seurat::CreateSeuratObject(counts = sce_counts,
+                                           meta.data = coldata,
+                                           assay = assay_name)
 
   # add rowdata and metadata separately adding it while creating leaves the slots empty without warning
   seurat_obj[[assay_name]]@var.features <- rowdata
@@ -69,8 +69,9 @@ sce_to_seurat <- function(sce,
   # grab names of altExp, if any
   alt_names <- altExpNames(sce)
 
-  # add each altExp from the SCE to the Seurat object
-  for (name in alt_names) {
+ # add each altExp from the SCE to the Seurat object
+  for (name in alt_names){
+
     # we want to make sure that we are only adding counts for the cells
     # that currently exist in the object
     seurat_obj_cells <- colnames(seurat_obj)
@@ -91,10 +92,12 @@ sce_to_seurat <- function(sce,
     seurat_obj[[name]]@var.features <- rowdata
 
     # check that altExp data is present as a new assay, since Seurat sometimes fails without warning
-    if (is.null(seurat_obj[[name]])) {
+    if(is.null(seurat_obj[[name]])){
       warning("Unable to convert altExp data found in SCE to Seurat.")
     }
+
   }
 
   return(seurat_obj)
+
 }

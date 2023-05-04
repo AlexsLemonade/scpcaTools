@@ -1,4 +1,4 @@
-dir <- system.file("extdata", package = "scpcaData")
+dir <- system.file("extdata", package="scpcaData")
 cellranger_dir <- file.path(dir, "Breast_Cancer_3p_LT/cellranger_cdna")
 
 # expected matrix size
