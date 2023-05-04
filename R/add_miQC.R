@@ -18,21 +18,21 @@ add_miQC <- function(sce,
                      posterior_cutoff = 0.75,
                      keep_all_below_boundary = TRUE,
                      enforce_left_cutoff = TRUE,
-                     seed = NULL){
+                     seed = NULL) {
   # check that input is a SingleCellExperiment
-  if(!is(sce, "SingleCellExperiment")){
+  if (!is(sce, "SingleCellExperiment")) {
     stop("sce must be a SingleCellExperiment object")
   }
   # check that sce has subsets_mito_percent
-  if(!("subsets_mito_percent" %in% colnames(colData(sce)))){
+  if (!("subsets_mito_percent" %in% colnames(colData(sce)))) {
     stop("sce must have subsets_mito_percent in the column data. Use scuttle::addPerCellQCMetrics or similar to add it.")
   }
   # check if prob_compromised exists
-  if(!is.null(sce$prob_compromised)){
+  if (!is.null(sce$prob_compromised)) {
     warning("prob_compromised was already calculated and will be replaced.")
   }
   # check if miQC_pass exists
-  if(!is.null(sce$miQC_pass)){
+  if (!is.null(sce$miQC_pass)) {
     warning("miQC_pass was already calculated and will be replaced.")
   }
 
@@ -45,34 +45,38 @@ add_miQC <- function(sce,
   model_attempt <- 0
 
   # This can fail in a few ways, so we will wrap the next steps in a while/try loop
-  while(model_attempt < 3 &&
-        (!is(model, "flexmix") || length(model@components) < 2 ) &&
-        is.null(pass_cells)){
+  while (model_attempt < 3 &&
+    (!is(model, "flexmix") || length(model@components) < 2) &&
+    is.null(pass_cells)) {
     model_attempt <- model_attempt + 1
-    try({
-      model <- miQC::mixtureModel(sce)
-      # filter step can fail, so we will try this too, keeping the passing cell ids
-      pass_cells <- colnames(
-        miQC::filterCells(sce,
-                          model = model,
-                          posterior_cutoff = posterior_cutoff,
-                          keep_all_below_boundary = keep_all_below_boundary,
-                          enforce_left_cutoff = enforce_left_cutoff,
-                          verbose = FALSE)
-      )
-    }, silent = TRUE)
+    try(
+      {
+        model <- miQC::mixtureModel(sce)
+        # filter step can fail, so we will try this too, keeping the passing cell ids
+        pass_cells <- colnames(
+          miQC::filterCells(sce,
+            model = model,
+            posterior_cutoff = posterior_cutoff,
+            keep_all_below_boundary = keep_all_below_boundary,
+            enforce_left_cutoff = enforce_left_cutoff,
+            verbose = FALSE
+          )
+        )
+      },
+      silent = TRUE
+    )
   }
 
-  if (!is(model, "flexmix") || length(model@components) < 2){
+  if (!is(model, "flexmix") || length(model@components) < 2) {
     # no good fit, fill prob_compromised with NA
     sce$prob_compromised <- NA_real_
-  }else{
+  } else {
     # add the prob_compromised value for all cells
     sce <- miQC_nofilter(sce, model = model)
     # test whether cells passed filtering
-    if(is.null(pass_cells)){
+    if (is.null(pass_cells)) {
       sce$miQC_pass <- NA
-    }else{
+    } else {
       sce$miQC_pass <- colnames(sce) %in% pass_cells
     }
     metadata(sce)$miQC_model <- model
@@ -123,5 +127,3 @@ miQC_nofilter <- function(sce, model = NULL) {
 
   return(sce)
 }
-
-

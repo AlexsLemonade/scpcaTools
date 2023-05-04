@@ -6,7 +6,8 @@ test_that("vireo cell assignment works as expected", {
   # construct cell assignments for half of cells, order arbitrary
   vireo_cells <- sample(colnames(sce), size = 50)
   donor_ids <- sample(c(metadata(sce)$sample_id, "doublet", "unassigned"),
-                      size = length(vireo_cells), replace = TRUE)
+    size = length(vireo_cells), replace = TRUE
+  )
 
   vireo_df <- data.frame(cell = vireo_cells, donor_id = donor_ids)
 
@@ -16,8 +17,10 @@ test_that("vireo cell assignment works as expected", {
   expect_equal(dim(vireo_sce), dim(sce))
 
   # check that columns were added to colData
-  vireo_cols <- c("vireo_sampleid",
-                  "vireo_donor_id")
+  vireo_cols <- c(
+    "vireo_sampleid",
+    "vireo_donor_id"
+  )
   expect_true(all(vireo_cols %in% colnames(colData(vireo_sce))))
 
   # test with different sample_ids

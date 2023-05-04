@@ -44,24 +44,26 @@
 #' @import SingleCellExperiment
 merge_sce_list <- function(sce_list = list(),
                            batch_column = "library_id",
-                           retain_coldata_cols = c("sum",
-                                                   "detected",
-                                                   "total",
-                                                   "subsets_mito_sum",
-                                                   "subsets_mito_detected",
-                                                   "subsets_mito_percent",
-                                                   "miQC_pass",
-                                                   "prob_compromised",
-                                                   "barcode"),
+                           retain_coldata_cols = c(
+                             "sum",
+                             "detected",
+                             "total",
+                             "subsets_mito_sum",
+                             "subsets_mito_detected",
+                             "subsets_mito_percent",
+                             "miQC_pass",
+                             "prob_compromised",
+                             "barcode"
+                           ),
                            preserve_rowdata_cols = NULL,
                            cell_id_column = "cell_id") {
-
   # Check `sce_list`----------------------
   if (is.null(names(sce_list))) {
     warning(
       glue::glue(
         "Individual SCE objects in `sce_list` are not named, so batches will be
-        named based on their list index in the merged SCE object.")
+        named based on their list index in the merged SCE object."
+      )
     )
     names(sce_list) <- 1:length(sce_list)
   }
@@ -92,7 +94,7 @@ merge_sce_list <- function(sce_list = list(),
 
   # Second, determine all the column names that are present in any SCE so it can
   #  be created in any missing SCEs with `NA` values
-  all_colnames <- purrr::map(sce_list, ~names(colData(.))) |>
+  all_colnames <- purrr::map(sce_list, ~ names(colData(.))) |>
     unlist() |>
     unname() |>
     unique()
@@ -106,11 +108,12 @@ merge_sce_list <- function(sce_list = list(),
   # Prepare SCEs
   sce_list <- sce_list |>
     purrr::imap(prepare_sce_for_merge,
-                batch_column = batch_column,
-                cell_id_column = cell_id_column,
-                shared_features = shared_features,
-                retain_coldata_cols = retain_coldata_cols,
-                preserve_rowdata_cols = preserve_rowdata_cols)
+      batch_column = batch_column,
+      cell_id_column = cell_id_column,
+      shared_features = shared_features,
+      retain_coldata_cols = retain_coldata_cols,
+      preserve_rowdata_cols = preserve_rowdata_cols
+    )
 
   # Create the merged SCE from the processed list ------------------
   merged_sce <- do.call(cbind, sce_list)
@@ -145,12 +148,11 @@ prepare_sce_for_merge <- function(sce,
                                   shared_features,
                                   retain_coldata_cols,
                                   preserve_rowdata_cols) {
-
   # Current functionality does not retain any present altExps
   sce <- removeAltExps(sce)
 
   # Subset to shared features
-  sce <- sce[shared_features,]
+  sce <- sce[shared_features, ]
 
   ##### rowData #####
   # Add `sce_name` ID to rowData column names except for those
