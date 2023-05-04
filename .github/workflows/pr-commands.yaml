@@ -32,7 +32,7 @@ jobs:
 
       - name: Document
         run: roxygen2::roxygenise()
-        shell: Rscript {0}
+        shell: Rscript --no-init-file {0}
 
       - name: commit
         run: |
@@ -62,11 +62,11 @@ jobs:
 
       - name: Install dependencies
         run: install.packages(c("styler", "roxygen2"))
-        shell: Rscript {0}
+        shell: Rscript --no-init-file {0}
 
       - name: Enable styler cache
         run: styler::cache_activate()
-        shell: Rscript {0}
+        shell: Rscript --no-init-file {0}
 
       - name: Determine cache location
         id: styler-location
@@ -79,7 +79,7 @@ jobs:
             append = TRUE,
             sep = ""
           )
-        shell: Rscript {0}
+        shell: Rscript --no-init-file {0}
 
       - name: Cache styler
         uses: actions/cache@v3
@@ -92,7 +92,7 @@ jobs:
 
       - name: Style
         run: styler::style_pkg()
-        shell: Rscript {0}
+        shell: Rscript --no-init-file {0}
 
 
 
