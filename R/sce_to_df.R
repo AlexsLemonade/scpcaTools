@@ -11,14 +11,13 @@
 #' @export
 #'
 coldata_to_df <- function(sce) {
-
   # make sure that input is a SingleCellExperiment
-  if(!is(sce, "SingleCellExperiment")){
+  if (!is(sce, "SingleCellExperiment")) {
     stop("Input must be a SingleCellExperiment object.")
   }
 
   # make sure that input has colData
-  if(ncol(colData(sce)) == 0){
+  if (ncol(colData(sce)) == 0) {
     warning("SingleCellExperiment has empty colData slot.")
   }
 
@@ -40,14 +39,13 @@ coldata_to_df <- function(sce) {
 #'
 #' @export
 rowdata_to_df <- function(sce) {
-
   # make sure that input is a SingleCellExperiment
-  if(!is(sce, "SingleCellExperiment")){
+  if (!is(sce, "SingleCellExperiment")) {
     stop("Input must be a SingleCellExperiment object.")
   }
 
   # make sure that input has rowData
-  if(ncol(rowData(sce)) == 0){
+  if (ncol(rowData(sce)) == 0) {
     warning("SingleCellExperiment has empty rowData slot")
   }
 

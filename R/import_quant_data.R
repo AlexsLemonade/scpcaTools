@@ -25,29 +25,33 @@
 #' \dontrun{
 #' # read in single cell RNA seq data processed using cellranger
 #' import_quant_data(quant_dir,
-#' tool = "cellranger")
+#'   tool = "cellranger"
+#' )
 #'
 #' # read in single-cell RNA seq data processed using alevin-fry in USA mode
 #' # with alignment to cDNA only and including counts for spliced cDNA only
 #' import_quant_data(quant_dir,
-#'                   tool = "alevin-fry",
-#'                   include_unspliced = FALSE,
-#'                   usa_mode = TRUE)
+#'   tool = "alevin-fry",
+#'   include_unspliced = FALSE,
+#'   usa_mode = TRUE
+#' )
 #'
 #' # read in single-nuclei RNA-seq data processed using alevin-fry in
 #' # USA mode with alignment to cDNA + introns and including counts for
 #' # unspliced cDNA and perform filtering
 #' import_quant_data(quant_dir,
-#'                   tool = "alevin-fry",
-#'                   usa_mode = TRUE,
-#'                   filter = TRUE)
+#'   tool = "alevin-fry",
+#'   usa_mode = TRUE,
+#'   filter = TRUE
+#' )
 #'
 #' # read in single-nuclei RNA-seq data processed using kallisto with
 #' # alignment to cDNA + introns and including counts for unspliced cDNA
 #' # and perform filtering
 #' import_quant_data(quant_dir,
-#'                   tool = "kallisto",
-#'                   filter = TRUE)
+#'   tool = "kallisto",
+#'   filter = TRUE
+#' )
 #' }
 #'
 import_quant_data <- function(quant_dir,
@@ -58,46 +62,45 @@ import_quant_data <- function(quant_dir,
                               fdr_cutoff = 0.01,
                               tech_version = NULL,
                               ...) {
-
   which_counts <- match.arg(which_counts)
 
-  if(!(tool %in% c("cellranger", "alevin", "alevin-fry", "kallisto"))){
+  if (!(tool %in% c("cellranger", "alevin", "alevin-fry", "kallisto"))) {
     stop("Tool must be either cellranger, alevin, alevin-fry, or kallisto.")
   }
 
   # checks for intron_mode and usa_mode
-  if(!is.logical(include_unspliced)){
+  if (!is.logical(include_unspliced)) {
     stop("include_unspliced must be set as TRUE or FALSE")
   }
-  if(!is.logical(usa_mode)){
+  if (!is.logical(usa_mode)) {
     stop("usa_mode must be set as TRUE or FALSE")
   }
-  if(!is.logical(filter)){
+  if (!is.logical(filter)) {
     stop("filter must be set as TRUE or FALSE")
   }
 
   # check that usa_mode and intron_mode are used with the proper tools
-  if(usa_mode & tool %in% c("cellranger", "alevin", "kallisto")){
+  if (usa_mode & tool %in% c("cellranger", "alevin", "kallisto")) {
     stop("USA mode only compatible with alevin-fry.")
   }
-  if(include_unspliced & tool %in% c("cellranger")){
+  if (include_unspliced & tool %in% c("cellranger")) {
     stop("Include unspliced not compatible with cellranger.")
   }
 
   # check that filter is not used with cellranger
-  if(filter & tool == "cellranger"){
+  if (filter & tool == "cellranger") {
     stop("Cannot perform emptyDrops filtering on cellranger output.")
   }
-  if(filter){
-    if(!(is.numeric(fdr_cutoff))){
+  if (filter) {
+    if (!(is.numeric(fdr_cutoff))) {
       stop("fdr_cutoff is not a number.")
     }
-    if(fdr_cutoff < 0 | fdr_cutoff > 1){
+    if (fdr_cutoff < 0 | fdr_cutoff > 1) {
       stop("fdr_cutoff must be a number between 0 - 1.")
     }
   }
 
-  if (tool %in% c("alevin-fry", "alevin")){
+  if (tool %in% c("alevin-fry", "alevin")) {
     sce <- read_alevin(quant_dir, include_unspliced, usa_mode, tech_version)
   } else if (tool == "kallisto") {
     sce <- read_kallisto(quant_dir, include_unspliced)
@@ -105,7 +108,7 @@ import_quant_data <- function(quant_dir,
     sce <- read_cellranger(quant_dir)
   }
 
-  if(filter){
+  if (filter) {
     sce <- filter_counts(sce, fdr_cutoff, ...)
   }
 

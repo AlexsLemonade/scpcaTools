@@ -30,46 +30,49 @@ generate_qc_report <- function(library_id,
                                report_template = NULL,
                                extra_params = NULL,
                                output = NULL,
-                               ...){
-
+                               ...) {
   ### Check dependencies for generating report
-  required_packages <- c("ggplot2", "kableExtra", "rmarkdown",
-                         "scater", "scran")
+  required_packages <- c(
+    "ggplot2", "kableExtra", "rmarkdown",
+    "scater", "scran"
+  )
 
   installed_status <- sapply(required_packages,
-                             requireNamespace,
-                             quietly = TRUE)
+    requireNamespace,
+    quietly = TRUE
+  )
 
-  if(!all(installed_status)){
-    missing_packages <- required_packages[!installed_status]|>
+  if (!all(installed_status)) {
+    missing_packages <- required_packages[!installed_status] |>
       paste(collapse = ", ")
     stop(paste("The following packages are required for generating a QC report:",
-               missing_packages,
-               sep = "\n       "))
+      missing_packages,
+      sep = "\n       "
+    ))
   }
 
-  if(!inherits(unfiltered_sce, "SingleCellExperiment")){
+  if (!inherits(unfiltered_sce, "SingleCellExperiment")) {
     stop("`unfiltered_sce` must be a SingleCellExperiment object.")
   }
   # check that the filtered sce is as expected
-  if(!is.null(filtered_sce)){
-    if (!inherits(filtered_sce, "SingleCellExperiment")){
+  if (!is.null(filtered_sce)) {
+    if (!inherits(filtered_sce, "SingleCellExperiment")) {
       stop("`filtered_sce` must be a SingleCellExperiment object.")
     }
-    if (ncol(unfiltered_sce) < ncol(filtered_sce)){
+    if (ncol(unfiltered_sce) < ncol(filtered_sce)) {
       stop("`filtered_sce` should have fewer cells than `unfiltered_sce`")
     }
-    if (!all(colnames(filtered_sce) %in% colnames(unfiltered_sce))){
+    if (!all(colnames(filtered_sce) %in% colnames(unfiltered_sce))) {
       stop("Some cells in `filtered_sce` are not present in `unfiltered_sce`, from which it should be derived.")
     }
   }
 
-  if(is.null(output)){
-    output_file = glue::glue("{library_id}_qc_report")
-    output_dir = "."
+  if (is.null(output)) {
+    output_file <- glue::glue("{library_id}_qc_report")
+    output_dir <- "."
   } else {
-    output_file = basename(output)
-    output_dir = dirname(output)
+    output_file <- basename(output)
+    output_dir <- dirname(output)
   }
 
   # create list of parameters
@@ -81,23 +84,24 @@ generate_qc_report <- function(library_id,
   )
 
   # define rmd file if none provided
-  if(is.null(report_template)){
+  if (is.null(report_template)) {
     report_template <- system.file(file.path("rmd", "qc_report.rmd"), package = "scpcaTools")
 
     # ignore extra parameters if they exist
-    if(!is.null(extra_params)){
+    if (!is.null(extra_params)) {
       message("`extra_params` are only used if providing a template file, so will be ignored")
     }
-
   } else {
     # rmd file is provided, check that it exists
-    if(!file.exists(report_template)){
+    if (!file.exists(report_template)) {
       stop("Provided template file does not exist.")
     }
 
     # if additional rmd file is provided, add extra params
-    params_list <- append(params_list,
-                          extra_params)
+    params_list <- append(
+      params_list,
+      extra_params
+    )
   }
 
   suppressPackageStartupMessages(rmarkdown::render(
