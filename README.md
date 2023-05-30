@@ -2,7 +2,7 @@
 # scpcaTools: Useful tools for analysis of single-cell RNA seq counts data
 
   <!-- badges: start -->
-  [![R-CMD-check](https://github.com/AlexsLemonade/scpcaTools/workflows/R-CMD-check/badge.svg)](https://github.com/AlexsLemonade/scpcaTools/actions)
+  [![R-CMD-check](https://github.com/AlexsLemonade/scpcaTools/workflows/R-CMD-check/badge.svg)](https://github.com/AlexsLemonade/scpcaTools/actions/workflows/R-CMD-check.yaml)
   <!-- badges: end --> 
 
 The `scpcaTools` package contains a set of tools for working with single-cell and single-nuclei RNA-seq counts data.

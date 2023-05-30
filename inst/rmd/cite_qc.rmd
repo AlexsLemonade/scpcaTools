@@ -50,4 +50,3 @@ knitr::kable(antibody_tags, digits = 2) |>
   kableExtra::column_spec(2:3, monospace = TRUE) 
   
 ```
-
