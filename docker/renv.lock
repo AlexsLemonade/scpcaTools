@@ -2,10 +2,6 @@
   "R": {
     "Version": "4.2.3",
     "Repositories": [
-       {
-        "Name": "RSPM",
-        "URL": "https://packagemanager.rstudio.com/cran/latest"
-      },
       {
         "Name": "PPM",
         "URL": "https://packagemanager.posit.co/cran/latest"
