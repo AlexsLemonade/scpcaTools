@@ -15,21 +15,20 @@
 #'
 #' # only keep counts from spliced cDNA in final counts matrix
 #' collapse_intron_counts(counts,
-#'                        which_counts = "spliced")
+#'   which_counts = "spliced"
+#' )
 #'
 #' # include unspliced cDNA in final counts matrix
 #' collapse_intron_counts(counts,
-#'                        which_counts = "total")
+#'   which_counts = "total"
+#' )
 #' }
 #'
-#'
-#'
 collapse_intron_counts <- function(counts,
-                                   which_counts = c("spliced", "total", "unspliced")){
-
+                                   which_counts = c("spliced", "total", "unspliced")) {
   which_counts <- match.arg(which_counts)
 
-  if (which_counts ==  "unspliced"){
+  if (which_counts == "unspliced") {
     warning("which_counts = 'unspliced' is deprecated, please use 'total'
             which counts both spliced and unspliced reads.")
   }
@@ -38,24 +37,24 @@ collapse_intron_counts <- function(counts,
   usa_introns <- str_detect(rownames(counts), "-U$")
   usa_ambiguous <- str_detect(rownames(counts), "-A$")
 
-  if(any(introns) & any(usa_introns)){
+  if (any(introns) & any(usa_introns)) {
     stop("Gene ids with both -U and -I suffixes, can't determine read matrix type.")
   }
-  if(any(introns)){
+  if (any(introns)) {
     spliced_genes <- !introns
-  } else if(any(usa_introns)){
+  } else if (any(usa_introns)) {
     spliced_genes <- !usa_introns & !usa_ambiguous
   } else {
     stop('No counts corresponding to intronic reads detected,
          must have "-I" or "-U" at the end of gene name to signify intronic reads.')
   }
-  if(all(!spliced_genes)){
+  if (all(!spliced_genes)) {
     stop("Missing spliced genes in counts matrix.")
   }
 
 
-  if(which_counts == "spliced") {
-    counts <- counts[spliced_genes | usa_ambiguous,]
+  if (which_counts == "spliced") {
+    counts <- counts[spliced_genes | usa_ambiguous, ]
   }
   # remove -I -U -A at the end of the gene names
   genes <- str_remove(rownames(counts), "-[IUA]$")
@@ -65,12 +64,11 @@ collapse_intron_counts <- function(counts,
   ugenes <- unique(genes)
   fgenes <- factor(genes, levels = ugenes)
   # create a transformer matrix, with 1s at positions that correspond to old/new names, zeros elsewhere
-  transformer <- Matrix::sparseMatrix(as.integer(fgenes), 1:length(fgenes), x =1)
+  transformer <- Matrix::sparseMatrix(as.integer(fgenes), 1:length(fgenes), x = 1)
   rownames(transformer) <- ugenes
   # matrix multiplication to collapse
   counts <- transformer %*% counts
   # drop extra slots silently
   counts <- suppressWarnings(BiocGenerics::updateObject(counts))
   return(counts)
-
 }

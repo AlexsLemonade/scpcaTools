@@ -6,7 +6,7 @@ test_that("merging alternative experiments works as expected", {
   # rename the alt_exp so it shares half of its cells with the base
   colnames(alt_sce) <- c(colnames(alt_sce)[1:20], colnames(sce)[1:20])
   # merge alt into main
-  alt_name = "alt"
+  alt_name <- "alt"
   merged_sce <- merge_altexp(sce, alt_sce, alt_name)
   # test general expectations
   expect_true(alt_name %in% altExpNames(merged_sce))
