@@ -13,21 +13,21 @@
 #'
 #' @examples
 #' \dontrun{
-#'   sim_sce(n_genes = 100, n_cells = 100, n_empty = 2000, n_groups = 4)
+#' sim_sce(n_genes = 100, n_cells = 100, n_empty = 2000, n_groups = 4)
 #' }
 #'
-sim_sce <- function(n_genes = 200, n_cells = 100, n_empty = 1000, n_groups = 3){
-  if (n_genes < 1){
+sim_sce <- function(n_genes = 200, n_cells = 100, n_empty = 1000, n_groups = 3) {
+  if (n_genes < 1) {
     stop("n_genes must be a positive number.")
   }
-  if (n_cells < 1){
+  if (n_cells < 1) {
     stop("n_cells must be a postive number.")
   }
   # enforce some minimums
   n_empty <- max(n_empty, 0)
   n_groups <- max(n_groups, 1)
 
-  if (n_cells + n_empty > 1000000){
+  if (n_cells + n_empty > 1000000) {
     warning("Did you really want to simulate more than a million droplets?")
   }
 
@@ -46,7 +46,7 @@ sim_sce <- function(n_genes = 200, n_cells = 100, n_empty = 1000, n_groups = 3){
   # random cell barcodes
   cell_barcodes <- replicate(
     (n_cells + n_empty) * 1.1, # account for (rare, but possible) duplicates
-    paste0(sample(c("A","T","G","C"), 12, replace = TRUE), collapse = '')
+    paste0(sample(c("A", "T", "G", "C"), 12, replace = TRUE), collapse = "")
   ) |>
     unique() |>
     head(n_cells + n_empty)
