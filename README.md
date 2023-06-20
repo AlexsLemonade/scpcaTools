@@ -50,7 +50,7 @@ It is important to note that some of the Python functionality may not be exposed
 ### Setup
 
 To get started, you will want to open an R session in the project directory and run `renv::restore()`.
-You will prompted first to update any R packages (if required), then for the Python enviroment updates.
+You will first be prompted to update any R packages (if required), then for the Python environment updates.
 This will create a `.venv` directory and populate it with the required Python packages, as specified in `requirements.txt`.
 
 To use the python environment from the terminal, you may need to activate it.
