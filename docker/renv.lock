@@ -15,6 +15,11 @@
   "Bioconductor": {
     "Version": "3.16"
   },
+  "Python": {
+    "Version": "3.9.6",
+    "Type": "virtualenv",
+    "Name": "./.venv"
+  },
   "Packages": {
     "AnnotationDbi": {
       "Package": "AnnotationDbi",

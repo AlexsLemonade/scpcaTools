@@ -29,4 +29,6 @@ apt-get -y --no-install-recommends install \
     libxtst6 \
     libxt-dev \
     pandoc \
-  && rm -rf /var/lib/apt/lists/*
+    python3-pip
+
+rm -rf /var/lib/apt/lists/*

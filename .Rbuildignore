@@ -1,6 +1,7 @@
+^requirements\.txt$
 ^renv$
 ^renv\.lock$
-^dependencies.R$
+^dependencies\.R$
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^\.github$
