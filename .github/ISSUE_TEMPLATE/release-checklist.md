@@ -12,15 +12,15 @@ assignees: ''
 ### Preparing for the release and testing
 
 - [ ] Are all of the issues planned for this release resolved? If there are any issues that are unresolved, mark this issue as blocked by those on ZenHub.
-- [ ] Update [DESCRIPTION](https://github.com/AlexsLemonade/scpcaTools/blob/main/DESCRIPTION#L4) with new version number. 
+- [ ] Update [DESCRIPTION](https://github.com/AlexsLemonade/scpcaTools/blob/main/DESCRIPTION#L4) with new version number.
 - [ ] Did all automated tests and the Docker build in this repo pass in CI? You may have to wait for the docker image to build. Check [Github actions](https://github.com/AlexsLemonade/scpcaTools/actions/workflows/build-docker.yaml) before proceeding to the next step.
 - [ ] Test the new docker build in `scpca-nf`
   - [ ] Create a branch in [scpca-nf](https://github.com/AlexsLemonade/scpca-nf/) for testing the latest Docker version from the `main` branch.
   - [ ] Update [containers.config](https://github.com/AlexsLemonade/scpca-nf/blob/main/config/containers.config) with the `edge` version of the scpca-tools container: ```SCPCATOOLS_CONTAINER = 'ghcr.io/alexslemonade/scpca-tools:edge'``` and push the branch to github.
-  - [ ] If necessary, update the `scpca-nf` workflow to accommodate changes in the `scpcaTools` package  
+  - [ ] If necessary, update the `scpca-nf` workflow to accommodate changes in the `scpcaTools` package
   - [ ] Perform a test run of the workflow with:
-```nextflow run AlexsLemonade/scpca-nf -r "<TESTBRANCH>" -profile batch```
-If the [default `run_ids`](https://github.com/AlexsLemonade/scpca-nf/blob/main/main.nf#L4-L9) for the workflow do not cover expected changes in this tools package, you may want to specify particular test samples or projects with the `--run_id` option (use your judgement).
+```nextflow run AlexsLemonade/scpca-nf -r "<TESTBRANCH>" -profile batch,ccdl```
+If the [default `run_ids`](https://github.com/AlexsLemonade/scpca-nf/blob/main/config/profile_ccdl.config#L12-L13 for the workflow do not cover expected changes in this tools package, you may want to specify particular test samples or projects with the `--run_id` option (use your judgement).
 
 ### Creating a release
 - [ ] On the [releases page](https://github.com/AlexsLemonade/scpcatools/releases), choose `Draft a new release`.
