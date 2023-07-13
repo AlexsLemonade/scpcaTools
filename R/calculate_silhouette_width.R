@@ -7,16 +7,16 @@
 #' @param seed Seed for initializing random sampling
 #' @param batch_column The variable in `integrated_sce` indicating the grouping of interest.
 #'  Generally this is either batches or cell types. Default is "batch".
-#'   
+#'
 #' @return Tibble with six columns: `rep`, representing the given downsampling replicate;
-#'   `silhouette_width`, the calculated silhouette width for the given `rep`; `silhouette_cluster`, 
-#'   the assigned cluster for the cell during silhouette calculation, i.e. the true identity; 
-#'   `other_cluster`, the other assigned for the cell during silhouette calculation; 
+#'   `silhouette_width`, the calculated silhouette width for the given `rep`; `silhouette_cluster`,
+#'   the assigned cluster for the cell during silhouette calculation, i.e. the true identity;
+#'   `other_cluster`, the other assigned for the cell during silhouette calculation;
 #'   `pc_name`, the name associated with the pc results
 #'
-#' @import SingleCellExperment
+#' @import SingleCellExperiment
 #' @import bluster
-#' @import magrittr
+#' @import dplyr
 #'
 #' @export
 calculate_silhouette_width <- function(integrated_sce,
@@ -25,13 +25,13 @@ calculate_silhouette_width <- function(integrated_sce,
                                        nreps = 20,
                                        seed = 2023,
                                        batch_column = "library_id") {
-  
-  # Set the seed for subsampling 
+
+  # Set the seed for subsampling
   set.seed(seed)
-  
+
   # Pull out the PCs or analogous reduction
   pcs <- reducedDim(integrated_sce, pc_name)
-  
+
   # Perform calculations
   all_silhouette <- tibble::tibble(
     rep                = as.numeric(),
@@ -42,23 +42,23 @@ calculate_silhouette_width <- function(integrated_sce,
   for (i in 1:nreps) {
     # Downsample PCs
     downsampled <- downsample_for_metrics(pcs, pc_name, frac_cells)
-    
+
     # Calculate batch ASW and add into final tibble
     rep_silhouette <- bluster::approxSilhouette(downsampled$pc_name, downsampled$batch_labels) %>%
       tibble::as_tibble() %>%
       dplyr::mutate(rep = i) %>%
-      dplyr::select(rep, 
-                    silhouette_width = width, 
-                    silhouette_cluster = cluster, 
+      dplyr::select(rep,
+                    silhouette_width = width,
+                    silhouette_cluster = cluster,
                     other_cluster = other)
-    
+
     all_silhouette <- dplyr::bind_rows(all_silhouette, rep_silhouette)
   }
-  
+
   # Add integration method into tibble
   all_silhouette <- dplyr::mutate(all_silhouette, pc_name = pc_name)
-  
+
   # Return tibble with silhouette width results which can further be summarized downstream
   return(all_silhouette)
-  
+
 }
