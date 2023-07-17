@@ -51,7 +51,7 @@ calculate_silhouette_width <- function(integrated_sce,
   all_silhouette <- purrr::map(1:nrep, \(rep) {
 
     # Downsample PCs
-    downsampled <- downsample_pcs(pcs, pc_name, frac_cells)
+    downsampled <- downsample_pcs(pcs, frac_cells)
     # Calculate batch ASW and add into final tibble
     rep_silhouette <- bluster::approxSilhouette(downsampled$pc_name, downsampled$batch_labels) %>%
       tibble::as_tibble() %>%
