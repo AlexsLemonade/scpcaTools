@@ -24,22 +24,21 @@ calculate_silhouette_width <- function(integrated_sce,
                                        nreps = 20,
                                        seed = 2023,
                                        batch_column = "library_id") {
-
   # Set the seed for subsampling
   set.seed(seed)
 
   # Check that provided `pc_name` is present in SingleCellExperiment object
-  if(!pc_name %in% reducedDimNames(integrated_sce)) {
+  if (!pc_name %in% reducedDimNames(integrated_sce)) {
     stop("The provided `pc_name` cannot be found in the SingleCellExperiment object.")
   }
 
   # Check that `nreps` is an integer
-  if(!(is.integer(nreps))) {
+  if (!(is.integer(nreps))) {
     stop("The provided `nreps` should be an integer.")
   }
 
   # Check that frac_cells is in range
-  if(frac_cells < 0 | frac_cells > 1) {
+  if (frac_cells < 0 | frac_cells > 1) {
     stop("The fraction of cells to downsample should be between 0 and 1.")
   }
 
@@ -49,7 +48,6 @@ calculate_silhouette_width <- function(integrated_sce,
 
   # Perform calculations
   all_silhouette <- purrr::map(1:nreps, \(rep) {
-
     # Downsample PCs
     downsampled <- downsample_pcs(pcs, frac_cells)
     # Calculate batch ASW and add into final tibble
@@ -57,11 +55,11 @@ calculate_silhouette_width <- function(integrated_sce,
       tibble::as_tibble() %>%
       dplyr::mutate(rep = rep) %>%
       dplyr::select(rep,
-                    silhouette_width = width,
-                    silhouette_cluster = cluster,
-                    other_cluster = other) |>
+        silhouette_width = width,
+        silhouette_cluster = cluster,
+        other_cluster = other
+      ) |>
       dplyr::bind_rows()
-
   })
 
   # Add integration method into tibble
@@ -69,5 +67,4 @@ calculate_silhouette_width <- function(integrated_sce,
 
   # Return tibble with silhouette width results which can further be summarized downstream
   return(all_silhouette)
-
 }
