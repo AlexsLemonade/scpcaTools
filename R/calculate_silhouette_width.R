@@ -48,7 +48,7 @@ calculate_silhouette_width <- function(integrated_sce,
 
 
   # Perform calculations
-  all_silhouette <- purrr::map(1:nrep, \(rep) {
+  all_silhouette <- purrr::map(1:nreps, \(rep) {
 
     # Downsample PCs
     downsampled <- downsample_pcs(pcs, frac_cells)
