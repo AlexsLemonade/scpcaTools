@@ -6,7 +6,7 @@
 #' @param nreps The number of times to repeat sub-sampling procedure. Default: 20
 #' @param seed Seed for initializing random sampling
 #' @param batch_column The variable in `integrated_sce` indicating the grouping of interest.
-#'  Generally this is either batches or cell types. Default is "batch".
+#'  Generally this is either batches or cell types. Default is "library_id".
 #'
 #' @return Tibble with six columns: `rep`, representing the given downsampling replicate;
 #'   `silhouette_width`, the calculated silhouette width for the given `rep`; `silhouette_cluster`,
@@ -16,7 +16,6 @@
 #'
 #' @import SingleCellExperiment
 #' @import bluster
-#' @import dplyr
 #'
 #' @export
 calculate_silhouette_width <- function(integrated_sce,
@@ -29,31 +28,41 @@ calculate_silhouette_width <- function(integrated_sce,
   # Set the seed for subsampling
   set.seed(seed)
 
+  # Check that provided `pc_name` is present in SingleCellExperiment object
+  if(!pc_name %in% reducedDimNames(integrated_sce)) {
+    stop("The provided `pc_name` cannot be found in the SingleCellExperiment object.")
+  }
+
+  # Check that `nreps` is an integer
+  if(!(is.integer(nreps))) {
+    stop("The provided `nreps` should be an integer.")
+  }
+
+  # Check that frac_cells is in range
+  if(frac_cells < 0 | frac_cells > 1) {
+    stop("The fraction of cells to downsample should be between 0 and 1.")
+  }
+
   # Pull out the PCs or analogous reduction
   pcs <- reducedDim(integrated_sce, pc_name)
 
-  # Perform calculations
-  all_silhouette <- tibble::tibble(
-    rep                = as.numeric(),
-    silhouette_width   = as.numeric(),
-    silhouette_cluster = as.character(),
-    other_cluster      = as.character()
-  )
-  for (i in 1:nreps) {
-    # Downsample PCs
-    downsampled <- downsample_for_metrics(pcs, pc_name, frac_cells)
 
+  # Perform calculations
+  all_silhouette <- purrr::map(1:nrep, \(rep) {
+
+    # Downsample PCs
+    downsampled <- downsample_pcs(pcs, pc_name, frac_cells)
     # Calculate batch ASW and add into final tibble
     rep_silhouette <- bluster::approxSilhouette(downsampled$pc_name, downsampled$batch_labels) %>%
       tibble::as_tibble() %>%
-      dplyr::mutate(rep = i) %>%
+      dplyr::mutate(rep = rep) %>%
       dplyr::select(rep,
                     silhouette_width = width,
                     silhouette_cluster = cluster,
-                    other_cluster = other)
+                    other_cluster = other) |>
+      dplyr::bind_rows()
 
-    all_silhouette <- dplyr::bind_rows(all_silhouette, rep_silhouette)
-  }
+  })
 
   # Add integration method into tibble
   all_silhouette <- dplyr::mutate(all_silhouette, pc_name = pc_name)
