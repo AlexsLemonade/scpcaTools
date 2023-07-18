@@ -1,6 +1,6 @@
 # generate testing data
 set.seed(1665)
-merged_sce <- sim_sce(n_cells = 300, n_genes = 100, n_empty = 0)
+merged_sce <- scpcaTools:::sim_sce(n_cells = 300, n_genes = 100, n_empty = 0)
 batches <- rep(c("a", "b", "c"), each = 100)
 barcodes <- rownames(colData(merged_sce))
 
@@ -69,9 +69,9 @@ test_that("`downsample_pcs` fails as expected", {
 
 test_that("`calculate_silhouette_width` works as expected", {
 
-  asw <- calculate_silhouette_width(merged_sce,
+  asw <- calculate_silhouette_width(integrated_sce = merged_sce,
                                     pc_name = "PCA",
-                                    batch_column = "samples")
+                                    batch_column = "sample")
 
   expected_cols <- c(
     "rep", "silhouette_width", "silhouette_cluster",
@@ -81,10 +81,10 @@ test_that("`calculate_silhouette_width` works as expected", {
   expect_true(all(expected_cols %in% colnames(asw)))
 
   # check that pc name is PCA
-  expect_true(asw$pc_name == "PCA")
+  expect_true(all(asw$pc_name == "PCA"))
 
   # check that nreps equal 1-20
-  expect_true(asw$nreps %in% 1:20)
+  expect_true(all(asw$rep %in% 1:20))
 
 })
 
@@ -93,13 +93,13 @@ test_that("`calculate_silhouette_width`fails as expected", {
   # missing pc name
   expect_error(calculate_silhouette_width(merged_sce,
                                           pc_name = "test_PC",
-                                          batch_column = "samples"))
+                                          batch_column = "sample"))
 
   # error in nreps
   expect_error(calculate_silhouette_width(merged_sce,
                                           pc_name = "PCA",
                                           nreps = "twenty",
-                                          batch_column = "samples"))
+                                          batch_column = "sample"))
 
   # incorrect batch labels
   expect_error(calculate_silhouette_width(merged_sce,
