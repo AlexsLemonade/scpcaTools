@@ -45,6 +45,11 @@ calculate_silhouette_width <- function(integrated_sce,
   # Pull out the PCs or analogous reduction
   pcs <- reducedDim(integrated_sce, pc_name)
 
+  # Check that `batch_column` is in colData of SCE
+  if (!batch_column %in% colnames(colData(integrated_sce))) {
+    stop("The specified batch column is missing from the colData of the SingleCellExperiment object.")
+  }
+
   # Label rownames and remove batch NAs from PCs
   labeled_pcs <- set_pc_rownames(pcs, colData(integrated_sce)[,batch_column])[["pcs"]]
 

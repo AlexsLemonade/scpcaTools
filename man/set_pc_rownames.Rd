@@ -2,19 +2,19 @@
 % Please edit documentation in R/set_pc_rownames.R
 \name{set_pc_rownames}
 \alias{set_pc_rownames}
-\title{Label rownames of provided PCs and remove NA batch cells from PCs}
+\title{Label rownames of provided PCs and remove cells with NA batch label from PCs}
 \usage{
-set_pc_rownames(integrated_pcs, batches)
+set_pc_rownames(pcs, batches)
 }
 \arguments{
-\item{integrated_pcs}{The PCs with unlabeled rownames}
+\item{pcs}{The PCs with unlabeled rownames}
 
 \item{batches}{Vector of cell-wise batch information whose length is the number of
-rows in `integrated_pcs`}
+rows in `pcs`}
 }
 \value{
 PCs with labeled rownames and NA batch cells removed
 }
 \description{
-Label rownames of provided PCs and remove NA batch cells from PCs
+Label rownames of provided PCs and remove cells with NA batch label from PCs
 }

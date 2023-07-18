@@ -1,23 +1,24 @@
-#' Label rownames of provided PCs and remove NA batch cells from PCs
+#' Label rownames of provided PCs and remove cells with NA batch label from PCs
 #'
-#' @param integrated_pcs The PCs with unlabeled rownames
+#' @param pcs The PCs with unlabeled rownames
 #' @param batches Vector of cell-wise batch information whose length is the number of
-#'   rows in `integrated_pcs`
+#'   rows in `pcs`
 #'
 #' @return PCs with labeled rownames and NA batch cells removed
-set_pc_rownames <- function(integrated_pcs, batches) {
-
-  retain_indices <- which(!is.na(batches))
-  batches <- batches[retain_indices]
-  integrated_pcs <- integrated_pcs[retain_indices,]
+set_pc_rownames <- function(pcs, batches) {
 
   # Check dimensions
-  if (nrow(integrated_pcs) != length(batches)) {
+  if (nrow(pcs) != length(batches)) {
     stop("Incompatable PC and batch information dimensions after removing NAs.")
   }
 
-  # Set PC rownames to be the batches
-  rownames(integrated_pcs) <- batches
+  # Remove NA batch cells
+  retain_indices <- which(!is.na(batches))
+  batches <- batches[retain_indices]
+  pcs <- pcs[retain_indices,]
 
-  return(integrated_pcs)
+  # Set PC rownames to be the batches
+  rownames(pcs) <- batches
+
+  return(pcs)
 }
