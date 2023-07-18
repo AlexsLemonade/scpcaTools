@@ -6,7 +6,6 @@
 #'
 #' @return PCs with labeled rownames and NA batch cells removed
 set_pc_rownames <- function(pcs, batches) {
-
   # Check dimensions
   if (nrow(pcs) != length(batches)) {
     stop("Incompatable PC and batch information dimensions after removing NAs.")
@@ -15,7 +14,7 @@ set_pc_rownames <- function(pcs, batches) {
   # Remove NA batch cells
   retain_indices <- which(!is.na(batches))
   batches <- batches[retain_indices]
-  pcs <- pcs[retain_indices,]
+  pcs <- pcs[retain_indices, ]
 
   # Set PC rownames to be the batches
   rownames(pcs) <- batches
