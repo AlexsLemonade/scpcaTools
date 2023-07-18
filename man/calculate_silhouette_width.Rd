@@ -25,7 +25,7 @@ calculate_silhouette_width(
 \item{seed}{Seed for initializing random sampling}
 
 \item{batch_column}{The variable in `integrated_sce` indicating the grouping of interest.
-Generally this is either batches or cell types. Default is "batch".}
+Generally this is either batches or cell types. Default is "library_id".}
 }
 \value{
 Tibble with six columns: `rep`, representing the given downsampling replicate;
