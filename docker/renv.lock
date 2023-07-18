@@ -221,7 +221,7 @@
       "Package": "BiocManager",
       "Version": "1.30.20",
       "Source": "Repository",
-      "Repository": "RSPM",
+      "Repository": "PPM",
       "Requirements": [
         "utils"
       ],
@@ -356,7 +356,7 @@
       "Package": "DT",
       "Version": "0.27",
       "Source": "Repository",
-      "Repository": "RSPM",
+      "Repository": "PPM",
       "RemoteType": "standard",
       "RemotePkgRef": "DT",
       "RemoteRef": "DT",
@@ -646,7 +646,7 @@
       "Package": "MASS",
       "Version": "7.3-59",
       "Source": "Repository",
-      "Repository": "RSPM",
+      "Repository": "PPM",
       "Requirements": [
         "R",
         "grDevices",
@@ -661,7 +661,7 @@
       "Package": "Matrix",
       "Version": "1.5-4",
       "Source": "Repository",
-      "Repository": "RSPM",
+      "Repository": "PPM",
       "Requirements": [
         "R",
         "graphics",
@@ -815,7 +815,7 @@
       "Package": "Rcpp",
       "Version": "1.0.10",
       "Source": "Repository",
-      "Repository": "RSPM",
+      "Repository": "PPM",
       "Requirements": [
         "methods",
         "utils"
@@ -826,7 +826,7 @@
       "Package": "RcppAnnoy",
       "Version": "0.0.20",
       "Source": "Repository",
-      "Repository": "RSPM",
+      "Repository": "PPM",
       "Requirements": [
         "R",
         "Rcpp",
@@ -838,7 +838,7 @@
       "Package": "RcppArmadillo",
       "Version": "0.12.2.0.0",
       "Source": "Repository",
-      "Repository": "RSPM",
+      "Repository": "PPM",
       "Requirements": [
         "R",
         "Rcpp",
@@ -1023,7 +1023,7 @@
       "Package": "Seurat",
       "Version": "4.3.0",
       "Source": "Repository",
-      "Repository": "RSPM",
+      "Repository": "PPM",
       "Requirements": [
         "KernSmooth",
         "MASS",
@@ -1444,7 +1444,7 @@
       "Package": "broom",
       "Version": "1.0.4",
       "Source": "Repository",
-      "Repository": "RSPM",
+      "Repository": "PPM",
       "Requirements": [
         "R",
         "backports",
@@ -1465,7 +1465,7 @@
       "Package": "bslib",
       "Version": "0.4.2",
       "Source": "Repository",
-      "Repository": "RSPM",
+      "Repository": "PPM",
       "Requirements": [
         "R",
         "base64enc",
@@ -1628,7 +1628,7 @@
       "Package": "cpp11",
       "Version": "0.4.3",
       "Source": "Repository",
-      "Repository": "RSPM",
+      "Repository": "PPM",
       "Hash": "ed588261931ee3be2c700d22e94a29ab"
     },
     "crayon": {
@@ -1660,7 +1660,7 @@
       "Package": "curl",
       "Version": "5.0.0",
       "Source": "Repository",
-      "Repository": "RSPM",
+      "Repository": "PPM",
       "Requirements": [
         "R"
       ],
@@ -1681,7 +1681,7 @@
       "Package": "dbplyr",
       "Version": "2.3.2",
       "Source": "Repository",
-      "Repository": "RSPM",
+      "Repository": "PPM",
       "Requirements": [
         "DBI",
         "R",
@@ -1709,7 +1709,7 @@
       "Package": "deldir",
       "Version": "1.0-6",
       "Source": "Repository",
-      "Repository": "RSPM",
+      "Repository": "PPM",
       "Requirements": [
         "R",
         "grDevices",
@@ -1750,7 +1750,7 @@
       "Package": "digest",
       "Version": "0.6.31",
       "Source": "Repository",
-      "Repository": "RSPM",
+      "Repository": "PPM",
       "Requirements": [
         "R",
         "utils"
@@ -1929,7 +1929,7 @@
       "Package": "evaluate",
       "Version": "0.20",
       "Source": "Repository",
-      "Repository": "RSPM",
+      "Repository": "PPM",
       "Requirements": [
         "R",
         "methods"
@@ -2108,7 +2108,7 @@
       "Package": "future",
       "Version": "1.32.0",
       "Source": "Repository",
-      "Repository": "RSPM",
+      "Repository": "PPM",
       "Requirements": [
         "digest",
         "globals",
@@ -2123,7 +2123,7 @@
       "Package": "future.apply",
       "Version": "1.10.0",
       "Source": "Repository",
-      "Repository": "RSPM",
+      "Repository": "PPM",
       "Requirements": [
         "R",
         "future",
@@ -2137,7 +2137,7 @@
       "Package": "gargle",
       "Version": "1.4.0",
       "Source": "Repository",
-      "Repository": "RSPM",
+      "Repository": "PPM",
       "Requirements": [
         "R",
         "cli",
@@ -2220,7 +2220,7 @@
       "Package": "ggrastr",
       "Version": "1.0.1",
       "Source": "Repository",
-      "Repository": "RSPM",
+      "Repository": "PPM",
       "Requirements": [
         "Cairo",
         "R",
@@ -2299,7 +2299,7 @@
       "Package": "googledrive",
       "Version": "2.1.0",
       "Source": "Repository",
-      "Repository": "RSPM",
+      "Repository": "PPM",
       "Requirements": [
         "R",
         "cli",
@@ -2324,7 +2324,7 @@
       "Package": "googlesheets4",
       "Version": "1.1.0",
       "Source": "Repository",
-      "Repository": "RSPM",
+      "Repository": "PPM",
       "Requirements": [
         "R",
         "cellranger",
@@ -2430,7 +2430,7 @@
       "Package": "haven",
       "Version": "2.5.2",
       "Source": "Repository",
-      "Repository": "RSPM",
+      "Repository": "PPM",
       "Requirements": [
         "R",
         "cli",
@@ -2518,7 +2518,7 @@
       "Package": "httpuv",
       "Version": "1.6.9",
       "Source": "Repository",
-      "Repository": "RSPM",
+      "Repository": "PPM",
       "Requirements": [
         "R",
         "R6",
@@ -2533,7 +2533,7 @@
       "Package": "httr",
       "Version": "1.4.5",
       "Source": "Repository",
-      "Repository": "RSPM",
+      "Repository": "PPM",
       "Requirements": [
         "R",
         "R6",
@@ -2566,7 +2566,7 @@
       "Package": "igraph",
       "Version": "1.4.2",
       "Source": "Repository",
-      "Repository": "RSPM",
+      "Repository": "PPM",
       "Requirements": [
         "Matrix",
         "R",
@@ -2637,7 +2637,7 @@
       "Package": "jsonlite",
       "Version": "1.8.4",
       "Source": "Repository",
-      "Repository": "RSPM",
+      "Repository": "PPM",
       "Requirements": [
         "methods"
       ],
@@ -2675,7 +2675,7 @@
       "Package": "knitr",
       "Version": "1.42",
       "Source": "Repository",
-      "Repository": "RSPM",
+      "Repository": "PPM",
       "Requirements": [
         "R",
         "evaluate",
@@ -2713,7 +2713,7 @@
       "Package": "later",
       "Version": "1.3.0",
       "Source": "Repository",
-      "Repository": "RSPM",
+      "Repository": "PPM",
       "Requirements": [
         "Rcpp",
         "rlang"
@@ -2816,7 +2816,7 @@
       "Package": "locfit",
       "Version": "1.5-9.7",
       "Source": "Repository",
-      "Repository": "RSPM",
+      "Repository": "PPM",
       "Requirements": [
         "R",
         "lattice"
@@ -2850,7 +2850,7 @@
       "Package": "matrixStats",
       "Version": "0.63.0",
       "Source": "Repository",
-      "Repository": "RSPM",
+      "Repository": "PPM",
       "Requirements": [
         "R"
       ],
@@ -3007,7 +3007,7 @@
       "Package": "openssl",
       "Version": "2.0.6",
       "Source": "Repository",
-      "Repository": "RSPM",
+      "Repository": "PPM",
       "Requirements": [
         "askpass"
       ],
@@ -3029,7 +3029,7 @@
       "Package": "parallelly",
       "Version": "1.35.0",
       "Source": "Repository",
-      "Repository": "RSPM",
+      "Repository": "PPM",
       "Requirements": [
         "parallel",
         "tools",
@@ -3057,7 +3057,7 @@
       "Package": "pbapply",
       "Version": "1.7-0",
       "Source": "Repository",
-      "Repository": "RSPM",
+      "Repository": "PPM",
       "Requirements": [
         "R",
         "parallel"
@@ -3112,7 +3112,7 @@
       "Package": "pkgload",
       "Version": "1.3.2",
       "Source": "Repository",
-      "Repository": "RSPM",
+      "Repository": "PPM",
       "Requirements": [
         "R",
         "cli",
@@ -3139,7 +3139,7 @@
       "Package": "plotly",
       "Version": "4.10.1",
       "Source": "Repository",
-      "Repository": "RSPM",
+      "Repository": "PPM",
       "Requirements": [
         "R",
         "RColorBrewer",
@@ -3216,7 +3216,7 @@
       "Package": "processx",
       "Version": "3.8.1",
       "Source": "Repository",
-      "Repository": "RSPM",
+      "Repository": "PPM",
       "Requirements": [
         "R",
         "R6",
@@ -3356,7 +3356,7 @@
       "Package": "readxl",
       "Version": "1.4.2",
       "Source": "Repository",
-      "Repository": "RSPM",
+      "Repository": "PPM",
       "Requirements": [
         "R",
         "cellranger",
@@ -3449,7 +3449,7 @@
       "Package": "reticulate",
       "Version": "1.28",
       "Source": "Repository",
-      "Repository": "RSPM",
+      "Repository": "PPM",
       "Requirements": [
         "Matrix",
         "R",
@@ -3520,7 +3520,7 @@
       "Package": "rmarkdown",
       "Version": "2.21",
       "Source": "Repository",
-      "Repository": "RSPM",
+      "Repository": "PPM",
       "Requirements": [
         "R",
         "bslib",
@@ -3554,7 +3554,7 @@
       "Package": "rstudioapi",
       "Version": "0.14",
       "Source": "Repository",
-      "Repository": "RSPM",
+      "Repository": "PPM",
       "Hash": "690bd2acc42a9166ce34845884459320"
     },
     "rsvd": {
@@ -3621,7 +3621,7 @@
       "Package": "sass",
       "Version": "0.4.5",
       "Source": "Repository",
-      "Repository": "RSPM",
+      "Repository": "PPM",
       "Requirements": [
         "R6",
         "fs",
@@ -3693,7 +3693,7 @@
       "Package": "scattermore",
       "Version": "0.8",
       "Source": "Repository",
-      "Repository": "RSPM",
+      "Repository": "PPM",
       "Requirements": [
         "ggplot2",
         "grDevices",
@@ -3818,7 +3818,7 @@
       "Package": "shiny",
       "Version": "1.7.4",
       "Source": "Repository",
-      "Repository": "RSPM",
+      "Repository": "PPM",
       "Requirements": [
         "R",
         "R6",
@@ -3884,7 +3884,7 @@
       "Package": "sp",
       "Version": "1.6-0",
       "Source": "Repository",
-      "Repository": "RSPM",
+      "Repository": "PPM",
       "Requirements": [
         "R",
         "grDevices",
@@ -3930,7 +3930,7 @@
       "Package": "spatstat.explore",
       "Version": "3.1-0",
       "Source": "Repository",
-      "Repository": "RSPM",
+      "Repository": "PPM",
       "Requirements": [
         "Matrix",
         "R",
@@ -3954,7 +3954,7 @@
       "Package": "spatstat.geom",
       "Version": "3.1-0",
       "Source": "Repository",
-      "Repository": "RSPM",
+      "Repository": "PPM",
       "Requirements": [
         "R",
         "deldir",
@@ -3973,7 +3973,7 @@
       "Package": "spatstat.random",
       "Version": "3.1-4",
       "Source": "Repository",
-      "Repository": "RSPM",
+      "Repository": "PPM",
       "Requirements": [
         "R",
         "grDevices",
@@ -3990,7 +3990,7 @@
       "Package": "spatstat.sparse",
       "Version": "3.0-1",
       "Source": "Repository",
-      "Repository": "RSPM",
+      "Repository": "PPM",
       "Requirements": [
         "Matrix",
         "R",
@@ -4007,7 +4007,7 @@
       "Package": "spatstat.utils",
       "Version": "3.0-2",
       "Source": "Repository",
-      "Repository": "RSPM",
+      "Repository": "PPM",
       "Requirements": [
         "R",
         "grDevices",
@@ -4106,7 +4106,7 @@
       "Package": "sys",
       "Version": "3.4.1",
       "Source": "Repository",
-      "Repository": "RSPM",
+      "Repository": "PPM",
       "Hash": "34c16f1ef796057bfa06d3f4ff818a5d"
     },
     "systemfonts": {
@@ -4131,7 +4131,7 @@
       "Package": "testthat",
       "Version": "3.1.7",
       "Source": "Repository",
-      "Repository": "RSPM",
+      "Repository": "PPM",
       "Requirements": [
         "R",
         "R6",
@@ -4307,7 +4307,7 @@
       "Package": "tzdb",
       "Version": "0.3.0",
       "Source": "Repository",
-      "Repository": "RSPM",
+      "Repository": "PPM",
       "Requirements": [
         "R",
         "cpp11"
@@ -4338,7 +4338,7 @@
       "Package": "uwot",
       "Version": "0.1.14",
       "Source": "Repository",
-      "Repository": "RSPM",
+      "Repository": "PPM",
       "Requirements": [
         "FNN",
         "Matrix",
@@ -4355,7 +4355,7 @@
       "Package": "vctrs",
       "Version": "0.6.2",
       "Source": "Repository",
-      "Repository": "RSPM",
+      "Repository": "PPM",
       "Requirements": [
         "R",
         "cli",
@@ -4381,7 +4381,7 @@
       "Package": "viridis",
       "Version": "0.6.2",
       "Source": "Repository",
-      "Repository": "RSPM",
+      "Repository": "PPM",
       "Requirements": [
         "R",
         "ggplot2",
@@ -4395,7 +4395,7 @@
       "Package": "viridisLite",
       "Version": "0.4.1",
       "Source": "Repository",
-      "Repository": "RSPM",
+      "Repository": "PPM",
       "Requirements": [
         "R"
       ],
@@ -4431,7 +4431,7 @@
       "Package": "waldo",
       "Version": "0.5.0",
       "Source": "Repository",
-      "Repository": "RSPM",
+      "Repository": "PPM",
       "Requirements": [
         "cli",
         "diffobj",
@@ -4448,7 +4448,7 @@
       "Package": "webshot",
       "Version": "0.5.4",
       "Source": "Repository",
-      "Repository": "RSPM",
+      "Repository": "PPM",
       "Requirements": [
         "R",
         "callr",
@@ -4485,7 +4485,7 @@
       "Package": "xml2",
       "Version": "1.3.4",
       "Source": "Repository",
-      "Repository": "RSPM",
+      "Repository": "PPM",
       "Requirements": [
         "R",
         "methods"
