@@ -33,12 +33,12 @@ calculate_silhouette_width <- function(integrated_sce,
   }
 
   # Check that `nreps` is an integer
-  if (!(is.integer(nreps))) {
+  if (!(nreps == round(nreps))) {
     stop("The provided `nreps` should be an integer.")
   }
 
   # Check that frac_cells is in range
-  if (frac_cells < 0 | frac_cells > 1) {
+  if (frac_cells <= 0 | frac_cells >=1) {
     stop("The fraction of cells to downsample should be between 0 and 1.")
   }
 
