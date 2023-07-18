@@ -38,7 +38,7 @@ calculate_silhouette_width <- function(integrated_sce,
   }
 
   # Check that frac_cells is in range
-  if (frac_cells <= 0 | frac_cells >=1) {
+  if (frac_cells <= 0 | frac_cells >= 1) {
     stop("The fraction of cells to downsample should be between 0 and 1.")
   }
 
@@ -51,7 +51,7 @@ calculate_silhouette_width <- function(integrated_sce,
   }
 
   # Label rownames and remove batch NAs from PCs
-  labeled_pcs <- set_pc_rownames(pcs, colData(integrated_sce)[,batch_column])[["pcs"]]
+  labeled_pcs <- set_pc_rownames(pcs, colData(integrated_sce)[, batch_column])[["pcs"]]
 
   # Perform calculations
   all_silhouette <- purrr::map(1:nreps, \(rep) {
@@ -67,7 +67,7 @@ calculate_silhouette_width <- function(integrated_sce,
         silhouette_cluster = cluster,
         other_cluster = other
       )
-    }) |>
+  }) |>
     dplyr::bind_rows() |>
     # Add integration method into tibble
     dplyr::mutate(pc_name = pc_name)
