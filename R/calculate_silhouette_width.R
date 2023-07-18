@@ -51,8 +51,7 @@ calculate_silhouette_width <- function(integrated_sce,
     # Downsample PCs
     downsampled <- downsample_pcs(pcs, frac_cells)
     # Calculate batch ASW and add into final tibble
-    rep_silhouette <-
-      bluster::approxSilhouette(downsampled$pc_name, downsampled$batch_labels) |>
+    bluster::approxSilhouette(downsampled$pc_name, downsampled$batch_labels) |>
       tibble::as_tibble() |>
       dplyr::mutate(rep = rep) |>
       dplyr::select(
@@ -60,10 +59,9 @@ calculate_silhouette_width <- function(integrated_sce,
         silhouette_width = width,
         silhouette_cluster = cluster,
         other_cluster = other
-      ) |>
-      dplyr::bind_rows()
+      )
     }) |>
-    as.data.frame() |>
+    dplyr::bind_rows() |>
     # Add integration method into tibble
     dplyr::mutate(pc_name = pc_name)
 
