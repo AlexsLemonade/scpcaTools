@@ -24,7 +24,7 @@ downsample_pcs <- function(pcs, frac_cells) {
 
   return(
     list(
-      pc_name = downsampled_pcs,
+      pcs = downsampled_pcs,,
       batch_labels = rownames(downsampled_pcs)
     )
   )
