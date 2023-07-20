@@ -1,7 +1,13 @@
 set.seed(1665)
 sce <- sim_sce(n_cells = 100, n_genes = 200, n_empty = 0)
-colData(sce) <- DataFrame("test_column" = sample(0:10, 100, rep = TRUE))
-rowData(sce) <- DataFrame("test_row" = sample(0:10, 200, rep = TRUE))
+colData(sce) <- DataFrame(
+  "test_column" = sample(0:10, 100, rep = TRUE),
+  row.names = colnames(sce)
+)
+rowData(sce) <- DataFrame(
+  "test_row" = sample(0:10, 200, rep = TRUE),
+  row.names = rownames(sce)
+)
 
 test_that("Conversion of SCE to AnnData works as expected", {
   anndata_file <- "test_anndata.h5"
