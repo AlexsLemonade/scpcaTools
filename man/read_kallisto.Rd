@@ -30,7 +30,8 @@ Read in counts data processed with Kallisto
 # import output files processed with kallisto with alignment to cDNA + introns,
 # including all unspliced cDNA counts in final counts matrix
 read_kallisto(quant_dir,
-              include_unspliced = TRUE,
-              which_counts = "unspliced")
+  include_unspliced = TRUE,
+  which_counts = "unspliced"
+)
 }
 }

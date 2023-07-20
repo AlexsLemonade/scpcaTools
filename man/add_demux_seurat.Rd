@@ -24,7 +24,7 @@ Add cellhash demultiplexing results using Seurat::HTODemux()
 }
 \examples{
 \dontrun{
-  # add cell calls from Seurat::HTODemux()
-  add_demux_seurat(sce = sce)
+# add cell calls from Seurat::HTODemux()
+add_demux_seurat(sce = sce)
 }
 }
