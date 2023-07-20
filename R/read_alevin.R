@@ -108,7 +108,8 @@ read_alevin <- function(quant_dir,
     # must be both alevin-fry and usa mode to use fishpond
     sce <- fishpond::loadFry(
       fryDir = quant_dir,
-      outputFormat = assay_formats
+      outputFormat = assay_formats,
+      quiet = TRUE
     )
   }
 

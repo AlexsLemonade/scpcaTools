@@ -183,6 +183,7 @@ integrate_harmony <- function(merged_sce,
   harmony_results <- harmony::HarmonyMatrix(reducedDim(merged_sce, "PCA"),
     meta_data = harmony_metadata,
     vars_use  = covariate_cols,
+    verbose = FALSE,
     ...
   )
   # Ensure PCs have rownames
