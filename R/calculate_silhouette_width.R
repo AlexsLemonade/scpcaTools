@@ -1,12 +1,13 @@
-#' Calculate silhouette width scores from an integrated SCE object
+#' Calculate silhouette width scores from an integrated SCE object.
+#' This function performs replicated calculations on downsampled data.
 #'
 #' @param integrated_sce The integrated SCE object
 #' @param pc_name The name that allows access to the PCs. Example: fastMNN_PCA
+#' @param batch_column The variable in `integrated_sce` indicating the grouping of interest.
+#'  Generally this is either batches or cell types. Default is "library_id".
 #' @param frac_cells The fraction of cells to downsample to. Default: 0.8
 #' @param nreps The number of times to repeat sub-sampling procedure. Default: 20
 #' @param seed Seed for initializing random sampling
-#' @param batch_column The variable in `integrated_sce` indicating the grouping of interest.
-#'  Generally this is either batches or cell types. Default is "library_id".
 #'
 #' @return Tibble with five columns: `rep`, representing the given downsampling replicate;
 #'   `silhouette_width`, the calculated silhouette width for the given `rep`; `silhouette_cluster`,
@@ -19,10 +20,10 @@
 #' @export
 calculate_silhouette_width <- function(integrated_sce,
                                        pc_name,
+                                       batch_column = "library_id",
                                        frac_cells = 0.8,
                                        nreps = 20,
-                                       seed = NULL,
-                                       batch_column = "library_id") {
+                                       seed = NULL) {
   # Set the seed for subsampling
   set.seed(seed)
 
