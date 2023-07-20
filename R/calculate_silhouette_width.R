@@ -1,4 +1,5 @@
 #' Calculate silhouette width scores from an integrated SCE object.
+#'
 #' This function performs replicated calculations on downsampled data.
 #'
 #' @param integrated_sce The integrated SCE object
