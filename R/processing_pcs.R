@@ -6,12 +6,11 @@
 #'
 #' @return PCs with NA batch cells removed and labeled rownames
 filter_pcs <- function(pcs, batches) {
-
   # Remove NA batch cells
   retain_indices <- which(!is.na(batches))
 
   # Check that there are retained indices present
-  if(length(retain_indices) == 0) {
+  if (length(retain_indices) == 0) {
     stop("There are no batch cells that are not NA present.")
   }
 
@@ -40,7 +39,6 @@ filter_pcs <- function(pcs, batches) {
 #'
 #' @return The downsampled PCs
 downsample_pcs <- function(pcs, frac_cells, min_cells = 50) {
-
   # Check that there is a minimum number of cells
   num_cells <- nrow(pcs)
   if (frac_cells * num_cells < min_cells) {
