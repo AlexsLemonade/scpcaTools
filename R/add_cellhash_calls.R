@@ -62,7 +62,7 @@ add_cellhash_ids <- function(sce, hashsample_table,
   # test that each barcode has a corresponding sample
   missing_barcodes <- barcode_rowdata |>
     dplyr::filter(is.na(.data$sample_id)) |>
-    dplyr::pull(.data$barcode_id)
+    dplyr::pull("barcode_id")
 
   if (remove_unlabeled) {
     missing_rows <- rownames(altExp(sce, altexp_id)) %in% missing_barcodes
