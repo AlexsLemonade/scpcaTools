@@ -46,7 +46,8 @@ test_that("`set_pc_rownames` fails without batch labels", {
 
 test_that("`downsample_pcs` works as expected", {
 
-  downsampled <- downsample_pcs(pcs, frac_cells = 0.8)
+  test_frac = 0.8
+  downsampled <- downsample_pcs(pcs, frac_cells = test_frac)
   downsampled_pcs <- downsampled$pcs
   downsampled_batch_labels <- downsampled$batch_labels
 
@@ -84,7 +85,7 @@ test_that("`calculate_silhouette_width` works as expected", {
   expect_true(all(asw$pc_name == "PCA"))
 
   # check that nreps equal 1-20
-  expect_true(all(asw$rep %in% 1:20))
+  expect_true(all(sort(unique(asw$rep)) == 1:nreps))
 
 })
 
