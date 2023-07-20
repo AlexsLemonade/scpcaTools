@@ -2,8 +2,7 @@
 % Please edit documentation in R/calculate_silhouette_width.R
 \name{calculate_silhouette_width}
 \alias{calculate_silhouette_width}
-\title{Calculate silhouette width scores from an integrated SCE object.
-This function performs replicated calculations on downsampled data.}
+\title{Calculate silhouette width scores from an integrated SCE object.}
 \usage{
 calculate_silhouette_width(
   integrated_sce,
@@ -36,6 +35,5 @@ Tibble with five columns: `rep`, representing the given downsampling replicate;
   `pc_name`, the name associated with the pc results
 }
 \description{
-Calculate silhouette width scores from an integrated SCE object.
 This function performs replicated calculations on downsampled data.
 }
