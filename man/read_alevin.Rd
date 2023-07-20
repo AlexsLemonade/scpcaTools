@@ -58,13 +58,14 @@ read_alevin(quant_dir)
 # Import output files processed with either Alevin or Alevin-fry with alignment to
 # cDNA + introns and including all unspliced cDNA in final counts matrix
 read_alevin(quant_dir,
-            include_unspliced = TRUE)
+  include_unspliced = TRUE
+)
 
 # Import output files processed with alevin-fry USA mode
 # including all unspliced cDNA in final counts matrix
 read_alevin(quant_dir,
-            fry_mode = TRUE,
-            include_unspliced = TRUE)
-
+  fry_mode = TRUE,
+  include_unspliced = TRUE
+)
 }
 }

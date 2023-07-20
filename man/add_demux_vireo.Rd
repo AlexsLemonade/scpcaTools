@@ -23,7 +23,7 @@ Add genetic demultiplexing results to a SCE object from Vireo
 }
 \examples{
 \dontrun{
-  # add cell calls from a vireo data frame
-  add_demux_vireo(sce, vireo_table = vireo_df)
+# add cell calls from a vireo data frame
+add_demux_vireo(sce, vireo_table = vireo_df)
 }
 }
