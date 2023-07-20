@@ -21,7 +21,7 @@ calculate_silhouette_width <- function(integrated_sce,
                                        pc_name,
                                        frac_cells = 0.8,
                                        nreps = 20,
-                                       seed = 2023,
+                                       seed = NULL,
                                        batch_column = "library_id") {
   # Set the seed for subsampling
   set.seed(seed)
