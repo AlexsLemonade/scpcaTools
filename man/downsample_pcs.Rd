@@ -12,8 +12,7 @@ downsample_pcs(pcs, frac_cells)
 \item{frac_cells}{The fraction of cells to downsample to}
 }
 \value{
-List with two items: `pcs`, the downsampled PCs; `batch_labels`, the
- corresponding batch labels for the downsampled PCs
+The downsampled PCs
 }
 \description{
 Downsample PCs for use in integration metric calculations

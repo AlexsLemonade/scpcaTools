@@ -8,7 +8,7 @@
 #' @param batch_column The variable in `integrated_sce` indicating the grouping of interest.
 #'  Generally this is either batches or cell types. Default is "library_id".
 #'
-#' @return Tibble with six columns: `rep`, representing the given downsampling replicate;
+#' @return Tibble with five columns: `rep`, representing the given downsampling replicate;
 #'   `silhouette_width`, the calculated silhouette width for the given `rep`; `silhouette_cluster`,
 #'   the assigned cluster for the cell during silhouette calculation, i.e. the true identity;
 #'   `other_cluster`, the other assigned for the cell during silhouette calculation;
@@ -57,7 +57,7 @@ calculate_silhouette_width <- function(integrated_sce,
     # Downsample PCs
     downsampled <- downsample_pcs(labeled_pcs, frac_cells)
     # Calculate batch ASW and add into final tibble
-    bluster::approxSilhouette(downsampled$pcs, downsampled$batch_labels) |>
+    bluster::approxSilhouette(downsampled, rownames(downsampled)) |>
       tibble::as_tibble() |>
       dplyr::mutate(rep = rep) |>
       dplyr::select(
@@ -69,7 +69,7 @@ calculate_silhouette_width <- function(integrated_sce,
   }) |>
     dplyr::bind_rows() |>
     # Add integration method into tibble
-    dplyr::mutate(pcs = pcs)
+    dplyr::mutate(pc_name = pc_name)
 
   # Return tibble with silhouette width results which can further be summarized downstream
   return(all_silhouette)

@@ -28,7 +28,7 @@ calculate_silhouette_width(
 Generally this is either batches or cell types. Default is "library_id".}
 }
 \value{
-Tibble with six columns: `rep`, representing the given downsampling replicate;
+Tibble with five columns: `rep`, representing the given downsampling replicate;
   `silhouette_width`, the calculated silhouette width for the given `rep`; `silhouette_cluster`,
   the assigned cluster for the cell during silhouette calculation, i.e. the true identity;
   `other_cluster`, the other assigned for the cell during silhouette calculation;
