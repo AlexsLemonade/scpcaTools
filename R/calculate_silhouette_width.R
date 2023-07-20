@@ -17,6 +17,7 @@
 #'   `pc_name`, the name associated with the pc results
 #'
 #' @import SingleCellExperiment
+#' @importFrom rlang .data
 #'
 #' @export
 calculate_silhouette_width <- function(integrated_sce,
@@ -63,10 +64,10 @@ calculate_silhouette_width <- function(integrated_sce,
       tibble::as_tibble() |>
       dplyr::mutate(rep = rep) |>
       dplyr::select(
-        rep,
-        silhouette_width = width,
-        silhouette_cluster = cluster,
-        other_cluster = other
+        .data$rep,
+        silhouette_width = .data$width,
+        silhouette_cluster = .data$cluster,
+        other_cluster = .data$other
       )
   }) |>
     dplyr::bind_rows() |>
