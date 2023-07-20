@@ -13,7 +13,6 @@ cluster_sce <- function(sce,
                         seed = NULL,
                         k = NULL,
                         ...) {
-
   # Set the seed
   set.seed(seed)
 
@@ -26,12 +25,14 @@ cluster_sce <- function(sce,
     # Grab weighting type based on cluster type
     weighting_type <- ifelse(cluster_type == "louvain", "jaccard", "rank")
     # Perform graph-based clustering
-    clustering_results <- bluster::clusterRows(pcs,
-                                               bluster::NNGraphParam(
-                                                 k = k,
-                                                 type = weighting_type,
-                                                 cluster.fun = cluster_type,
-                                               ))
+    clustering_results <- bluster::clusterRows(
+      pcs,
+      bluster::NNGraphParam(
+        k = k,
+        type = weighting_type,
+        cluster.fun = cluster_type,
+      )
+    )
   } else {
     stop("Clustering type is not valid. Please specify 'kmeans', 'walktrap' or 'louvain' clustering.")
   }
