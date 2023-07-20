@@ -2,15 +2,16 @@
 % Please edit documentation in R/calculate_silhouette_width.R
 \name{calculate_silhouette_width}
 \alias{calculate_silhouette_width}
-\title{Calculate silhouette width scores from an integrated SCE object}
+\title{Calculate silhouette width scores from an integrated SCE object.
+This function performs replicated calculations on downsampled data.}
 \usage{
 calculate_silhouette_width(
   integrated_sce,
   pc_name,
+  batch_column = "library_id",
   frac_cells = 0.8,
   nreps = 20,
-  seed = 2023,
-  batch_column = "library_id"
+  seed = NULL
 )
 }
 \arguments{
@@ -18,14 +19,14 @@ calculate_silhouette_width(
 
 \item{pc_name}{The name that allows access to the PCs. Example: fastMNN_PCA}
 
+\item{batch_column}{The variable in `integrated_sce` indicating the grouping of interest.
+Generally this is either batches or cell types. Default is "library_id".}
+
 \item{frac_cells}{The fraction of cells to downsample to. Default: 0.8}
 
 \item{nreps}{The number of times to repeat sub-sampling procedure. Default: 20}
 
 \item{seed}{Seed for initializing random sampling}
-
-\item{batch_column}{The variable in `integrated_sce` indicating the grouping of interest.
-Generally this is either batches or cell types. Default is "library_id".}
 }
 \value{
 Tibble with five columns: `rep`, representing the given downsampling replicate;
@@ -35,5 +36,6 @@ Tibble with five columns: `rep`, representing the given downsampling replicate;
   `pc_name`, the name associated with the pc results
 }
 \description{
-Calculate silhouette width scores from an integrated SCE object
+Calculate silhouette width scores from an integrated SCE object.
+This function performs replicated calculations on downsampled data.
 }

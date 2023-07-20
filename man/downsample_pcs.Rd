@@ -4,12 +4,14 @@
 \alias{downsample_pcs}
 \title{Downsample PCs for use in integration metric calculations}
 \usage{
-downsample_pcs(pcs, frac_cells)
+downsample_pcs(pcs, frac_cells, min_cells = 50)
 }
 \arguments{
 \item{pcs}{The PCs to downsample, these PCs should contain batch labels as rownames}
 
 \item{frac_cells}{The fraction of cells to downsample to}
+
+\item{min_cells}{The minimum number of cells after downsampling. Default: 50}
 }
 \value{
 The downsampled PCs
