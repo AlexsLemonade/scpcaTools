@@ -3,6 +3,26 @@
     "Version": "4.2.3",
     "Repositories": [
       {
+        "Name": "BioCsoft",
+        "URL": "https://bioconductor.org/packages/3.16/bioc"
+      },
+      {
+        "Name": "BioCann",
+        "URL": "https://bioconductor.org/packages/3.16/data/annotation"
+      },
+      {
+        "Name": "BioCexp",
+        "URL": "https://bioconductor.org/packages/3.16/data/experiment"
+      },
+      {
+        "Name": "BioCworkflows",
+        "URL": "https://bioconductor.org/packages/3.16/workflows"
+      },
+      {
+        "Name": "BioCbooks",
+        "URL": "https://bioconductor.org/packages/3.16/books"
+      },
+      {
         "Name": "PPM",
         "URL": "https://packagemanager.posit.co/cran/latest"
       },
@@ -900,6 +920,26 @@
         "methods"
       ],
       "Hash": "eb32630df937c2bbbf696df242dd06b5"
+    },
+    "Rgraphviz": {
+      "Package": "Rgraphviz",
+      "Version": "2.42.0",
+      "Source": "Bioconductor",
+      "git_url": "https://git.bioconductor.org/packages/Rgraphviz",
+      "git_branch": "RELEASE_3_16",
+      "git_last_commit": "f687744",
+      "git_last_commit_date": "2022-11-01",
+      "Requirements": [
+        "R",
+        "grDevices",
+        "graph",
+        "graphics",
+        "grid",
+        "methods",
+        "stats4",
+        "utils"
+      ],
+      "Hash": "a6e1afeed0c7ae598904748a655414fb"
     },
     "Rhdf5lib": {
       "Package": "Rhdf5lib",
@@ -2343,6 +2383,24 @@
       ],
       "Hash": "75437dd4c43599f6e9418ea249495fda"
     },
+    "graph": {
+      "Package": "graph",
+      "Version": "1.76.0",
+      "Source": "Bioconductor",
+      "git_url": "https://git.bioconductor.org/packages/graph",
+      "git_branch": "RELEASE_3_16",
+      "git_last_commit": "e3efc10",
+      "git_last_commit_date": "2022-11-01",
+      "Requirements": [
+        "BiocGenerics",
+        "R",
+        "methods",
+        "stats",
+        "stats4",
+        "utils"
+      ],
+      "Hash": "ed149e9995e7d1cbfebe1820980eed68"
+    },
     "gridExtra": {
       "Package": "gridExtra",
       "Version": "2.3",
@@ -2983,6 +3041,60 @@
       ],
       "Hash": "170da2130d5332bea7d6ede01875ba1d"
     },
+    "ontoProc": {
+      "Package": "ontoProc",
+      "Version": "1.20.0",
+      "Source": "Bioconductor",
+      "git_url": "https://git.bioconductor.org/packages/ontoProc",
+      "git_branch": "RELEASE_3_16",
+      "git_last_commit": "c0d8166",
+      "git_last_commit_date": "2022-11-01",
+      "Requirements": [
+        "AnnotationHub",
+        "Biobase",
+        "BiocFileCache",
+        "DT",
+        "R",
+        "Rgraphviz",
+        "S4Vectors",
+        "SummarizedExperiment",
+        "dplyr",
+        "graph",
+        "igraph",
+        "magrittr",
+        "methods",
+        "ontologyIndex",
+        "ontologyPlot",
+        "shiny",
+        "stats",
+        "utils"
+      ],
+      "Hash": "f2e259d40da7ca777cd8217cba7d7857"
+    },
+    "ontologyIndex": {
+      "Package": "ontologyIndex",
+      "Version": "2.11",
+      "Source": "Repository",
+      "Repository": "PPM",
+      "Requirements": [
+        "R"
+      ],
+      "Hash": "d78d554536e3bc46741a6492e6a434cb"
+    },
+    "ontologyPlot": {
+      "Package": "ontologyPlot",
+      "Version": "1.6",
+      "Source": "Repository",
+      "Repository": "PPM",
+      "Requirements": [
+        "R",
+        "Rgraphviz",
+        "methods",
+        "ontologyIndex",
+        "paintmap"
+      ],
+      "Hash": "013a457338fccdc34994fea51340342f"
+    },
     "openssl": {
       "Package": "openssl",
       "Version": "2.0.6",
@@ -3004,6 +3116,13 @@
         "methods"
       ],
       "Hash": "aa4a7717b5760a769c7fd3d34614f2a2"
+    },
+    "paintmap": {
+      "Package": "paintmap",
+      "Version": "1.0",
+      "Source": "Repository",
+      "Repository": "PPM",
+      "Hash": "864410e690c3e4d660c025037638058d"
     },
     "parallelly": {
       "Package": "parallelly",
