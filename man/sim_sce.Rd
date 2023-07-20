@@ -24,7 +24,7 @@ Create a random SingleCellExperiment object
 }
 \examples{
 \dontrun{
-  sim_sce(n_genes = 100, n_cells = 100, n_empty = 2000, n_groups = 4)
+sim_sce(n_genes = 100, n_cells = 100, n_empty = 2000, n_groups = 4)
 }
 
 }

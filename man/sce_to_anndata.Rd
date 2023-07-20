@@ -22,7 +22,9 @@ Convert SingleCellExperiment objects to AnnData file stored as HDF5 file
 }
 \examples{
 \dontrun{
-sce_to_anndata(sce = sce_object,
-               anndata_file = "test_anndata.h5")
+sce_to_anndata(
+  sce = sce_object,
+  anndata_file = "test_anndata.h5"
+)
 }
 }

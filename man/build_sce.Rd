@@ -37,7 +37,7 @@ build_sce(counts)
 # build a SCE object with unspliced cDNA as the main counts assay and spliced
 # counts as a second assay
 build_sce(counts,
-          include_unspliced = TRUE)
-
+  include_unspliced = TRUE
+)
 }
 }
