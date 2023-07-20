@@ -1,6 +1,6 @@
 # generate testing data
 set.seed(1665)
-merged_sce <- scpcaTools:::sim_sce(n_cells = 303, n_genes = 100, n_empty = 0)
+merged_sce <- sim_sce(n_cells = 303, n_genes = 100, n_empty = 0)
 batches <- rep(c("a", "b", "c"), each = 101)
 barcodes <- rownames(colData(merged_sce))
 
@@ -86,8 +86,12 @@ test_that("`calculate_silhouette_width` works as expected", {
   # check that pc name is PCA
   expect_true(all(asw$pc_name == "PCA"))
 
-  # check that nreps equal 1-20
+  # check that number of reps is correct
   expect_true(all(sort(unique(asw$rep)) == 1:nreps))
+
+  # check that width is in expected range
+  expect_true(all(asw$silhouette_width >= -1 |
+                    asw$silhouette_width <= 1))
 
 })
 
