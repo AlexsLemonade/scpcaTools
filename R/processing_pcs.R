@@ -36,14 +36,15 @@ filter_pcs <- function(pcs, batches) {
 #'
 #' @param pcs The PCs to downsample, these PCs should contain batch labels as rownames
 #' @param frac_cells The fraction of cells to downsample to
+#' @param min_cells The minimum number of cells after downsampling. Default: 50
 #'
 #' @return The downsampled PCs
-downsample_pcs <- function(pcs, frac_cells) {
+downsample_pcs <- function(pcs, frac_cells, min_cells = 50) {
 
   # Check that there is a minimum number of cells
   num_cells <- nrow(pcs)
-  if (!num_cells > 50) {
-    stop("There are not enough cells to perform downsampling.")
+  if (frac_cells * num_cells < min_cells) {
+    stop("Downsampling would result in fewer cells than the `min_cells` threshold.")
   }
 
   # Check that frac_cells is in range
