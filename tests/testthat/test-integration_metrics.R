@@ -40,7 +40,7 @@ test_that("`filter_pcs` removes NAs as expected", {
 test_that("`filter_pcs` fails without batch labels", {
 
   all_na_batches <- NA
-  expect_error(scpcaTools:::filter_pcs(pcs, all_na_batches))
+  expect_error(filter_pcs(pcs, all_na_batches))
 
 })
 
