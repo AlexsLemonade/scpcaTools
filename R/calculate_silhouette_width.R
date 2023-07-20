@@ -15,7 +15,6 @@
 #'   `pc_name`, the name associated with the pc results
 #'
 #' @import SingleCellExperiment
-#' @import bluster
 #'
 #' @export
 calculate_silhouette_width <- function(integrated_sce,
@@ -50,8 +49,8 @@ calculate_silhouette_width <- function(integrated_sce,
     stop("The specified batch column is missing from the colData of the SingleCellExperiment object.")
   }
 
-  # Label rownames and remove batch NAs from PCs
-  labeled_pcs <- set_pc_rownames(pcs, colData(integrated_sce)[, batch_column])
+  # Remove batch NAs from PCs and label rownames
+  labeled_pcs <- filter_pcs(pcs, colData(integrated_sce)[, batch_column])
 
   # Perform calculations
   all_silhouette <- purrr::map(1:nreps, \(rep) {
