@@ -8,21 +8,20 @@
 #' @param batch_column The variable in `integrated_sce` indicating the grouping of interest.
 #'  Generally this is either batches or cell types. Default is "library_id".
 #'
-#' @return Tibble with six columns: `rep`, representing the given downsampling replicate;
+#' @return Tibble with five columns: `rep`, representing the given downsampling replicate;
 #'   `silhouette_width`, the calculated silhouette width for the given `rep`; `silhouette_cluster`,
 #'   the assigned cluster for the cell during silhouette calculation, i.e. the true identity;
 #'   `other_cluster`, the other assigned for the cell during silhouette calculation;
 #'   `pc_name`, the name associated with the pc results
 #'
 #' @import SingleCellExperiment
-#' @import bluster
 #'
 #' @export
 calculate_silhouette_width <- function(integrated_sce,
                                        pc_name,
                                        frac_cells = 0.8,
                                        nreps = 20,
-                                       seed = 2023,
+                                       seed = NULL,
                                        batch_column = "library_id") {
   # Set the seed for subsampling
   set.seed(seed)
@@ -50,15 +49,15 @@ calculate_silhouette_width <- function(integrated_sce,
     stop("The specified batch column is missing from the colData of the SingleCellExperiment object.")
   }
 
-  # Label rownames and remove batch NAs from PCs
-  labeled_pcs <- set_pc_rownames(pcs, colData(integrated_sce)[,batch_column])
+  # Remove batch NAs from PCs and label rownames
+  labeled_pcs <- filter_pcs(pcs, colData(integrated_sce)[, batch_column])
 
   # Perform calculations
   all_silhouette <- purrr::map(1:nreps, \(rep) {
     # Downsample PCs
     downsampled <- downsample_pcs(labeled_pcs, frac_cells)
     # Calculate batch ASW and add into final tibble
-    bluster::approxSilhouette(downsampled$pcs, downsampled$batch_labels) |>
+    bluster::approxSilhouette(downsampled, rownames(downsampled)) |>
       tibble::as_tibble() |>
       dplyr::mutate(rep = rep) |>
       dplyr::select(
