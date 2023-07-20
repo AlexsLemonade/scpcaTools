@@ -3,6 +3,7 @@
 
 library(AnnotationHub)
 library(BSgenome)
+library(celldex)
 library(eds)
 library(eisaR)
 library(ensembldb)
