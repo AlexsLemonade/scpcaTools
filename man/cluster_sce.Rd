@@ -4,16 +4,18 @@
 \alias{cluster_sce}
 \title{Perform clustering on a SingleCellExperiment object}
 \usage{
-cluster_sce(sce, seed = 2023, pca_column, k_range)
+cluster_sce(sce, pca_column, cluster_type, seed = NULL, k = NULL, ...)
 }
 \arguments{
 \item{sce}{SingleCellExperiment object that requires clustering}
 
-\item{seed}{Seed for reproducibility of clustering results}
-
 \item{pca_column}{The SingleCellExperiment column name to reference the PCA results}
 
-\item{k_range}{Range of k values to use for k-means clustering. Default: `seq(5, 25, 5)`}
+\item{cluster_type}{The type of clustering method to be performed - can be "kmeans", "walktrap", or "louvain"}
+
+\item{seed}{Seed for reproducibility of clustering results}
+
+\item{k}{The desired number of centers}
 }
 \value{
 SingleCellExperiment object containing clustering results
