@@ -1,7 +1,7 @@
 # generate testing data
 set.seed(1665)
-merged_sce <- scpcaTools:::sim_sce(n_cells = 300, n_genes = 100, n_empty = 0)
-batches <- rep(c("a", "b", "c"), each = 100)
+merged_sce <- scpcaTools:::sim_sce(n_cells = 303, n_genes = 100, n_empty = 0)
+batches <- rep(c("a", "b", "c"), each = 101)
 barcodes <- rownames(colData(merged_sce))
 
 # set up colData rownames as batch-barcode
@@ -13,34 +13,34 @@ colData(merged_sce)$sample <- batches
 
 # add PCs for testing (exact numbers don't matter)
 # make a 300x100 matrix
-reducedDim(merged_sce, "PCA") <- matrix(runif(300 * 100, min = 0, max = 100), nrow = 300)
+reducedDim(merged_sce, "PCA") <- matrix(runif(303 * 100, min = 0, max = 100), nrow = 303)
 
 # grab pcs and batches
 pcs <- reducedDim(merged_sce, "PCA")
 batches <- merged_sce$sample
 
-test_that("`set_pc_rownames` works as expected", {
+test_that("`filter_pcs` works as expected", {
 
   # expect rownames of returned pcs to be the same as the batch column
-  named_pcs <- set_pc_rownames(pcs, batches)
+  named_pcs <- filter_pcs(pcs, batches)
   expect_true(all.equal(rownames(named_pcs), batches))
 
 })
 
-test_that("`set_pc_rownames` removes NAs as expected", {
+test_that("`filter_pcs` removes NAs as expected", {
 
   batches[1:5] <- NA # set a subset of batch labels to NAs
 
   # expect rownames to be equal to only the batches without NA
-  named_pcs <- set_pc_rownames(pcs, batches)
+  named_pcs <- filter_pcs(pcs, batches)
   expect_true(all.equal(rownames(named_pcs), batches[!is.na(batches)]))
   expect_false(length(rownames(named_pcs)) == length(batches))
 })
 
-test_that("`set_pc_rownames` fails without batch labels", {
+test_that("`filter_pcs` fails without batch labels", {
 
-  short_batches <- c("a", "b", "c")
-  expect_error(scpcaTools:::set_pc_rownames(pcs, short_batches))
+  all_na_batches <- NA
+  expect_error(scpcaTools:::filter_pcs(pcs, all_na_batches))
 
 })
 
@@ -48,12 +48,12 @@ test_that("`downsample_pcs` works as expected", {
 
   test_frac = 0.8
   downsampled <- downsample_pcs(pcs, frac_cells = test_frac)
-  downsampled_pcs <- downsampled$pcs
-  downsampled_batch_labels <- downsampled$batch_labels
+  downsampled_pcs <-downsampled
+  downsampled_batch_labels <- rownames(downsampled)
 
   # check that the correct number of cells were downsampled
-  expect_true(length(rownames(downsampled_pcs)) == 0.8*length(rownames(pcs)))
-  expect_true(length(downsampled_batch_labels) == 0.8*length(batches))
+  expect_true(length(rownames(downsampled_pcs)) == round(test_frac*length(rownames(pcs))))
+  expect_true(length(downsampled_batch_labels) == round(test_frac*length(batches)))
 
   # check that the columns in downsampled were in the original pcs
   expect_true(length(colnames(downsampled_pcs)) == length(colnames(pcs)))
@@ -70,8 +70,10 @@ test_that("`downsample_pcs` fails as expected", {
 
 test_that("`calculate_silhouette_width` works as expected", {
 
+  nreps <- 5
   asw <- calculate_silhouette_width(integrated_sce = merged_sce,
                                     pc_name = "PCA",
+                                    nreps = 5,
                                     batch_column = "sample")
 
   expected_cols <- c(
