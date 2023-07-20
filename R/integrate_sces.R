@@ -182,7 +182,7 @@ integrate_harmony <- function(merged_sce,
   # Perform integration
   harmony_results <- harmony::HarmonyMatrix(reducedDim(merged_sce, "PCA"),
     meta_data = harmony_metadata,
-    vars_use  = covariate_cols,
+    vars_use = covariate_cols,
     verbose = FALSE,
     ...
   )
