@@ -31,7 +31,9 @@ Add cellhash sample information to altExperiment rowData
 \examples{
 \dontrun{
 # add sample information for a cellhash table
-add_cellhash_ids(sce = sce,
-                 hashsample_table = barcode_ids)
+add_cellhash_ids(
+  sce = sce,
+  hashsample_table = barcode_ids
+)
 }
 }
