@@ -64,10 +64,10 @@ calculate_silhouette_width <- function(integrated_sce,
       tibble::as_tibble() |>
       dplyr::mutate(rep = rep) |>
       dplyr::select(
-        .data$rep,
-        silhouette_width = .data$width,
-        silhouette_cluster = .data$cluster,
-        other_cluster = .data$other
+        "rep",
+        silhouette_width = "width",
+        silhouette_cluster = "cluster",
+        other_cluster = "other"
       )
   }) |>
     dplyr::bind_rows() |>
