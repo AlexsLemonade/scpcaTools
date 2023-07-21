@@ -18,6 +18,8 @@ use}
 results in the SCE}
 
 \item{seed}{Seed for reproducibility of clustering results}
+
+\item{...}{Allows for additional arguments to be provided to `clusterRows()`}
 }
 \value{
 SingleCellExperiment object containing clustering results

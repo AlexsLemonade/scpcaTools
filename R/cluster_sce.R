@@ -7,6 +7,7 @@
 #' @param cluster_column_name The name of the column to store the clustering
 #' results in the SCE
 #' @param seed Seed for reproducibility of clustering results
+#' @param ... Allows for additional arguments to be provided to `clusterRows()`
 #'
 #' @return SingleCellExperiment object containing clustering results
 cluster_sce <- function(sce,
