@@ -4,7 +4,7 @@
 \alias{cluster_sce}
 \title{Perform clustering on a SingleCellExperiment object}
 \usage{
-cluster_sce(sce, pca_name, BLUSPARAM, cluster_name, seed = NULL, ...)
+cluster_sce(sce, pca_name, BLUSPARAM, cluster_column_name, seed = NULL, ...)
 }
 \arguments{
 \item{sce}{SingleCellExperiment object that requires clustering}
@@ -12,10 +12,10 @@ cluster_sce(sce, pca_name, BLUSPARAM, cluster_name, seed = NULL, ...)
 \item{pca_name}{The name used to access the PCA results}
 
 \item{BLUSPARAM}{A BlusterParam object specifying the clustering algorithm to
-use - can be `KmeansParam` or `NNGraphParam`}
+use}
 
-\item{cluster_name}{The type of clustering method to be performed - can be
-"kmeans", "walktrap", or "louvain"}
+\item{cluster_column_name}{The name of the column to store the clustering
+results in the SCE}
 
 \item{seed}{Seed for reproducibility of clustering results}
 }
