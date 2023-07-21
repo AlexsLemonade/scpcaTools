@@ -26,8 +26,10 @@ Calculate QC metrics for all reads and mitochondrial subset for each cell in a S
 \examples{
 \dontrun{
 # add per cell QC metrics using only genes detected > 5\% of cells
-add_cell_mito_qc(sce = sce,
-                 mito = mito_genes,
-                 threshold = 5)
+add_cell_mito_qc(
+  sce = sce,
+  mito = mito_genes,
+  threshold = 5
+)
 }
 }

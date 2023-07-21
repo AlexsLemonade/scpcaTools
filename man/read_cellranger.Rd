@@ -20,7 +20,6 @@ Read in counts data processed with Cellranger
 
 # Import data from cellranger output directory quant_dir
 read_cellranger(quant_dir)
-
 }
 
 }

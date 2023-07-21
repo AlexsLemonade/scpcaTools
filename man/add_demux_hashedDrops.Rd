@@ -24,7 +24,7 @@ Add cellhash demultiplexing results using DropletUtils::hashedDrops
 }
 \examples{
 \dontrun{
-  # add cell calls from DropletUtils::hashedDrops()
-  add_demux_hashedDrops(sce = sce)
+# add cell calls from DropletUtils::hashedDrops()
+add_demux_hashedDrops(sce = sce)
 }
 }

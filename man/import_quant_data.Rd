@@ -49,29 +49,33 @@ Imports the gene x cell matrix output from either Alevin, Alevin-fry, Cellranger
 \dontrun{
 # read in single cell RNA seq data processed using cellranger
 import_quant_data(quant_dir,
-tool = "cellranger")
+  tool = "cellranger"
+)
 
 # read in single-cell RNA seq data processed using alevin-fry in USA mode
 # with alignment to cDNA only and including counts for spliced cDNA only
 import_quant_data(quant_dir,
-                  tool = "alevin-fry",
-                  include_unspliced = FALSE,
-                  usa_mode = TRUE)
+  tool = "alevin-fry",
+  include_unspliced = FALSE,
+  usa_mode = TRUE
+)
 
 # read in single-nuclei RNA-seq data processed using alevin-fry in
 # USA mode with alignment to cDNA + introns and including counts for
 # unspliced cDNA and perform filtering
 import_quant_data(quant_dir,
-                  tool = "alevin-fry",
-                  usa_mode = TRUE,
-                  filter = TRUE)
+  tool = "alevin-fry",
+  usa_mode = TRUE,
+  filter = TRUE
+)
 
 # read in single-nuclei RNA-seq data processed using kallisto with
 # alignment to cDNA + introns and including counts for unspliced cDNA
 # and perform filtering
 import_quant_data(quant_dir,
-                  tool = "kallisto",
-                  filter = TRUE)
+  tool = "kallisto",
+  filter = TRUE
+)
 }
 
 }
