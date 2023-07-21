@@ -27,6 +27,7 @@ Depends:
     R (>= 4.2.0)
 Imports:
     BiocGenerics,
+    bluster,
     dplyr,
     DropletUtils,
     fishpond,
