@@ -50,8 +50,7 @@ calculate_within_batch_ari <- function(individual_sce_list,
       cluster_column_name = "integrated_clusters"
     )
 
-  integrated_clustering_result <- colData(integrated_sce)[["integrated_clusters"]] |>
-    rlang::set_names(rownames(integrated_pcs)) # make sure to set the names with the batch ids
+  rownames(integrated_pcs) <- integrated_clustering_result[["integrated_clusters"]] # make sure to set the names with the batch ids
 
 
   # For every batch id, cluster and then calculate ARI for that batch
@@ -67,7 +66,7 @@ calculate_within_batch_ari <- function(individual_sce_list,
         )
 
       # Extract clusters from integrated clustering for batch
-      clusters_to_keep <- grep(batch, names(integrated_clustering_result))
+      clusters_to_keep <- grep(batch, integrated_clustering_result[[batch_column]])
       batch_integrated_clusters <- integrated_clustering_result[clusters_to_keep]
 
       # Calculate ARI between pre-integrated clustering and post-integrated clustering for the given batch
