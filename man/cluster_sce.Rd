@@ -15,7 +15,8 @@ cluster_sce(sce, pca_name, BLUSPARAM, cluster_column_name, seed = NULL, ...)
 use}
 
 \item{cluster_column_name}{The name of the column to store the clustering
-results in the SCE}
+results in the SCE; for naming you may want to include the type of clustering
+and k value of centers, e.g. `kmeans_10`}
 
 \item{seed}{Seed for reproducibility of clustering results}
 

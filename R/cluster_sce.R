@@ -5,7 +5,8 @@
 #' @param BLUSPARAM A BlusterParam object specifying the clustering algorithm to
 #' use
 #' @param cluster_column_name The name of the column to store the clustering
-#' results in the SCE
+#' results in the SCE; for naming you may want to include the type of clustering
+#' and k value of centers, e.g. `kmeans_10`
 #' @param seed Seed for reproducibility of clustering results
 #' @param ... Allows for additional arguments to be provided to `clusterRows()`
 #'
