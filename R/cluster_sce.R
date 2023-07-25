@@ -1,18 +1,25 @@
 #' Perform clustering on a SingleCellExperiment object
 #'
 #' @param sce SingleCellExperiment object that requires clustering
-#' @param pca_name The name used to access the PCA results
+#' @param pca_name The name used to access the PCA results stored in the
+#'   SingleCellExperiment object; default is "PCA"
 #' @param BLUSPARAM A BlusterParam object specifying the clustering algorithm to
-#' use
+#'   use and any additional clustering options
 #' @param cluster_column_name The name of the column to store the clustering
-#' results in the SCE; for naming you may want to include the type of clustering
-#' and k value of centers, e.g. `kmeans_10`
+#'   results in the SCE; for naming you may want to include the type of clustering
+#'   and k value of centers, e.g. `kmeans_10`
 #' @param seed Seed for reproducibility of clustering results
-#' @param ... Allows for additional arguments to be provided to `clusterRows()`
+#' @param ... Additional arguments to provide to `bluster::clusterRows()`
+#'
+#' @import SingleCellExperiment
 #'
 #' @return SingleCellExperiment object containing clustering results
+#'
+#' @examples
+#'   Perform K-means clustering with 10 centers
+#'   cluster_sce(sce, "PCA", bluster::KmeansParam(centers = 10), "kmeans_10")
 cluster_sce <- function(sce,
-                        pca_name,
+                        pca_name = "PCA",
                         BLUSPARAM,
                         cluster_column_name,
                         seed = NULL,
