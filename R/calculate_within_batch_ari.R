@@ -26,14 +26,15 @@ calculate_within_batch_ari <- function(individual_sce_list,
 
   # Check that list of SCE objects is named
   batch_ids <- names(individual_sce_list)
-  if(is.null(batch_ids)){
+  if (is.null(batch_ids)) {
     stop("Must provide a named list of SCE objects.")
   } else {
     # Make sure the batch ids provided match between the list and the integrated object
-    if(!(identical(
+    if (!(identical(
       sort(batch_ids),
-      sort(unique(colData(integrated_sce)[, batch_column]))))
-    ){
+      sort(unique(colData(integrated_sce)[, batch_column]))
+    ))
+    ) {
       stop("Names of provided SCE objects included in the individual SCE object
            do not match batch IDs present in the batch_column of the integrated object")
     }
@@ -56,7 +57,6 @@ calculate_within_batch_ari <- function(individual_sce_list,
   # For every batch id, cluster and then calculate ARI for that batch
   all_ari <- batch_ids |>
     purrr::map_dbl(\(batch){
-
       # Cluster pc matrix for specified batch
       individual_clustering_result <- individual_sce_list[[batch]] |>
         cluster_sce(
@@ -70,19 +70,19 @@ calculate_within_batch_ari <- function(individual_sce_list,
       batch_integrated_clusters <- integrated_clustering_result[clusters_to_keep]
 
       # Calculate ARI between pre-integrated clustering and post-integrated clustering for the given batch
-      ari <- bluster::pairwiseRand(individual_clustering_result,
-                                   batch_integrated_clusters,
-                                   mode = "index")
+      ari <- bluster::pairwiseRand(individual_clustering_result[["individual_clusters"]],
+        batch_integrated_clusters[["integrated_clusters"]],
+        mode = "index"
+      )
 
       return(ari)
-
     })
 
   # Create tibble with ARI and batch id
   within_batch_ari_tibble <- tibble::tibble(
     ari = all_ari,
     batch_id = batch_ids,
-    pca_name = pca_name
+    pc_name = pc_name
   )
 
   return(within_batch_ari_tibble)
