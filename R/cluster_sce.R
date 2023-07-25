@@ -16,8 +16,10 @@
 #' @return SingleCellExperiment object containing clustering results
 #'
 #' @examples
-#'   Perform K-means clustering with 10 centers
+#'  \dontrun{
+#'   # Perform K-means clustering with 10 centers
 #'   cluster_sce(sce, "PCA", bluster::KmeansParam(centers = 10), "kmeans_10")
+#'  }
 cluster_sce <- function(sce,
                         pca_name = "PCA",
                         BLUSPARAM,
