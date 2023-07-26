@@ -4,15 +4,23 @@
 \alias{cluster_sce}
 \title{Perform clustering on a SingleCellExperiment object}
 \usage{
-cluster_sce(sce, pca_name, BLUSPARAM, cluster_column_name, seed = NULL, ...)
+cluster_sce(
+  sce,
+  pca_name = "PCA",
+  BLUSPARAM,
+  cluster_column_name,
+  seed = NULL,
+  ...
+)
 }
 \arguments{
 \item{sce}{SingleCellExperiment object that requires clustering}
 
-\item{pca_name}{The name used to access the PCA results}
+\item{pca_name}{The name used to access the PCA results stored in the
+SingleCellExperiment object; default is "PCA"}
 
 \item{BLUSPARAM}{A BlusterParam object specifying the clustering algorithm to
-use}
+use and any additional clustering options}
 
 \item{cluster_column_name}{The name of the column to store the clustering
 results in the SCE; for naming you may want to include the type of clustering
@@ -20,11 +28,17 @@ and k value of centers, e.g. `kmeans_10`}
 
 \item{seed}{Seed for reproducibility of clustering results}
 
-\item{...}{Allows for additional arguments to be provided to `clusterRows()`}
+\item{...}{Additional arguments to provide to `bluster::clusterRows()`}
 }
 \value{
 SingleCellExperiment object containing clustering results
 }
 \description{
 Perform clustering on a SingleCellExperiment object
+}
+\examples{
+ \dontrun{
+  # Perform K-means clustering with 10 centers
+  cluster_sce(sce, "PCA", bluster::KmeansParam(centers = 10), "kmeans_10")
+ }
 }
