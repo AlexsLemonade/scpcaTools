@@ -2,7 +2,10 @@
 #'
 #'
 #' @param individual_sce_list A list of individual SCE objects
-#' @param pc_name The name that allows access to the PCs. Example: fastMNN_PCA
+#' @param individual_pc_name The name that allows access to the PCs in the
+#'  individual SCE objects. Default is "PCA".
+#' @param integrated_pc_name The name that allows access to the PCs in the
+#'  integrated SCE object.  Example: "fastMNN_PCA".
 #' @param integrated_sce The integrated SCE object
 #' @param batch_column The variable in `integrated_sce` indicating the grouping of interest.
 #'  Generally this is either batches or cell types. Default is "library_id".
@@ -17,7 +20,8 @@
 #'
 #' @export
 calculate_within_batch_ari <- function(individual_sce_list,
-                                       pc_name,
+                                       individual_pc_name,
+                                       integrated_pc_name,
                                        integrated_sce,
                                        batch_column = "library_id",
                                        seed = NULL) {
@@ -41,12 +45,12 @@ calculate_within_batch_ari <- function(individual_sce_list,
   }
 
   # Pull out the PCs or analogous reduction from integrated object
-  integrated_pcs <- reducedDim(integrated_sce, pc_name)
+  integrated_pcs <- reducedDim(integrated_sce, integrated_pc_name)
 
   # Cluster integrated pcs only one time
   integrated_clustering_result <- integrated_sce |>
     cluster_sce(
-      pca_name = pc_name,
+      pca_name = integrated_pc_name,
       BLUSPARAM = bluster::NNGraphParam(cluster.fun = "louvain", type = "jaccard"),
       cluster_column_name = "integrated_clusters"
     )
@@ -60,7 +64,7 @@ calculate_within_batch_ari <- function(individual_sce_list,
       # Cluster pc matrix for specified batch
       individual_clustering_result <- individual_sce_list[[batch]] |>
         cluster_sce(
-          pca_name = pc_name,
+          pca_name = individual_pc_name,
           BLUSPARAM = bluster::NNGraphParam(cluster.fun = "louvain", type = "jaccard"),
           cluster_column_name = "individual_clusters"
         )
@@ -82,7 +86,8 @@ calculate_within_batch_ari <- function(individual_sce_list,
   within_batch_ari_tibble <- tibble::tibble(
     ari = all_ari,
     batch_id = batch_ids,
-    pc_name = pc_name
+    individual_pc_name = individual_pc_name,
+    integrated_pc_name = integrated_pc_name
   )
 
   return(within_batch_ari_tibble)

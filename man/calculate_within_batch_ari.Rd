@@ -6,7 +6,8 @@
 \usage{
 calculate_within_batch_ari(
   individual_sce_list,
-  pc_name,
+  individual_pc_name,
+  integrated_pc_name,
   integrated_sce,
   batch_column = "library_id",
   seed = NULL
@@ -15,7 +16,11 @@ calculate_within_batch_ari(
 \arguments{
 \item{individual_sce_list}{A list of individual SCE objects}
 
-\item{pc_name}{The name that allows access to the PCs. Example: fastMNN_PCA}
+\item{individual_pc_name}{The name that allows access to the PCs in the
+individual SCE objects. Default is "PCA".}
+
+\item{integrated_pc_name}{The name that allows access to the PCs in the
+integrated SCE object.  Example: "fastMNN_PCA".}
 
 \item{integrated_sce}{The integrated SCE object}
 
