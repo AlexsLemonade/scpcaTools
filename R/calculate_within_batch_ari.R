@@ -1,13 +1,11 @@
-#' Calculate within-batch ARI scores from an integrated SCE object.
+#' Calculate within-batch ARI scores from a merged SCE object.
 #'
 #'
 #' @param individual_sce_list A list of individual SCE objects
-#' @param individual_pc_name The name that allows access to the PCs in the
-#'  individual SCE objects. Default is "PCA".
-#' @param integrated_pc_name The name that allows access to the PCs in the
-#'  integrated SCE object.  Example: "fastMNN_PCA".
-#' @param integrated_sce The integrated SCE object
-#' @param batch_column The variable in `integrated_sce` indicating the grouping of interest.
+#' @param pc_name The name that allows access to the PCs in the merged SCE
+#'  object. Example: "fastMNN_PCA".
+#' @param merged_sce The merged SCE object containing data from multiple batches
+#' @param batch_column The variable in `merged_sce` indicating the grouping of interest.
 #'  Generally this is either batches or cell types. Default is "library_id".
 #' @param seed Seed for initializing random sampling
 #'
@@ -20,43 +18,52 @@
 #'
 #' @export
 calculate_within_batch_ari <- function(individual_sce_list,
-                                       individual_pc_name,
-                                       integrated_pc_name,
-                                       integrated_sce,
+                                       pc_name,
+                                       merged_sce,
                                        batch_column = "library_id",
                                        seed = NULL) {
   # Set the seed for subsampling and clustering
   set.seed(seed)
+
+  # Check that `batch_column` is in colData of SCE
+  if (!batch_column %in% colnames(colData(merged_sce))) {
+    stop("The specified batch column is missing from the colData of the SingleCellExperiment object.")
+  }
 
   # Check that list of SCE objects is named
   batch_ids <- names(individual_sce_list)
   if (is.null(batch_ids)) {
     stop("Must provide a named list of SCE objects.")
   } else {
-    # Make sure the batch ids provided match between the list and the integrated object
+    # Make sure the batch ids provided match between the list and the merged object
     if (!(identical(
       sort(batch_ids),
-      sort(unique(colData(integrated_sce)[, batch_column]))
+      sort(unique(colData(merged_sce)[, batch_column]))
     ))
     ) {
       stop("Names of provided SCE objects included in the individual SCE object
-           do not match batch IDs present in the batch_column of the integrated object")
+           do not match batch IDs present in the batch_column of the merged object")
     }
   }
 
-  # Pull out the PCs or analogous reduction from integrated object
-  integrated_pcs <- reducedDim(integrated_sce, integrated_pc_name)
+  # Check that `pc_name` is in merged SCE object
+  if (!pc_name %in% reducedDimNames(merged_sce)) {
+    stop("The provided `pc_name` cannot be found in the SingleCellExperiment object.")
+  }
 
-  # Cluster integrated pcs only one time
-  integrated_clustering_result <- integrated_sce |>
+  # Pull out the PCs or analogous reduction from merged object
+  merged_pcs <- reducedDim(merged_sce, pc_name)
+
+  # Cluster merged pcs only one time
+  merged_sce <- merged_sce |>
     cluster_sce(
-      pca_name = integrated_pc_name,
+      pca_name = pc_name,
       BLUSPARAM = bluster::NNGraphParam(cluster.fun = "louvain", type = "jaccard"),
-      cluster_column_name = "integrated_clusters"
+      cluster_column_name = "merged_clusters"
     )
 
-  rownames(integrated_pcs) <- integrated_clustering_result[["integrated_clusters"]] # make sure to set the names with the batch ids
-
+  merged_clusters <- merged_sce$merged_clusters |>
+    purrr::set_names(merged_sce[[batch_column]])
 
   # For every batch id, cluster and then calculate ARI for that batch
   all_ari <- batch_ids |>
@@ -64,19 +71,19 @@ calculate_within_batch_ari <- function(individual_sce_list,
       # Cluster pc matrix for specified batch
       individual_clustering_result <- individual_sce_list[[batch]] |>
         cluster_sce(
-          pca_name = individual_pc_name,
+          pca_name = "PCA",
           BLUSPARAM = bluster::NNGraphParam(cluster.fun = "louvain", type = "jaccard"),
           cluster_column_name = "individual_clusters"
         )
 
-      # Extract clusters from integrated clustering for batch
-      clusters_to_keep <- grep(batch, integrated_clustering_result[[batch_column]])
-      batch_integrated_clusters <- integrated_clustering_result[clusters_to_keep]
+      # Extract clusters from merged clustering for batch
+      clusters_to_keep <- grep(batch, merged_sce[[batch_column]])
+      batch_merged_clusters <- merged_clusters[clusters_to_keep]
 
-      # Calculate ARI between pre-integrated clustering and post-integrated clustering for the given batch
+      # Calculate ARI between pre-merged clustering and post-merged clustering for the given batch
       ari <- bluster::pairwiseRand(individual_clustering_result[["individual_clusters"]],
-        batch_integrated_clusters[["integrated_clusters"]],
-        mode = "index"
+                                   batch_merged_clusters,
+                                   mode = "index"
       )
 
       return(ari)
@@ -86,8 +93,7 @@ calculate_within_batch_ari <- function(individual_sce_list,
   within_batch_ari_tibble <- tibble::tibble(
     ari = all_ari,
     batch_id = batch_ids,
-    individual_pc_name = individual_pc_name,
-    integrated_pc_name = integrated_pc_name
+    pc_name = pc_name
   )
 
   return(within_batch_ari_tibble)
