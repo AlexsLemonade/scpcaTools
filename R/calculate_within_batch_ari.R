@@ -27,7 +27,7 @@ calculate_within_batch_ari <- function(individual_sce_list,
 
   # Check that `batch_column` is in colData of SCE
   if (!batch_column %in% colnames(colData(merged_sce))) {
-    stop("The specified batch column is missing from the colData of the SingleCellExperiment object.")
+    stop("The specified batch column is missing from the colData of the `merged_sce`.")
   }
 
   # Check that list of SCE objects is named
@@ -48,7 +48,7 @@ calculate_within_batch_ari <- function(individual_sce_list,
 
   # Check that `pc_name` is in merged SCE object
   if (!pc_name %in% reducedDimNames(merged_sce)) {
-    stop("The provided `pc_name` cannot be found in the SingleCellExperiment object.")
+    stop("The provided `pc_name` cannot be found in the `merged_sce`.")
   }
 
   # Pull out the PCs or analogous reduction from merged object
@@ -81,7 +81,7 @@ calculate_within_batch_ari <- function(individual_sce_list,
       batch_merged_clusters <- merged_clusters[clusters_to_keep]
 
       # Calculate ARI between pre-merged clustering and post-merged clustering for the given batch
-      ari <- bluster::pairwiseRand(individual_clustering_result[["individual_clusters"]],
+      ari <- bluster::pairwiseRand(individual_clustering_result$individual_clusters,
                                    batch_merged_clusters,
                                    mode = "index"
       )
