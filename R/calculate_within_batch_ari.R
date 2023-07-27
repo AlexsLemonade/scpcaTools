@@ -1,7 +1,8 @@
 #' Calculate within-batch ARI scores from a merged SCE object.
 #'
 #'
-#' @param individual_sce_list A list of individual SCE objects
+#' @param individual_sce_list A named list of individual SCE objects. It is
+#'  assumed these have a reduced dimension slot with principal components named "PCA".
 #' @param pc_name The name that allows access to the PCs in the merged SCE
 #'  object. Example: "fastMNN_PCA".
 #' @param merged_sce The merged SCE object containing data from multiple batches
@@ -82,8 +83,8 @@ calculate_within_batch_ari <- function(individual_sce_list,
 
       # Calculate ARI between pre-merged clustering and post-merged clustering for the given batch
       ari <- bluster::pairwiseRand(individual_clustering_result$individual_clusters,
-                                   batch_merged_clusters,
-                                   mode = "index"
+        batch_merged_clusters,
+        mode = "index"
       )
 
       return(ari)

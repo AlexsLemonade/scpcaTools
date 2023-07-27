@@ -13,7 +13,8 @@ calculate_within_batch_ari(
 )
 }
 \arguments{
-\item{individual_sce_list}{A list of individual SCE objects}
+\item{individual_sce_list}{A named list of individual SCE objects. It is
+assumed these have a reduced dimension slot with principal components named "PCA".}
 
 \item{pc_name}{The name that allows access to the PCs in the merged SCE
 object. Example: "fastMNN_PCA".}
