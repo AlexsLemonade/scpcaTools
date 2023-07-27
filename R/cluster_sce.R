@@ -29,6 +29,11 @@ cluster_sce <- function(sce,
   # Set the seed
   set.seed(seed)
 
+  # Check that provided sce is indeed an SCE
+  if (!is(sce, "SingleCellExperiment")) {
+    stop("Expected a `SingleCellExperiment` object for `sce` argument.")
+  }
+
   # Check that the PCs are present in the SingleCellExperiment object
   if (!pc_name %in% reducedDimNames(sce)) {
     stop("The provided `pc_name` cannot be found in the reduced dimensions of

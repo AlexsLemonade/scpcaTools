@@ -21,6 +21,12 @@ test_that("cluster_sce function works when correctly specified", {
 test_that("cluster_sce function should fail when inputs incorrectly specified", {
 
   expect_error(
+    cluster_sce("not an sce object",
+                BLUSPARAM = blus_param,
+                cluster_column_name = cluster_colname)
+  )
+
+  expect_error(
     cluster_sce(sce,
                 pc_name = "definitely not the PCA name",
                 BLUSPARAM = blus_param,
