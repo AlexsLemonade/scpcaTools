@@ -53,6 +53,7 @@ Suggests:
     ggplot2,
     harmony,
     kableExtra,
+    lisi,
     rmarkdown,
     scater,
     scran,
