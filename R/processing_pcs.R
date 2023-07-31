@@ -123,3 +123,47 @@ within_batch_ari_pcs <- function(merged_sce, pc_name, batch_column = "library_id
 
   return(within_batch_ari_tibble)
 }
+
+#' Calculate silhouette width scores from a merged SCE object.
+#'
+#' This function performs replicated calculations on downsampled data.
+#'
+#' @param merged_sce The merged SCE object containing data from multiple batches
+#' @param pc_name The name used to access the PCA results stored in the
+#'   SingleCellExperiment object
+#' @param batch_column The variable in `merged_sce` indicating the grouping of interest.
+#'  Generally this is either batches or cell types. Default is "library_id".
+#'
+#' @return Tibble with five columns: `rep`, representing the given downsampling replicate;
+#'   `silhouette_width`, the calculated silhouette width for the given `rep`; `silhouette_cluster`,
+#'   the assigned cluster for the cell during silhouette calculation, i.e. the true identity;
+#'   `other_cluster`, the other assigned for the cell during silhouette calculation;
+#'   `pc_name`, the name associated with the pc results
+calculate_silhouette_width_pcs <- function(merged_sce, pc_name, batch_column = "library_id") {
+  # Pull out the PCs or analogous reduction
+  pcs <- reducedDim(merged_sce, pc_name)
+
+  # Remove batch NAs from PCs and label rownames
+  labeled_pcs <- filter_pcs(pcs, colData(merged_sce)[, batch_column])
+
+  # Perform calculations
+  all_silhouette <- purrr::map(1:nreps, \(rep) {
+    # Downsample PCs
+    downsampled <- downsample_pcs(labeled_pcs, frac_cells)
+    # Calculate batch ASW and add into final tibble
+    bluster::approxSilhouette(downsampled, rownames(downsampled)) |>
+      tibble::as_tibble() |>
+      dplyr::mutate(rep = rep) |>
+      dplyr::select(
+        "rep",
+        silhouette_width = "width",
+        silhouette_cluster = "cluster",
+        other_cluster = "other"
+      )
+  }) |>
+    dplyr::bind_rows() |>
+    # Add integration method into tibble
+    dplyr::mutate(pc_name = pc_name)
+
+  return(all_silhouette)
+}

@@ -3,7 +3,8 @@
 #' This function performs replicated calculations on downsampled data.
 #'
 #' @param merged_sce The merged SCE object containing data from multiple batches
-#' @param pc_name The name that allows access to the PCs. Example: fastMNN_PCA
+#' @param pc_list A list of names that allow access to the PCs in the merged SCE
+#'  object. Example: c("PCA", "fastMNN_PCA").
 #' @param batch_column The variable in `merged_sce` indicating the grouping of interest.
 #'  Generally this is either batches or cell types. Default is "library_id".
 #' @param frac_cells The fraction of cells to downsample to. Default: 0.8
@@ -21,7 +22,7 @@
 #'
 #' @export
 calculate_silhouette_width <- function(merged_sce,
-                                       pc_name,
+                                       pc_list,
                                        batch_column = "library_id",
                                        frac_cells = 0.8,
                                        nreps = 20,
@@ -30,8 +31,8 @@ calculate_silhouette_width <- function(merged_sce,
   set.seed(seed)
 
   # Check that provided `pc_name` is present in SingleCellExperiment object
-  if (!pc_name %in% reducedDimNames(merged_sce)) {
-    stop("The provided `pc_name` cannot be found in the SingleCellExperiment object.")
+  if (!any(pc_list %in% reducedDimNames(merged_sce))) {
+    stop("One or more of the PC names provided in `pc_list` cannot be found in the `merged_sce`.")
   }
 
   # Check that `nreps` is an integer
@@ -44,36 +45,21 @@ calculate_silhouette_width <- function(merged_sce,
     stop("The fraction of cells to downsample should be between 0 and 1.")
   }
 
-  # Pull out the PCs or analogous reduction
-  pcs <- reducedDim(merged_sce, pc_name)
-
   # Check that `batch_column` is in colData of SCE
   if (!batch_column %in% colnames(colData(merged_sce))) {
     stop("The specified batch column is missing from the colData of the SingleCellExperiment object.")
   }
 
-  # Remove batch NAs from PCs and label rownames
-  labeled_pcs <- filter_pcs(pcs, colData(merged_sce)[, batch_column])
-
-  # Perform calculations
-  all_silhouette <- purrr::map(1:nreps, \(rep) {
-    # Downsample PCs
-    downsampled <- downsample_pcs(labeled_pcs, frac_cells)
-    # Calculate batch ASW and add into final tibble
-    bluster::approxSilhouette(downsampled, rownames(downsampled)) |>
-      tibble::as_tibble() |>
-      dplyr::mutate(rep = rep) |>
-      dplyr::select(
-        "rep",
-        silhouette_width = "width",
-        silhouette_cluster = "cluster",
-        other_cluster = "other"
-      )
-  }) |>
-    dplyr::bind_rows() |>
-    # Add integration method into tibble
-    dplyr::mutate(pc_name = pc_name)
+  # Calculate the silhouette width values across list of PCs
+  all_silhouette_df <- purrr::map_df(
+    pc_list,
+    ~ calculate_silhouette_width_pcs(
+      merged_sce = merged_sce,
+      batch_column = batch_column,
+      pc_name = .
+    )
+  )
 
   # Return tibble with silhouette width results which can further be summarized downstream
-  return(all_silhouette)
+  return(all_silhouette_df)
 }
