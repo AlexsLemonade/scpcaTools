@@ -2,10 +2,10 @@
 % Please edit documentation in R/calculate_silhouette_width.R
 \name{calculate_silhouette_width}
 \alias{calculate_silhouette_width}
-\title{Calculate silhouette width scores from an integrated SCE object.}
+\title{Calculate silhouette width scores from a merged SCE object.}
 \usage{
 calculate_silhouette_width(
-  integrated_sce,
+  merged_sce,
   pc_name,
   batch_column = "library_id",
   frac_cells = 0.8,
@@ -14,11 +14,11 @@ calculate_silhouette_width(
 )
 }
 \arguments{
-\item{integrated_sce}{The integrated SCE object}
+\item{merged_sce}{The merged SCE object containing data from multiple batches}
 
 \item{pc_name}{The name that allows access to the PCs. Example: fastMNN_PCA}
 
-\item{batch_column}{The variable in `integrated_sce` indicating the grouping of interest.
+\item{batch_column}{The variable in `merged_sce` indicating the grouping of interest.
 Generally this is either batches or cell types. Default is "library_id".}
 
 \item{frac_cells}{The fraction of cells to downsample to. Default: 0.8}
