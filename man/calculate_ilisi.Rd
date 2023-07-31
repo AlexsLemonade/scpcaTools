@@ -4,14 +4,14 @@
 \alias{calculate_ilisi}
 \title{Calculate iLISI (integration Local Inverse Simpson's Index) scores}
 \usage{
-calculate_ilisi(integrated_sce, pc_name, batch_column = "library_id")
+calculate_ilisi(merged_sce, pc_name, batch_column = "library_id")
 }
 \arguments{
-\item{integrated_sce}{The integrated SCE object}
+\item{merged_sce}{The merged SCE object containing data from multiple batches}
 
 \item{pc_name}{The name that allows access to the PCs. Example: fastMNN_PCA}
 
-\item{batch_column}{The variable in `integrated_sce` indicating the grouping of interest.
+\item{batch_column}{The variable in `merged_sce` indicating the grouping of interest.
 Generally this is either batches or cell types. Default is "library_id".}
 }
 \value{
