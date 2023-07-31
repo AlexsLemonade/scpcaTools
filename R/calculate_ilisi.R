@@ -18,12 +18,12 @@ calculate_ilisi <- function(merged_sce,
                             batch_column = "library_id") {
 
   # Check that provided `pc_name` is present in SingleCellExperiment object
-  if (!pc_name %in% reducedDimNames(integrated_sce)) {
+  if (!pc_name %in% reducedDimNames(merged_sce)) {
     stop("The provided `pc_name` cannot be found in the SingleCellExperiment object.")
   }
 
   # Check that `batch_column` is in colData of SCE
-  if (!batch_column %in% colnames(colData(integrated_sce))) {
+  if (!batch_column %in% colnames(colData(merged_sce))) {
     stop("The specified batch column is missing from the colData of the SingleCellExperiment object.")
   }
 
@@ -37,7 +37,7 @@ calculate_ilisi <- function(merged_sce,
 
   # Remove batch NAs from PCs and label rownames
   labeled_pcs <- filter_pcs(pcs,
-                            colData(integrated_sce)[, batch_column],
+                            colData(merged_sce)[, batch_column],
                             # don't rename with batch labels
                             rename_pcs = FALSE)
 
