@@ -6,7 +6,7 @@
 \usage{
 calculate_within_batch_ari(
   individual_sce_list,
-  pc_name,
+  pc_list,
   merged_sce,
   batch_column = "library_id",
   seed = NULL
@@ -16,7 +16,7 @@ calculate_within_batch_ari(
 \item{individual_sce_list}{A named list of individual SCE objects. It is
 assumed these have a reduced dimension slot with principal components named "PCA".}
 
-\item{pc_name}{The name that allows access to the PCs in the merged SCE
+\item{pc_list}{A list of names that allow access to the PCs in the merged SCE
 object. Example: "fastMNN_PCA".}
 
 \item{merged_sce}{The merged SCE object containing data from multiple batches}
