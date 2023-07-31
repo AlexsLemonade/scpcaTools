@@ -2,29 +2,26 @@
 % Please edit documentation in R/calculate_within_batch_ari.R
 \name{calculate_within_batch_ari}
 \alias{calculate_within_batch_ari}
-\title{Calculate within-batch ARI scores from an integrated SCE object.}
+\title{Calculate within-batch ARI scores from a merged SCE object.}
 \usage{
 calculate_within_batch_ari(
   individual_sce_list,
-  individual_pc_name,
-  integrated_pc_name,
-  integrated_sce,
+  pc_name,
+  merged_sce,
   batch_column = "library_id",
   seed = NULL
 )
 }
 \arguments{
-\item{individual_sce_list}{A list of individual SCE objects}
+\item{individual_sce_list}{A named list of individual SCE objects. It is
+assumed these have a reduced dimension slot with principal components named "PCA".}
 
-\item{individual_pc_name}{The name that allows access to the PCs in the
-individual SCE objects. Default is "PCA".}
+\item{pc_name}{The name that allows access to the PCs in the merged SCE
+object. Example: "fastMNN_PCA".}
 
-\item{integrated_pc_name}{The name that allows access to the PCs in the
-integrated SCE object.  Example: "fastMNN_PCA".}
+\item{merged_sce}{The merged SCE object containing data from multiple batches}
 
-\item{integrated_sce}{The integrated SCE object}
-
-\item{batch_column}{The variable in `integrated_sce` indicating the grouping of interest.
+\item{batch_column}{The variable in `merged_sce` indicating the grouping of interest.
 Generally this is either batches or cell types. Default is "library_id".}
 
 \item{seed}{Seed for initializing random sampling}
@@ -35,5 +32,5 @@ Tibble with three columns: `ari`, representing the calculated ARI values;
   associated with the pc results
 }
 \description{
-Calculate within-batch ARI scores from an integrated SCE object.
+Calculate within-batch ARI scores from a merged SCE object.
 }

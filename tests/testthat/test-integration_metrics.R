@@ -62,7 +62,7 @@ test_that("`downsample_pcs` fails as expected", {
 test_that("`calculate_silhouette_width` works as expected", {
   nreps <- 5
   asw <- calculate_silhouette_width(
-    integrated_sce = merged_sce,
+    merged_sce = merged_sce,
     pc_name = "PCA",
     nreps = 5,
     batch_column = "sample"
