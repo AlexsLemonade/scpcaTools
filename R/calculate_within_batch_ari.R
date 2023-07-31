@@ -56,7 +56,7 @@ calculate_within_batch_ari <- function(individual_sce_list,
   within_batch_ari_tibble <-
     purrr::map_df(
       pc_list,
-      ~ within_batch_ari_pcs(
+      ~ calculate_within_batch_ari_pcs(
         merged_sce = merged_sce,
         batch_column = batch_column,
         pc_name = .
