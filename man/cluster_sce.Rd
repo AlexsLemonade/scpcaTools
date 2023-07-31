@@ -6,7 +6,7 @@
 \usage{
 cluster_sce(
   sce,
-  pca_name = "PCA",
+  pc_name = "PCA",
   BLUSPARAM,
   cluster_column_name,
   seed = NULL,
@@ -16,7 +16,7 @@ cluster_sce(
 \arguments{
 \item{sce}{SingleCellExperiment object that requires clustering}
 
-\item{pca_name}{The name used to access the PCA results stored in the
+\item{pc_name}{The name used to access the PCA results stored in the
 SingleCellExperiment object; default is "PCA"}
 
 \item{BLUSPARAM}{A BlusterParam object specifying the clustering algorithm to

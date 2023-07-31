@@ -1,7 +1,7 @@
 #' Perform clustering on a SingleCellExperiment object
 #'
 #' @param sce SingleCellExperiment object that requires clustering
-#' @param pca_name The name used to access the PCA results stored in the
+#' @param pc_name The name used to access the PCA results stored in the
 #'   SingleCellExperiment object; default is "PCA"
 #' @param BLUSPARAM A BlusterParam object specifying the clustering algorithm to
 #'   use and any additional clustering options
@@ -21,7 +21,7 @@
 #'   cluster_sce(sce, "PCA", bluster::KmeansParam(centers = 10), "kmeans_10")
 #'  }
 cluster_sce <- function(sce,
-                        pca_name = "PCA",
+                        pc_name = "PCA",
                         BLUSPARAM,
                         cluster_column_name,
                         seed = NULL,
@@ -29,14 +29,19 @@ cluster_sce <- function(sce,
   # Set the seed
   set.seed(seed)
 
+  # Check that provided sce is indeed an SCE
+  if (!is(sce, "SingleCellExperiment")) {
+    stop("Expected a `SingleCellExperiment` object for `sce` argument.")
+  }
+
   # Check that the PCs are present in the SingleCellExperiment object
-  if (!pca_name %in% reducedDimNames(sce)) {
-    stop("The provided `pca_name` cannot be found in the reduced dimensions of
+  if (!pc_name %in% reducedDimNames(sce)) {
+    stop("The provided `pc_name` cannot be found in the reduced dimensions of
          the SingleCellExperiment object.")
   }
 
   # Extract PCs
-  pcs <- reducedDim(sce, pca_name)
+  pcs <- reducedDim(sce, pc_name)
   clustering_results <- bluster::clusterRows(pcs, BLUSPARAM, ...)
   sce[[cluster_column_name]] <- clustering_results
 
