@@ -1,9 +1,9 @@
 #' Calculate iLISI (integration Local Inverse Simpson's Index) scores
 #'
 #'
-#' @param integrated_sce The integrated SCE object
+#' @param merged_sce The merged SCE object containing data from multiple batches
 #' @param pc_name The name that allows access to the PCs. Example: fastMNN_PCA
-#' @param batch_column The variable in `integrated_sce` indicating the grouping of interest.
+#' @param batch_column The variable in `merged_sce` indicating the grouping of interest.
 #'  Generally this is either batches or cell types. Default is "library_id".
 #'
 #'
@@ -13,7 +13,7 @@
 #' @import SingleCellExperiment
 #'
 #' @export
-calculate_ilisi <- function(integrated_sce,
+calculate_ilisi <- function(merged_sce,
                             pc_name,
                             batch_column = "library_id") {
 
@@ -28,7 +28,7 @@ calculate_ilisi <- function(integrated_sce,
   }
 
   # Pull out the PCs or analogous reduction
-  pcs <- reducedDim(integrated_sce, pc_name)
+  pcs <- reducedDim(merged_sce, pc_name)
 
   # Check that PCs have rownames already, since we won't be renaming them
   if (is.null(rownames(pcs))) {
