@@ -16,7 +16,6 @@
 calculate_ilisi <- function(merged_sce,
                             pc_name,
                             batch_column = "library_id") {
-
   # Check that provided `pc_name` is present in SingleCellExperiment object
   if (!pc_name %in% reducedDimNames(merged_sce)) {
     stop("The provided `pc_name` cannot be found in the SingleCellExperiment object.")
@@ -37,19 +36,22 @@ calculate_ilisi <- function(merged_sce,
 
   # Remove batch NAs from PCs and label rownames
   labeled_pcs <- filter_pcs(pcs,
-                            colData(merged_sce)[, batch_column],
-                            # don't rename with batch labels
-                            rename_pcs = FALSE)
+    colData(merged_sce)[, batch_column],
+    # don't rename with batch labels
+    rename_pcs = FALSE
+  )
 
   # Create data frame for input to lisi calculation
   batch_df <- data.frame(batch = rownames(labeled_pcs))
 
   # Calculate iLISI score
-  ilisi_df <- lisi::compute_lisi(labeled_pcs,
-                                 # define the batches
-                                 batch_df,
-                                 # which variables in `batch_df` to compute lisi for
-                                 "batch") |>
+  ilisi_df <- lisi::compute_lisi(
+    labeled_pcs,
+    # define the batches
+    batch_df,
+    # which variables in `batch_df` to compute lisi for
+    "batch"
+  ) |>
     dplyr::rename(ilisi_score = batch) |>
     dplyr::mutate(
       cell_barcode = rownames(labeled_pcs),
