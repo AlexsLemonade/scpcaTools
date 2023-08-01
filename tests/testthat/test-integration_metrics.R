@@ -25,6 +25,13 @@ test_that("`filter_pcs` works as expected", {
   expect_true(all.equal(rownames(named_pcs), batches))
 })
 
+test_that("`filter_pcs` works as expected when rename_pcs is FALSE", {
+  # set input PCA names to be something else
+  named_pcs <- filter_pcs(pcs, batches, rename_pcs = FALSE)
+  expect_true(all.equal(rownames(named_pcs), rownames(pcs)))
+})
+
+
 test_that("`filter_pcs` removes NAs as expected", {
   batches[1:5] <- NA # set a subset of batch labels to NAs
 
@@ -38,6 +45,7 @@ test_that("`filter_pcs` fails without batch labels", {
   all_na_batches <- NA
   expect_error(filter_pcs(pcs, all_na_batches))
 })
+
 
 test_that("`downsample_pcs` works as expected", {
   test_frac <- 0.8
