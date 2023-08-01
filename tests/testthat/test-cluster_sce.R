@@ -38,7 +38,7 @@ test_that("cluster_sce function should fail when inputs incorrectly specified", 
 
   expect_error(
     cluster_sce(sce,
-      BLUSPARAM = "not a bluster param",
+      BLUSPARAM = "not a bluster parameter",
       cluster_column_name = cluster_colname
     )
   )
