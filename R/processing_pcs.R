@@ -3,9 +3,11 @@
 #' @param pcs The PCs to be filtered and labeled
 #' @param batches Vector of cell-wise batch information whose length is the number of
 #'   rows in `pcs`
+#' @param rename_pcs Whether to rename the PC rownames with the cell's batch label.
+#'   Default is `TRUE`.
 #'
 #' @return PCs with NA batch cells removed and labeled rownames
-filter_pcs <- function(pcs, batches) {
+filter_pcs <- function(pcs, batches, rename_pcs = TRUE) {
   # Remove NA batch cells
   retain_indices <- which(!is.na(batches))
 
@@ -23,8 +25,10 @@ filter_pcs <- function(pcs, batches) {
     stop("Incompatable PC and batch information dimensions after removing NAs.")
   }
 
-  # Set PC rownames to be the batches
-  rownames(pcs) <- batches
+  # rename PCs to batches if specified
+  if (rename_pcs) {
+    rownames(pcs) <- batches
+  }
 
   return(pcs)
 }

@@ -357,12 +357,6 @@
       "Version": "0.27",
       "Source": "Repository",
       "Repository": "CRAN",
-      "RemoteType": "standard",
-      "RemotePkgRef": "DT",
-      "RemoteRef": "DT",
-      "RemoteRepos": "https://cloud.r-project.org",
-      "RemotePkgPlatform": "aarch64-apple-darwin20",
-      "RemoteSha": "0.27",
       "Requirements": [
         "crosstalk",
         "htmltools",
@@ -1582,6 +1576,12 @@
       "Version": "1.1.0",
       "Source": "Repository",
       "Repository": "CRAN",
+      "RemoteType": "standard",
+      "RemotePkgRef": "cellranger",
+      "RemoteRef": "cellranger",
+      "RemoteRepos": "https://cloud.r-project.org",
+      "RemotePkgPlatform": "aarch64-apple-darwin20",
+      "RemoteSha": "1.1.0",
       "Requirements": [
         "R",
         "rematch",
@@ -2635,6 +2635,12 @@
       "Version": "1.0.1",
       "Source": "Repository",
       "Repository": "CRAN",
+      "RemoteType": "standard",
+      "RemotePkgRef": "ids",
+      "RemoteRef": "ids",
+      "RemoteRepos": "https://cloud.r-project.org",
+      "RemotePkgPlatform": "aarch64-apple-darwin20",
+      "RemoteSha": "1.0.1",
       "Requirements": [
         "openssl",
         "uuid"
@@ -2717,12 +2723,6 @@
       "Version": "1.8.4",
       "Source": "Repository",
       "Repository": "CRAN",
-      "RemoteType": "standard",
-      "RemotePkgRef": "jsonlite",
-      "RemoteRef": "jsonlite",
-      "RemoteRepos": "https://cloud.r-project.org",
-      "RemotePkgPlatform": "aarch64-apple-darwin20",
-      "RemoteSha": "1.8.4",
       "Requirements": [
         "methods"
       ],
@@ -2873,6 +2873,24 @@
         "utils"
       ],
       "Hash": "88e1f52195c7b500f19bc0c0f536ed1e"
+    },
+    "lisi": {
+      "Package": "lisi",
+      "Version": "1.0",
+      "Source": "GitHub",
+      "RemoteType": "github",
+      "RemoteHost": "api.github.com",
+      "RemoteUsername": "immunogenomics",
+      "RemoteRepo": "LISI",
+      "RemoteRef": "master",
+      "RemoteSha": "a917556310d8d2c66833dcc35aa3d0f4d1b6e0f4",
+      "Requirements": [
+        "R",
+        "RANN",
+        "Rcpp",
+        "RcppArmadillo"
+      ],
+      "Hash": "c186cf505b1b0d9b3ced6d2946d45e48"
     },
     "listenv": {
       "Package": "listenv",
@@ -3518,6 +3536,12 @@
       "Version": "1.0.1",
       "Source": "Repository",
       "Repository": "CRAN",
+      "RemoteType": "standard",
+      "RemotePkgRef": "rematch",
+      "RemoteRef": "rematch",
+      "RemoteRepos": "https://cloud.r-project.org",
+      "RemotePkgPlatform": "aarch64-apple-darwin20",
+      "RemoteSha": "1.0.1",
       "Hash": "c66b930d20bb6d858cd18e1cebcfae5c"
     },
     "rematch2": {
@@ -4475,6 +4499,12 @@
       "Version": "1.1-0",
       "Source": "Repository",
       "Repository": "CRAN",
+      "RemoteType": "standard",
+      "RemotePkgRef": "uuid",
+      "RemoteRef": "uuid",
+      "RemoteRepos": "https://cloud.r-project.org",
+      "RemotePkgPlatform": "aarch64-apple-darwin20",
+      "RemoteSha": "1.1-0",
       "Requirements": [
         "R"
       ],
