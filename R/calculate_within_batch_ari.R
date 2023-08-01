@@ -79,12 +79,16 @@ calculate_within_batch_ari <- function(individual_sce_list,
 #' @return Tibble with three columns: `ari`, representing the calculated ARI values;
 #'   `batch_id`, the batch id associated with each `ari`; `pc_name`, the name
 #'   associated with the pc results
-
 within_batch_ari_from_pcs <-
   function(merged_sce, pc_name, batch_column = "library_id") {
     # Check that `pc_name` is in merged SCE object
     if (!pc_name %in% reducedDimNames(merged_sce)) {
       stop("The provided `pc_name` cannot be found in the `merged_sce` object.")
+    }
+
+    # Check that `batch_column` is in colData of SCE
+    if (!batch_column %in% colnames(colData(merged_sce))) {
+      stop("The specified batch column is missing from the colData of the `merged_sce`.")
     }
 
     # Pull out the PCs or analogous reduction from merged object
