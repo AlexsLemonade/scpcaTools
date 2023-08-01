@@ -7,7 +7,7 @@
 #'   Default is `TRUE`.
 #'
 #' @return PCs with NA batch cells removed and labeled rownames
-  filter_pcs <- function(pcs, batches, rename_pcs = TRUE) {
+filter_pcs <- function(pcs, batches, rename_pcs = TRUE) {
   # Remove NA batch cells
   retain_indices <- which(!is.na(batches))
 
