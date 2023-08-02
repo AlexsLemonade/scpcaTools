@@ -6,7 +6,7 @@
 \usage{
 calculate_silhouette_width(
   merged_sce,
-  pc_list,
+  pc_names,
   batch_column = "library_id",
   frac_cells = 0.8,
   nreps = 20,
@@ -16,7 +16,7 @@ calculate_silhouette_width(
 \arguments{
 \item{merged_sce}{The merged SCE object containing data from multiple batches}
 
-\item{pc_list}{A list of names that allow access to the PCs in the merged SCE
+\item{pc_names}{A list of names that allow access to the PCs in the merged SCE
 object. Example: c("PCA", "fastMNN_PCA").}
 
 \item{batch_column}{The variable in `merged_sce` indicating the grouping of interest.

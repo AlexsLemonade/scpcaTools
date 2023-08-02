@@ -27,7 +27,7 @@ Generally this is either batches or cell types. Default is "library_id".}
 
 \item{nreps}{The number of times to repeat sub-sampling procedure.}
 
-\item{seed}{Seed for initializing random sampling}
+\item{seed}{Seed for initializing random sampling. Default is NULL.}
 }
 \value{
 Tibble with five columns: `rep`, representing the given downsampling replicate;

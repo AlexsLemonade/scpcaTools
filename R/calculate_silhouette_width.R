@@ -3,7 +3,7 @@
 #' This function performs replicated calculations on downsampled data.
 #'
 #' @param merged_sce The merged SCE object containing data from multiple batches
-#' @param pc_list A list of names that allow access to the PCs in the merged SCE
+#' @param pc_names A list of names that allow access to the PCs in the merged SCE
 #'  object. Example: c("PCA", "fastMNN_PCA").
 #' @param batch_column The variable in `merged_sce` indicating the grouping of interest.
 #'  Generally this is either batches or cell types. Default is "library_id".
@@ -22,17 +22,14 @@
 #'
 #' @export
 calculate_silhouette_width <- function(merged_sce,
-                                       pc_list,
+                                       pc_names,
                                        batch_column = "library_id",
                                        frac_cells = 0.8,
                                        nreps = 20,
                                        seed = NULL) {
-  # Set the seed for subsampling
-  set.seed(seed)
-
   # Check that provided `pc_name` is present in SingleCellExperiment object
-  if (!any(pc_list %in% reducedDimNames(merged_sce))) {
-    stop("One or more of the PC names provided in `pc_list` cannot be found in the `merged_sce`.")
+  if (!any(pc_names %in% reducedDimNames(merged_sce))) {
+    stop("One or more of the PC names provided in `pc_names` cannot be found in the `merged_sce`.")
   }
 
   # Check that `nreps` is an integer
@@ -52,7 +49,7 @@ calculate_silhouette_width <- function(merged_sce,
 
   # Calculate the silhouette width values across list of PCs
   all_silhouette_df <- purrr::map(
-    pc_list,
+    pc_names,
     \(pcs)
     silhouette_width_from_pcs(
       merged_sce = merged_sce,
@@ -80,7 +77,7 @@ calculate_silhouette_width <- function(merged_sce,
 #'  Generally this is either batches or cell types. Default is "library_id".
 #' @param frac_cells The fraction of cells to downsample to.
 #' @param nreps The number of times to repeat sub-sampling procedure.
-#' @param seed Seed for initializing random sampling
+#' @param seed Seed for initializing random sampling. Default is NULL.
 #'
 #' @return Tibble with five columns: `rep`, representing the given downsampling replicate;
 #'   `silhouette_width`, the calculated silhouette width for the given `rep`; `silhouette_cluster`,
@@ -99,7 +96,7 @@ silhouette_width_from_pcs <-
 
     # Check that provided `pc_name` is present in SingleCellExperiment object
     if (!pc_name %in% reducedDimNames(merged_sce)) {
-      stop("The provided in `pc_name` cannot be found in the `merged_sce`.")
+      stop("The provided `pc_name` cannot be found in the `merged_sce`.")
     }
 
     # Check that `batch_column` is in colData of SCE
