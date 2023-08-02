@@ -20,6 +20,7 @@ RUN Rscript -e "renv::consent(provided = TRUE); \
       rm -rf /tmp/Rtmp*
 
 # Complete installation of zellkonverter conda env
+ENV BASILISK_EXTERNAL_DIR /usr/local/renv/basilisk
 RUN Rscript -e "proc <- basilisk::basiliskStart(env = zellkonverter::zellkonverterAnnDataEnv(), testload = 'anndata'); \
                 basilisk::basiliskStop(proc)"
 
