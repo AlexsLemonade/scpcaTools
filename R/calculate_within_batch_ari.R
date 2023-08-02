@@ -3,7 +3,7 @@
 #'
 #' @param individual_sce_list A named list of individual SCE objects. It is
 #'  assumed these have a reduced dimension slot with principal components named "PCA".
-#' @param pc_list A list of names that allow access to the PCs in the merged SCE
+#' @param pc_names A list of names that allow access to the PCs in the merged SCE
 #'  object. Example: c("PCA", "fastMNN_PCA"). A within-batch ARI will be returned for each `pc_name`.
 #' @param merged_sce The merged SCE object containing data from multiple batches
 #' @param batch_column The variable in `merged_sce` indicating the grouping of interest.
@@ -19,7 +19,7 @@
 #'
 #' @export
 calculate_within_batch_ari <- function(individual_sce_list,
-                                       pc_list,
+                                       pc_names,
                                        merged_sce,
                                        batch_column = "library_id",
                                        seed = NULL) {
@@ -48,14 +48,14 @@ calculate_within_batch_ari <- function(individual_sce_list,
   }
 
   # Check that `pc_name` is in merged SCE object
-  if (!any(pc_list %in% reducedDimNames(merged_sce))) {
-    stop("One or more of the PC names provided in `pc_list` cannot be found in the `merged_sce`.")
+  if (!any(pc_names %in% reducedDimNames(merged_sce))) {
+    stop("One or more of the PC names provided in `pc_names` cannot be found in the `merged_sce`.")
   }
 
   # Calculate within-batch ARI values across list of PCs
   within_batch_ari_tibble <-
     purrr::map(
-      pc_list,
+      pc_names,
       \(pcs)
       within_batch_ari_from_pcs(
         merged_sce = merged_sce,
