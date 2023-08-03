@@ -9,8 +9,8 @@ silhouette_width_from_pcs(
   merged_sce,
   pc_name,
   batch_column = "library_id",
-  frac_cells,
-  nreps,
+  frac_cells = 0.8,
+  nreps = 20,
   seed = NULL
 )
 }
@@ -23,9 +23,9 @@ SingleCellExperiment object}
 \item{batch_column}{The variable in `merged_sce` indicating the grouping of interest.
 Generally this is either batches or cell types. Default is "library_id".}
 
-\item{frac_cells}{The fraction of cells to downsample to.}
+\item{frac_cells}{The fraction of cells to downsample to. Default: 0.8}
 
-\item{nreps}{The number of times to repeat sub-sampling procedure.}
+\item{nreps}{The number of times to repeat sub-sampling procedure. Default: 20}
 
 \item{seed}{Seed for initializing random sampling. Default is NULL.}
 }
