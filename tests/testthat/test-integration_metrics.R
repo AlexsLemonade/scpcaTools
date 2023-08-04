@@ -71,7 +71,7 @@ test_that("`calculate_silhouette_width` works as expected", {
   nreps <- 5
   asw <- calculate_silhouette_width(
     merged_sce = merged_sce,
-    pc_name = "PCA",
+    pc_names = "PCA",
     nreps = 5,
     batch_column = "sample"
   )
@@ -97,20 +97,20 @@ test_that("`calculate_silhouette_width` works as expected", {
 test_that("`calculate_silhouette_width`fails as expected", {
   # missing pc name
   expect_error(calculate_silhouette_width(merged_sce,
-    pc_name = "test_PC",
+    pc_names = "test_PC",
     batch_column = "sample"
   ))
 
   # error in nreps
   expect_error(calculate_silhouette_width(merged_sce,
-    pc_name = "PCA",
+    pc_names = "PCA",
     nreps = "twenty",
     batch_column = "sample"
   ))
 
   # incorrect batch labels
   expect_error(calculate_silhouette_width(merged_sce,
-    pc_name = "PCA",
+    pc_names = "PCA",
     batch_column = "batch"
   ))
 })
