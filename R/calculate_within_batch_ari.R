@@ -3,11 +3,14 @@
 #'
 #' @param individual_sce_list A named list of individual SCE objects. It is
 #'  assumed these have a reduced dimension slot with principal components named "PCA".
-#' @param pc_names A list of names that allow access to the PCs in the merged SCE
+#' @param pc_names A list of names of the PCs in the merged SCE `reducedDim` slot
 #'  object. Example: c("PCA", "fastMNN_PCA"). A within-batch ARI will be returned for each `pc_name`.
 #' @param merged_sce The merged SCE object containing data from multiple batches
 #' @param batch_column The variable in `merged_sce` indicating the grouping of interest.
 #'  Generally this is either batches or cell types. Default is "library_id".
+#' @param BLUSPARAM A BlusterParam object specifying the clustering algorithm to
+#'   use and any additional clustering options. Default is
+#'   `bluster::NNGraphParam(cluster.fun = "louvain", type = "jaccard")`
 #' @param seed Seed for initializing random sampling
 #'
 #' @return Tibble with three columns: `ari`, representing the calculated ARI values;
@@ -22,6 +25,7 @@ calculate_within_batch_ari <- function(individual_sce_list,
                                        pc_names,
                                        merged_sce,
                                        batch_column = "library_id",
+                                       BLUSPARAM = bluster::NNGraphParam(cluster.fun = "louvain", type = "jaccard"),
                                        seed = NULL) {
   # Set the seed for subsampling and clustering
   set.seed(seed)
@@ -48,7 +52,7 @@ calculate_within_batch_ari <- function(individual_sce_list,
   }
 
   # Check that `pc_name` is in merged SCE object
-  if (!any(pc_names %in% reducedDimNames(merged_sce))) {
+  if (!all(pc_names %in% reducedDimNames(merged_sce))) {
     stop("One or more of the PC names provided in `pc_names` cannot be found in the `merged_sce`.")
   }
 
@@ -60,7 +64,8 @@ calculate_within_batch_ari <- function(individual_sce_list,
       within_batch_ari_from_pcs(
         merged_sce = merged_sce,
         batch_column = batch_column,
-        pc_name = pcs
+        pc_name = pcs,
+        BLUSPARAM = BLUSPARAM
       )
     ) |>
     dplyr::bind_rows()
@@ -75,22 +80,18 @@ calculate_within_batch_ari <- function(individual_sce_list,
 #'   SingleCellExperiment object
 #' @param batch_column The variable in `merged_sce` indicating the grouping of interest.
 #'  Generally this is either batches or cell types. Default is "library_id".
+#' @param BLUSPARAM A BlusterParam object specifying the clustering algorithm to
+#'   use and any additional clustering options. Default is
+#'   `bluster::NNGraphParam(cluster.fun = "louvain", type = "jaccard")`
 #'
 #' @return Tibble with three columns: `ari`, representing the calculated ARI values;
 #'   `batch_id`, the batch id associated with each `ari`; `pc_name`, the name
 #'   associated with the pc results
 within_batch_ari_from_pcs <-
-  function(merged_sce, pc_name, batch_column = "library_id") {
-    # Check that `pc_name` is in merged SCE object
-    if (!pc_name %in% reducedDimNames(merged_sce)) {
-      stop("The provided `pc_name` cannot be found in the `merged_sce` object.")
-    }
-
-    # Check that `batch_column` is in colData of SCE
-    if (!batch_column %in% colnames(colData(merged_sce))) {
-      stop("The specified batch column is missing from the colData of the `merged_sce`.")
-    }
-
+  function(merged_sce,
+           pc_name,
+           batch_column = "library_id",
+           BLUSPARAM = bluster::NNGraphParam(cluster.fun = "louvain", type = "jaccard")) {
     # Pull out the PCs or analogous reduction from merged object
     merged_pcs <- reducedDim(merged_sce, pc_name)
 
@@ -98,39 +99,48 @@ within_batch_ari_from_pcs <-
     merged_sce <- merged_sce |>
       cluster_sce(
         pc_name = pc_name,
-        BLUSPARAM = bluster::NNGraphParam(cluster.fun = "louvain", type = "jaccard"),
+        BLUSPARAM = BLUSPARAM,
         cluster_column_name = "merged_clusters"
       )
 
-    merged_clusters <- merged_sce$merged_clusters |>
-      purrr::set_names(merged_sce[[batch_column]])
-
     # For every batch id, cluster and then calculate ARI for that batch
-    all_ari <- batch_ids |>
-      purrr::map_dbl(\(batch) {
-        # Cluster pc matrix for specified batch
-        individual_clustering_result <-
-          individual_sce_list[[batch]] |>
-          cluster_sce(
-            pc_name = "PCA",
-            BLUSPARAM = bluster::NNGraphParam(cluster.fun = "louvain", type = "jaccard"),
-            cluster_column_name = "individual_clusters"
-          )
+    all_ari <-
+      purrr::map(
+        batch_ids,
+        \(batch) {
+          # Cluster pc matrix for specified batch
+          individual_clustering_result <-
+            individual_sce_list[[batch]] |>
+            cluster_sce(
+              pc_name = "PCA",
+              BLUSPARAM = BLUSPARAM,
+              cluster_column_name = "individual_clusters"
+            )
 
-        # Extract clusters from merged clustering for batch
-        clusters_to_keep <- grep(batch, merged_sce[[batch_column]])
-        batch_merged_clusters <- merged_clusters[clusters_to_keep]
+          # Extract cells from merged clustering for batch
+          merged_clusters <- merged_sce$merged_clusters |>
+            purrr::set_names(colData(merged_sce)[["cell_id"]])
+          cells_to_keep <- which(merged_sce[[batch_column]] == batch)
+          batch_merged_clusters <- merged_clusters[cells_to_keep]
 
-        # Calculate ARI between pre-merged clustering and post-merged clustering for the given batch
-        ari <-
-          bluster::pairwiseRand(
-            individual_clustering_result$individual_clusters,
-            batch_merged_clusters,
-            mode = "index"
-          )
+          # Check order of cells
+          if (!all.equal(names(batch_merged_clusters), colnames(individual_clustering_result))) {
+            stop(
+              "The cell barcodes of the merged and individual clustering results are not the same or are not in the same order."
+            )
+          }
 
-        return(ari)
-      })
+          # Calculate ARI between pre-merged clustering and post-merged clustering for the given batch
+          ari <-
+            bluster::pairwiseRand(
+              individual_clustering_result$individual_clusters,
+              batch_merged_clusters,
+              mode = "index"
+            )
+
+          return(ari)
+        }
+      )
 
     # Create tibble with ARI and batch id
     within_batch_ari_tibble <- tibble::tibble(
