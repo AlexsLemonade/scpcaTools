@@ -7,41 +7,45 @@ blus_param <- bluster::KmeansParam(centers = 10)
 
 
 test_that("cluster_sce function works when correctly specified", {
-
   sce_clustered <- cluster_sce(sce,
-                               BLUSPARAM = blus_param,
-                               cluster_column_name = cluster_colname)
+    BLUSPARAM = blus_param,
+    cluster_column_name = cluster_colname
+  )
 
   # Does the output look as expected?
   expect_true(cluster_colname %in% names(colData(sce_clustered)))
-  expect_equal(levels(sce_clustered[[cluster_colname]]),
-               as.character(1:10))
+  expect_equal(
+    levels(sce_clustered[[cluster_colname]]),
+    as.character(1:10)
+  )
 })
 
 test_that("cluster_sce function should fail when inputs incorrectly specified", {
-
   expect_error(
     cluster_sce("not an sce object",
-                BLUSPARAM = blus_param,
-                cluster_column_name = cluster_colname)
+      BLUSPARAM = blus_param,
+      cluster_column_name = cluster_colname
+    )
   )
 
   expect_error(
     cluster_sce(sce,
-                pc_name = "definitely not the PCA name",
-                BLUSPARAM = blus_param,
-                cluster_column_name = cluster_colname)
+      pc_name = "definitely not the PCA name",
+      BLUSPARAM = blus_param,
+      cluster_column_name = cluster_colname
+    )
   )
 
   expect_error(
     cluster_sce(sce,
-                BLUSPARAM = "not a bluster param",
-                cluster_column_name = cluster_colname)
+      BLUSPARAM = "not a bluster parameter",
+      cluster_column_name = cluster_colname
+    )
   )
 
   expect_error(
     cluster_sce(sce,
-                BLUSPARAM = blus_param)
+      BLUSPARAM = blus_param
+    )
   )
-
 })

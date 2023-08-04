@@ -4,13 +4,16 @@
 \alias{filter_pcs}
 \title{Remove cells with NA batch label from PCs and label rownames}
 \usage{
-filter_pcs(pcs, batches)
+filter_pcs(pcs, batches, rename_pcs = TRUE)
 }
 \arguments{
 \item{pcs}{The PCs to be filtered and labeled}
 
 \item{batches}{Vector of cell-wise batch information whose length is the number of
 rows in `pcs`}
+
+\item{rename_pcs}{Whether to rename the PC rownames with the cell's batch label.
+Default is `TRUE`.}
 }
 \value{
 PCs with NA batch cells removed and labeled rownames
