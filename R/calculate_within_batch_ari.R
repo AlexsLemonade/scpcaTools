@@ -12,6 +12,7 @@
 #'   use and any additional clustering options. Default is
 #'   `bluster::NNGraphParam(cluster.fun = "louvain", type = "jaccard")`
 #' @param seed Seed for initializing random sampling
+#' @param ... Additional arguments to provide to `bluster::clusterRows()` within `cluster_sce()`
 #'
 #' @return Tibble with three columns: `ari`, representing the calculated ARI values;
 #'   `batch_id`, the batch id associated with each `ari`; `pc_name`, the name
@@ -26,7 +27,8 @@ calculate_within_batch_ari <- function(individual_sce_list,
                                        merged_sce,
                                        batch_column = "library_id",
                                        BLUSPARAM = bluster::NNGraphParam(cluster.fun = "louvain", type = "jaccard"),
-                                       seed = NULL) {
+                                       seed = NULL,
+                                       ...) {
   # Set the seed for subsampling and clustering
   set.seed(seed)
 
@@ -83,6 +85,7 @@ calculate_within_batch_ari <- function(individual_sce_list,
 #' @param BLUSPARAM A BlusterParam object specifying the clustering algorithm to
 #'   use and any additional clustering options. Default is
 #'   `bluster::NNGraphParam(cluster.fun = "louvain", type = "jaccard")`
+#' @param ... Additional arguments to provide to `bluster::clusterRows()` within `cluster_sce()`
 #'
 #' @return Tibble with three columns: `ari`, representing the calculated ARI values;
 #'   `batch_id`, the batch id associated with each `ari`; `pc_name`, the name
@@ -91,7 +94,8 @@ within_batch_ari_from_pcs <-
   function(merged_sce,
            pc_name,
            batch_column = "library_id",
-           BLUSPARAM = bluster::NNGraphParam(cluster.fun = "louvain", type = "jaccard")) {
+           BLUSPARAM = bluster::NNGraphParam(cluster.fun = "louvain", type = "jaccard"),
+           ...) {
     # Pull out the PCs or analogous reduction from merged object
     merged_pcs <- reducedDim(merged_sce, pc_name)
 

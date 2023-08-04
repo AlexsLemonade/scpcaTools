@@ -8,7 +8,8 @@ within_batch_ari_from_pcs(
   merged_sce,
   pc_name,
   batch_column = "library_id",
-  BLUSPARAM = bluster::NNGraphParam(cluster.fun = "louvain", type = "jaccard")
+  BLUSPARAM = bluster::NNGraphParam(cluster.fun = "louvain", type = "jaccard"),
+  ...
 )
 }
 \arguments{
@@ -23,6 +24,8 @@ Generally this is either batches or cell types. Default is "library_id".}
 \item{BLUSPARAM}{A BlusterParam object specifying the clustering algorithm to
 use and any additional clustering options. Default is
 `bluster::NNGraphParam(cluster.fun = "louvain", type = "jaccard")`}
+
+\item{...}{Additional arguments to provide to `bluster::clusterRows()` within `cluster_sce()`}
 }
 \value{
 Tibble with three columns: `ari`, representing the calculated ARI values;
