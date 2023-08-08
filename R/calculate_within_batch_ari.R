@@ -37,22 +37,6 @@ calculate_within_batch_ari <- function(individual_sce_list,
     stop("The specified batch column is missing from the colData of the `merged_sce`.")
   }
 
-  # Check that list of SCE objects is named
-  batch_ids <- names(individual_sce_list)
-  if (is.null(batch_ids)) {
-    stop("Must provide a named list of SCE objects.")
-  } else {
-    # Make sure the batch ids provided match between the list and the merged object
-    if (!(identical(
-      sort(batch_ids),
-      sort(unique(colData(merged_sce)[, batch_column]))
-    ))
-    ) {
-      stop("Names of provided SCE objects included in the individual SCE object
-           do not match batch IDs present in the batch_column of the merged object")
-    }
-  }
-
   # Check that `pc_name` is in merged SCE object
   if (!all(pc_names %in% reducedDimNames(merged_sce))) {
     stop("One or more of the PC names provided in `pc_names` cannot be found in the `merged_sce`.")
@@ -64,6 +48,7 @@ calculate_within_batch_ari <- function(individual_sce_list,
       pc_names,
       \(pcs)
       within_batch_ari_from_pcs(
+        individual_sce_list = individual_sce_list,
         merged_sce = merged_sce,
         batch_column = batch_column,
         pc_name = pcs,
@@ -77,6 +62,8 @@ calculate_within_batch_ari <- function(individual_sce_list,
 
 #' Calculate within-batch ARI using provided PCs for use in integration metric calculations
 #'
+#' @param individual_sce_list A named list of individual SCE objects. It is
+#'  assumed these have a reduced dimension slot with principal components named "PCA".
 #' @param merged_sce The merged SCE object containing data from multiple batches
 #' @param pc_name The name used to access the PCA results stored in the
 #'   SingleCellExperiment object
@@ -91,7 +78,8 @@ calculate_within_batch_ari <- function(individual_sce_list,
 #'   `batch_id`, the batch id associated with each `ari`; `pc_name`, the name
 #'   associated with the pc results
 within_batch_ari_from_pcs <-
-  function(merged_sce,
+  function(individual_sce_list,
+           merged_sce,
            pc_name,
            batch_column = "library_id",
            BLUSPARAM = bluster::NNGraphParam(cluster.fun = "louvain", type = "jaccard"),
@@ -106,6 +94,22 @@ within_batch_ari_from_pcs <-
         BLUSPARAM = BLUSPARAM,
         cluster_column_name = "merged_clusters"
       )
+
+    # Check that list of SCE objects is named
+    batch_ids <- names(individual_sce_list)
+    if (is.null(batch_ids)) {
+      stop("Must provide a named list of SCE objects.")
+    } else {
+      # Make sure the batch ids provided match between the list and the merged object
+      if (!(identical(
+        sort(batch_ids),
+        sort(unique(colData(merged_sce)[, batch_column]))
+      ))
+      ) {
+        stop("Names of provided SCE objects included in the individual SCE object
+           do not match batch IDs present in the batch_column of the merged object")
+      }
+    }
 
     # For every batch id, cluster and then calculate ARI for that batch
     all_ari <-

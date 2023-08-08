@@ -5,6 +5,7 @@
 \title{Calculate within-batch ARI using provided PCs for use in integration metric calculations}
 \usage{
 within_batch_ari_from_pcs(
+  individual_sce_list,
   merged_sce,
   pc_name,
   batch_column = "library_id",
@@ -13,6 +14,9 @@ within_batch_ari_from_pcs(
 )
 }
 \arguments{
+\item{individual_sce_list}{A named list of individual SCE objects. It is
+assumed these have a reduced dimension slot with principal components named "PCA".}
+
 \item{merged_sce}{The merged SCE object containing data from multiple batches}
 
 \item{pc_name}{The name used to access the PCA results stored in the
