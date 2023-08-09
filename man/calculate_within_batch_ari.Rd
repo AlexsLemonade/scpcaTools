@@ -9,6 +9,7 @@ calculate_within_batch_ari(
   pc_names,
   merged_sce,
   batch_column = "library_id",
+  barcode_column = "barcode",
   BLUSPARAM = bluster::NNGraphParam(cluster.fun = "louvain", type = "jaccard"),
   seed = NULL,
   ...
@@ -25,6 +26,9 @@ object. Example: c("PCA", "fastMNN_PCA"). A within-batch ARI will be returned fo
 
 \item{batch_column}{The variable in `merged_sce` indicating the grouping of interest.
 Generally this is either batches or cell types. Default is "library_id".}
+
+\item{barcode_column}{The variable in `merged_sce` indicating the original cell barcode.
+Default is "barcode".}
 
 \item{BLUSPARAM}{A BlusterParam object specifying the clustering algorithm to
 use and any additional clustering options. Default is

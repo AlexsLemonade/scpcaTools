@@ -8,6 +8,8 @@
 #' @param merged_sce The merged SCE object containing data from multiple batches
 #' @param batch_column The variable in `merged_sce` indicating the grouping of interest.
 #'  Generally this is either batches or cell types. Default is "library_id".
+#' @param barcode_column The variable in `merged_sce` indicating the original cell barcode.
+#'  Default is "barcode".
 #' @param BLUSPARAM A BlusterParam object specifying the clustering algorithm to
 #'   use and any additional clustering options. Default is
 #'   `bluster::NNGraphParam(cluster.fun = "louvain", type = "jaccard")`
@@ -26,6 +28,7 @@ calculate_within_batch_ari <- function(individual_sce_list,
                                        pc_names,
                                        merged_sce,
                                        batch_column = "library_id",
+                                       barcode_column = "barcode",
                                        BLUSPARAM = bluster::NNGraphParam(cluster.fun = "louvain", type = "jaccard"),
                                        seed = NULL,
                                        ...) {
@@ -36,6 +39,12 @@ calculate_within_batch_ari <- function(individual_sce_list,
   if (!batch_column %in% colnames(colData(merged_sce))) {
     stop("The specified batch column is missing from the colData of the `merged_sce`.")
   }
+
+  # Check that `barcode_column` is in colData of SCE
+  if (!barcode_column %in% colnames(colData(merged_sce))) {
+    stop("The specified barcode column is missing from the colData of the `merged_sce`.")
+  }
+
 
   # Check that `pc_name` is in merged SCE object
   if (!all(pc_names %in% reducedDimNames(merged_sce))) {
@@ -51,6 +60,7 @@ calculate_within_batch_ari <- function(individual_sce_list,
         individual_sce_list = individual_sce_list,
         merged_sce = merged_sce,
         batch_column = batch_column,
+        barcode_column = barcode_column,
         pc_name = pcs,
         BLUSPARAM = BLUSPARAM
       )
@@ -69,6 +79,8 @@ calculate_within_batch_ari <- function(individual_sce_list,
 #'   SingleCellExperiment object
 #' @param batch_column The variable in `merged_sce` indicating the grouping of interest.
 #'  Generally this is either batches or cell types. Default is "library_id".
+#' @param barcode_column The variable in `merged_sce` indicating the original cell barcode.
+#'  Default is "barcode".
 #' @param BLUSPARAM A BlusterParam object specifying the clustering algorithm to
 #'   use and any additional clustering options. Default is
 #'   `bluster::NNGraphParam(cluster.fun = "louvain", type = "jaccard")`
@@ -82,8 +94,15 @@ within_batch_ari_from_pcs <-
            merged_sce,
            pc_name,
            batch_column = "library_id",
+           barcode_column = "barcode",
            BLUSPARAM = bluster::NNGraphParam(cluster.fun = "louvain", type = "jaccard"),
            ...) {
+
+    # Check that `pc_name` is in merged SCE object
+    if (!(pc_name %in% reducedDimNames(merged_sce))) {
+      stop("The PC name provided in `pc_names` cannot be found in the `merged_sce`.")
+    }
+
     # Pull out the PCs or analogous reduction from merged object
     merged_pcs <- reducedDim(merged_sce, pc_name)
 
@@ -127,7 +146,7 @@ within_batch_ari_from_pcs <-
 
           # Extract cells from merged clustering for batch
           merged_clusters <- merged_sce$merged_clusters |>
-            purrr::set_names(colData(merged_sce)[["cell_id"]])
+            purrr::set_names(colData(merged_sce)[[barcode_column]])
           cells_to_keep <- which(merged_sce[[batch_column]] == batch)
           batch_merged_clusters <- merged_clusters[cells_to_keep]
 
