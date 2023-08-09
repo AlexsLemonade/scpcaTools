@@ -9,6 +9,7 @@ calculate_within_batch_ari(
   pc_names,
   merged_sce,
   batch_column = "library_id",
+  cell_id_column = "cell_id",
   BLUSPARAM = bluster::NNGraphParam(cluster.fun = "louvain", type = "jaccard"),
   seed = NULL,
   ...
@@ -16,7 +17,8 @@ calculate_within_batch_ari(
 }
 \arguments{
 \item{individual_sce_list}{A named list of individual SCE objects. It is
-assumed these have a reduced dimension slot with principal components named "PCA".}
+assumed these have a reduced dimension slot with principal components named "PCA".
+Column names of each object should match the contents of the `cell_id_column` for the `merged_sce.`}
 
 \item{pc_names}{A list of names of the PCs in the merged SCE `reducedDim` slot
 object. Example: c("PCA", "fastMNN_PCA"). A within-batch ARI will be returned for each `pc_name`.}
@@ -25,6 +27,9 @@ object. Example: c("PCA", "fastMNN_PCA"). A within-batch ARI will be returned fo
 
 \item{batch_column}{The variable in `merged_sce` indicating the grouping of interest.
 Generally this is either batches or cell types. Default is "library_id".}
+
+\item{cell_id_column}{The variable in `merged_sce` indicating the original cell barcode.
+Default is "cell_id".}
 
 \item{BLUSPARAM}{A BlusterParam object specifying the clustering algorithm to
 use and any additional clustering options. Default is
