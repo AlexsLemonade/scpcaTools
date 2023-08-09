@@ -23,7 +23,15 @@ pcs <- reducedDim(merged_sce, "PCA")
 batches <- merged_sce$sample
 
 # create list of sce objects
-sce_list <- split(merged_sce, colData(merged_sce)$sample)
+batch_ids <- unique(batches)
+sce_list <- purrr::map(batch_ids,
+                       \(batch){
+                         individual_sce <- merged_sce[, which(colData(merged_sce)$sample == batch)]
+                         # individual sce object columns should be named without batches
+                         colnames(individual_sce) <- stringr::word(colnames(individual_sce), -1, sep = "-")
+                         return(individual_sce)
+                       }) |>
+  purrr::set_names(batch_ids)
 
 test_that("`filter_pcs` works as expected", {
   # expect rownames of returned pcs to be the same as the batch column
@@ -171,7 +179,7 @@ test_that("`within_batch_ari_from_pcs`fails as expected", {
   unnamed_sce_list <- sce_list
   names(unnamed_sce_list) <- NULL
 
-  expect_error(within_batch_ari_from_pcs(individual_sce_list = sce_list,
+  expect_error(within_batch_ari_from_pcs(individual_sce_list = unnamed_sce_list,
                                          merged_sce = merged_sce,
                                          pc_name = "PCA",
                                          batch_column = "sample",
