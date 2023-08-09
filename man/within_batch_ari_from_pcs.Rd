@@ -9,7 +9,7 @@ within_batch_ari_from_pcs(
   merged_sce,
   pc_name,
   batch_column = "library_id",
-  barcode_column = "barcode",
+  barcode_column = "cell_id",
   BLUSPARAM = bluster::NNGraphParam(cluster.fun = "louvain", type = "jaccard"),
   ...
 )
@@ -28,7 +28,7 @@ SingleCellExperiment object}
 Generally this is either batches or cell types. Default is "library_id".}
 
 \item{barcode_column}{The variable in `merged_sce` indicating the original cell barcode.
-Default is "barcode".}
+Default is "cell_id".}
 
 \item{BLUSPARAM}{A BlusterParam object specifying the clustering algorithm to
 use and any additional clustering options. Default is

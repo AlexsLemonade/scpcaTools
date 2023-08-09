@@ -10,7 +10,7 @@
 #' @param batch_column The variable in `merged_sce` indicating the grouping of interest.
 #'  Generally this is either batches or cell types. Default is "library_id".
 #' @param barcode_column The variable in `merged_sce` indicating the original cell barcode.
-#'  Default is "barcode".
+#'  Default is "cell_id".
 #' @param BLUSPARAM A BlusterParam object specifying the clustering algorithm to
 #'   use and any additional clustering options. Default is
 #'   `bluster::NNGraphParam(cluster.fun = "louvain", type = "jaccard")`
@@ -29,7 +29,7 @@ calculate_within_batch_ari <- function(individual_sce_list,
                                        pc_names,
                                        merged_sce,
                                        batch_column = "library_id",
-                                       barcode_column = "barcode",
+                                       barcode_column = "cell_id",
                                        BLUSPARAM = bluster::NNGraphParam(cluster.fun = "louvain", type = "jaccard"),
                                        seed = NULL,
                                        ...) {
@@ -82,7 +82,7 @@ calculate_within_batch_ari <- function(individual_sce_list,
 #' @param batch_column The variable in `merged_sce` indicating the grouping of interest.
 #'  Generally this is either batches or cell types. Default is "library_id".
 #' @param barcode_column The variable in `merged_sce` indicating the original cell barcode.
-#'  Default is "barcode".
+#'  Default is "cell_id".
 #' @param BLUSPARAM A BlusterParam object specifying the clustering algorithm to
 #'   use and any additional clustering options. Default is
 #'   `bluster::NNGraphParam(cluster.fun = "louvain", type = "jaccard")`
@@ -96,7 +96,7 @@ within_batch_ari_from_pcs <-
            merged_sce,
            pc_name,
            batch_column = "library_id",
-           barcode_column = "barcode",
+           barcode_column = "cell_id",
            BLUSPARAM = bluster::NNGraphParam(cluster.fun = "louvain", type = "jaccard"),
            ...) {
 

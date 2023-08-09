@@ -11,7 +11,7 @@ rownames(colData(merged_sce)) <- new_rownames
 # Add "sample" to colData
 colData(merged_sce)$sample <- batches
 # add barcode to colData
-colData(merged_sce)$barcode <- barcodes
+colData(merged_sce)$cell_id <- barcodes
 
 # add PCs for testing (exact numbers don't matter)
 # make a 300x100 matrix
@@ -135,7 +135,7 @@ test_that("`within_batch_ari_from_pcs` works as expected", {
                                             merged_sce = merged_sce,
                                             pc_name = "PCA",
                                             batch_column = "sample",
-                                            barcode_column = "barcode")
+                                            barcode_column = "cell_id")
 
   expected_cols <- c(
     "ari", "batch_id", "pc_name"
@@ -158,7 +158,7 @@ test_that("`within_batch_ari_from_pcs`fails as expected", {
                                          merged_sce = merged_sce,
                                          pc_name = "test_PC",
                                          batch_column = "sample",
-                                         barcode_column = "barcode"))
+                                         barcode_column = "cell_id"))
 
 
   # incorrect batch labels
@@ -166,7 +166,7 @@ test_that("`within_batch_ari_from_pcs`fails as expected", {
                                          merged_sce = merged_sce,
                                          pc_name = "PCA",
                                          batch_column = "batch",
-                                         barcode_column = "barcode"))
+                                         barcode_column = "cell_id"))
   # incorrect barcode label
   expect_error(within_batch_ari_from_pcs(individual_sce_list = sce_list,
                                          merged_sce = merged_sce,
@@ -183,7 +183,7 @@ test_that("`within_batch_ari_from_pcs`fails as expected", {
                                          merged_sce = merged_sce,
                                          pc_name = "PCA",
                                          batch_column = "sample",
-                                         barcode_column = "barcode"))
+                                         barcode_column = "cell_id"))
 
 })
 
@@ -196,7 +196,7 @@ test_that("`calculate_within_batch_ari` works as expected", {
                                     merged_sce = merged_sce,
                                     pc_names = c("PCA", "fastMNN_PCA"),
                                     batch_column = "sample",
-                                    barcode_column = "barcode")
+                                    barcode_column = "cell_id")
 
   expected_cols <- c(
     "ari", "batch_id", "pc_name"
@@ -219,7 +219,7 @@ test_that("`calculate_within_batch_ari`fails as expected", {
                                           merged_sce = merged_sce,
                                           pc_names = "test_PC",
                                           batch_column = "sample",
-                                          barcode_column = "barcode"))
+                                          barcode_column = "cell_id"))
 
 
   # incorrect batch labels
@@ -227,7 +227,7 @@ test_that("`calculate_within_batch_ari`fails as expected", {
                                          merged_sce = merged_sce,
                                          pc_names = c("PCA", "fastMNN_PCA"),
                                          batch_column = "batch",
-                                         barcode_column = "barcode"))
+                                         barcode_column = "cell_id"))
 
   # incorrect barcode labels
   expect_error(within_batch_ari_from_pcs(individual_sce_list = sce_list,
