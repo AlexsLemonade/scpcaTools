@@ -135,7 +135,7 @@ test_that("`within_batch_ari_from_pcs` works as expected", {
                                             merged_sce = merged_sce,
                                             pc_name = "PCA",
                                             batch_column = "sample",
-                                            barcode_column = "cell_id")
+                                            cell_id_column = "cell_id")
 
   expected_cols <- c(
     "ari", "batch_id", "pc_name"
@@ -158,7 +158,7 @@ test_that("`within_batch_ari_from_pcs`fails as expected", {
                                          merged_sce = merged_sce,
                                          pc_name = "test_PC",
                                          batch_column = "sample",
-                                         barcode_column = "cell_id"))
+                                         cell_id_column = "cell_id"))
 
 
   # incorrect batch labels
@@ -166,13 +166,13 @@ test_that("`within_batch_ari_from_pcs`fails as expected", {
                                          merged_sce = merged_sce,
                                          pc_name = "PCA",
                                          batch_column = "batch",
-                                         barcode_column = "cell_id"))
+                                         cell_id_column = "cell_id"))
   # incorrect barcode label
   expect_error(within_batch_ari_from_pcs(individual_sce_list = sce_list,
                                          merged_sce = merged_sce,
                                          pc_name = "PCA",
                                          batch_column = "sample",
-                                         barcode_column = "not a barcode"))
+                                         cell_id_column = "not a barcode"))
 
   ## missing names for sce list
   # save to a new variable so we can use the sce list again later
@@ -183,7 +183,7 @@ test_that("`within_batch_ari_from_pcs`fails as expected", {
                                          merged_sce = merged_sce,
                                          pc_name = "PCA",
                                          batch_column = "sample",
-                                         barcode_column = "cell_id"))
+                                         cell_id_column = "cell_id"))
 
 })
 
@@ -196,7 +196,7 @@ test_that("`calculate_within_batch_ari` works as expected", {
                                     merged_sce = merged_sce,
                                     pc_names = c("PCA", "fastMNN_PCA"),
                                     batch_column = "sample",
-                                    barcode_column = "cell_id")
+                                    cell_id_column = "cell_id")
 
   expected_cols <- c(
     "ari", "batch_id", "pc_name"
@@ -219,7 +219,7 @@ test_that("`calculate_within_batch_ari`fails as expected", {
                                           merged_sce = merged_sce,
                                           pc_names = "test_PC",
                                           batch_column = "sample",
-                                          barcode_column = "cell_id"))
+                                          cell_id_column = "cell_id"))
 
 
   # incorrect batch labels
@@ -227,14 +227,14 @@ test_that("`calculate_within_batch_ari`fails as expected", {
                                          merged_sce = merged_sce,
                                          pc_names = c("PCA", "fastMNN_PCA"),
                                          batch_column = "batch",
-                                         barcode_column = "cell_id"))
+                                         cell_id_column = "cell_id"))
 
   # incorrect barcode labels
   expect_error(within_batch_ari_from_pcs(individual_sce_list = sce_list,
                                          merged_sce = merged_sce,
                                          pc_names = c("PCA", "fastMNN_PCA"),
                                          batch_column = "sample",
-                                         barcode_column = "not a barcode"))
+                                         cell_id_column = "not a barcode"))
 
 })
 
