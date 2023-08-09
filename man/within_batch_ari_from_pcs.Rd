@@ -16,7 +16,8 @@ within_batch_ari_from_pcs(
 }
 \arguments{
 \item{individual_sce_list}{A named list of individual SCE objects. It is
-assumed these have a reduced dimension slot with principal components named "PCA".}
+assumed these have a reduced dimension slot with principal components named "PCA".
+Column names of each object should match the contents of the `barcode_column` for the `merged_sce.`}
 
 \item{merged_sce}{The merged SCE object containing data from multiple batches}
 

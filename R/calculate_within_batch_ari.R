@@ -3,6 +3,7 @@
 #'
 #' @param individual_sce_list A named list of individual SCE objects. It is
 #'  assumed these have a reduced dimension slot with principal components named "PCA".
+#'  Column names of each object should match the contents of the `barcode_column` for the `merged_sce.`
 #' @param pc_names A list of names of the PCs in the merged SCE `reducedDim` slot
 #'  object. Example: c("PCA", "fastMNN_PCA"). A within-batch ARI will be returned for each `pc_name`.
 #' @param merged_sce The merged SCE object containing data from multiple batches
@@ -74,6 +75,7 @@ calculate_within_batch_ari <- function(individual_sce_list,
 #'
 #' @param individual_sce_list A named list of individual SCE objects. It is
 #'  assumed these have a reduced dimension slot with principal components named "PCA".
+#'  Column names of each object should match the contents of the `barcode_column` for the `merged_sce.`
 #' @param merged_sce The merged SCE object containing data from multiple batches
 #' @param pc_name The name used to access the PCA results stored in the
 #'   SingleCellExperiment object
