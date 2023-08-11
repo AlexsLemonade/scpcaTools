@@ -104,8 +104,7 @@ test_that("`calculate_silhouette_width` works as expected", {
   expect_true(all(sort(unique(asw$rep)) == 1:nreps))
 
   # check that width is in expected range
-  expect_true(all(asw$silhouette_width >= -1 |
-    asw$silhouette_width <= 1))
+  expect_true(all(dplyr::between(asw$silhouette_width, -1, 1)))
 })
 
 test_that("`calculate_silhouette_width`fails as expected", {
@@ -147,8 +146,9 @@ test_that("`within_batch_ari_from_pcs` works as expected", {
   expect_true(all(ari_from_pcs$pc_name == "PCA"))
 
   # check that ari is in expected range
-  expect_true(all(ari_from_pcs$ari >= 0 |
-                    ari_from_pcs$ari <= 1))
+  expect_true(all(
+    dplyr::between(ari_from_pcs$ari, -1, 1)
+  ))
 })
 
 test_that("`within_batch_ari_from_pcs`fails as expected", {
@@ -192,7 +192,7 @@ test_that("`calculate_within_batch_ari` works as expected", {
   # add fastmnn pca to test multiple pcs
   reducedDim(merged_sce, "fastMNN_PCA") <- matrix(runif(303 * 100, min = 0, max = 100), nrow = 303)
 
-  ari <- calculate_within_batch_ari(individual_sce_list = sce_list,
+  ari <- scpcaTools::calculate_within_batch_ari(individual_sce_list = sce_list,
                                     merged_sce = merged_sce,
                                     pc_names = c("PCA", "fastMNN_PCA"),
                                     batch_column = "sample",
@@ -208,8 +208,9 @@ test_that("`calculate_within_batch_ari` works as expected", {
   expect_true(all(ari$pc_name %in% c("PCA", "fastMNN_PCA")))
 
   # check that ari is in expected range
-  expect_true(all(ari$ari >= 0 |
-                    ari$ari <= 1))
+  expect_true(all(
+    dplyr::between(ari$ari, -1, 1)
+  ))
 })
 
 test_that("`calculate_within_batch_ari`fails as expected", {
