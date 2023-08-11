@@ -134,7 +134,7 @@ within_batch_ari_from_pcs <-
 
     # For every batch id, cluster and then calculate ARI for that batch
     all_ari <-
-      purrr::map(
+      purrr::map_dbl(
         batch_ids,
         \(batch) {
           # Cluster pc matrix for specified batch
