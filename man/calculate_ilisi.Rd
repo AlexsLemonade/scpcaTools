@@ -16,7 +16,8 @@ Generally this is either batches or cell types. Default is "library_id".}
 }
 \value{
 Data frame with three columns, one row per cell. Columns are `ilisi_score`,
-  `cell_barcode`, and `batch_id`
+ `ilisi_score_norm`, `cell_barcode`, and `batch_id`. The column `ilisi_score_norm`
+ is a normalized version if `ilisi_score` where values range from [0,1], inclusive
 }
 \description{
 Calculate iLISI (integration Local Inverse Simpson's Index) scores

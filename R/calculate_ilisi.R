@@ -8,7 +8,8 @@
 #'
 #'
 #' @return Data frame with three columns, one row per cell. Columns are `ilisi_score`,
-#'   `cell_barcode`, and `batch_id`
+#'  `ilisi_score_norm`, `cell_barcode`, and `batch_id`. The column `ilisi_score_norm`
+#'  is a normalized version if `ilisi_score` where values range from [0,1], inclusive
 #'
 #' @import SingleCellExperiment
 #'
@@ -44,6 +45,9 @@ calculate_ilisi <- function(merged_sce,
   # Create data frame for input to lisi calculation
   batch_df <- data.frame(batch = rownames(labeled_pcs))
 
+  # calculate number of unique batches for later normalization
+  num_batches <- length(unique(batch_df$batch))
+
   # Calculate iLISI score
   ilisi_df <- lisi::compute_lisi(
     labeled_pcs,
@@ -55,7 +59,10 @@ calculate_ilisi <- function(merged_sce,
     dplyr::rename(ilisi_score = batch) |>
     dplyr::mutate(
       cell_barcode = rownames(labeled_pcs),
-      batch_id = batch_df$batch
+      batch_id = batch_df$batch,
+      # add normalized iLISI score as in in scib approach:
+      # https://github.com/theislab/scib/blob/067eb1aee7044f5ce0652fa363ec8deab0e9668d/scib/metrics/lisi.py#L98-L100
+      ilisi_score_norm = (ilisi_score - 1)/(num_batches - 1)
     )
 
   # Return data frame with cell-wise iLISI scores and associated cell & batch identifiers

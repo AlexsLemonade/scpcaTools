@@ -245,14 +245,17 @@ test_that("`calculate_ilisi` works as expected", {
                            batch_column = "sample")
 
   expected_cols <- c(
-    "ilisi_score", "cell_barcode", "batch_id"
+    "ilisi_score", "cell_barcode", "batch_id", "ilisi_score_norm"
   )
   # check column names
   expect_true(all(expected_cols %in% colnames(ilisi)))
 
-  # check that ilisi is in expected range
-  expect_true(all(ilisi$ilisi_score >= 0 |
-                    ilisi$ilisi_score <= 1))
+  # check that normalized ilisi scores are in in expected range
+  expect_true(
+    all(
+      dplyr::between(ilisi$ilisi_score_norm, 0, 1)
+    )
+  )
 })
 
 test_that("`calculate_ilisi` fails as expected", {
