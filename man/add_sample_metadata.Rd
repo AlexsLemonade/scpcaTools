@@ -4,12 +4,15 @@
 \alias{add_sample_metadata}
 \title{Add data frame with sample metadata to an SCE object}
 \usage{
-add_sample_metadata(sce, metadata_df)
+add_sample_metadata(sce, metadata_df, sample_id_column)
 }
 \arguments{
 \item{sce}{SingleCellExperiment object to add metadata too}
 
 \item{metadata_df}{A dataframe with metadata to add to the sce.}
+
+\item{sample_id_column}{Name of column in `metadata_df` that contains the sample ids.
+The contents of this column should be equivalent to the `sample_id` in `metadata(sce)`}
 }
 \value{
 SingleCellExperiment object with a `metadata_df` added to the `sample_metadata`

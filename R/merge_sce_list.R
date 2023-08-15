@@ -174,12 +174,10 @@ merge_sce_list <- function(sce_list = list(),
   if("sample_metadata" %in% names(metadata_list)){
     all_sample_metadata <- metadata_list[names(metadata_list) == "sample_metadata"] |>
       purrr::map(as.data.frame) |>
-      dplyr::bind_rows()
+      dplyr::bind_rows() |>
+      unique()
 
-    metadata_list <- c(
-      metadata_list,
-      sample_metadata = list(all_sample_metadata)
-    )
+    metadata_list[["sample_metadata"]] <- all_sample_metadata
   }
 
   metadata(merged_sce) <- metadata_list
