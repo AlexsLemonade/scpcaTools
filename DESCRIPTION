@@ -14,6 +14,9 @@ Authors@R: c(
     person(c("Stephanie", "J."), "Spielman",
            email = "stephanie.spielman@ccdatalab.org",
            comment = list(ORCID = "0000-0002-9090-4788"),
+           role = c("aut")),
+    person(c("Chanté", "J."), "Bethell",
+           comment = list(ORCID = "0000-0001-9653-8128"),
            role = c("aut"))
     )
 Maintainer: Ally Hawkins <ally.hawkins@ccdatalab.org>
@@ -62,7 +65,7 @@ Suggests:
     Seurat,
     testthat (>= 3.0.0),
     zellkonverter
-Remotes: 
+Remotes:
     AlexsLemonade/scpcaData,
     github::immunogenomics/lisi
 Config/testthat/edition: 3
