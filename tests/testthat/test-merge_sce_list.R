@@ -62,8 +62,8 @@ test_that("`prepare_sce_for_merge` works as expected when all columns are presen
     cell_id_column,
     shared_features,
     retain_coldata_cols,
-    preserve_rowdata_cols,
-    combine_metadata_cols
+    combine_metadata_cols,
+    preserve_rowdata_cols
   )
 
   expect_equal(ncol(result_sce), total_cells) # cells
@@ -147,6 +147,7 @@ test_that("merging SCEs with matching genes works as expected", {
     batch_column = batch_column,
     # "total" should get removed
     retain_coldata_cols = retain_coldata_cols,
+    combine_metadata_cols = combine_metadata_cols,
     # this row name should not be modified:
     preserve_rowdata_cols = c("gene_names")
   )
@@ -260,6 +261,6 @@ test_that("merging SCEs without names works as expected", {
 })
 
 test_that("merging SCEs with metadata that isn't in the object fails as expected", {
-  expect_error(merge_sce_list(sce_list,
-                              combine_metadata_cols = "no column"))
+  expect_warning(merge_sce_list(sce_list,
+                                combine_metadata_cols = "no column"))
 })

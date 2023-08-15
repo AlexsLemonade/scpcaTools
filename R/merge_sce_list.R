@@ -178,7 +178,7 @@ merge_sce_list <- function(sce_list = list(),
 
     metadata_list <- c(
       metadata_list,
-      sample_metadata = list(all_sample_metaata)
+      sample_metadata = list(all_sample_metadata)
     )
   }
 
