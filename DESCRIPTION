@@ -1,7 +1,7 @@
 Package: scpcaTools
 Type: Package
 Title: Single cell data tools for ScPCA
-Version: 0.2.3
+Version: 0.3.0
 Authors@R: c(
     person("Ally", "Hawkins",
            email = "ally.hawkins@ccdatalab.org",
@@ -27,10 +27,10 @@ Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.2.3
 Depends:
-    R (>= 4.2.0)
+    R (>= 4.3.0)
 Imports:
     BiocGenerics,
-    bluster,
+    bluster (>= 1.10),
     dplyr,
     DropletUtils,
     fishpond,
@@ -39,7 +39,7 @@ Imports:
     jsonlite,
     Matrix,
     methods,
-    miQC (>= 1.2.0),
+    miQC,
     purrr,
     rlang,
     S4Vectors,
@@ -66,6 +66,5 @@ Suggests:
     testthat (>= 3.0.0),
     zellkonverter
 Remotes:
-    AlexsLemonade/scpcaData,
-    github::immunogenomics/lisi
+    AlexsLemonade/scpcaData
 Config/testthat/edition: 3

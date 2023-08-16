@@ -17,7 +17,7 @@ being integrated.}
 \item{covariate_cols}{A vector of other columns to consider as
 covariates during integration.}
 
-\item{...}{Additional arguments to pass into `harmony::harmonyMatrix()`}
+\item{...}{Additional arguments to pass into `harmony::HarmonyMatrix()`}
 }
 \value{
 Integrated PCs as calculated by `harmony`
