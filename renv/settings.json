@@ -1,5 +1,5 @@
 {
-  "bioconductor.version": "3.16",
+  "bioconductor.version": "3.17",
   "external.libraries": [],
   "ignored.packages": [
     "scpcaData"
@@ -9,7 +9,9 @@
     "Depends",
     "LinkingTo"
   ],
-  "r.version": "4.2.3",
+  "ppm.enabled": true,
+  "ppm.ignored.urls": [],
+  "r.version": "4.3.1",
   "snapshot.type": "implicit",
   "use.cache": true,
   "vcs.ignore.cellar": true,
