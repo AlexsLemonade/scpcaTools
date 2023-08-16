@@ -15,7 +15,7 @@
 #'   use and any additional clustering options. Default is
 #'   `bluster::NNGraphParam(cluster.fun = "louvain", type = "jaccard")`
 #' @param seed Seed for initializing random sampling
-#' @param ... Additional arguments to provide to `bluster::clusterRows()` within `cluster_sce()`
+#' @param ... Additional arguments to provide to `scran::clusterCells()`
 #'
 #' @return Tibble with three columns: `ari`, representing the calculated ARI values;
 #'   `batch_id`, the batch id associated with each `ari`; `pc_name`, the name
@@ -86,7 +86,7 @@ calculate_within_batch_ari <- function(individual_sce_list,
 #' @param BLUSPARAM A BlusterParam object specifying the clustering algorithm to
 #'   use and any additional clustering options. Default is
 #'   `bluster::NNGraphParam(cluster.fun = "louvain", type = "jaccard")`
-#' @param ... Additional arguments to provide to `bluster::clusterRows()` within `cluster_sce()`
+#' @param ... Additional arguments to provide to `scran::clusterCells()`
 #'
 #' @return Tibble with three columns: `ari`, representing the calculated ARI values;
 #'   `batch_id`, the batch id associated with each `ari`; `pc_name`, the name
@@ -108,11 +108,11 @@ within_batch_ari_from_pcs <-
     merged_pcs <- reducedDim(merged_sce, pc_name)
 
     # Cluster merged pcs only one time
-    merged_sce <- merged_sce |>
-      cluster_sce(
-        pc_name = pc_name,
+    merged_sce$merged_clusters <- merged_sce |>
+      scran::clusterCells(
+        use.dimred = pc_name,
         BLUSPARAM = BLUSPARAM,
-        cluster_column_name = "merged_clusters"
+        ...
       )
 
     # Check that list of SCE objects is named
@@ -137,12 +137,11 @@ within_batch_ari_from_pcs <-
         batch_ids,
         \(batch) {
           # Cluster pc matrix for specified batch
-          individual_clustering_result <-
-            individual_sce_list[[batch]] |>
-            cluster_sce(
-              pc_name = "PCA",
+          individual_clusters <- individual_sce_list[[batch]] |>
+            scran::clusterCells(
+              use.dimred = "PCA",
               BLUSPARAM = BLUSPARAM,
-              cluster_column_name = "individual_clusters"
+              ...
             )
 
           # Extract cells from merged clustering for batch
@@ -152,7 +151,7 @@ within_batch_ari_from_pcs <-
           batch_merged_clusters <- merged_clusters[cells_to_keep]
 
           # Check order of cells
-          if (!all.equal(names(batch_merged_clusters), colnames(individual_clustering_result))) {
+          if (!all.equal(names(batch_merged_clusters), colnames(individual_sce_list[[batch]]))) {
             stop(
               "The cell barcodes of the merged and individual clustering results are not the same or are not in the same order."
             )
@@ -161,7 +160,7 @@ within_batch_ari_from_pcs <-
           # Calculate ARI between pre-merged clustering and post-merged clustering for the given batch
           ari <-
             bluster::pairwiseRand(
-              individual_clustering_result$individual_clusters,
+              individual_clusters,
               batch_merged_clusters,
               mode = "index"
             )

@@ -37,7 +37,7 @@ use and any additional clustering options. Default is
 
 \item{seed}{Seed for initializing random sampling}
 
-\item{...}{Additional arguments to provide to `bluster::clusterRows()` within `cluster_sce()`}
+\item{...}{Additional arguments to provide to `scran::clusterCells()`}
 }
 \value{
 Tibble with three columns: `ari`, representing the calculated ARI values;
