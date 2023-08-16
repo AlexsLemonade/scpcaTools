@@ -24,13 +24,15 @@ batches <- merged_sce$sample
 
 # create list of sce objects
 batch_ids <- unique(batches)
-sce_list <- purrr::map(batch_ids,
-                       \(batch){
-                         individual_sce <- merged_sce[, which(colData(merged_sce)$sample == batch)]
-                         # individual sce object columns should be named without batches
-                         colnames(individual_sce) <- stringr::word(colnames(individual_sce), -1, sep = "-")
-                         return(individual_sce)
-                       }) |>
+sce_list <- purrr::map(
+  batch_ids,
+  \(batch){
+    individual_sce <- merged_sce[, which(colData(merged_sce)$sample == batch)]
+    # individual sce object columns should be named without batches
+    colnames(individual_sce) <- stringr::word(colnames(individual_sce), -1, sep = "-")
+    return(individual_sce)
+  }
+) |>
   purrr::set_names(batch_ids)
 
 test_that("`filter_pcs` works as expected", {
@@ -129,12 +131,13 @@ test_that("`calculate_silhouette_width`fails as expected", {
 })
 
 test_that("`within_batch_ari_from_pcs` works as expected", {
-
-  ari_from_pcs <- within_batch_ari_from_pcs(individual_sce_list = sce_list,
-                                            merged_sce = merged_sce,
-                                            pc_name = "PCA",
-                                            batch_column = "sample",
-                                            cell_id_column = "cell_id")
+  ari_from_pcs <- within_batch_ari_from_pcs(
+    individual_sce_list = sce_list,
+    merged_sce = merged_sce,
+    pc_name = "PCA",
+    batch_column = "sample",
+    cell_id_column = "cell_id"
+  )
 
   expected_cols <- c(
     "ari", "batch_id", "pc_name"
@@ -152,51 +155,58 @@ test_that("`within_batch_ari_from_pcs` works as expected", {
 })
 
 test_that("`within_batch_ari_from_pcs`fails as expected", {
-
   # missing pc name
-  expect_error(within_batch_ari_from_pcs(individual_sce_list = sce_list,
-                                         merged_sce = merged_sce,
-                                         pc_name = "test_PC",
-                                         batch_column = "sample",
-                                         cell_id_column = "cell_id"))
+  expect_error(within_batch_ari_from_pcs(
+    individual_sce_list = sce_list,
+    merged_sce = merged_sce,
+    pc_name = "test_PC",
+    batch_column = "sample",
+    cell_id_column = "cell_id"
+  ))
 
 
   # incorrect batch labels
-  expect_error(within_batch_ari_from_pcs(individual_sce_list = sce_list,
-                                         merged_sce = merged_sce,
-                                         pc_name = "PCA",
-                                         batch_column = "batch",
-                                         cell_id_column = "cell_id"))
+  expect_error(within_batch_ari_from_pcs(
+    individual_sce_list = sce_list,
+    merged_sce = merged_sce,
+    pc_name = "PCA",
+    batch_column = "batch",
+    cell_id_column = "cell_id"
+  ))
   # incorrect barcode label
-  expect_error(within_batch_ari_from_pcs(individual_sce_list = sce_list,
-                                         merged_sce = merged_sce,
-                                         pc_name = "PCA",
-                                         batch_column = "sample",
-                                         cell_id_column = "not a barcode"))
+  expect_error(within_batch_ari_from_pcs(
+    individual_sce_list = sce_list,
+    merged_sce = merged_sce,
+    pc_name = "PCA",
+    batch_column = "sample",
+    cell_id_column = "not a barcode"
+  ))
 
   ## missing names for sce list
   # save to a new variable so we can use the sce list again later
   unnamed_sce_list <- sce_list
   names(unnamed_sce_list) <- NULL
 
-  expect_error(within_batch_ari_from_pcs(individual_sce_list = unnamed_sce_list,
-                                         merged_sce = merged_sce,
-                                         pc_name = "PCA",
-                                         batch_column = "sample",
-                                         cell_id_column = "cell_id"))
-
+  expect_error(within_batch_ari_from_pcs(
+    individual_sce_list = unnamed_sce_list,
+    merged_sce = merged_sce,
+    pc_name = "PCA",
+    batch_column = "sample",
+    cell_id_column = "cell_id"
+  ))
 })
 
 test_that("`calculate_within_batch_ari` works as expected", {
-
   # add fastmnn pca to test multiple pcs
   reducedDim(merged_sce, "fastMNN_PCA") <- matrix(runif(303 * 100, min = 0, max = 100), nrow = 303)
 
-  ari <- scpcaTools::calculate_within_batch_ari(individual_sce_list = sce_list,
-                                    merged_sce = merged_sce,
-                                    pc_names = c("PCA", "fastMNN_PCA"),
-                                    batch_column = "sample",
-                                    cell_id_column = "cell_id")
+  ari <- scpcaTools::calculate_within_batch_ari(
+    individual_sce_list = sce_list,
+    merged_sce = merged_sce,
+    pc_names = c("PCA", "fastMNN_PCA"),
+    batch_column = "sample",
+    cell_id_column = "cell_id"
+  )
 
   expected_cols <- c(
     "ari", "batch_id", "pc_name"
@@ -214,36 +224,41 @@ test_that("`calculate_within_batch_ari` works as expected", {
 })
 
 test_that("`calculate_within_batch_ari`fails as expected", {
-
   # missing pc name
-  expect_error(calculate_within_batch_ari(individual_sce_list = sce_list,
-                                          merged_sce = merged_sce,
-                                          pc_names = "test_PC",
-                                          batch_column = "sample",
-                                          cell_id_column = "cell_id"))
+  expect_error(calculate_within_batch_ari(
+    individual_sce_list = sce_list,
+    merged_sce = merged_sce,
+    pc_names = "test_PC",
+    batch_column = "sample",
+    cell_id_column = "cell_id"
+  ))
 
 
   # incorrect batch labels
-  expect_error(within_batch_ari_from_pcs(individual_sce_list = sce_list,
-                                         merged_sce = merged_sce,
-                                         pc_names = c("PCA", "fastMNN_PCA"),
-                                         batch_column = "batch",
-                                         cell_id_column = "cell_id"))
+  expect_error(within_batch_ari_from_pcs(
+    individual_sce_list = sce_list,
+    merged_sce = merged_sce,
+    pc_names = c("PCA", "fastMNN_PCA"),
+    batch_column = "batch",
+    cell_id_column = "cell_id"
+  ))
 
   # incorrect barcode labels
-  expect_error(within_batch_ari_from_pcs(individual_sce_list = sce_list,
-                                         merged_sce = merged_sce,
-                                         pc_names = c("PCA", "fastMNN_PCA"),
-                                         batch_column = "sample",
-                                         cell_id_column = "not a barcode"))
-
+  expect_error(within_batch_ari_from_pcs(
+    individual_sce_list = sce_list,
+    merged_sce = merged_sce,
+    pc_names = c("PCA", "fastMNN_PCA"),
+    batch_column = "sample",
+    cell_id_column = "not a barcode"
+  ))
 })
 
 test_that("`calculate_ilisi` works as expected", {
-
-  ilisi <- calculate_ilisi(merged_sce = merged_sce,
-                           pc_name = "PCA",
-                           batch_column = "sample")
+  ilisi <- calculate_ilisi(
+    merged_sce = merged_sce,
+    pc_name = "PCA",
+    batch_column = "sample"
+  )
 
   expected_cols <- c(
     "ilisi_score", "cell_barcode", "batch_id", "ilisi_score_norm"
@@ -260,15 +275,17 @@ test_that("`calculate_ilisi` works as expected", {
 })
 
 test_that("`calculate_ilisi` fails as expected", {
-
   # fails with missing PC name
-  expect_error(calculate_ilisi(merged_sce = merged_sce,
-                               pc_name = "test_PC",
-                               batch_column = "sample"))
+  expect_error(calculate_ilisi(
+    merged_sce = merged_sce,
+    pc_name = "test_PC",
+    batch_column = "sample"
+  ))
 
   # fails with incorrect batch column
-  expect_error(calculate_ilisi(merged_sce = merged_sce,
-                               pc_name = "PCA",
-                               batch_column = "library_id"))
-
+  expect_error(calculate_ilisi(
+    merged_sce = merged_sce,
+    pc_name = "PCA",
+    batch_column = "library_id"
+  ))
 })

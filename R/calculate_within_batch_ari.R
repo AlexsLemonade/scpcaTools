@@ -99,7 +99,6 @@ within_batch_ari_from_pcs <-
            cell_id_column = "cell_id",
            BLUSPARAM = bluster::NNGraphParam(cluster.fun = "louvain", type = "jaccard"),
            ...) {
-
     # Check that `pc_name` is in merged SCE object
     if (!(pc_name %in% reducedDimNames(merged_sce))) {
       stop("The PC name provided in `pc_names` cannot be found in the `merged_sce`.")
