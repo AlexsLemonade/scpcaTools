@@ -106,14 +106,16 @@ merge_sce_list <- function(sce_list = list(),
   }
 
   # check that library id and sample id are present in metadata
-  all_metadata_names <- purrr::map(sce_list, ~ names(metadata(.))) |>
-    unlist() |>
-    unname() |>
-    unique()
+id_checks <- sce_list |>
+  purrr::map(\(sce){
+    all(c("library_id", "sample_id") %in% names(metadata(sce)))
+  }) |>
+  unlist()
+  
+if (!all(id_checks)){
+  stop("The metadata for each SCE object must contain `library_id` and `sample_id`.")
+}
 
-  if (!(any(c("library_id", "sample_id") %in% all_metadata_names))) {
-    warning("The SCE object metadata must contain `library_id` and `sample_id`.")
-  }
 
 
   # Prepare SCEs

@@ -23,16 +23,16 @@ add_sample_metadata <- function(sce,
 
   # sample id column should be present in metadata
   if(!"sample_id" %in% colnames(metadata_df)){
-    stop("`sample_id_column` not found in `metadata_df`")
+    stop("No column named `sample_id` in `metadata_df`")
   }
 
   # filter to relevant sample ids
   metadata_df <- metadata_df |>
     dplyr::filter(.data$sample_id %in% metadata(sce)$sample_id)
 
-  # check that sample id in object corresponds to the sample id column in metadata being added
-  if(!all.equal(sort(metadata_df$sample_id), sort(metadata(sce)$sample_id))){
-    stop("Sample ids in SCE object do not match the contents of `sample_id_column` in `metadata_df`")
+  # check that sample ids in the object are found in the metadata data frame
+  if(!all(metadata(sce)$sample_id %in% metadata_df$sample_id)){
+    stop("Sample ids in SCE object are not all present in `metadata_df`")
   }
 
   # add sample metadata
