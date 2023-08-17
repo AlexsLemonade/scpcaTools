@@ -1,5 +1,5 @@
 # helper function to add more info to a simulated SCE ----
-add_sce_data <- function(sce) {
+add_sce_data <- function(sce, batch) {
   # add some coldata columns
   colData(sce)[["sum"]] <- runif(ncol(sce))
   colData(sce)[["detected"]] <- runif(ncol(sce))
@@ -100,6 +100,16 @@ test_that("`prepare_sce_for_merge` works as expected when all columns are presen
   # check that sample metadata is a data frame
   expect_true(
     is.data.frame(metadata(result_sce)$sample_metadata)
+  )
+
+  # check that contents of library id and sample id are correct
+  # since they all have the same library/sample id there should just be 1
+  expect_true(
+    metadata(result_sce)$library_id == "library1"
+  )
+
+  expect_true(
+    metadata(result_sce)$sample_id == "sample1"
   )
 
 })
