@@ -131,7 +131,7 @@ merge_sce_list <- function(sce_list = list(),
     warning("The provided `retain_coldata_cols` are not present in any SCEs.")
   }
 
-  # check that metadat columns are present
+  # check that metadata columns are present
   all_metadata_names <- purrr::map(sce_list, ~ names(metadata(.))) |>
     unlist() |>
     unname() |>
