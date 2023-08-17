@@ -111,7 +111,7 @@ id_checks <- sce_list |>
     all(c("library_id", "sample_id") %in% names(metadata(sce)))
   }) |>
   unlist()
-  
+
 if (!all(id_checks)){
   stop("The metadata for each SCE object must contain `library_id` and `sample_id`.")
 }
@@ -147,22 +147,31 @@ if (!all(id_checks)){
     unlist() |>
     unique()
 
+  # if object has sample metadata then combine into a single data frame
+  if("sample_metadata" %in% names(metadata_list)){
+    sample_metadata <- metadata_list[[names(metadata_list) == "sample_metadata"]] |>
+      dplyr::bind_rows() |>
+      unique()
+
+    # check that all sample ids are found in the new sample metadata and warn if not
+    if(all(sample_ids %in% sample_metadata$sample_id)){
+      warning("Not all sample ids are present in metadata(merged_sce)$sample_metadata.")
+    }
+
+    # assign sample metadata
+    sample_metadata <- sample_metadata
+  } else {
+    # if no sample metadata, set to NULL
+    sample_metadata <- NULL
+  }
+
   # combine into one metadata list
   metadata_list <- list(
     library_id = library_ids,
     sample_id = sample_ids,
-    library_metadata = library_metadata
+    library_metadata = library_metadata,
+    sample_metadata = sample_metadata
   )
-
-  # if object has sample metadata then combine into a single data frame
-  if("sample_metadata" %in% names(metadata_list)){
-    sample_metadata <- metadata_list[names(metadata_list) == "sample_metadata"] |>
-      purrr::map(as.data.frame) |>
-      dplyr::bind_rows() |>
-      unique()
-
-    metadata_list[["sample_metadata"]] <- sample_metadata
-  }
 
   metadata(merged_sce) <- metadata_list
 
@@ -238,8 +247,15 @@ prepare_sce_for_merge <- function(sce,
   # Add `sce_name` to colnames so cell ids can be mapped to originating SCE
   colnames(sce) <- glue::glue("{sce_name}-{colnames(sce)}")
 
-  # separate library and sample metadata
+  # get metadata list
   metadata_list <- metadata(sce)
+
+  # first check that this library hasn't already been merged
+  if("library_metadata" %in% names(metadata_list)){
+    stop("This SCE object appears to be a merged object. We do not support merging objects with objects that have already been merged.")
+  }
+
+  # create library and sample metadata
   library_metadata <- metadata_list[names(metadata_list) != "sample_metadata"]
   sample_metadata <- metadata_list$sample_metadata
 
