@@ -11,7 +11,6 @@ prepare_sce_for_merge(
   cell_id_column,
   shared_features,
   retain_coldata_cols,
-  combine_metadata_cols,
   preserve_rowdata_cols
 )
 }
@@ -33,11 +32,6 @@ have in common}
 If columns are missing from the data, they will be filled with `NA` values.
 The exceptions to this are `barcode_column` and `batch_column` which will be
 populated with respective information.}
-
-\item{combine_metadata_cols}{A vector of column names that appear in originating SCE
-objects' metadata slot that should be combined into a data frame. All specified
-columns will be combined into a single dataframe that is stored in the
-SCE object metadata as 'library_metadata'.}
 
 \item{preserve_rowdata_cols}{A vector of rowData columns which should not be
 renamed}

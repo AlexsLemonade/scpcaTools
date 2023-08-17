@@ -10,11 +10,6 @@ merge_sce_list(
   retain_coldata_cols = c("sum", "detected", "total", "subsets_mito_sum",
     "subsets_mito_detected", "subsets_mito_percent", "miQC_pass", "prob_compromised",
     "barcode"),
-  combine_metadata_cols = c("library_id", "sample_id", "salmon_version",
-    "reference_index", "total_reads", "mapped_reads", "mapping_tool",
-    "alevinfry_version", "af_permit_type", "af_resolution", "usa_mode", "af_num_cells",
-    "tech_version", "transcript_type", "include_unspliced", "filtering_method",
-    "prob_compromised_cutoff", "scpca_filter_method", "min_gene_cutoff", "normalization"),
   preserve_rowdata_cols = NULL,
   cell_id_column = "cell_id"
 )
@@ -30,11 +25,6 @@ are unique library IDs. Default value is `library_id`.}
 
 \item{retain_coldata_cols}{A vector of colData columns which should be retained
 in the the final merged SCE object.}
-
-\item{combine_metadata_cols}{A vector of column names that appear in originating SCE
-objects' metadata slot that should be combined into a single entry in the merged SCE object's
-metadata. All specified columns will be combined into a single dataframe that is stored in the
-merged SCE object metadata as 'library_metadata'.}
 
 \item{preserve_rowdata_cols}{A vector of column names that appear in originating
 SCE objects' rowData slots which should not be renamed with

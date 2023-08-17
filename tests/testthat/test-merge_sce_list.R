@@ -37,7 +37,6 @@ shared_features <- rownames(sce)[1:10]
 retain_coldata_cols <- c("sum", "detected")
 preserve_rowdata_cols <- "gene_names"
 expected_coldata_cols <- sort(c("sum", "detected", batch_column, cell_id_column))
-combine_metadata_cols <- c("library_id", "sample_id")
 
 # Generate some shared data for testing `merge_sce_list()` ------
 sce1 <- sim_sce(n_cells = total_cells / 3, n_genes = total_genes, n_empty = 0)
@@ -62,7 +61,6 @@ test_that("`prepare_sce_for_merge` works as expected when all columns are presen
     cell_id_column,
     shared_features,
     retain_coldata_cols,
-    combine_metadata_cols,
     preserve_rowdata_cols
   )
 
@@ -94,17 +92,12 @@ test_that("`prepare_sce_for_merge` works as expected when all columns are presen
     c("gene_names", paste(sce_name, "other_column", sep = "-"))
   )
 
-  # metadata names
+  # metadata names check
   expect_true(
-    "library_metadata" %in% names(metadata(result_sce))
+    all(c("library_id", "sample_id", "library_metadata", "sample_metadata") %in% names(metadata(result_sce)))
   )
 
-  # check that library metadata is a data frame
-  expect_true(
-    is.data.frame(metadata(result_sce)$library_metadata)
-  )
-
-  # check that sample metadata gets turned into a 2x2 data frame
+  # check that sample metadata is a data frame
   expect_true(
     is.data.frame(metadata(result_sce)$sample_metadata)
   )
@@ -125,7 +118,6 @@ test_that("`prepare_sce_for_merge` works as expected when an expected column is 
     cell_id_column,
     shared_features,
     retain_coldata_cols, # will add detected back in as NA
-    combine_metadata_cols,
     preserve_rowdata_cols
   )
 
@@ -147,7 +139,6 @@ test_that("merging SCEs with matching genes works as expected", {
     batch_column = batch_column,
     # "total" should get removed
     retain_coldata_cols = retain_coldata_cols,
-    combine_metadata_cols = combine_metadata_cols,
     # this row name should not be modified:
     preserve_rowdata_cols = c("gene_names")
   )
@@ -258,9 +249,4 @@ test_that("merging SCEs without names works as expected", {
       rep("3", total_cells / 3)
     )
   )
-})
-
-test_that("merging SCEs with metadata that isn't in the object fails as expected", {
-  expect_warning(merge_sce_list(sce_list,
-                                combine_metadata_cols = "no column"))
 })

@@ -33,10 +33,6 @@
 #'  the given SCE object name or index is name is not given. These are generally
 #'  columns which are not specific to the given library's preparation or statistics.
 #'  For example, such a vector might contain items like "Gene", "ensembl_ids", etc.
-#' @param combine_metadata_cols A vector of column names that appear in originating SCE
-#'   objects' metadata slot that should be combined into a single entry in the merged SCE object's
-#'   metadata. All specified columns will be combined into a single dataframe that is stored in the
-#'   merged SCE object metadata as 'library_metadata'.
 #' @param cell_id_column A character value giving the resulting colData column name
 #'  to hold unique cell IDs formatted as their original row name. Default
 #'  value is `cell_id`.
@@ -58,28 +54,6 @@ merge_sce_list <- function(sce_list = list(),
                              "miQC_pass",
                              "prob_compromised",
                              "barcode"
-                           ),
-                           combine_metadata_cols = c(
-                             "library_id",
-                             "sample_id",
-                             "salmon_version",
-                             "reference_index",
-                             "total_reads",
-                             "mapped_reads",
-                             "mapping_tool",
-                             "alevinfry_version",
-                             "af_permit_type",
-                             "af_resolution",
-                             "usa_mode",
-                             "af_num_cells",
-                             "tech_version",
-                             "transcript_type",
-                             "include_unspliced",
-                             "filtering_method",
-                             "prob_compromised_cutoff",
-                             "scpca_filter_method",
-                             "min_gene_cutoff",
-                             "normalization"
                            ),
                            preserve_rowdata_cols = NULL,
                            cell_id_column = "cell_id") {
@@ -131,14 +105,14 @@ merge_sce_list <- function(sce_list = list(),
     warning("The provided `retain_coldata_cols` are not present in any SCEs.")
   }
 
-  # check that metadata columns are present
+  # check that library id and sample id are present in metadata
   all_metadata_names <- purrr::map(sce_list, ~ names(metadata(.))) |>
     unlist() |>
     unname() |>
     unique()
 
-  if (!(any(combine_metadata_cols %in% all_metadata_names))) {
-    warning("The provided `combine_metadata_cols` are not present in any SCEs.")
+  if (!(any(c("library_id", "sample_id") %in% all_metadata_names))) {
+    warning("The SCE object metadata must contain `library_id` and `sample_id`.")
   }
 
 
@@ -149,7 +123,6 @@ merge_sce_list <- function(sce_list = list(),
       cell_id_column = cell_id_column,
       shared_features = shared_features,
       retain_coldata_cols = retain_coldata_cols,
-      combine_metadata_cols = combine_metadata_cols,
       preserve_rowdata_cols = preserve_rowdata_cols
     )
 
@@ -158,26 +131,35 @@ merge_sce_list <- function(sce_list = list(),
 
   # combine library metadata into a single data frame
   metadata_list <- metadata(merged_sce)
-  metadata_to_keep <- metadata_list[!names(metadata_list) %in% c("library_metadata", "sample_metadata")]
 
+  # create a single list of library metadata
+  library_metadata <- metadata_list[names(metadata_list) == "library_metadata"]
 
-  all_library_metadata <- metadata_list[names(metadata_list) == "library_metadata"] |>
-    purrr::map(as.data.frame) |>
-    dplyr::bind_rows()
+  # get a single list of all library ids
+  library_ids <- metadata(merged_sce)[names(metadata_list) == "library_id"] |>
+    unlist() |>
+    unique()
 
-  metadata_list <- c(
-    library_metadata = list(all_library_metadata),
-    metadata_to_keep
+  # get a single list of all sample ids
+  sample_ids <- metadata(merged_sce)[names(metadata_list) == "sample_id"] |>
+    unlist() |>
+    unique()
+
+  # combine into one metadata list
+  metadata_list <- list(
+    library_id = library_ids,
+    sample_id = sample_ids,
+    library_metadata = library_metadata
   )
 
   # if object has sample metadata then combine into a single data frame
   if("sample_metadata" %in% names(metadata_list)){
-    all_sample_metadata <- metadata_list[names(metadata_list) == "sample_metadata"] |>
+    sample_metadata <- metadata_list[names(metadata_list) == "sample_metadata"] |>
       purrr::map(as.data.frame) |>
       dplyr::bind_rows() |>
       unique()
 
-    metadata_list[["sample_metadata"]] <- all_sample_metadata
+    metadata_list[["sample_metadata"]] <- sample_metadata
   }
 
   metadata(merged_sce) <- metadata_list
@@ -201,10 +183,6 @@ merge_sce_list <- function(sce_list = list(),
 #'   If columns are missing from the data, they will be filled with `NA` values.
 #'   The exceptions to this are `barcode_column` and `batch_column` which will be
 #'   populated with respective information.
-#' @param combine_metadata_cols A vector of column names that appear in originating SCE
-#'   objects' metadata slot that should be combined into a data frame. All specified
-#'   columns will be combined into a single dataframe that is stored in the
-#'   SCE object metadata as 'library_metadata'.
 #' @param preserve_rowdata_cols A vector of rowData columns which should not be
 #'   renamed
 #'
@@ -215,7 +193,6 @@ prepare_sce_for_merge <- function(sce,
                                   cell_id_column,
                                   shared_features,
                                   retain_coldata_cols,
-                                  combine_metadata_cols,
                                   preserve_rowdata_cols) {
   # Current functionality does not retain any present altExps
   sce <- removeAltExps(sce)
@@ -259,21 +236,20 @@ prepare_sce_for_merge <- function(sce,
   # Add `sce_name` to colnames so cell ids can be mapped to originating SCE
   colnames(sce) <- glue::glue("{sce_name}-{colnames(sce)}")
 
-  # merge library metadata
+  # separate library and sample metadata
   metadata_list <- metadata(sce)
+  library_metadata <- metadata_list[names(metadata_list) != "sample_metadata"]
+  sample_metadata <- metadata_list$sample_metadata
 
-  # create a data frame with all the library specific information
-  library_metadata <- metadata_list[names(metadata_list) %in% combine_metadata_cols] |>
-    # combine anything that might have multiple values (e.g., transcript_type becomes "spliced,total")
-    purrr::map(\(metadata) paste(metadata, collapse = ",")) |>
-    as.data.frame()
-
-  # replace existing metadata with library metadata + all other metadata columns not in combine_metadata_cols
-  metadata_to_keep <- metadata_list[!names(metadata_list) %in% combine_metadata_cols]
-  metadata_list <- c(
-    library_metadata = list(library_metadata),
-    metadata_to_keep
+  # combine into one list
+  metadata_list <- list(
+    library_id = metadata(sce)[["library_id"]],
+    sample_id = metadata(sce)[["sample_id"]],
+    library_metadata = library_metadata,
+    sample_metadata = sample_metadata
   )
+
+  # replace existing metadata
   metadata(sce) <- metadata_list
 
   # return the processed SCE
