@@ -28,7 +28,7 @@ set.seed(1665)
 total_cells <- 24 # divisible by 3
 total_genes <- 12 # number of months intentionally.
 sce <- add_sce_data(
-  sim_sce(n_cells = total_cells, n_genes = total_genes, n_empty = 0)
+  scpcaTools:::sim_sce(n_cells = total_cells, n_genes = total_genes, n_empty = 0)
 )
 sce_name <- "sce_object"
 batch_column <- "batch" # not the default
@@ -260,3 +260,13 @@ test_that("merging SCEs without names works as expected", {
     )
   )
 })
+
+test_that("merging SCEs with library metadata fails as expected",{
+
+  # add library metadata to one of the objects in the list
+  metadata(sce_list$sce1)$library_metadata <- "library_metadata"
+
+  expect_error(merge_sce_list(sce_list))
+
+})
+
