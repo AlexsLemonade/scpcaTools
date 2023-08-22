@@ -208,12 +208,12 @@ test_that("merging SCEs with matching genes works as expected", {
 
   # metadata names check
   expect_contains(
-    names(metadata(result_sce)),
+    names(metadata(merged_sce)),
     c("library_id", "sample_id", "library_metadata", "sample_metadata")
   )
 
   # check that sample metadata is a data frame
-  expect_s3_class(metadata(result_sce)$sample_metadata, "data.frame")
+  expect_s3_class(metadata(merged_sce)$sample_metadata, "data.frame")
 
   # library metadata should contain a list of library metadata with all three libraries
   expect_length(
