@@ -149,7 +149,7 @@ merge_sce_list <- function(sce_list = list(),
       unique()
 
     # check that all sample ids are found in the new sample metadata and warn if not
-    if(all(metadata_list$sample_id %in% sample_metadata$sample_id)){
+    if(!all(metadata_list$sample_id %in% sample_metadata$sample_id)){
       warning("Not all sample ids are present in metadata(merged_sce)$sample_metadata.")
     }
 

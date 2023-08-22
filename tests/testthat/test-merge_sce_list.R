@@ -10,11 +10,14 @@ add_sce_data <- function(sce, batch) {
   rowData(sce)[["other_column"]] <- runif(nrow(sce))
 
   # add some metadata
-  metadata(sce)$library_id <- "library1"
-  metadata(sce)$sample_id <- "sample1"
+  library_id <- glue::glue("library-{batch}")
+  sample_id <- glue::glue("sample-{batch}")
+
+  metadata(sce)$library_id <- library_id
+  metadata(sce)$sample_id <- sample_id
   metadata(sce)$sample_metadata <- data.frame(
-    diagnosis = "diagnosis",
-    ontology_id = "ontology"
+    sample_id = sample_id,
+    library_id = library_id
   )
 
   # Copy counts -> logcounts just to make sure the assay is retained
@@ -28,7 +31,8 @@ set.seed(1665)
 total_cells <- 24 # divisible by 3
 total_genes <- 12 # number of months intentionally.
 sce <- add_sce_data(
-  sim_sce(n_cells = total_cells, n_genes = total_genes, n_empty = 0)
+  scpcaTools:::sim_sce(n_cells = total_cells, n_genes = total_genes, n_empty = 0),
+  batch = "1"
 )
 sce_name <- "sce_object"
 batch_column <- "batch" # not the default
@@ -39,10 +43,10 @@ preserve_rowdata_cols <- "gene_names"
 expected_coldata_cols <- sort(c("sum", "detected", batch_column, cell_id_column))
 
 # Generate some shared data for testing `merge_sce_list()` ------
-sce1 <- sim_sce(n_cells = total_cells / 3, n_genes = total_genes, n_empty = 0)
-sce2 <- sim_sce(n_cells = total_cells / 3, n_genes = total_genes, n_empty = 0)
-sce3 <- sim_sce(n_cells = total_cells / 3, n_genes = total_genes, n_empty = 0)
-sce_list <- purrr::map(
+sce1 <- scpcaTools:::sim_sce(n_cells = total_cells / 3, n_genes = total_genes, n_empty = 0)
+sce2 <- scpcaTools:::sim_sce(n_cells = total_cells / 3, n_genes = total_genes, n_empty = 0)
+sce3 <- scpcaTools:::sim_sce(n_cells = total_cells / 3, n_genes = total_genes, n_empty = 0)
+sce_list <- purrr::imap(
   list(
     "sce1" = sce1,
     "sce2" = sce2,
@@ -93,23 +97,23 @@ test_that("`prepare_sce_for_merge` works as expected when all columns are presen
   )
 
   # metadata names check
-  expect_true(
-    all(c("library_id", "sample_id", "library_metadata", "sample_metadata") %in% names(metadata(result_sce)))
+  expect_contains(
+    names(metadata(result_sce)),
+    c("library_id", "sample_id", "library_metadata", "sample_metadata")
   )
 
   # check that sample metadata is a data frame
-  expect_true(
-    is.data.frame(metadata(result_sce)$sample_metadata)
-  )
+  expect_s3_class(metadata(result_sce)$sample_metadata, "data.frame")
 
   # check that contents of library id and sample id are correct
-  # since they all have the same library/sample id there should just be 1
-  expect_true(
-    metadata(result_sce)$library_id == "library1"
+  expect_equal(
+    metadata(result_sce)$library_id,
+    "library-1"
   )
 
-  expect_true(
-    metadata(result_sce)$sample_id == "sample1"
+  expect_equal(
+    metadata(result_sce)$sample_id,
+    "sample-1"
   )
 
 })
@@ -203,32 +207,32 @@ test_that("merging SCEs with matching genes works as expected", {
   )
 
   # metadata names check
-  expect_true(
-    all(c("library_id", "sample_id", "library_metadata", "sample_metadata") %in% names(metadata(merged_sce)))
+  expect_contains(
+    names(metadata(result_sce)),
+    c("library_id", "sample_id", "library_metadata", "sample_metadata")
   )
 
   # check that sample metadata is a data frame
-  expect_true(
-    is.data.frame(metadata(merged_sce)$sample_metadata)
-  )
+  expect_s3_class(metadata(result_sce)$sample_metadata, "data.frame")
 
-  # library metadata should contain a list of library metadata
-  expect_true(
-    length(metadata(merged_sce)$library_metadata) == 3
+  # library metadata should contain a list of library metadata with all three libraries
+  expect_length(
+    length(metadata(merged_sce)$library_metadata),
+    3
   )
 
   # check that contents of library id and sample id are correct
-  # since they all have the same library/sample id there should just be 1 rather than the list
-  expect_true(
-    metadata(merged_sce)$library_id == "library1"
+  expect_setequal(
+    metadata(merged_sce)$library_id,
+    metadata(merged_sce)$sample_metadata$library_id
   )
 
-  expect_true(
-    metadata(merged_sce)$sample_id == "sample1"
+  expect_setequal(
+    metadata(merged_sce)$sample_id,
+    metadata(merged_sce)$sample_metadata$sample_id
   )
 
 })
-
 
 
 test_that("merging SCEs with different genes among input SCEs works as expected", {
