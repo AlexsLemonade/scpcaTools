@@ -28,7 +28,7 @@ set.seed(1665)
 total_cells <- 24 # divisible by 3
 total_genes <- 12 # number of months intentionally.
 sce <- add_sce_data(
-  scpcaTools:::sim_sce(n_cells = total_cells, n_genes = total_genes, n_empty = 0)
+  sim_sce(n_cells = total_cells, n_genes = total_genes, n_empty = 0)
 )
 sce_name <- "sce_object"
 batch_column <- "batch" # not the default
@@ -201,6 +201,32 @@ test_that("merging SCEs with matching genes works as expected", {
     sort(assayNames(merged_sce)),
     c("counts", "logcounts")
   )
+
+  # metadata names check
+  expect_true(
+    all(c("library_id", "sample_id", "library_metadata", "sample_metadata") %in% names(metadata(merged_sce)))
+  )
+
+  # check that sample metadata is a data frame
+  expect_true(
+    is.data.frame(metadata(merged_sce)$sample_metadata)
+  )
+
+  # library metadata should contain a list of library metadata
+  expect_true(
+    length(metadata(merged_sce)$library_metadata) == 3
+  )
+
+  # check that contents of library id and sample id are correct
+  # since they all have the same library/sample id there should just be 1 rather than the list
+  expect_true(
+    metadata(merged_sce)$library_id == "library1"
+  )
+
+  expect_true(
+    metadata(merged_sce)$sample_id == "sample1"
+  )
+
 })
 
 
