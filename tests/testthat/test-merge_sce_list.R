@@ -31,7 +31,7 @@ set.seed(1665)
 total_cells <- 24 # divisible by 3
 total_genes <- 12 # number of months intentionally.
 sce <- add_sce_data(
-  scpcaTools:::sim_sce(n_cells = total_cells, n_genes = total_genes, n_empty = 0),
+  sim_sce(n_cells = total_cells, n_genes = total_genes, n_empty = 0),
   batch = "1"
 )
 sce_name <- "sce_object"
@@ -43,9 +43,9 @@ preserve_rowdata_cols <- "gene_names"
 expected_coldata_cols <- sort(c("sum", "detected", batch_column, cell_id_column))
 
 # Generate some shared data for testing `merge_sce_list()` ------
-sce1 <- scpcaTools:::sim_sce(n_cells = total_cells / 3, n_genes = total_genes, n_empty = 0)
-sce2 <- scpcaTools:::sim_sce(n_cells = total_cells / 3, n_genes = total_genes, n_empty = 0)
-sce3 <- scpcaTools:::sim_sce(n_cells = total_cells / 3, n_genes = total_genes, n_empty = 0)
+sce1 <- sim_sce(n_cells = total_cells / 3, n_genes = total_genes, n_empty = 0)
+sce2 <- sim_sce(n_cells = total_cells / 3, n_genes = total_genes, n_empty = 0)
+sce3 <- sim_sce(n_cells = total_cells / 3, n_genes = total_genes, n_empty = 0)
 sce_list <- purrr::imap(
   list(
     "sce1" = sce1,
@@ -217,7 +217,7 @@ test_that("merging SCEs with matching genes works as expected", {
 
   # library metadata should contain a list of library metadata with all three libraries
   expect_length(
-    length(metadata(merged_sce)$library_metadata),
+    metadata(merged_sce)$library_metadata,
     3
   )
 
