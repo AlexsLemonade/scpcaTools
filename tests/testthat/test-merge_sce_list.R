@@ -91,8 +91,8 @@ test_that("`prepare_sce_for_merge` works as expected when all columns are presen
 
 
   # rowData names and contents:
-  expect_equal(
-    sort(names(rowData(result_sce))),
+  expect_setequal(
+    names(rowData(result_sce)),
     c("gene_names", paste(sce_name, "other_column", sep = "-"))
   )
 
@@ -163,8 +163,8 @@ test_that("merging SCEs with matching genes works as expected", {
   expect_equal(ncol(merged_sce), total_cells)
 
   # colData names and contents:
-  expect_equal(
-    sort(names(colData(merged_sce))),
+  expect_setequal(
+    names(colData(merged_sce)),
     expected_coldata_cols
   )
   expect_equal(
@@ -175,20 +175,18 @@ test_that("merging SCEs with matching genes works as expected", {
       rep("sce3", total_cells / 3)
     )
   )
-  expect_equal(
-    sort(rownames(colData(merged_sce))),
-    sort(
-      c(
+  expect_setequal(
+    rownames(colData(merged_sce)),
+    c(
         glue::glue("sce1-{rownames(colData(sce1))}"),
         glue::glue("sce2-{rownames(colData(sce2))}"),
         glue::glue("sce3-{rownames(colData(sce3))}")
       )
-    )
   )
 
   # rowData names and contents:
-  expect_equal(
-    sort(names(rowData(merged_sce))),
+  expect_setequal(
+    names(rowData(merged_sce)),
     c("gene_names", "sce1-other_column", "sce2-other_column", "sce3-other_column")
   )
   expect_equal(
@@ -201,8 +199,8 @@ test_that("merging SCEs with matching genes works as expected", {
   )
 
   # assays
-  expect_equal(
-    sort(assayNames(merged_sce)),
+  expect_setequal(
+    assayNames(merged_sce),
     c("counts", "logcounts")
   )
 
