@@ -222,6 +222,17 @@ test_that("merging SCEs with matching genes works as expected", {
   # check that contents of library id and sample id are correct
   expect_setequal(
     metadata(merged_sce)$library_id,
+    c("library-sce1", "library-sce2", "library-sce3")
+  )
+
+  expect_setequal(
+    metadata(merged_sce)$sample_id,
+    c("sample-sce1", "sample-sce2", "sample-sce3")
+  )
+
+  # check contents of sample metadata
+  expect_setequal(
+    metadata(merged_sce)$library_id,
     metadata(merged_sce)$sample_metadata$library_id
   )
 
