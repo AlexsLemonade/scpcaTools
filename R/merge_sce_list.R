@@ -105,6 +105,17 @@ merge_sce_list <- function(sce_list = list(),
     warning("The provided `retain_coldata_cols` are not present in any SCEs.")
   }
 
+  # check that library id and sample id are present in metadata
+  id_checks <- sce_list |>
+    purrr::map(\(sce){
+      all(c("library_id", "sample_id") %in% names(metadata(sce)))
+    }) |>
+    unlist()
+
+  if (!all(id_checks)){
+    stop("The metadata for each SCE object must contain `library_id` and `sample_id`.")
+  }
+
   # Prepare SCEs
   sce_list <- sce_list |>
     purrr::imap(prepare_sce_for_merge,
@@ -115,8 +126,43 @@ merge_sce_list <- function(sce_list = list(),
       preserve_rowdata_cols = preserve_rowdata_cols
     )
 
+  # get a list of metadata from the list of sce objects
+  # each library becomes an element within the metadata components
+  metadata_list <- sce_list |>
+    purrr::map(metadata) |>
+    purrr::transpose()
+
+  # flatten and reduce the library ids and sample ids
+  metadata_list$library_id <- metadata_list$library_id |>
+    unlist() |>
+    unique()
+
+  metadata_list$sample_id <- metadata_list$sample_id |>
+    unlist() |>
+    unique()
+
+  # if object has sample metadata then combine into a single data frame
+  if("sample_metadata" %in% names(metadata_list)){
+
+    sample_metadata <- metadata_list$sample_metadata |>
+      dplyr::bind_rows() |>
+      unique()
+
+    # check that all sample ids are found in the new sample metadata and warn if not
+    if(!all(metadata_list$sample_id %in% sample_metadata$sample_id)){
+      warning("Not all sample ids are present in metadata(merged_sce)$sample_metadata.")
+    }
+
+    # replace sample metadata in metadata list
+    metadata_list$sample_metadata <- sample_metadata
+
+  }
+
   # Create the merged SCE from the processed list ------------------
   merged_sce <- do.call(cbind, sce_list)
+
+  # replace existing metadata list with merged metadata
+  metadata(merged_sce) <- metadata_list
 
   return(merged_sce)
 }
@@ -189,6 +235,29 @@ prepare_sce_for_merge <- function(sce,
 
   # Add `sce_name` to colnames so cell ids can be mapped to originating SCE
   colnames(sce) <- glue::glue("{sce_name}-{colnames(sce)}")
+
+  # get metadata list
+  metadata_list <- metadata(sce)
+
+  # first check that this library hasn't already been merged
+  if("library_metadata" %in% names(metadata_list)){
+    stop("This SCE object appears to be a merged object. We do not support merging objects with objects that have already been merged.")
+  }
+
+  # create library and sample metadata
+  library_metadata <- metadata_list[names(metadata_list) != "sample_metadata"]
+  sample_metadata <- metadata_list$sample_metadata
+
+  # combine into one list
+  metadata_list <- list(
+    library_id = metadata(sce)[["library_id"]],
+    sample_id = metadata(sce)[["sample_id"]],
+    library_metadata = library_metadata,
+    sample_metadata = sample_metadata
+  )
+
+  # replace existing metadata
+  metadata(sce) <- metadata_list
 
   # return the processed SCE
   return(sce)
