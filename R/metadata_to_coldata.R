@@ -8,6 +8,8 @@
 #'
 #' @return SingleCellExperiment object with the contents of `metadata(sce)$sample_metadata`
 #'   added as new columns to the `colData(sce)`.
+#' @import SingleCellExperiment
+#'
 #' @export
 #'
 metadata_to_coldata <- function(sce,
@@ -37,11 +39,7 @@ metadata_to_coldata <- function(sce,
   }
 
   # check that batches match in colData and sample metadata
-  coldata_batches <- sce[[batch_column]] |>
-    unique()
-  metadata_batches <- sample_metadata_df[[batch_column]] |>
-    unique()
-  if(!all(metadata_batches %in% coldata_batches)){
+  if(!all(sce[[batch_column]] %in% sample_metadata_df[[batch_column]])){
     stop("The batches in `metadata(sce)$sample_metadata` are not found in the sce object.")
   }
 

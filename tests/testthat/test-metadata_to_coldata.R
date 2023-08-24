@@ -21,9 +21,9 @@ set.seed(1665)
 total_cells <- 24
 total_genes <- 12
 # create three individual objects
-sce1 <- scpcaTools:::sim_sce(n_cells = total_cells / 3, n_genes = total_genes, n_empty = 0)
-sce2 <- scpcaTools:::sim_sce(n_cells = total_cells / 3, n_genes = total_genes, n_empty = 0)
-sce3 <- scpcaTools:::sim_sce(n_cells = total_cells / 3, n_genes = total_genes, n_empty = 0)
+sce1 <- sim_sce(n_cells = total_cells / 3, n_genes = total_genes, n_empty = 0)
+sce2 <- sim_sce(n_cells = total_cells / 3, n_genes = total_genes, n_empty = 0)
+sce3 <- sim_sce(n_cells = total_cells / 3, n_genes = total_genes, n_empty = 0)
 
 # combine into a list
 sce_list <- purrr::imap(
