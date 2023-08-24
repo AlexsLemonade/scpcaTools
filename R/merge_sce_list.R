@@ -205,11 +205,14 @@ prepare_sce_for_merge <- function(sce,
   #  present in `preserve_rowdata_cols`
   original_colnames <- colnames(rowData(sce))
 
-  colnames(rowData(sce)) <- ifelse(
-    original_colnames %in% preserve_rowdata_cols,
-    original_colnames,
-    glue::glue("{sce_name}-{original_colnames}")
-  )
+  # only rename rowData if there is any rowData to begin with
+  if(length(original_colnames) > 0){
+    colnames(rowData(sce)) <- ifelse(
+      original_colnames %in% preserve_rowdata_cols,
+      original_colnames,
+      glue::glue("{sce_name}-{original_colnames}")
+    )
+  }
 
   ##### colData #####
   observed_coldata_names <- names(colData(sce))
