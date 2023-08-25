@@ -4,15 +4,14 @@
 \alias{metadata_to_coldata}
 \title{Add sample metadata to colData of SCE object}
 \usage{
-metadata_to_coldata(sce, batch_column = "library_id")
+metadata_to_coldata(sce, join_columns = "library_id")
 }
 \arguments{
 \item{sce}{SingleCellExperiment object to add sample metadata to colData.
 Must contain the `batch_column` as a column in `colData`.}
 
-\item{batch_column}{A character value giving the colData column name
-to differentiate originating SingleCellExperiment objects. Often these values
-are unique library IDs. Default value is `library_id`.}
+\item{join_column}{A character value giving the names of the columns in colData
+to use for joining with the `sample_metadata`. Default is `library_id`}
 }
 \value{
 SingleCellExperiment object with the contents of `metadata(sce)$sample_metadata`

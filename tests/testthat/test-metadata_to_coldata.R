@@ -6,14 +6,15 @@ metadata(sce)$library_id <- "library_id"
 # create sample data frame
 sample_metadata_df <- data.frame(
   sample_id = "sample_id",
-  library_id = "library_id"
+  library_id = "library_id",
+  diagnosis = "diagnosis"
 )
 
 # add sample metadata to object
 sce <- add_sample_metadata(sce,
                            metadata_df = sample_metadata_df)
 
-# add batch column to sce object
+# add join columns to sce object
 sce$library_id <- "library_id"
 
 # create a merged object for testing the function still works with a merged object
@@ -61,12 +62,12 @@ merged_sce <- merge_sce_list(sce_list = sce_list,
 test_that("`metadata_to_coldata` works as expected with a single object", {
 
   sce_with_metadata <- metadata_to_coldata(sce,
-                                           batch_column = "library_id")
+                                           join_columns = "library_id")
 
   # check that colData now contains sample id column
   expect_contains(
     colnames(colData(sce_with_metadata)),
-    "sample_id"
+    c("sample_id", "diagnosis")
   )
 
   # check that sample id column contains expected value
@@ -77,11 +78,34 @@ test_that("`metadata_to_coldata` works as expected with a single object", {
 
 })
 
+test_that("`metadata_to_coldata` works as expected joining on multiple columns", {
+
+  # add a second join column
+  sce$sample_id <- "sample_id"
+
+  sce_with_metadata <- metadata_to_coldata(sce,
+                                           join_columns = c("library_id", "sample_id"))
+
+  # check that colData now contains sample id column
+  expect_contains(
+    colnames(colData(sce_with_metadata)),
+    c("sample_id", "diagnosis")
+  )
+
+  # check that sample id column contains expected value
+  expect_equal(
+    unique(colData(sce_with_metadata)$sample_id),
+    "sample_id"
+  )
+
+
+})
+
 test_that("`metadata_to_coldata` works as expected with a merged object", {
 
 
   merged_sce_with_metadata <- metadata_to_coldata(merged_sce,
-                                                  batch_column = "library_id")
+                                                  join_columns = "library_id")
 
   # check that colData now contains sample id column
   expect_contains(
@@ -104,22 +128,22 @@ test_that("`metadata_to_coldata` fails as expected", {
 
   # column name is missing from colData
   expect_error(metadata_to_coldata(sce,
-                                   batch_column = "not a column"))
+                                   join_columns = "not a column"))
 
   # column is missing from sample metadata
   # add a new column that is only in the colData and not in the sample metadata
   sce$batch_column <- "library_id"
   expect_error(metadata_to_coldata(sce,
-                                   batch_column = "batch_column"))
+                                   join_columns = "batch_column"))
 
   # no sample metadata present
   metadata(sce) <- metadata(sce)[!names(metadata(sce)) %in% "sample_metadata"]
-  expect_error(metadata_to_coldata(sce,
-                                   batch_column = "library_id"))
+  expect_warning(metadata_to_coldata(sce,
+                                   join_columns = "library_id"))
 
 })
 
-test_that("`metadata_to_coldata` fails with mis-matching library ids", {
+test_that("`metadata_to_coldata` gives a warning with mis-matching library ids", {
 
   # replace existing sample metadata with one that has a library id
   # missing from the sce$library_id column
@@ -129,8 +153,8 @@ test_that("`metadata_to_coldata` fails with mis-matching library ids", {
   )
   metadata(sce)$sample_metadata <- sample_metadata_df
 
-  expect_error(metadata_to_coldata(sce,
-                                   batch_column = "library_id"))
+  expect_warning(metadata_to_coldata(sce,
+                                     join_columns = "library_id"))
 
 })
 
