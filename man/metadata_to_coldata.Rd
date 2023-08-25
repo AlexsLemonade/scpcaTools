@@ -10,7 +10,7 @@ metadata_to_coldata(sce, join_columns = "library_id")
 \item{sce}{SingleCellExperiment object to add sample metadata to colData.
 Must contain the `batch_column` as a column in `colData`.}
 
-\item{join_column}{A character value giving the names of the columns in colData
+\item{join_columns}{A character value giving the names of the columns in colData
 to use for joining with the `sample_metadata`. Default is `library_id`}
 }
 \value{

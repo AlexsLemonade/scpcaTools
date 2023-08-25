@@ -2,7 +2,7 @@
 #'
 #' @param sce SingleCellExperiment object to add sample metadata to colData.
 #'   Must contain the `batch_column` as a column in `colData`.
-#' @param join_column A character value giving the names of the columns in colData
+#' @param join_columns A character value giving the names of the columns in colData
 #'  to use for joining with the `sample_metadata`. Default is `library_id`
 #'
 #' @return SingleCellExperiment object with the contents of `metadata(sce)$sample_metadata`
