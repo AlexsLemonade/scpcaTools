@@ -5,9 +5,9 @@ metadata(sce)$library_id <- "library_id"
 
 # create sample data frame
 sample_metadata_df <- data.frame(
-  sample_id = "sample_id",
-  library_id = "library_id",
-  diagnosis = "diagnosis"
+  sample_id = "sample1",
+  library_id = "library1",
+  diagnosis = "diagnosis1"
 )
 
 # add sample metadata to object
@@ -64,7 +64,7 @@ test_that("`metadata_to_coldata` works as expected with a single object", {
   sce_with_metadata <- metadata_to_coldata(sce,
                                            join_columns = "library_id")
 
-  # check that colData now contains sample id column
+  # check that colData now contains sample id and diagnosis columns
   expect_contains(
     colnames(colData(sce_with_metadata)),
     c("sample_id", "diagnosis")

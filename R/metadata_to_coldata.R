@@ -24,7 +24,8 @@ metadata_to_coldata <- function(sce,
   metadata_list <- metadata(sce)
   if(!"sample_metadata" %in% names(metadata_list)){
     warning("No `sample_metadata` in SCE object to add.")
-  } else{
+    return(sce)
+  }
 
     # check that batch id column is present
     if(!all(join_columns %in% colnames(colData(sce)))) {
@@ -38,7 +39,7 @@ metadata_to_coldata <- function(sce,
       stop("One or more of the specified `join_columns` are not a column in `metadata(sce)$sample_metadata.")
     }
 
-    # check that batches match in colData and sample metadata
+    # check that join columns match in colData and sample metadata
     mismatching_columns <- purrr::map(
       join_columns,
       \(column){
