@@ -1,7 +1,7 @@
 # establish single test sce
 sce <- sim_sce(n_genes = 20, n_cells = 100, n_empty = 0)
-metadata(sce)$sample_id <- "sample_id"
-metadata(sce)$library_id <- "library_id"
+metadata(sce)$sample_id <- "sample1"
+metadata(sce)$library_id <- "library1"
 
 # create sample data frame
 sample_metadata_df <- data.frame(
@@ -15,7 +15,7 @@ sce <- add_sample_metadata(sce,
                            metadata_df = sample_metadata_df)
 
 # add join columns to sce object
-sce$library_id <- "library_id"
+sce$library_id <- "library1"
 
 # create a merged object for testing the function still works with a merged object
 set.seed(1665)
@@ -73,7 +73,7 @@ test_that("`metadata_to_coldata` works as expected with a single object", {
   # check that sample id column contains expected value
   expect_equal(
     unique(colData(sce_with_metadata)$sample_id),
-    "sample_id"
+    "sample1"
   )
 
 })
@@ -81,7 +81,7 @@ test_that("`metadata_to_coldata` works as expected with a single object", {
 test_that("`metadata_to_coldata` works as expected joining on multiple columns", {
 
   # add a second join column
-  sce$sample_id <- "sample_id"
+  sce$sample_id <- "sample1"
 
   sce_with_metadata <- metadata_to_coldata(sce,
                                            join_columns = c("library_id", "sample_id"))
@@ -95,7 +95,7 @@ test_that("`metadata_to_coldata` works as expected joining on multiple columns",
   # check that sample id column contains expected value
   expect_equal(
     unique(colData(sce_with_metadata)$sample_id),
-    "sample_id"
+    "sample1"
   )
 
 
@@ -132,7 +132,7 @@ test_that("`metadata_to_coldata` fails as expected", {
 
   # column is missing from sample metadata
   # add a new column that is only in the colData and not in the sample metadata
-  sce$batch_column <- "library_id"
+  sce$batch_column <- "library1"
   expect_error(metadata_to_coldata(sce,
                                    join_columns = "batch_column"))
 
@@ -148,13 +148,42 @@ test_that("`metadata_to_coldata` gives a warning with mis-matching library ids",
   # replace existing sample metadata with one that has a library id
   # missing from the sce$library_id column
   sample_metadata_df <- data.frame(
-    sample_id = "sample_id",
+    sample_id = "sample1",
     library_id = "not a matching library"
   )
   metadata(sce)$sample_metadata <- sample_metadata_df
 
   expect_warning(metadata_to_coldata(sce,
                                      join_columns = "library_id"))
+
+})
+
+test_that("`metadata_to_coldata` fails with multiple matches", {
+
+  # each library contains cells from multiple samples (multiplexed library)
+  sample_metadata_df <- data.frame(
+    library_id = c("library1", "library1"),
+    sample_id = c("sample1", "sample2")
+  )
+
+  metadata(sce)$sample_metadata <- sample_metadata_df
+
+  # add sample id column
+  sce$sample_id <- rep(c("sample1", "sample2"), 50)
+
+  # only joining on library ids will mean non-unique matches
+  expect_error(metadata_to_coldata(sce,
+                                   join_columns = "library_id"))
+
+  # joining on sample and library ids will mean unique matches and should work
+  sce_with_metadata <- metadata_to_coldata(sce,
+                                           join_columns = c("sample_id", "library_id"))
+
+  # make sure both sample ids are now present in colData
+  expect_setequal(
+    unique(colData(sce_with_metadata)$sample_id),
+    c("sample1", "sample2")
+  )
 
 })
 

@@ -27,42 +27,47 @@ metadata_to_coldata <- function(sce,
     return(sce)
   }
 
-    # check that batch id column is present
-    if(!all(join_columns %in% colnames(colData(sce)))) {
-      stop("One or more of the specified `join_columns` are not in `colData(sce)`.")
-    }
+  # check that batch id column is present
+  if(!all(join_columns %in% colnames(colData(sce)))) {
+    stop("One or more of the specified `join_columns` are not in `colData(sce)`.")
+  }
 
-    # pull out sample metadata
-    sample_metadata_df <- metadata_list$sample_metadata
-    # check that batch column exists
-    if(!all(join_columns %in% colnames(sample_metadata_df))){
-      stop("One or more of the specified `join_columns` are not a column in `metadata(sce)$sample_metadata.")
-    }
+  # pull out sample metadata
+  sample_metadata_df <- metadata_list$sample_metadata
+  # check that batch column exists
+  if(!all(join_columns %in% colnames(sample_metadata_df))){
+    stop("One or more of the specified `join_columns` are not a column in `metadata(sce)$sample_metadata.")
+  }
 
-    # check that join columns match in colData and sample metadata
-    mismatching_columns <- purrr::map(
-      join_columns,
-      \(column){
-        if(!all(sce[[column]] %in% sample_metadata_df[[column]])){
-          return(column)
-        }
-      }) |> unlist()
+  # check that join columns match in colData and sample metadata
+  mismatching_columns <- purrr::map(
+    join_columns,
+    \(column){
+      if(!all(sce[[column]] %in% sample_metadata_df[[column]])){
+        return(column)
+      }
+    }) |> unlist()
 
-    if(!is.null(mismatching_columns)){
-      warning(
-        glue::glue("Contents of {mismatching_columns} do not match the `metadata(sce)$sample_metadata.`")
-        )
-    }
+  if(!is.null(mismatching_columns)){
+    warning(
+      glue::glue("Contents of {mismatching_columns} do not match the `metadata(sce)$sample_metadata.`")
+    )
+  }
 
-    # join coldata with sample metadata
-    coldata_df <- as.data.frame(colData(sce)) |>
-      dplyr::left_join(sample_metadata_df, by = join_columns)
+  # join coldata with sample metadata
+  coldata_df <- as.data.frame(colData(sce)) |>
+    dplyr::left_join(sample_metadata_df, by = join_columns)
 
-    # replace existing coldata
-    colData(sce) <- DataFrame(coldata_df,
-                              row.names = rownames(coldata_df))
+  # check that the number of columns in colData is still the same
+  # make sure that nothing has been duplicated before adding it back into the colData
+  if(nrow(coldata_df) != nrow(colData(sce))){
+    stop("The specified `join_columns` cannot produce multiple matches.")
+  }
 
-    }
+  # replace existing coldata
+  colData(sce) <- DataFrame(coldata_df,
+                            row.names = rownames(coldata_df))
+
 
   # return modified sce with sample metadata
   return(sce)
