@@ -183,3 +183,11 @@ test_that("`metadata_to_coldata` works as expected with multiplexed libraries", 
     c("sample1", "sample2")
   )
 })
+
+test_that("`metadata_to_coldata` gives a warning with no colnames found in the SCE object", {
+
+  colnames(sce) <- NULL
+
+  expect_warning(metadata_to_coldata(sce,
+                                     join_columns = "library_id"))
+})
