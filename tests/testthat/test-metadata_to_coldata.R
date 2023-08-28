@@ -12,7 +12,8 @@ sample_metadata_df <- data.frame(
 
 # add sample metadata to object
 sce <- add_sample_metadata(sce,
-                           metadata_df = sample_metadata_df)
+  metadata_df = sample_metadata_df
+)
 
 # add join columns to sce object
 sce$library_id <- "library1"
@@ -35,7 +36,6 @@ sce_list <- purrr::imap(
   ),
   # add some colData and metadata to each SCE object
   \(sce, batch){
-
     # add some colData so merge_sce_list doesn't give a warning
     colData(sce)[["sum"]] <- runif(ncol(sce))
 
@@ -55,14 +55,16 @@ sce_list <- purrr::imap(
 )
 
 # create merged sce
-merged_sce <- merge_sce_list(sce_list = sce_list,
-                             retain_coldata_cols = "sum")
+merged_sce <- merge_sce_list(
+  sce_list = sce_list,
+  retain_coldata_cols = "sum"
+)
 
 
 test_that("`metadata_to_coldata` works as expected with a single object", {
-
   sce_with_metadata <- metadata_to_coldata(sce,
-                                           join_columns = "library_id")
+    join_columns = "library_id"
+  )
 
   # check that colData now contains sample id and diagnosis columns
   expect_contains(
@@ -75,16 +77,15 @@ test_that("`metadata_to_coldata` works as expected with a single object", {
     unique(colData(sce_with_metadata)$sample_id),
     "sample1"
   )
-
 })
 
 test_that("`metadata_to_coldata` works as expected joining on multiple columns", {
-
   # add a second join column
   sce$sample_id <- "sample1"
 
   sce_with_metadata <- metadata_to_coldata(sce,
-                                           join_columns = c("library_id", "sample_id"))
+    join_columns = c("library_id", "sample_id")
+  )
 
   # check that colData now contains sample id column
   expect_contains(
@@ -97,15 +98,12 @@ test_that("`metadata_to_coldata` works as expected joining on multiple columns",
     unique(colData(sce_with_metadata)$sample_id),
     "sample1"
   )
-
-
 })
 
 test_that("`metadata_to_coldata` works as expected with a merged object", {
-
-
   merged_sce_with_metadata <- metadata_to_coldata(merged_sce,
-                                                  join_columns = "library_id")
+    join_columns = "library_id"
+  )
 
   # check that colData now contains sample id column
   expect_contains(
@@ -118,33 +116,32 @@ test_that("`metadata_to_coldata` works as expected with a merged object", {
     unique(colData(merged_sce_with_metadata)$sample_id),
     c("sce1", "sce2", "sce3")
   )
-
 })
 
 test_that("`metadata_to_coldata` fails as expected", {
-
   # sce is required
   expect_error(metadata_to_coldata(sce = "not an sce"))
 
   # column name is missing from colData
   expect_error(metadata_to_coldata(sce,
-                                   join_columns = "not a column"))
+    join_columns = "not a column"
+  ))
 
   # column is missing from sample metadata
   # add a new column that is only in the colData and not in the sample metadata
   sce$batch_column <- "library1"
   expect_error(metadata_to_coldata(sce,
-                                   join_columns = "batch_column"))
+    join_columns = "batch_column"
+  ))
 
   # no sample metadata present
   metadata(sce) <- metadata(sce)[!names(metadata(sce)) %in% "sample_metadata"]
   expect_warning(metadata_to_coldata(sce,
-                                   join_columns = "library_id"))
-
+    join_columns = "library_id"
+  ))
 })
 
 test_that("`metadata_to_coldata` gives a warning with mis-matching library ids", {
-
   # replace existing sample metadata with one that has a library id
   # missing from the sce$library_id column
   sample_metadata_df <- data.frame(
@@ -154,12 +151,11 @@ test_that("`metadata_to_coldata` gives a warning with mis-matching library ids",
   metadata(sce)$sample_metadata <- sample_metadata_df
 
   expect_warning(metadata_to_coldata(sce,
-                                     join_columns = "library_id"))
-
+    join_columns = "library_id"
+  ))
 })
 
 test_that("`metadata_to_coldata` works as expected with multiplexed libraries", {
-
   # each library contains cells from multiple samples (multiplexed library)
   sample_metadata_df <- data.frame(
     library_id = c("library1", "library1"),
@@ -173,16 +169,17 @@ test_that("`metadata_to_coldata` works as expected with multiplexed libraries", 
 
   # only joining on library ids will mean non-unique matches
   expect_error(metadata_to_coldata(sce,
-                                   join_columns = "library_id"))
+    join_columns = "library_id"
+  ))
 
   # joining on sample and library ids will mean unique matches and should work
   sce_with_metadata <- metadata_to_coldata(sce,
-                                           join_columns = c("sample_id", "library_id"))
+    join_columns = c("sample_id", "library_id")
+  )
 
   # make sure both sample ids are now present in colData
   expect_setequal(
     unique(colData(sce_with_metadata)$sample_id),
     c("sample1", "sample2")
   )
-
 })

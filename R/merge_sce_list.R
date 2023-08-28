@@ -112,7 +112,7 @@ merge_sce_list <- function(sce_list = list(),
     }) |>
     unlist()
 
-  if (!all(id_checks)){
+  if (!all(id_checks)) {
     stop("The metadata for each SCE object must contain `library_id` and `sample_id`.")
   }
 
@@ -142,20 +142,18 @@ merge_sce_list <- function(sce_list = list(),
     unique()
 
   # if object has sample metadata then combine into a single data frame
-  if("sample_metadata" %in% names(metadata_list)){
-
+  if ("sample_metadata" %in% names(metadata_list)) {
     sample_metadata <- metadata_list$sample_metadata |>
       dplyr::bind_rows() |>
       unique()
 
     # check that all sample ids are found in the new sample metadata and warn if not
-    if(!all(metadata_list$sample_id %in% sample_metadata$sample_id)){
+    if (!all(metadata_list$sample_id %in% sample_metadata$sample_id)) {
       warning("Not all sample ids are present in metadata(merged_sce)$sample_metadata.")
     }
 
     # replace sample metadata in metadata list
     metadata_list$sample_metadata <- sample_metadata
-
   }
 
   # Create the merged SCE from the processed list ------------------
@@ -206,7 +204,7 @@ prepare_sce_for_merge <- function(sce,
   original_colnames <- colnames(rowData(sce))
 
   # only rename rowData if there is any rowData to begin with
-  if(length(original_colnames) > 0){
+  if (length(original_colnames) > 0) {
     colnames(rowData(sce)) <- ifelse(
       original_colnames %in% preserve_rowdata_cols,
       original_colnames,
@@ -243,7 +241,7 @@ prepare_sce_for_merge <- function(sce,
   metadata_list <- metadata(sce)
 
   # first check that this library hasn't already been merged
-  if("library_metadata" %in% names(metadata_list)){
+  if ("library_metadata" %in% names(metadata_list)) {
     stop("This SCE object appears to be a merged object. We do not support merging objects with objects that have already been merged.")
   }
 
