@@ -2,13 +2,13 @@
 #'
 #' @param sce SingleCellExperiment object to add sample metadata to colData.
 #'   Must contain the `batch_column` as a column in `colData`.
-#' @param join_columns A character value giving the names of the columns in colData
+#' @param join_columns A character vector giving the name(s) of the column(s) in colData
 #'  to use for joining with the `sample_metadata`. Default is `library_id`
 #'
 #' @return SingleCellExperiment object with the contents of `metadata(sce)$sample_metadata`
 #'   added as new columns to the `colData(sce)`.
 #' @import SingleCellExperiment
-#'
+#' @importFrom S4Vectors DataFrame
 #' @export
 
 metadata_to_coldata <- function(sce,
@@ -61,7 +61,7 @@ metadata_to_coldata <- function(sce,
   # check that the number of columns in colData is still the same
   # make sure that nothing has been duplicated before adding it back into the colData
   if(nrow(coldata_df) != nrow(colData(sce))){
-    stop("The specified `join_columns` cannot produce multiple matches.")
+    stop("The specified `join_columns` are producing multiple matches, but only one match is allowed.")
   }
 
   # replace existing coldata
