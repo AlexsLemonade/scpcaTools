@@ -68,6 +68,9 @@ metadata_to_coldata <- function(sce,
   colData(sce) <- DataFrame(coldata_df,
                             row.names = rownames(coldata_df))
 
+  if(is.null(colnames(sce))){
+    warning("No column names available for returned SCE object.")
+  }
 
   # return modified sce with sample metadata
   return(sce)
