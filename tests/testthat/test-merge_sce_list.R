@@ -115,7 +115,6 @@ test_that("`prepare_sce_for_merge` works as expected when all columns are presen
     metadata(result_sce)$sample_id,
     "sample-1"
   )
-
 })
 
 
@@ -178,10 +177,10 @@ test_that("merging SCEs with matching genes works as expected", {
   expect_setequal(
     rownames(colData(merged_sce)),
     c(
-        glue::glue("sce1-{rownames(colData(sce1))}"),
-        glue::glue("sce2-{rownames(colData(sce2))}"),
-        glue::glue("sce3-{rownames(colData(sce3))}")
-      )
+      glue::glue("sce1-{rownames(colData(sce1))}"),
+      glue::glue("sce2-{rownames(colData(sce2))}"),
+      glue::glue("sce3-{rownames(colData(sce3))}")
+    )
   )
 
   # rowData names and contents:
@@ -240,7 +239,6 @@ test_that("merging SCEs with matching genes works as expected", {
     metadata(merged_sce)$sample_id,
     metadata(merged_sce)$sample_metadata$sample_id
   )
-
 })
 
 
@@ -300,12 +298,9 @@ test_that("merging SCEs without names works as expected", {
   )
 })
 
-test_that("merging SCEs with library metadata fails as expected",{
-
+test_that("merging SCEs with library metadata fails as expected", {
   # add library metadata to one of the objects in the list
   metadata(sce_list$sce1)$library_metadata <- "library_metadata"
 
   expect_error(merge_sce_list(sce_list))
-
 })
-

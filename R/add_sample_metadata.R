@@ -9,25 +9,24 @@
 #' @export
 #'
 add_sample_metadata <- function(sce,
-                                metadata_df){
-
+                                metadata_df) {
   # make sure input is sce
   if (!is(sce, "SingleCellExperiment")) {
     stop("`sce` must be a SingleCellExperiment object.")
   }
 
   # make sure metadata is a dataframe
-  if (!is.data.frame(metadata_df)){
+  if (!is.data.frame(metadata_df)) {
     stop("`metadata_df` must be a data.frame")
   }
 
   # sample id column should be present in metadata
-  if(!"sample_id" %in% colnames(metadata_df)){
+  if (!"sample_id" %in% colnames(metadata_df)) {
     stop("No column named `sample_id` in `metadata_df`")
   }
 
   # check that sample ids in the object are found in the metadata data frame
-  if(!all(metadata(sce)$sample_id %in% metadata_df$sample_id)){
+  if (!all(metadata(sce)$sample_id %in% metadata_df$sample_id)) {
     stop("Sample ids in SCE object are not all present in `metadata_df`")
   }
 
@@ -39,5 +38,4 @@ add_sample_metadata <- function(sce,
   metadata(sce)$sample_metadata <- metadata_df
 
   return(sce)
-
 }

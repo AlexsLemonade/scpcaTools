@@ -62,7 +62,7 @@ calculate_ilisi <- function(merged_sce,
       batch_id = batch_df$batch,
       # add normalized iLISI score as in in scib approach:
       # https://github.com/theislab/scib/blob/067eb1aee7044f5ce0652fa363ec8deab0e9668d/scib/metrics/lisi.py#L98-L100
-      ilisi_score_norm = (ilisi_score - 1)/(num_batches - 1)
+      ilisi_score_norm = (ilisi_score - 1) / (num_batches - 1)
     )
 
   # Return data frame with cell-wise iLISI scores and associated cell & batch identifiers
