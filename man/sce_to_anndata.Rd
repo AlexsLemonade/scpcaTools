@@ -4,12 +4,14 @@
 \alias{sce_to_anndata}
 \title{Convert SingleCellExperiment objects to AnnData file stored as HDF5 file}
 \usage{
-sce_to_anndata(sce, anndata_file)
+sce_to_anndata(sce, anndata_file, x_assay_name = "counts")
 }
 \arguments{
 \item{sce}{SingleCellExperiment object to be converted to AnnData as an HDF5 file}
 
 \item{anndata_file}{Path to output AnnData file. Must be an `.h5` or `.hdf5`}
+
+\item{x_assay_name}{Name of assay in SCE object to save as X in AnnData}
 }
 \value{
 original SingleCellExperiment object used as input (invisibly)
