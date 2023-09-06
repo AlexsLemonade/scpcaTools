@@ -32,7 +32,7 @@ test_that("Conversion of SCE to AnnData works as expected", {
     new_anndata_file
   })
 
-  converted_sce <- zellkonverter::readH5AD(new_anndata_file)
+  converted_sce <- zellkonverter::readH5AD(new_anndata_file, X_name = "X")
   # check that counts is in assay names and no logcounts
   expect_setequal(
     assayNames(converted_sce),
