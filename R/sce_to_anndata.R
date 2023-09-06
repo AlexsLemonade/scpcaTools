@@ -2,7 +2,7 @@
 #'
 #' @param sce SingleCellExperiment object to be converted to AnnData as an HDF5 file
 #' @param anndata_file Path to output AnnData file. Must be an `.h5` or `.hdf5`
-#' @param x_assay_name Name of assay in SCE object to save as X in AnnData
+#' @param x_assay_name Name of assay in SCE object to save as X in AnnData. Default is "counts".
 #'
 #' @return original SingleCellExperiment object used as input (invisibly)
 #' **Note that any columns present in the `rowData` of an SCE object that contains
