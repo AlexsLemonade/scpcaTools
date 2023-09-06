@@ -32,6 +32,19 @@ test_that("Conversion of SCE to AnnData works as expected", {
     new_anndata_file
   })
 
+  converted_sce <- zellkonverter::readH5AD(new_anndata_file)
+  # check that counts is in assay names and no logcounts
+  expect_setequal(
+    assayNames(converted_sce),
+    c("X", "counts", "spliced")
+  )
+
+  # check that X is equal to logcounts
+  expect_equal(
+    logcounts(sce),
+    assay(converted_sce, "X")
+  )
+
 })
 
 test_that("Conversion of SCE to AnnData fails as expected", {
