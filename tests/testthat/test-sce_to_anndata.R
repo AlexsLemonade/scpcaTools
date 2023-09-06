@@ -26,7 +26,7 @@ test_that("Conversion of SCE to AnnData works as expected", {
   # test that H5 file is created with new assay name
   # add logcounts
   logcounts(sce) <- counts(sce)
-  new_anndata_file <- "test_anndata_logcounts.h5"
+  new_anndata_file <- tempfile(fileext = ".h5")
   expect_snapshot_file({
     sce_to_anndata(sce, new_anndata_file, x_assay_name = "logcounts")
     new_anndata_file
@@ -37,7 +37,7 @@ test_that("Conversion of SCE to AnnData works as expected", {
 test_that("Conversion of SCE to AnnData fails as expected", {
 
   # check that inputting an improper file name causes a failure
-  anndata_bad_file <- "test_anndata"
+  anndata_bad_file <- tempfile(fileext = ".rds")
   expect_error(sce_to_anndata(sce, anndata_bad_file))
 
   # improper assay name causes a failure
