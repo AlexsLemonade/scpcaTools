@@ -3,7 +3,9 @@ suppressPackageStartupMessages(library(zellkonverter))
 
 set.seed(1665)
 sce <- sim_sce(n_cells = 100, n_genes = 200, n_empty = 0)
-colData(sce) <- DataFrame("test_column" = sample(0:10, 100, rep = TRUE))
+# need to pull out barcodes to add to colData, otherwise colnames get replaced with NULL
+barcodes <- colnames(sce)
+colData(sce) <- DataFrame("test_column" = sample(0:10, 100, rep = TRUE), row.names = barcodes)
 rowData(sce) <- DataFrame("test_row" = sample(0:10, 200, rep = TRUE))
 
 # define anndata output
@@ -32,17 +34,17 @@ test_that("Conversion of SCE to AnnData works as expected", {
     new_anndata_file
   })
 
-  converted_sce <- zellkonverter::readH5AD(new_anndata_file, X_name = "X")
+  new_sce <- zellkonverter::readH5AD(new_anndata_file, X_name = "X")
   # check that counts is in assay names and no logcounts
   expect_setequal(
-    assayNames(converted_sce),
-    c("X", "counts", "spliced")
+    assayNames(new_sce),
+    c("X", "counts")
   )
 
   # check that X is equal to logcounts
   expect_equal(
     logcounts(sce),
-    assay(converted_sce, "X")
+    assay(new_sce, "X")
   )
 
 })
