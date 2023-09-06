@@ -49,7 +49,8 @@ sce_to_anndata <- function(sce, anndata_file, x_assay_name = "counts") {
   }
 
   # export SCE object as AnnData to HDF5 file
-  zellkonverter::writeH5AD(sce_to_convert, file = anndata_file, X_name = x_assay_name)
-
+  zellkonverter::writeH5AD(sce_to_convert,
+                           file = anndata_file,
+                           X_name = x_assay_name)
   invisible(sce)
 }

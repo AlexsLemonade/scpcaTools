@@ -11,7 +11,7 @@ sce_to_anndata(sce, anndata_file, x_assay_name = "counts")
 
 \item{anndata_file}{Path to output AnnData file. Must be an `.h5` or `.hdf5`}
 
-\item{x_assay_name}{Name of assay in SCE object to save as X in AnnData}
+\item{x_assay_name}{Name of assay in SCE object to save as X in AnnData. Default is "counts".}
 }
 \value{
 original SingleCellExperiment object used as input (invisibly)
