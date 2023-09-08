@@ -2,6 +2,7 @@
 #'
 #' @param sce SingleCellExperiment object to be converted to AnnData as an HDF5 file
 #' @param anndata_file Path to output AnnData file. Must be an `.h5` or `.hdf5`
+#' @param x_assay_name Name of assay in SCE object to save as X in AnnData. Default is "counts".
 #'
 #' @return original SingleCellExperiment object used as input (invisibly)
 #' **Note that any columns present in the `rowData` of an SCE object that contains
@@ -19,7 +20,7 @@
 #'   anndata_file = "test_anndata.h5"
 #' )
 #' }
-sce_to_anndata <- function(sce, anndata_file) {
+sce_to_anndata <- function(sce, anndata_file, x_assay_name = "counts") {
   if (!requireNamespace("zellkonverter", quietly = TRUE)) {
     stop("The zellkonverter package must be installed to convert objects to AnnData. No output file written.")
   }
@@ -33,6 +34,11 @@ sce_to_anndata <- function(sce, anndata_file) {
     stop("`anndata_file` must end in either '.hdf5' or '.h5'")
   }
 
+  # make sure assay is found in sce object
+  if(!x_assay_name %in% assayNames(sce)){
+    stop("`x_assay_name` is not an assay in `sce`")
+  }
+
   # assign SCE to new variable to avoid modifying input SCE
   sce_to_convert <- sce
 
@@ -43,7 +49,8 @@ sce_to_anndata <- function(sce, anndata_file) {
   }
 
   # export SCE object as AnnData to HDF5 file
-  zellkonverter::writeH5AD(sce_to_convert, file = anndata_file, X_name = "counts")
-
+  zellkonverter::writeH5AD(sce_to_convert,
+                           file = anndata_file,
+                           X_name = x_assay_name)
   invisible(sce)
 }
