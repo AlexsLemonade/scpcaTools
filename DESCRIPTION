@@ -63,7 +63,7 @@ Suggests:
     scpcaData,
     sessioninfo,
     Seurat,
-    testthat (>= 3.0.0),
+    testthat (>= 3.1.9),
     zellkonverter
 Remotes:
     AlexsLemonade/scpcaData,
