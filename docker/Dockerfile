@@ -13,9 +13,9 @@ RUN Rscript -e "install.packages(c('remotes', 'renv'))"
 
 WORKDIR /usr/local/renv
 COPY renv.lock renv.lock
-# restore with only PPM set for binary installs
+# restore with PPM repo set for binary installs
 RUN Rscript -e "renv::consent(provided = TRUE); \
-      renv::restore(repos = c(PPM = 'https://packagemanager.posit.co/cran/latest'))" && \
+      renv::restore(repos = 'https://packagemanager.posit.co/cran/latest')" && \
       rm -rf ~/.local/share/renv && \
       rm -rf /tmp/downloaded_packages && \
       rm -rf /tmp/Rtmp*
