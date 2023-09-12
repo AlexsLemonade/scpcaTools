@@ -1,5 +1,5 @@
 # helper function to add more info to a simulated SCE ----
-add_sce_data <- function(sce) {
+add_sce_data <- function(sce, batch) {
   # add some coldata columns
   colData(sce)[["sum"]] <- runif(ncol(sce))
   colData(sce)[["detected"]] <- runif(ncol(sce))
@@ -8,6 +8,17 @@ add_sce_data <- function(sce) {
   # add some rowdata columns
   rowData(sce)[["gene_names"]] <- rownames(sce)
   rowData(sce)[["other_column"]] <- runif(nrow(sce))
+
+  # add some metadata
+  library_id <- glue::glue("library-{batch}")
+  sample_id <- glue::glue("sample-{batch}")
+
+  metadata(sce)$library_id <- library_id
+  metadata(sce)$sample_id <- sample_id
+  metadata(sce)$sample_metadata <- data.frame(
+    sample_id = sample_id,
+    library_id = library_id
+  )
 
   # Copy counts -> logcounts just to make sure the assay is retained
   logcounts(sce) <- counts(sce)
@@ -20,7 +31,8 @@ set.seed(1665)
 total_cells <- 24 # divisible by 3
 total_genes <- 12 # number of months intentionally.
 sce <- add_sce_data(
-  sim_sce(n_cells = total_cells, n_genes = total_genes, n_empty = 0)
+  sim_sce(n_cells = total_cells, n_genes = total_genes, n_empty = 0),
+  batch = "1"
 )
 sce_name <- "sce_object"
 batch_column <- "batch" # not the default
@@ -34,7 +46,7 @@ expected_coldata_cols <- sort(c("sum", "detected", batch_column, cell_id_column)
 sce1 <- sim_sce(n_cells = total_cells / 3, n_genes = total_genes, n_empty = 0)
 sce2 <- sim_sce(n_cells = total_cells / 3, n_genes = total_genes, n_empty = 0)
 sce3 <- sim_sce(n_cells = total_cells / 3, n_genes = total_genes, n_empty = 0)
-sce_list <- purrr::map(
+sce_list <- purrr::imap(
   list(
     "sce1" = sce1,
     "sce2" = sce2,
@@ -79,15 +91,35 @@ test_that("`prepare_sce_for_merge` works as expected when all columns are presen
 
 
   # rowData names and contents:
-  expect_equal(
-    sort(names(rowData(result_sce))),
+  expect_setequal(
+    names(rowData(result_sce)),
     c("gene_names", paste(sce_name, "other_column", sep = "-"))
+  )
+
+  # metadata names check
+  expect_contains(
+    names(metadata(result_sce)),
+    c("library_id", "sample_id", "library_metadata", "sample_metadata")
+  )
+
+  # check that sample metadata is a data frame
+  expect_s3_class(metadata(result_sce)$sample_metadata, "data.frame")
+
+  # check that contents of library id and sample id are correct
+  expect_equal(
+    metadata(result_sce)$library_id,
+    "library-1"
+  )
+
+  expect_equal(
+    metadata(result_sce)$sample_id,
+    "sample-1"
   )
 })
 
 
 
-test_that("`prepare_sce_for_merge` works as expected when all an expected column is missing", {
+test_that("`prepare_sce_for_merge` works as expected when an expected column is missing", {
   # REMOVE "detected" column first
   # It should get re-added in as all NAs
   colData(sce)$detected <- NULL
@@ -130,8 +162,8 @@ test_that("merging SCEs with matching genes works as expected", {
   expect_equal(ncol(merged_sce), total_cells)
 
   # colData names and contents:
-  expect_equal(
-    sort(names(colData(merged_sce))),
+  expect_setequal(
+    names(colData(merged_sce)),
     expected_coldata_cols
   )
   expect_equal(
@@ -142,20 +174,18 @@ test_that("merging SCEs with matching genes works as expected", {
       rep("sce3", total_cells / 3)
     )
   )
-  expect_equal(
-    sort(rownames(colData(merged_sce))),
-    sort(
-      c(
-        glue::glue("sce1-{rownames(colData(sce1))}"),
-        glue::glue("sce2-{rownames(colData(sce2))}"),
-        glue::glue("sce3-{rownames(colData(sce3))}")
-      )
+  expect_setequal(
+    rownames(colData(merged_sce)),
+    c(
+      glue::glue("sce1-{rownames(colData(sce1))}"),
+      glue::glue("sce2-{rownames(colData(sce2))}"),
+      glue::glue("sce3-{rownames(colData(sce3))}")
     )
   )
 
   # rowData names and contents:
-  expect_equal(
-    sort(names(rowData(merged_sce))),
+  expect_setequal(
+    names(rowData(merged_sce)),
     c("gene_names", "sce1-other_column", "sce2-other_column", "sce3-other_column")
   )
   expect_equal(
@@ -168,12 +198,48 @@ test_that("merging SCEs with matching genes works as expected", {
   )
 
   # assays
-  expect_equal(
-    sort(assayNames(merged_sce)),
+  expect_setequal(
+    assayNames(merged_sce),
     c("counts", "logcounts")
   )
-})
 
+  # metadata names check
+  expect_contains(
+    names(metadata(merged_sce)),
+    c("library_id", "sample_id", "library_metadata", "sample_metadata")
+  )
+
+  # check that sample metadata is a data frame
+  expect_s3_class(metadata(merged_sce)$sample_metadata, "data.frame")
+
+  # library metadata should contain a list of library metadata with all three libraries
+  expect_length(
+    metadata(merged_sce)$library_metadata,
+    3
+  )
+
+  # check that contents of library id and sample id are correct
+  expect_setequal(
+    metadata(merged_sce)$library_id,
+    c("library-sce1", "library-sce2", "library-sce3")
+  )
+
+  expect_setequal(
+    metadata(merged_sce)$sample_id,
+    c("sample-sce1", "sample-sce2", "sample-sce3")
+  )
+
+  # check contents of sample metadata
+  expect_setequal(
+    metadata(merged_sce)$library_id,
+    metadata(merged_sce)$sample_metadata$library_id
+  )
+
+  expect_setequal(
+    metadata(merged_sce)$sample_id,
+    metadata(merged_sce)$sample_metadata$sample_id
+  )
+})
 
 
 test_that("merging SCEs with different genes among input SCEs works as expected", {
@@ -230,4 +296,11 @@ test_that("merging SCEs without names works as expected", {
       rep("3", total_cells / 3)
     )
   )
+})
+
+test_that("merging SCEs with library metadata fails as expected", {
+  # add library metadata to one of the objects in the list
+  metadata(sce_list$sce1)$library_metadata <- "library_metadata"
+
+  expect_error(merge_sce_list(sce_list))
 })
