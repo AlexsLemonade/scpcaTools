@@ -65,9 +65,9 @@ test_that("Check spliced collapse", {
   )
 })
 
-test_that("Check unspliced collapse", {
-  collapsed_mat <- collapse_intron_counts(intron_mat, "unspliced")
-  collapsed_usa <- collapse_intron_counts(usa_mat, "unspliced")
+test_that("Check total(unspliced) collapse", {
+  collapsed_mat <- collapse_intron_counts(intron_mat, "total")
+  collapsed_usa <- collapse_intron_counts(usa_mat, "total")
   # check the contents
   expect_equal(
     collapsed_mat@x,

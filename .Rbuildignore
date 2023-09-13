@@ -1,10 +1,20 @@
-^requirements\.txt$
+# Github and docs
+^\.github$
+^CONTRIBUTING\.md$
+
+# user settings
+^.*\.Rproj$
+^\.Rproj\.user$
+
+# renv files
 ^renv$
 ^renv\.lock$
 ^dependencies\.R$
-^.*\.Rproj$
-^\.Rproj\.user$
-^\.github$
-^README\.Rmd$
+^requirements\.txt$
+^\.venv$
+
+# rendered notebooks
 ^inst/rmd/.*\.html$
+
+# Docker folder
 ^docker$

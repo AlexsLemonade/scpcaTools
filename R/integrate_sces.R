@@ -148,7 +148,7 @@ integrate_fastmnn <- function(merged_sce,
 #'   being integrated.
 #' @param covariate_cols A vector of other columns to consider as
 #'   covariates during integration.
-#' @param ... Additional arguments to pass into `harmony::harmonyMatrix()`
+#' @param ... Additional arguments to pass into `harmony::HarmonyMatrix()`
 #'
 #' @return Integrated PCs as calculated by `harmony`
 #'
@@ -182,7 +182,8 @@ integrate_harmony <- function(merged_sce,
   # Perform integration
   harmony_results <- harmony::HarmonyMatrix(reducedDim(merged_sce, "PCA"),
     meta_data = harmony_metadata,
-    vars_use  = covariate_cols,
+    vars_use = covariate_cols,
+    verbose = FALSE,
     ...
   )
   # Ensure PCs have rownames

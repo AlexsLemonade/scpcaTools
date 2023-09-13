@@ -1,4 +1,4 @@
-FROM rocker/r-ver:4.2.3
+FROM rocker/r-ver:4.3.1
 LABEL maintainer="ccdl@alexslemonade.org"
 LABEL org.opencontainers.image.source https://github.com/AlexsLemonade/scpcaTools
 
@@ -13,13 +13,15 @@ RUN Rscript -e "install.packages(c('remotes', 'renv'))"
 
 WORKDIR /usr/local/renv
 COPY renv.lock renv.lock
+# restore with PPM repo set for binary installs
 RUN Rscript -e "renv::consent(provided = TRUE); \
-      renv::restore()" && \
+      renv::restore(repos = 'https://packagemanager.posit.co/cran/latest')" && \
       rm -rf ~/.local/share/renv && \
       rm -rf /tmp/downloaded_packages && \
       rm -rf /tmp/Rtmp*
 
 # Complete installation of zellkonverter conda env
+ENV BASILISK_EXTERNAL_DIR /usr/local/renv/basilisk
 RUN Rscript -e "proc <- basilisk::basiliskStart(env = zellkonverter::zellkonverterAnnDataEnv(), testload = 'anndata'); \
                 basilisk::basiliskStop(proc)"
 
