@@ -12,7 +12,10 @@ read_alevin(
   round_counts = TRUE,
   library_id = NULL,
   sample_id = NULL,
-  tech_version = NULL
+  project_id = NULL,
+  tech_version = NULL,
+  assay_ontology_term_id = NULL,
+  seq_unit = NULL
 )
 }
 \arguments{
@@ -40,7 +43,13 @@ Only used if `fry_mode` is FALSE. Default is TRUE.}
 \item{sample_id}{Optional sample identifier.
 If multiplexed samples are included in a library, this may be a vector.}
 
+\item{project_id}{Optional project identifier.}
+
 \item{tech_version}{Technology or kit used to process library (i.e. 10Xv3, 10Xv3.1).}
+
+\item{assay_ontology_term_id}{Optional Experimental Factor Ontology term associated with the provided `tech_version`}
+
+\item{seq_unit}{Optional sequencing unit associated with the library (i.e. cell, nucleus)}
 }
 \value{
 SingleCellExperiment of unfiltered gene x cell counts matrix.
