@@ -17,7 +17,10 @@
 #' @param library_id Optional library identifier
 #' @param sample_id Optional sample identifier.
 #'   If multiplexed samples are included in a library, this may be a vector.
+#' @param project_id Optional project identifier.
 #' @param tech_version Technology or kit used to process library (i.e. 10Xv3, 10Xv3.1).
+#' @param assay_ontology_term_id Optional Experimental Factor Ontology term associated with the provided `tech_version`
+#' @param seq_unit Optional sequencing unit associated with the library (i.e. cell, nucleus)
 #'
 #' @return SingleCellExperiment of unfiltered gene x cell counts matrix.
 #' @export
@@ -52,7 +55,11 @@ read_alevin <- function(quant_dir,
                         round_counts = TRUE,
                         library_id = NULL,
                         sample_id = NULL,
-                        tech_version = NULL) {
+                        project_id = NULL,
+                        tech_version = NULL,
+                        assay_ontology_term_id = NULL,
+                        seq_unit = NULL
+                        ) {
   # checks for *_mode
   if (!is.logical(fry_mode)) {
     stop("fry_mode must be set as TRUE or FALSE")
@@ -78,8 +85,11 @@ read_alevin <- function(quant_dir,
   meta <- read_alevin_metadata(
     quant_dir,
     tech_version,
+    assay_ontology_term_id = assay_ontology_term_id,
+    seq_unit = seq_unit,
     library_id = library_id,
-    sample_id = sample_id
+    sample_id = sample_id,
+    project_id = project_id
   )
 
   # if alevin-fry USA and MTX format directly create SCE object with fishpond
@@ -169,9 +179,12 @@ read_tximport <- function(quant_dir) {
 #'
 #' @param quant_dir Path alevin output directory.
 #' @param tech_version Technology or kit used to process library (i.e. 10Xv3, 10Xv3.1).
+#' @param assay_ontology_term_id Optional Experimental Factor Ontology term associated with the provided `tech_version`
+#' @param seq_unit Optional sequencing unit associated with the library (i.e. cell, nucleus)
 #' @param library_id Optional library identifier
 #' @param sample_id Optional sample identifier.
 #'   If multiplexed samples are included in a library, this may be a vector.
+#' @param project_id Optional project identifier.
 #'
 #' @return A list containing alevin run metadata,
 #'   with NULL values for missing elements.
@@ -179,8 +192,11 @@ read_tximport <- function(quant_dir) {
 #' @noRd
 read_alevin_metadata <- function(quant_dir,
                                  tech_version,
+                                 assay_ontology_term_id = NULL,
+                                 seq_unit = NULL,
                                  library_id = NULL,
-                                 sample_id = NULL) {
+                                 sample_id = NULL,
+                                 project_id = NULL) {
   cmd_info_path <- file.path(quant_dir, "cmd_info.json")
   permit_json_path <- file.path(quant_dir, "generate_permit_list.json")
   # Unused file, but leaving for future reference
@@ -221,6 +237,7 @@ read_alevin_metadata <- function(quant_dir,
   meta <- list(
     library_id = library_id,
     sample_id = sample_id,
+    project_id = project_id,
     salmon_version = cmd_info$salmon_version,
     reference_index = cmd_info[["index"]],
     total_reads = aux_meta[["num_processed"]],
@@ -245,6 +262,8 @@ read_alevin_metadata <- function(quant_dir,
   meta$usa_mode <- quant_info[["usa_mode"]]
   meta$af_num_cells <- quant_info[["num_quantified_cells"]]
   meta$tech_version <- tech_version
+  meta$assay_ontology_term_id <- assay_ontology_term_id
+  meta$seq_unit <- seq_unit
 
 
   return(meta)
