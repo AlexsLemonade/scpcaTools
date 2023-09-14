@@ -66,7 +66,7 @@ metadata_to_coldata <- function(sce,
 
   # replace existing coldata
   colData(sce) <- DataFrame(coldata_df,
-    row.names = rownames(coldata_df)
+    row.names = colnames(sce)
   )
 
   # return modified sce with sample metadata
