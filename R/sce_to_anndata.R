@@ -35,7 +35,7 @@ sce_to_anndata <- function(sce, anndata_file, x_assay_name = "counts") {
   }
 
   # make sure assay is found in sce object
-  if(!x_assay_name %in% assayNames(sce)){
+  if (!x_assay_name %in% assayNames(sce)) {
     stop("`x_assay_name` is not an assay in `sce`")
   }
 
@@ -48,9 +48,25 @@ sce_to_anndata <- function(sce, anndata_file, x_assay_name = "counts") {
     message("miQC model cannot be converted between SCE and AnnData.")
   }
 
+  # zellkonverter (or pandas) does not like NA values to be stored in character vectors
+  colData(sce_to_convert) <- colData(sce_to_convert) |>
+    as.data.frame() |>
+    dplyr::mutate(
+      across(where(\(x) all(is.na(x))), as.logical)
+    ) |>
+    DataFrame(row.names = colnames(sce_to_convert))
+
+  rowData(sce_to_convert) <- rowData(sce_to_convert) |>
+    as.data.frame() |>
+    dplyr::mutate(
+      across(where(\(x) all(is.na(x))), as.logical)
+    ) |>
+    DataFrame(row.names = rownames(sce_to_convert))
+
   # export SCE object as AnnData to HDF5 file
   zellkonverter::writeH5AD(sce_to_convert,
-                           file = anndata_file,
-                           X_name = x_assay_name)
+    file = anndata_file,
+    X_name = x_assay_name
+  )
   invisible(sce)
 }

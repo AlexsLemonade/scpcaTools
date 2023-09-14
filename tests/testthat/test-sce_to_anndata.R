@@ -5,7 +5,11 @@ set.seed(1665)
 sce <- sim_sce(n_cells = 100, n_genes = 200, n_empty = 0)
 # need to pull out barcodes to add to colData, otherwise colnames get replaced with NULL
 barcodes <- colnames(sce)
-colData(sce) <- DataFrame("test_column" = sample(0:10, 100, rep = TRUE), row.names = barcodes)
+colData(sce) <- DataFrame("test_column" = sample(0:10, 100, rep = TRUE),
+                          "na_column" = NA,
+                          "na_char_column" = NA_character_,
+                          # "some_na" = c("a", NA),
+                          row.names = barcodes)
 rowData(sce) <- DataFrame("test_row" = sample(0:10, 200, rep = TRUE))
 
 # define anndata output
