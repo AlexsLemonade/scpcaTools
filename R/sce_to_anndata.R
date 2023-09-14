@@ -52,14 +52,14 @@ sce_to_anndata <- function(sce, anndata_file, x_assay_name = "counts") {
   colData(sce_to_convert) <- colData(sce_to_convert) |>
     as.data.frame() |>
     dplyr::mutate(
-      across(where(\(x) all(is.na(x))), as.logical)
+      dplyr::across(dplyr::where(\(x) all(is.na(x))), as.logical)
     ) |>
     DataFrame(row.names = colnames(sce_to_convert))
 
   rowData(sce_to_convert) <- rowData(sce_to_convert) |>
     as.data.frame() |>
     dplyr::mutate(
-      across(where(\(x) all(is.na(x))), as.logical)
+      dplyr::across(dplyr::where(\(x) all(is.na(x))), as.logical)
     ) |>
     DataFrame(row.names = rownames(sce_to_convert))
 
