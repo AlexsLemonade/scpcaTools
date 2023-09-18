@@ -4,6 +4,7 @@
 library(AnnotationHub)
 library(BSgenome)
 library(celldex)
+library(ComplexHeatmap)
 library(eds)
 library(eisaR)
 library(ensembldb)
