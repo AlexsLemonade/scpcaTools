@@ -62,4 +62,8 @@ test_that("Conversion of SCE to AnnData fails as expected", {
 
   # improper assay name causes a failure
   expect_error(sce_to_anndata(sce, anndata_file, x_assay_name = "not an assay"))
+
+  # conversion fails if < 2 cells
+  small_sce <- sce[, 1]
+  expect_error(sce_to_anndata(small_sce, anndata_file))
 })
