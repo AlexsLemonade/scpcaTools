@@ -30,7 +30,7 @@ sce_to_anndata <- function(sce, anndata_file, x_assay_name = "counts") {
   }
 
   if(ncol(sce) < 2){
-    stop("Input SingleCellExperiment must at least 2 cells.")
+    stop("Input SingleCellExperiment must contain at least 2 cells.")
   }
 
   # check that filename is in the proper format for writing h5
