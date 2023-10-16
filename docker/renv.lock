@@ -991,7 +991,7 @@
     },
     "Seurat": {
       "Package": "Seurat",
-      "Version": "4.3.0.1",
+      "Version": "4.4.0",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
@@ -1034,6 +1034,7 @@
         "plotly",
         "png",
         "progressr",
+        "purrr",
         "reticulate",
         "rlang",
         "scales",
@@ -1048,11 +1049,11 @@
         "utils",
         "uwot"
       ],
-      "Hash": "54518b4c3db3d3f6217b96a4afd2fe52"
+      "Hash": "622e2dca3e48ed689fd418bffc0dc34e"
     },
     "SeuratObject": {
       "Package": "SeuratObject",
-      "Version": "4.1.3",
+      "Version": "4.1.4",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
@@ -1072,7 +1073,7 @@
         "tools",
         "utils"
       ],
-      "Hash": "31a87fa60eee00965ec7b5a5f56869b0"
+      "Hash": "1548d1c211c0a2eff1771991d4f71a9d"
     },
     "SingleCellExperiment": {
       "Package": "SingleCellExperiment",
@@ -3634,7 +3635,7 @@
     },
     "rmarkdown": {
       "Package": "rmarkdown",
-      "Version": "2.24",
+      "Version": "2.25",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
@@ -3654,7 +3655,7 @@
         "xfun",
         "yaml"
       ],
-      "Hash": "3854c37590717c08c32ec8542a2e0a35"
+      "Hash": "d65e35823c817f09f4de424fcdfa812a"
     },
     "rprojroot": {
       "Package": "rprojroot",
@@ -3843,7 +3844,7 @@
     },
     "sctransform": {
       "Package": "sctransform",
-      "Version": "0.3.5",
+      "Version": "0.4.0",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
@@ -3863,7 +3864,7 @@
         "reshape2",
         "rlang"
       ],
-      "Hash": "e70cffc72eb877eb06e86a20097e93af"
+      "Hash": "d55ea018c4cf7ee12c3188c574857755"
     },
     "scuttle": {
       "Package": "scuttle",
