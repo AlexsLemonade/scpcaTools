@@ -14,6 +14,11 @@
 #' @param covariate_cols A vector of additional columns in the merged SCE to
 #'   consider as covariates during integration. Currently, this is used only by
 #'   `harmony`.
+#' @param batch_lambda The ridge regression penalty to use when correcting using the `batch_column`.
+#'   This is only used by `harmony`. Default is 1.
+#' @param covariate_lambda A vector of ridge regression penalties to use with each covariate.
+#'   A lambda value must be provided for each covariate column.
+#'   This is only used by `harmony`.
 #' @param return_corrected_expression A boolean indicating whether corrected expression
 #'   values determined by the given integration method should be included in the
 #'   integrated SCE object. Note that `harmony` does not calculate corrected expression,
@@ -32,6 +37,8 @@ integrate_sces <- function(merged_sce,
                            integration_method = c("fastMNN", "harmony"),
                            batch_column = "sample",
                            covariate_cols = c(),
+                           batch_lambda = 1,
+                           covariate_lambda = c(),
                            return_corrected_expression = FALSE,
                            seed = NULL,
                            ...) {
@@ -90,6 +97,8 @@ integrate_sces <- function(merged_sce,
       merged_sce,
       batch_column,
       covariate_cols,
+      batch_lambda,
+      covariate_lambda,
       ...
     )
   }
@@ -148,7 +157,11 @@ integrate_fastmnn <- function(merged_sce,
 #'   being integrated.
 #' @param covariate_cols A vector of other columns to consider as
 #'   covariates during integration.
-#' @param ... Additional arguments to pass into `harmony::HarmonyMatrix()`
+#' @param batch_lambda The ridge regression penalty to use when correcting using the `batch_column`.
+#'   Default is 1.
+#' @param covariate_lambda A vector of ridge regression penalties to use with each covariate.
+#'   A lambda value must be provided for each covariate column.
+#' @param ... Additional arguments to pass into `harmony::RunHarmony()`
 #'
 #' @return Integrated PCs as calculated by `harmony`
 #'
@@ -156,6 +169,8 @@ integrate_fastmnn <- function(merged_sce,
 integrate_harmony <- function(merged_sce,
                               batch_column,
                               covariate_cols = c(),
+                              batch_lambda = 1,
+                              covariate_lambda = c(),
                               ...) {
   # Check that harmony is installed
   if (!requireNamespace("harmony", quietly = TRUE)) {
@@ -172,17 +187,28 @@ integrate_harmony <- function(merged_sce,
     stop("The provided covariate columns are not all present in the `merged_sce` colData.")
   }
 
+  # check that the lambda values match up
+  if(length(covariate_cols) != length(covariate_lambda)){
+    stop("The number of covariate columns must be equal to the number of covariate lambda values.")
+  }
+
   # Setup harmony metadata
   covariate_cols <- c(batch_column, covariate_cols)
-  harmony_metadata <- tibble::as_tibble(colData(merged_sce)) %>%
+
+  harmony_metadata <- tibble::as_tibble(colData(merged_sce)) |>
     dplyr::select(
       dplyr::all_of(covariate_cols)
     )
 
+  # get a vector of all lambdas
+  lambda_vec <- c(batch_lambda, covariate_lambda)
+
   # Perform integration
-  harmony_results <- harmony::HarmonyMatrix(reducedDim(merged_sce, "PCA"),
+  harmony_results <- harmony::RunHarmony(
+    data_mat = reducedDim(merged_sce, "PCA"),
     meta_data = harmony_metadata,
     vars_use = covariate_cols,
+    lambda = lambda_vec,
     verbose = FALSE,
     ...
   )
