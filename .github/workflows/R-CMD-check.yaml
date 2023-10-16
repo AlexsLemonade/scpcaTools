@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - master
+      - jashapiro/renv-testing
   pull_request:
     branches:
       - main
@@ -28,13 +29,13 @@ jobs:
         with:
           use-public-rspm: true
 
-      - name: Remove renv
-        run: rm -f renv.lock .Rprofile
-
       - name: Set up Pandoc
         uses: r-lib/actions/setup-pandoc@v2
 
-      - name: Set up dependencies
+      - name: Set up Renv
+        uses: r-lib/actions/setup-renv@v2
+
+      - name: Set up additional dependencies
         uses: r-lib/actions/setup-r-dependencies@v2
         with:
           extra-packages: any::rcmdcheck
