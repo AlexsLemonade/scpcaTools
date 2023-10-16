@@ -92,6 +92,18 @@ test_that("`integrate_harmony` fails when covariate columns are missing", {
   )
 })
 
+test_that("`integrate_harmony` fails when covariates are provided but no covariate_lambda", {
+  expect_error(
+    integrate_sces(
+      merged_sce,
+      "harmony",
+      batch_column,
+      covariate_cols = "covariate"
+      # no covariate lambda provided
+    )
+  )
+})
+
 
 ################################################################################
 ################################################################################
@@ -165,7 +177,8 @@ test_that("`integrate_sces` works as expected for return_corrected_expression=TR
   # harmony should warn:
   expect_warning(
     # this needs to be saved to avoid `Error in x$.self$finalize() : attempt to apply non-function`
-    result <- integrate_sces(merged_sce,
+    result <- integrate_sces(
+      merged_sce,
       "harmony",
       return_corrected_expression = TRUE
     )
@@ -203,22 +216,24 @@ test_that("`integrate_sces` works as expected for harmony defaults", {
 
 test_that("`integrate_sces` works as expected with harmony extra arguments", {
   expect_no_error(
-    integrated_sce <- integrate_sces(merged_sce,
+    integrated_sce <- integrate_sces(
+      merged_sce,
       "harmony",
       batch_column,
-      lambda = 2
+      max_iter = 2
     )
   )
 })
-
-
 
 test_that("`integrate_sces` works as expected with a harmony covariate", {
   expect_no_error(
-    integrate_sces(merged_sce,
+    integrate_sces(
+      merged_sce,
       "harmony",
       batch_column,
-      covariate_cols = "covariate"
+      covariate_cols = "covariate",
+      covariate_lambda = 1
     )
   )
 })
+
