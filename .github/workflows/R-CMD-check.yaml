@@ -44,6 +44,17 @@ jobs:
       - name: Set up Renv & install packages
         uses: r-lib/actions/setup-renv@v2
 
+      - name: Clean up temp files
+        run: |
+          rm -rf /tmp/downloaded_packages
+          rm -rf /tmp/Rtmp*
+
+      - name: Remove unneeded system files
+        run: |
+          sudo rm -rf /opt/hostedtoolcache/CodeQL
+          sudo rm -rf /opt/hostedtoolcache/PyPy
+          sudo rm -rf /opt/hostedtoolcache/Ruby
+
       - name: Install additional dependencies for testing
         run: |
           install.packages(c("remotes", "rcmdcheck"))
