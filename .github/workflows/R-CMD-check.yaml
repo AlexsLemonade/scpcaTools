@@ -46,7 +46,7 @@ jobs:
 
       - name: Install additional dependencies for testing
         run: |
-          install.packages("remotes")
+          install.packages(c("remotes", "rcmdcheck"))
           remotes::install_github("AlexsLemonade/scpcaData")
         shell: Rscript {0}
 
