@@ -13,6 +13,8 @@ integrate_sces(
   integration_method = c("fastMNN", "harmony"),
   batch_column = "sample",
   covariate_cols = c(),
+  batch_lambda = 1,
+  covariate_lambda = c(),
   return_corrected_expression = FALSE,
   seed = NULL,
   ...
@@ -29,6 +31,13 @@ integrate_sces(
 \item{covariate_cols}{A vector of additional columns in the merged SCE to
 consider as covariates during integration. Currently, this is used only by
 `harmony`.}
+
+\item{batch_lambda}{The ridge regression penalty to use when correcting using the `batch_column`.
+This is only used by `harmony`. Default is 1.}
+
+\item{covariate_lambda}{A vector of ridge regression penalties to use with each covariate.
+A lambda value must be provided for each covariate column.
+This is only used by `harmony`.}
 
 \item{return_corrected_expression}{A boolean indicating whether corrected expression
 values determined by the given integration method should be included in the

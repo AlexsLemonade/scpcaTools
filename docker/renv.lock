@@ -903,6 +903,13 @@
       ],
       "Hash": "a8e668a6eff4127b6b5e72d02ca9b111"
     },
+    "RhpcBLASctl": {
+      "Package": "RhpcBLASctl",
+      "Version": "0.23-42",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "c966ea2957ff75e77afa5c908dfc89e1"
+    },
     "Rhtslib": {
       "Package": "Rhtslib",
       "Version": "2.2.0",
@@ -2459,7 +2466,7 @@
     },
     "harmony": {
       "Package": "harmony",
-      "Version": "0.1.1",
+      "Version": "1.0.3",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
@@ -2468,16 +2475,15 @@
         "Rcpp",
         "RcppArmadillo",
         "RcppProgress",
+        "RhpcBLASctl",
         "cowplot",
         "dplyr",
         "ggplot2",
-        "irlba",
         "methods",
         "rlang",
-        "tibble",
-        "tidyr"
+        "tibble"
       ],
-      "Hash": "0c5a19c351e5ce6b053b852cb88c312a"
+      "Hash": "ae92e686936589dec53b0514cff659f6"
     },
     "haven": {
       "Package": "haven",
