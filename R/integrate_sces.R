@@ -187,31 +187,35 @@ integrate_harmony <- function(merged_sce,
     stop("The provided covariate columns are not all present in the `merged_sce` colData.")
   }
 
+  # if no covariate lambda provided, set to 1
+  if(length(covariate_lambda) == 0){
+    covariate_lambda <- rep(1, length(covariate_cols))
+  }
+
   # check that the lambda values match up
-  if(length(covariate_cols) != length(covariate_lambda)){
+  if(length(covariate_lambda) != length(covariate_cols)){
     stop("The number of covariate columns must be equal to the number of covariate lambda values.")
   }
 
   # Setup harmony metadata
   covariate_cols <- c(batch_column, covariate_cols)
 
-  harmony_metadata <- tibble::as_tibble(colData(merged_sce)) |>
-    dplyr::select(
-      dplyr::all_of(covariate_cols)
-    )
-
   # get a vector of all lambdas
   lambda_vec <- c(batch_lambda, covariate_lambda)
 
   # Perform integration
-  harmony_results <- harmony::RunHarmony(
-    data_mat = reducedDim(merged_sce, "PCA"),
-    meta_data = harmony_metadata,
-    vars_use = covariate_cols,
+  harmony_object <- harmony::RunHarmony(
+    merged_sce,
+    group.by.vars = covariate_cols,
+    reduction.use = "PCA",
     lambda = lambda_vec,
     verbose = FALSE,
     ...
   )
+
+  # pull out corrected pcs
+  harmony_results <- reducedDim(harmony_object, "HARMONY")
+
   # Ensure PCs have rownames
   if (is.null(rownames(harmony_results))) {
     rownames(harmony_results) <- rownames(reducedDim(merged_sce, "PCA"))
