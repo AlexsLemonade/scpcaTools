@@ -168,7 +168,7 @@ test_that("`metadata_to_coldata` works as expected with multiplexed libraries", 
   sce$sample_id <- rep(c("sample1", "sample2"), 50)
 
   # only joining on library ids will mean non-unique matches
-  supressWarnings(
+  suppressWarnings(
     expect_error(metadata_to_coldata(sce,
                                      join_columns = "library_id")
     )
