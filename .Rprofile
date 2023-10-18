@@ -1,7 +1,5 @@
-# Use PPM for linux (not Mac or Windows) (CRAN by default)
-if (! Sys.info()[["sysname"]] %in% c("Darwin", "Windows")) {
-  options(renv.config.repos.override = c(CRAN = "https://packagemanager.posit.co/cran/latest"))
-}
+options(BioC_mirror = "https://packagemanager.posit.co/bioconductor")
+options(BIOCONDUCTOR_CONFIG_FILE = "https://packagemanager.posit.co/bioconductor/config.yaml")
 
 # activate renv
 source("renv/activate.R")
