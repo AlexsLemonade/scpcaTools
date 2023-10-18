@@ -46,11 +46,22 @@ sce_to_anndata <- function(sce, anndata_file, x_assay_name = "counts") {
   # assign SCE to new variable to avoid modifying input SCE
   sce_to_convert <- sce
 
-  # remove miQC model from metadata
-  if (!is.null(metadata(sce_to_convert)$miQC_model)) {
-    metadata(sce_to_convert)$miQC_model <- NULL
-    message("miQC model cannot be converted between SCE and AnnData.")
+  # grab existing metadata
+  metadata_list <- metadata(sce_to_convert)
+
+  # remove any objects or dataframes
+  metadata_to_keep <- metadata_list |>
+    purrr::discard(is.object) |>
+    purrr::discard(is.data.frame)
+
+  # print out warning that removed objects won't be converted
+  removed_metadata <- names(metadata_list)[!names(metadata_list) %in% names(metadata_to_keep)]
+  if(length(removed_metadata) > 0){
+    glue::glue("{removed_metadata} cannot be converted between SCE and AnnData.")
   }
+
+  # reset metadata
+  metadata(sce_to_convert) <- metadata_to_keep
 
   # zellkonverter (or pandas) does not like NA values to be stored in character vectors
   colData(sce_to_convert) <- colData(sce_to_convert) |>
