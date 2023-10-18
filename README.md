@@ -2,6 +2,7 @@
 # scpcaTools: Useful tools for analysis of single-cell RNA seq counts data
 
   <!-- badges: start -->
+  [![R-CMD-check-renv](https://github.com/AlexsLemonade/scpcaTools/workflows/R-CMD-check-renv/badge.svg)](https://github.com/AlexsLemonade/scpcaTools/actions/workflows/R-CMD-check-renv.yaml)
   [![R-CMD-check-current](https://github.com/AlexsLemonade/scpcaTools/workflows/R-CMD-check-current/badge.svg)](https://github.com/AlexsLemonade/scpcaTools/actions/workflows/R-CMD-check-current.yaml)
   <!-- badges: end -->
 
