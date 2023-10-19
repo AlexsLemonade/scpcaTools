@@ -12,6 +12,15 @@ colData(sce) <- DataFrame("test_column" = sample(0:10, 100, rep = TRUE),
                           row.names = barcodes)
 rowData(sce) <- DataFrame("test_row" = sample(0:10, 200, rep = TRUE))
 
+# add some metadata
+metadata(sce) <- list(
+  library_id = "library1",
+  sample_metadata = data.frame(
+    library_id = "library1",
+    sample_id = "sample1"
+  )
+)
+
 # define anndata output
 tempdir <- tempdir()
 anndata_file <- file.path(tempdir, "anndata.h5")
@@ -29,6 +38,13 @@ test_that("Conversion of SCE to AnnData works as expected", {
   expect_equal(dim(sce), dim(converted_sce))
   expect_equal(colnames(colData(sce)), colnames(colData(converted_sce)))
   expect_equal(colnames(rowData(sce)), colnames(rowData(converted_sce)))
+
+
+  # expect that sample metadata has been removed from converted SCE and only library id remains
+  expect_setequal(
+    "library_id",
+    names(metadata(converted_sce))
+  )
 
   # test that H5 file is created with new assay name
   # add logcounts
