@@ -6,10 +6,10 @@ on:
       - main
       - master
 
-name: R-CMD-check
+name: R-CMD-check-renv
 
 jobs:
-  R-CMD-check:
+  R-CMD-check-renv:
     runs-on: ubuntu-22.04
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
