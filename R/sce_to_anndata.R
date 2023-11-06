@@ -33,6 +33,10 @@ sce_to_anndata <- function(sce, anndata_file, x_assay_name = "counts") {
     stop("Input SingleCellExperiment must contain at least 2 cells.")
   }
 
+  if(nrow(sce) < 2){
+    stop("Input SingleCellExperiment must contain at least 2 genes or features.")
+  }
+
   # check that filename is in the proper format for writing h5
   if (!(stringr::str_ends(anndata_file, ".hdf5|.h5"))) {
     stop("`anndata_file` must end in either '.hdf5' or '.h5'")
