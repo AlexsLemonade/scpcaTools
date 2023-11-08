@@ -18,3 +18,7 @@
 
 # Docker folder
 ^docker$
+
+# development
+^\.pre-commit-config\.yaml$
+^\.lintr$
