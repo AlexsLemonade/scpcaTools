@@ -36,6 +36,7 @@ repos:
           (.*/|)NAMESPACE|
           (.*/|)renv/settings\.dcf|
           (.*/|)renv\.lock|
+          (.*/|)requirements\.txt|
           (.*/|)WORDLIST|
           \.github/workflows/.*|
           data/.*|
