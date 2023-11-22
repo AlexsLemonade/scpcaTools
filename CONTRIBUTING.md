@@ -12,7 +12,7 @@ If code needs styling during/after a PR, one of the repository owners can perfor
 
 For convenience, we have included a set of [pre-commit hooks](https://pre-commit.com/) that can be used to automatically format code according to the above specifications, as well as to spell check and check for other common errors.
 
-To use these hooks, install the `pre-commit` package according to your favorite method (`pip install pre-commit` or `conda install pre-commit`), then run `pre-commit install` in the `scpca-nf` directory.
+To use these hooks, install the `pre-commit` package according to your favorite method (`pip install pre-commit` or `conda install pre-commit`), then run `pre-commit install` in the `scpcaTools` directory.
 This will install the hooks in the `.git/hooks` directory, and they will be run automatically when you commit changes.
 If any of the hooks fail, the commit will be aborted, and you will need to fix the errors and re-commit.
 
