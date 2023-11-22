@@ -63,7 +63,7 @@ sce_to_seurat <- function(sce,
   )
 
   # add rowdata and metadata separately adding it while creating leaves the slots empty without warning
-  seurat_obj[[assay_name]]@var.features <- rowdata
+  seurat_obj[[assay_name]] <- Seurat::AddMetaData(seurat_obj[[assay_name]], rowdata)
   seurat_obj@misc <- metadata(sce)
 
   # grab names of altExp, if any
@@ -78,7 +78,7 @@ sce_to_seurat <- function(sce,
     # round counts and calculate total counts
     alt_counts <- round(counts(altExp(sce, name)))
 
-    # subset altExp counts and seurat object to shared cells
+    # subset altExp counts and Seurat object to shared cells
     cells_to_keep <- intersect(seurat_obj_cells, colnames(alt_counts))
     alt_counts <- alt_counts[, cells_to_keep]
 
@@ -88,7 +88,7 @@ sce_to_seurat <- function(sce,
     # add new assay along with associated row data, if any
     seurat_obj[[name]] <- Seurat::CreateAssayObject(counts = alt_counts)
     rowdata <- as.data.frame(rowData(altExp(sce, name)))
-    seurat_obj[[name]]@var.features <- rowdata
+    seurat_obj[[name]] <- Seurat::AddMetaData(seurat_obj[[name]], rowdata)
 
     # check that altExp data is present as a new assay, since Seurat sometimes fails without warning
     if (is.null(seurat_obj[[name]])) {
