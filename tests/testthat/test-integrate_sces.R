@@ -99,7 +99,7 @@ test_that("`integrate_harmony` fails when covariates and covariate_lambda don't 
       "harmony",
       batch_column,
       covariate_cols = "covariate",
-      covariate_lambda = c(1,2) # 1 extra lambda
+      covariate_lambda = c(1, 2) # 1 extra lambda
     )
   )
 })
@@ -226,7 +226,6 @@ test_that("`integrate_sces` works as expected with harmony extra arguments", {
 })
 
 test_that("`integrate_sces` works as expected with a harmony covariate", {
-
   # first with providing lambda
   expect_no_error(
     integrate_sces(
@@ -247,6 +246,4 @@ test_that("`integrate_sces` works as expected with a harmony covariate", {
       covariate_cols = "covariate"
     )
   )
-
 })
-

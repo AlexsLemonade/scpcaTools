@@ -62,7 +62,7 @@ Suggests:
     scran,
     scpcaData,
     sessioninfo,
-    Seurat,
+    Seurat (< 5.0.0),
     testthat (>= 3.1.9),
     zellkonverter
 Remotes:
