@@ -32,6 +32,7 @@ repos:
           (.*/|)\.Rprofile|
           (.*/|)\.travis\.yml|
           (.*/|)appveyor\.yml|
+          (.*/|)DESCRIPTION|
           (.*/|)NAMESPACE|
           (.*/|)renv/settings\.dcf|
           (.*/|)renv\.lock|
