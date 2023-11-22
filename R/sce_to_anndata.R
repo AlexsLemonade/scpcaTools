@@ -29,11 +29,11 @@ sce_to_anndata <- function(sce, anndata_file, x_assay_name = "counts") {
     stop("Input must be a SingleCellExperiment object.")
   }
 
-  if(ncol(sce) < 2){
+  if (ncol(sce) < 2) {
     stop("Input SingleCellExperiment must contain at least 2 cells.")
   }
 
-  if(nrow(sce) < 2){
+  if (nrow(sce) < 2) {
     stop("Input SingleCellExperiment must contain at least 2 genes or features.")
   }
 
@@ -56,8 +56,8 @@ sce_to_anndata <- function(sce, anndata_file, x_assay_name = "counts") {
     purrr::discard(is.list)
 
   # print out warning that removed objects won't be converted
-  removed_metadata <- setdiff(names(metadata(sce_to_convert)),  names(metadata_to_keep))
-  if(length(removed_metadata) > 0){
+  removed_metadata <- setdiff(names(metadata(sce_to_convert)), names(metadata_to_keep))
+  if (length(removed_metadata) > 0) {
     glue::glue("{removed_metadata} cannot be converted between SCE and AnnData.") |>
       purrr::walk(message)
   }

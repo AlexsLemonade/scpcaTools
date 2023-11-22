@@ -1,3 +1,4 @@
+# nolint start: cyclocomp_linter.
 #' Read in counts data processed with Alevin or Alevin-fry
 #'
 #' @param quant_dir Path to directory where output files are located.
@@ -48,18 +49,18 @@
 #'   include_unspliced = TRUE
 #' )
 #' }
-read_alevin <- function(quant_dir,
-                        fry_mode = FALSE,
-                        include_unspliced = TRUE,
-                        feature_data = FALSE,
-                        round_counts = TRUE,
-                        library_id = NULL,
-                        sample_id = NULL,
-                        project_id = NULL,
-                        tech_version = NULL,
-                        assay_ontology_term_id = NULL,
-                        seq_unit = NULL
-                        ) {
+read_alevin <- function(
+    quant_dir,
+    fry_mode = FALSE,
+    include_unspliced = TRUE,
+    feature_data = FALSE,
+    round_counts = TRUE,
+    library_id = NULL,
+    sample_id = NULL,
+    project_id = NULL,
+    tech_version = NULL,
+    assay_ontology_term_id = NULL,
+    seq_unit = NULL) {
   # checks for *_mode
   if (!is.logical(fry_mode)) {
     stop("fry_mode must be set as TRUE or FALSE")
@@ -72,7 +73,7 @@ read_alevin <- function(quant_dir,
   }
 
   # make sure that include unspliced and feature data are not both set as TRUE
-  if (include_unspliced & feature_data) {
+  if (include_unspliced && feature_data) {
     stop("Feature data does not have unspliced reads, cannot use `include_unspliced=TRUE`")
   }
 
@@ -95,11 +96,8 @@ read_alevin <- function(quant_dir,
   # if alevin-fry USA and MTX format directly create SCE object with fishpond
   if (fry_mode) {
     # only check for usa mode for non-feature data
-    if (!feature_data) {
-      # actually check that files are in usa mode
-      if (meta$usa_mode != TRUE) {
-        stop("Output files not in USA mode")
-      }
+    if (!feature_data && !meta$usa_mode) {
+      stop("Output files not in USA mode")
     }
 
     # define assays to include in SCE object based on include_unspliced
@@ -120,9 +118,7 @@ read_alevin <- function(quant_dir,
       fryDir = quant_dir,
       outputFormat = assay_formats
     )
-  }
-
-  if (!fry_mode) {
+  } else {
     # read in any non-USA formatted alevin-fry data or Alevin data
     counts <- read_tximport(quant_dir)
 
@@ -149,7 +145,7 @@ read_alevin <- function(quant_dir,
 
   return(sce)
 }
-
+# nolint end
 
 #' Read in counts data processed with Alevin or alevin-fry in tximport-compatible formats
 #'
@@ -174,6 +170,8 @@ read_tximport <- function(quant_dir) {
   ))
   counts <- as(txi$counts, "CsparseMatrix")
 }
+
+
 
 #' Read alevin metadata from json files
 #'

@@ -188,12 +188,12 @@ integrate_harmony <- function(merged_sce,
   }
 
   # if no covariate lambda provided, set to 1
-  if(length(covariate_lambda) == 0){
+  if (length(covariate_lambda) == 0) {
     covariate_lambda <- rep(1, length(covariate_cols))
   }
 
   # check that the lambda values match up
-  if(length(covariate_lambda) != length(covariate_cols)){
+  if (length(covariate_lambda) != length(covariate_cols)) {
     stop("The number of covariate columns must be equal to the number of covariate lambda values.")
   }
 

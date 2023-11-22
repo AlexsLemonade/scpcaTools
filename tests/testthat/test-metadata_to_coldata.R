@@ -35,7 +35,7 @@ sce_list <- purrr::imap(
     "sce3" = sce3
   ),
   # add some colData and metadata to each SCE object
-  \(sce, batch){
+  \(sce, batch) {
     # add some colData so merge_sce_list doesn't give a warning
     colData(sce)[["sum"]] <- runif(ncol(sce))
 
@@ -130,7 +130,8 @@ test_that("`metadata_to_coldata` fails as expected", {
   # column is missing from sample metadata
   # add a new column that is only in the colData and not in the sample metadata
   sce$batch_column <- "library1"
-  expect_error(metadata_to_coldata(sce,
+  expect_error(metadata_to_coldata(
+    sce,
     join_columns = "batch_column"
   ))
 
@@ -170,8 +171,8 @@ test_that("`metadata_to_coldata` works as expected with multiplexed libraries", 
   # only joining on library ids will mean non-unique matches
   suppressWarnings(
     expect_error(metadata_to_coldata(sce,
-                                     join_columns = "library_id")
-    )
+      join_columns = "library_id"
+    ))
   )
 
   # joining on sample and library ids will mean unique matches and should work
