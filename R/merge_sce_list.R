@@ -139,8 +139,18 @@ merge_sce_list <- function(
   } else {
 
     # If we are retaining altExps, first find all the features
-    # Then, add NA features where needed
+    altexp_features <- sce_list |>
+      purrr::map(
+        \(sce) rownames(altExp(sce))
+      ) |>
+      purrr::reduce(union)
 
+    # Then, add NA features where needed
+    sce_list <- sce_list |>
+      purrr::map(
+        prepare_altexps_for_merge,
+        altexp_features
+      )
   }
 
 
@@ -280,4 +290,120 @@ prepare_sce_for_merge <- function(
 
   # return the processed SCE
   return(sce)
+}
+
+
+
+#' Prepare altExps for merge by ensuring that all altExps have the same features.
+#'
+#' For any features in `altexp_features` that are missing from the SCE's altExp,
+#'  add those features in with `NA` counts, and update the rowData slot to match.
+#'  This involves creating a new SCE to replace the current altExp.
+#'
+#' @param sce The SCE object whose altExp should be prepared
+#' @param altexp_features Vector of features that should be present in the altExp
+#'
+#' @return An updated SCE object with all altExp features present
+prepare_altexps_for_merge <- function(
+    sce,
+    altexp_features) {
+
+  sce_altexp <- altExp(sce)
+
+  # Determine which features are missing
+  missing_features <- altexp_features[!(altexp_features %in% rownames(sce_altexp))]
+
+  # Update altExp if any features are missing
+  if (length(missing_features) > 0) {
+
+    # First, establish new rowData with all NA values
+    new_rowdata <- data.frame(
+      var = names(rowData(sce_altexp)),
+      val = rep(NA, n_feat)
+    ) |>
+      tidyr::pivot_wider(
+        names_from = var,
+        values_from = val
+      ) |>
+      # repeat rows n_missing times
+      dplyr::slice(
+        rep(1:dplyr::n(), each = length(missing_features))
+      ) |>
+      # force it to be a data frame so we can add rownames
+      # required due to tidyverse manipulation
+      as.data.frame()
+
+    # create new rownames to be added in when we re-DataFrame this
+    new_rownames <- c(
+      rownames(sce_altexp), # existing rownames
+      missing_features # new rownames
+    )
+
+    # Next, establish new counts and logcounts assays
+    # TODO: Can either add `if` for whether to run on each assay, or fail if
+    #  either is missing. Any reviewer preferences?
+    new_counts <- update_altexp_assay(
+      counts(sce_altexp),
+      missing_features
+    )
+
+    new_logcounts <- update_altexp_assay(
+      logcounts(sce_altexp),
+      missing_features
+    )
+
+    # Create a new altexp and add it into the SCE
+    # TODO: this line needs to be changed if we want to do `if` with assay update
+    new_altexp <- SingleCellExperiment(assays = list(counts = new_counts,
+                                                     logcounts = new_logcounts))
+
+    # Add the new rowData rows into the SCE
+    rowData(new_altexp) <- sce_altexp |>
+      rowData() |>
+      as.data.frame() |>
+      rbind(new_rowdata) |>
+      DataFrame(row.names = new_rownames)
+
+    # Add colData and metadata without modification
+    colData(new_altexp) <- colData(altExp(sce))
+    metadata(new_altexp) <- metadata(altExp(sce))
+
+
+    # Replace the old altExp
+    altExp(sce) <- new_altexp
+  }
+
+  # Return the SCE
+  return(sce)
+}
+
+
+
+#' Create a new assay sparse matrix with `NA` values for missing features
+#'
+#' @param assay_sparse_matrix Assay to modify, in sparse format
+#' @param missing_features Vector of missing features to add to the assay matrix
+#'
+#' @return Updated sparse matrix
+update_altexp_assay <- function(
+    assay_sparse_matrix,
+    missing_features) {
+
+  # First, create matrix for missing features with all NA values
+  new_matrix <- matrix(
+    NA,
+    nrow = length(missing_features),
+    ncol = ncol(assay_sparse_matrix)
+  )
+  rownames(new_matrix) <- missing_features
+
+  # Now rbind it to the existing matrix
+  new_assay <- assay_sparse_matrix |>
+    as.matrix() |>
+    rbind(new_matrix) |>
+    # make it sparse again
+    as("CsparseMatrix")
+
+  return(new_assay)
+
 }
