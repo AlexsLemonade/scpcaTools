@@ -57,7 +57,8 @@ sce_list <- purrr::imap(
 # create merged sce
 merged_sce <- merge_sce_list(
   sce_list = sce_list,
-  retain_coldata_cols = "sum"
+  retain_coldata_cols = "sum",
+  include_altexp = FALSE
 )
 
 
