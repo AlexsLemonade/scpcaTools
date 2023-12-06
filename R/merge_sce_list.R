@@ -312,13 +312,13 @@ prepare_sce_for_merge <- function(
 #'  This involves creating a new SCE to replace the current altExp.
 #'
 #' @param sce The SCE object whose altExp should be prepared
-#' @param batch The batch name for this SCE
+#' @param sce_name The name for this SCE
 #' @param altexp_features Vector of features that should be present in the altExp
 #'
 #' @return An updated SCE object with all altExp features present
 prepare_altexps_for_merge <- function(
     sce,
-    batch,
+    sce_name,
     altexp_features) {
 
   sce_altexp <- altExp(sce)
