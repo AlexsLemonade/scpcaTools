@@ -177,7 +177,7 @@ merge_sce_list <- function(
   metadata(merged_sce) <- metadata_list
 
   # If we are including altExps, process them and add to the merged sce
-  if (include_altExp) {
+  if (include_altexp) {
 
     # Find all shared features
     altexp_features <- sce_list |>
