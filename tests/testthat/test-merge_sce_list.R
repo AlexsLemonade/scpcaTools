@@ -15,6 +15,7 @@ add_sce_data <- function(sce, batch) {
 
   metadata(sce)$library_id <- library_id
   metadata(sce)$sample_id <- sample_id
+  metadata(sce)$total_reads <- ceiling(runif(1, 100, 1000))
   metadata(sce)$sample_metadata <- data.frame(
     sample_id = sample_id,
     library_id = library_id
@@ -25,6 +26,45 @@ add_sce_data <- function(sce, batch) {
   return(sce)
 }
 
+
+# helper function to add an altExp to a simulated SCE
+add_sce_altexp <- function(
+    sce,
+    batch,
+    num_altexp_features,
+    n_cells) {
+
+  sce_alt <- sim_sce(
+    n_genes = num_altexp_features,
+    n_cells = n_cells,
+    n_empty = 0)
+
+  # ensure matching barcodes
+  colnames(sce_alt) <- colnames(sce)
+
+  # add some rowdata columns
+  rowData(sce_alt)[["feature_column"]] <- rownames(sce_alt)
+  rowData(sce_alt)[["other_column"]] <- runif(nrow(sce_alt))
+
+  # add a coldat columns
+  colData(sce_alt)[["coldata_column"]] <- runif(ncol(sce_alt))
+
+  # add logcounts
+  logcounts(sce_alt) <- counts(sce_alt)
+
+  # add metadata
+  library_id <- glue::glue("library-{batch}")
+  sample_id <- glue::glue("sample-{batch}")
+
+  metadata(sce_alt)$library_id <- library_id
+  metadata(sce_alt)$sample_id <- sample_id
+  metadata(sce_alt)$mapped_reads <- ceiling(runif(1, 100, 1000))
+
+  # add sce_alt as sce's altExp
+  altExp(sce) <- sce_alt
+
+  return(sce)
+}
 
 # Generate some shared data for testing `prepare_sce_for_merge()` ---
 set.seed(1665)
@@ -41,21 +81,30 @@ shared_features <- rownames(sce)[1:10]
 retain_coldata_cols <- c("sum", "detected")
 preserve_rowdata_cols <- "gene_names"
 expected_coldata_cols <- sort(c("sum", "detected", batch_column, cell_id_column))
+num_altexp_features <- 5
 
-# Generate some shared data for testing `merge_sce_list()` ------
-sce1 <- sim_sce(n_cells = total_cells / 3, n_genes = total_genes, n_empty = 0)
+sce1 <-  sim_sce(n_cells = total_cells / 3, n_genes = total_genes, n_empty = 0)
 sce2 <- sim_sce(n_cells = total_cells / 3, n_genes = total_genes, n_empty = 0)
 sce3 <- sim_sce(n_cells = total_cells / 3, n_genes = total_genes, n_empty = 0)
-sce_list <- purrr::imap(
-  list(
-    "sce1" = sce1,
-    "sce2" = sce2,
-    "sce3" = sce3
-  ),
-  add_sce_data
-)
 
-
+# Generate some shared data for testing `merge_sce_list()` ------
+sce_list <- list(
+  "sce1" = sce1,
+  "sce2" = sce2,
+  "sce3" = sce3
+) |>
+  purrr::imap(
+    add_sce_data
+  ) |>
+  purrr::imap(
+    add_sce_altexp,
+    num_altexp_features,
+    total_cells / 3
+  )
+# keep only the first 3 features from the first SCE
+altExp(sce_list[[1]]) <- altExp(sce_list[[1]])[1:3]
+# vector of all expected names
+full_altexp_names <- names(altExp(sce_list[[2]]))
 
 test_that("`prepare_sce_for_merge` works as expected when all columns are present", {
   result_sce <- prepare_sce_for_merge(
@@ -148,7 +197,8 @@ test_that("merging SCEs with matching genes works as expected", {
   expect_warning(merge_sce_list(sce_list = list("sce1" = sce1)))
 
   # Works as expected:
-  merged_sce <- merge_sce_list(sce_list,
+  merged_sce <- merge_sce_list(
+    sce_list,
     batch_column = batch_column,
     # "total" should get removed
     retain_coldata_cols = retain_coldata_cols,
@@ -304,3 +354,4 @@ test_that("merging SCEs with library metadata fails as expected", {
 
   expect_error(merge_sce_list(sce_list))
 })
+
