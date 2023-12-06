@@ -346,10 +346,7 @@ prepare_altexps_for_merge <- function(
           1:dplyr::n(),
           each = n_missing
         )
-      ) |>
-      # force it to be a data frame so we can add rownames
-      # required due to tidyverse manipulation
-      as.data.frame()
+      )
 
     # create new rownames to be added in when we re-DataFrame this
     new_rownames <- c(
