@@ -275,7 +275,7 @@ prepare_sce_for_merge <- function(
   # Add `sce_name` to colnames so cell ids can be mapped to originating SCE
   colnames(sce) <- glue::glue("{sce_name}-{colnames(sce)}")
 
-  # Update metadata to only contain library and sample information
+  # get metadata list for updating it
   metadata_list <- metadata(sce)
 
   # first check that this library hasn't already been merged
@@ -283,7 +283,8 @@ prepare_sce_for_merge <- function(
     stop("This SCE object appears to be a merged object. We do not support merging objects with objects that have already been merged.")
   }
 
-  # create library and sample metadata
+  # create library and sample metadata.
+  # library metadata will hold all the previous metadata fields, to avoid conflicts
   library_metadata <- metadata_list[names(metadata_list) != "sample_metadata"]
   sample_metadata <- metadata_list$sample_metadata
 
