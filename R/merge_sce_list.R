@@ -1,4 +1,4 @@
-#' Merge a list of SCEs as preparation for formal integration
+#' Merge a list of SCEs into one SCE object
 #'
 #' This function takes an optionally-named (if named, ideally by a form of
 #'  library ID) list of SingleCellExperiment (SCE) objects and merges them into
@@ -36,27 +36,32 @@
 #' @param cell_id_column A character value giving the resulting colData column name
 #'  to hold unique cell IDs formatted as their original row name. Default
 #'  value is `cell_id`.
+#' @param include_altexp Boolean for whether or not any present alternative experiments
+#'  should be included in the final merged object. Default is TRUE.
 #'
 #' @return A SingleCellExperiment object containing all SingleCellExperiment objects
 #'   present in the inputted list
 #' @export
 #'
 #' @import SingleCellExperiment
-merge_sce_list <- function(sce_list = list(),
-                           batch_column = "library_id",
-                           retain_coldata_cols = c(
-                             "sum",
-                             "detected",
-                             "total",
-                             "subsets_mito_sum",
-                             "subsets_mito_detected",
-                             "subsets_mito_percent",
-                             "miQC_pass",
-                             "prob_compromised",
-                             "barcode"
-                           ),
-                           preserve_rowdata_cols = NULL,
-                           cell_id_column = "cell_id") {
+merge_sce_list <- function(
+    sce_list = list(),
+    batch_column = "library_id",
+    retain_coldata_cols = c(
+      "sum",
+      "detected",
+      "total",
+      "subsets_mito_sum",
+      "subsets_mito_detected",
+      "subsets_mito_percent",
+      "miQC_pass",
+      "prob_compromised",
+      "barcode"
+    ),
+    preserve_rowdata_cols = NULL,
+    cell_id_column = "cell_id",
+    include_altexp = TRUE) {
+
   # Check `sce_list`----------------------
   if (is.null(names(sce_list))) {
     warning(
@@ -116,15 +121,29 @@ merge_sce_list <- function(sce_list = list(),
     stop("The metadata for each SCE object must contain `library_id` and `sample_id`.")
   }
 
-  # Prepare SCEs
+  # Prepare main experiment of SCEs for merging
   sce_list <- sce_list |>
-    purrr::imap(prepare_sce_for_merge,
+    purrr::imap(
+      prepare_sce_for_merge,
       batch_column = batch_column,
       cell_id_column = cell_id_column,
       shared_features = shared_features,
       retain_coldata_cols = retain_coldata_cols,
       preserve_rowdata_cols = preserve_rowdata_cols
     )
+
+  # Handle alternative experiments
+  if (!include_altexp) {
+    sce_list <- sce_list |>
+      purrr::map(removeAltExps)
+  } else {
+
+    # If we are retaining altExps, first find all the features
+    # Then, add NA features where needed
+
+  }
+
+
 
   # get a list of metadata from the list of sce objects
   # each library becomes an element within the metadata components
@@ -185,15 +204,14 @@ merge_sce_list <- function(sce_list = list(),
 #'   renamed
 #'
 #' @return An updated SCE that is prepared for merging
-prepare_sce_for_merge <- function(sce,
-                                  sce_name,
-                                  batch_column,
-                                  cell_id_column,
-                                  shared_features,
-                                  retain_coldata_cols,
-                                  preserve_rowdata_cols) {
-  # Current functionality does not retain any present altExps
-  sce <- removeAltExps(sce)
+prepare_sce_for_merge <- function(
+  sce,
+  sce_name,
+  batch_column,
+  cell_id_column,
+  shared_features,
+  retain_coldata_cols,
+  preserve_rowdata_cols) {
 
   # Subset to shared features
   sce <- sce[shared_features, ]
