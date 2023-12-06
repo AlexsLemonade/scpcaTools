@@ -85,6 +85,16 @@ merge_sce_list <- function(
      Please check that `retain_coldata_cols` was correctly specified.")
   }
 
+  # If we are including altExps, extract them now for separate merging, to be
+  #  added back into the final merged SCE at the end
+  if (include_altexp) {
+    altexp_list <- sce_list |>
+      purrr::map(altExp)
+  }
+  sce_list <- sce_list |>
+    purrr::map(removeAltExps)
+
+
   # Subset SCEs to shared features and ensure appropriate naming ------------------
 
   # First, obtain intersection among all SCE objects
@@ -132,29 +142,6 @@ merge_sce_list <- function(
       preserve_rowdata_cols = preserve_rowdata_cols
     )
 
-  # Handle alternative experiments
-  if (!include_altexp) {
-    sce_list <- sce_list |>
-      purrr::map(removeAltExps)
-  } else {
-
-    # If we are retaining altExps, first find all the features
-    altexp_features <- sce_list |>
-      purrr::map(
-        \(sce) rownames(altExp(sce))
-      ) |>
-      purrr::reduce(union)
-
-    # Then, add NA features where needed
-    sce_list <- sce_list |>
-      purrr::map(
-        prepare_altexps_for_merge,
-        altexp_features
-      )
-  }
-
-
-
   # get a list of metadata from the list of sce objects
   # each library becomes an element within the metadata components
   metadata_list <- sce_list |>
@@ -185,11 +172,34 @@ merge_sce_list <- function(
     metadata_list$sample_metadata <- sample_metadata
   }
 
-  # Create the merged SCE from the processed list ------------------
+  # Create the merged SCE from the processed list and replace existing metadata list with merged metadata
   merged_sce <- do.call(cbind, sce_list)
-
-  # replace existing metadata list with merged metadata
   metadata(merged_sce) <- metadata_list
+
+  # If we are including altExps, process them and add to the merged sce
+  if (include_altExp) {
+
+    # Find all shared features
+    altexp_features <- sce_list |>
+      purrr::map(
+        \(sce) rownames(altExp(sce))
+      ) |>
+      purrr::reduce(union)
+
+    # Add NA values for features where needed, and otherwise prepare for merging
+    altexp_list <- altexp_list |>
+      purrr::imap(
+        prepare_altexps_for_merge,
+        altexp_features
+      )
+
+    # merge altExps
+    merged_altexps <- do.call(cbind, altexp_list)
+
+    # add the merged altExp to the merged_sce
+    # arbitrarily select the first altExp name to use here, since they are all the same
+    altExp(merged_sce, altExpNames(sce_list[[1]])) <- merged_altexps
+  }
 
   return(merged_sce)
 }
@@ -265,7 +275,7 @@ prepare_sce_for_merge <- function(
   # Add `sce_name` to colnames so cell ids can be mapped to originating SCE
   colnames(sce) <- glue::glue("{sce_name}-{colnames(sce)}")
 
-  # get metadata list
+  # Update metadata to only contain library and sample information
   metadata_list <- metadata(sce)
 
   # first check that this library hasn't already been merged
@@ -281,8 +291,8 @@ prepare_sce_for_merge <- function(
   metadata_list <- list(
     library_id = metadata(sce)[["library_id"]],
     sample_id = metadata(sce)[["sample_id"]],
-    library_metadata = library_metadata,
-    sample_metadata = sample_metadata
+    library_metadata = library_metadata, # this will be all previous metadata for the given library
+    sample_metadata = sample_metadata # this will be the same as the previous sample_metadata column
   )
 
   # replace existing metadata
@@ -301,25 +311,29 @@ prepare_sce_for_merge <- function(
 #'  This involves creating a new SCE to replace the current altExp.
 #'
 #' @param sce The SCE object whose altExp should be prepared
+#' @param batch The batch name for this SCE
 #' @param altexp_features Vector of features that should be present in the altExp
 #'
 #' @return An updated SCE object with all altExp features present
 prepare_altexps_for_merge <- function(
     sce,
+    batch,
     altexp_features) {
 
   sce_altexp <- altExp(sce)
 
   # Determine which features are missing
   missing_features <- altexp_features[!(altexp_features %in% rownames(sce_altexp))]
+  n_missing <- length(missing_features)
 
   # Update altExp if any features are missing
-  if (length(missing_features) > 0) {
+  if (n_missing > 0) {
 
     # First, establish new rowData with all NA values
+    # this data.frame only contains rows for missing features
     new_rowdata <- data.frame(
       var = names(rowData(sce_altexp)),
-      val = rep(NA, n_feat)
+      val = rep(NA, n_missing)
     ) |>
       tidyr::pivot_wider(
         names_from = var,
@@ -327,7 +341,10 @@ prepare_altexps_for_merge <- function(
       ) |>
       # repeat rows n_missing times
       dplyr::slice(
-        rep(1:dplyr::n(), each = length(missing_features))
+        rep(
+          1:dplyr::n(),
+          each = n_missing
+        )
       ) |>
       # force it to be a data frame so we can add rownames
       # required due to tidyverse manipulation
@@ -357,23 +374,31 @@ prepare_altexps_for_merge <- function(
     new_altexp <- SingleCellExperiment(assays = list(counts = new_counts,
                                                      logcounts = new_logcounts))
 
-    # Add the new rowData rows into the SCE
+    # Add the new rowData rows into the SCE, with updated column names
     rowData(new_altexp) <- sce_altexp |>
       rowData() |>
       as.data.frame() |>
       rbind(new_rowdata) |>
+      # re DataFrame with _all_ feature rownames
       DataFrame(row.names = new_rownames)
 
-    # Add colData and metadata without modification
+    # Add colData and metadata
     colData(new_altexp) <- colData(altExp(sce))
     metadata(new_altexp) <- metadata(altExp(sce))
 
-
-    # Replace the old altExp
-    altExp(sce) <- new_altexp
+    # Replace the old altExp, while preparing it for merge
+    altExp(sce) <- prepare_sce_for_merge(
+      new_altexp,
+      sce_name,
+      batch_column = "library_id",
+      cell_id_column = "cell_id",
+      shared_features = altexp_features,
+      retain_coldata_cols = colnames(colData(new_altexp)),
+      preserve_rowdata_cols = NA # rename them all
+    )
   }
 
-  # Return the SCE
+  # Return the SCE with updated altExp
   return(sce)
 }
 
