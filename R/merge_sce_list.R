@@ -324,7 +324,7 @@ prepare_altexps_for_merge <- function(
   sce_altexp <- altExp(sce)
 
   # Determine which features are missing
-  missing_features <- altexp_features[!(altexp_features %in% rownames(sce_altexp))]
+  missing_features <- setdiff(altexp_features, rownames(sce_altexp))
   n_missing <- length(missing_features)
 
   # Update altExp if any features are missing
