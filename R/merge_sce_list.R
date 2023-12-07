@@ -109,9 +109,11 @@ merge_sce_list <- function(
 
   # Second, determine all the column names that are present in any SCE so it can
   #  be created in any missing SCEs with `NA` values
-  all_colnames <- purrr::map(sce_list, ~ names(colData(.))) |>
+  all_colnames <- sce_list |>
+    purrr::map(
+      \(sce) names(colData(sce))
+    ) |>
     unlist() |>
-    unname() |>
     unique()
 
   # Check that the `retain_coldata_cols` are present in at least one SCE, and
@@ -332,21 +334,13 @@ prepare_altexps_for_merge <- function(
 
     # First, establish new rowData with all NA values
     # this data.frame only contains rows for missing features
-    new_rowdata <- data.frame(
-      var = names(rowData(sce_altexp)),
-      val = rep(NA, n_missing)
+    new_rowdata <- matrix(
+      NA,
+      nrow = n_missing,
+      ncol = ncol(rowData(sce_altexp))
     ) |>
-      tidyr::pivot_wider(
-        names_from = var,
-        values_from = val
-      ) |>
-      # repeat rows n_missing times
-      dplyr::slice(
-        rep(
-          1:dplyr::n(),
-          each = n_missing
-        )
-      )
+      as.data.frame() |>
+      purrr::set_names(colnames(rowData(sce_altexp)))
 
     # create new rownames to be added in when we re-DataFrame this
     new_rownames <- c(
@@ -354,23 +348,18 @@ prepare_altexps_for_merge <- function(
       missing_features # new rownames
     )
 
-    # Next, establish new counts and logcounts assays
-    # TODO: Can either add `if` for whether to run on each assay, or fail if
-    #  either is missing. Any reviewer preferences?
-    new_counts <- update_altexp_assay(
-      counts(sce_altexp),
-      missing_features
-    )
+    # Next, establish new assay matrices
+    assay_names <- assayNames(sce_altexp)
+    new_assays <- assay_names |>
+      purrr::map(
+        update_altexp_assay,
+        sce_altexp,
+        altexp_features
+      )
+    names(new_assays) <- assay_names
 
-    new_logcounts <- update_altexp_assay(
-      logcounts(sce_altexp),
-      missing_features
-    )
-
-    # Create a new altexp and add it into the SCE
-    # TODO: this line needs to be changed if we want to do `if` with assay update
-    new_altexp <- SingleCellExperiment(assays = list(counts = new_counts,
-                                                     logcounts = new_logcounts))
+    # Create a new altexp starting with new assay matrices
+    new_altexp <- SingleCellExperiment(assays = new_assays)
 
     # Add the new rowData rows into the SCE, with updated column names
     rowData(new_altexp) <- sce_altexp |>
@@ -404,29 +393,31 @@ prepare_altexps_for_merge <- function(
 
 #' Create a new assay sparse matrix with `NA` values for missing features
 #'
-#' @param assay_sparse_matrix Assay to modify, in sparse format
-#' @param missing_features Vector of missing features to add to the assay matrix
+#' @param assay_name The name of the assay to update
+#' @param sce_altexp Alternative experiment SCE to modify
+#' @param altexp_features All features that should end up in the matrix
 #'
 #' @return Updated sparse matrix
 update_altexp_assay <- function(
-    assay_sparse_matrix,
-    missing_features) {
+    assay_name,
+    sce_altexp,
+    altexp_features) {
 
-  # First, create matrix for missing features with all NA values
+  # pull out existing matrix
+  assay_sparse_matrix <- assay(sce_altexp, assay_name)
+
+  # define the new full matrix
   new_matrix <- matrix(
-    NA,
-    nrow = length(missing_features),
-    ncol = ncol(assay_sparse_matrix)
+    nrow = length(altexp_features),
+    ncol = ncol(assay_sparse_matrix),
+    dimnames = list(altexp_features, colnames(assay_sparse_matrix))
   )
-  rownames(new_matrix) <- missing_features
+  # fill in existing features
+  new_matrix[rownames(assay_sparse_matrix),] <- matrix(assay_sparse_matrix)
 
-  # Now rbind it to the existing matrix
-  new_assay <- assay_sparse_matrix |>
-    as.matrix() |>
-    rbind(new_matrix) |>
-    # make it sparse again
-    as("CsparseMatrix")
+  # make it sparse again
+  new_matrix <- as(new_matrix, "CsparseMatrix")
 
-  return(new_assay)
+  return(new_matrix)
 
 }
