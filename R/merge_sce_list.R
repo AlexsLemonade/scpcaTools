@@ -175,10 +175,10 @@ merge_sce_list <- function(
 
     # First we need to determine the final column names of the merged_sce (not yet made)
     #  for use in altExp code. Later we'll apply this order to the merged_sce itself.
+    # These values are cell ids: `{sce_name}_{barcode}`
     all_merged_barcodes <- sce_list |>
       purrr::map(colnames) |>
-      unlist() |>
-      unname()
+      purrr::reduce(union)
 
     # Find all altExp names present in the SCE objects.
     # We will prepare a merged altExp for each of these.
