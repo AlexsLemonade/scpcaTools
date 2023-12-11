@@ -189,7 +189,6 @@ merge_sce_list <- function(
       purrr::reduce(union)
 
     for (altexp_name in altexp_names) {
-      altexp_name <- "CITEseq"
       # Determine which SCEs contain this altExp, and create list of those altExps
       has_altexp_name <- sce_list |>
         purrr::map_lgl(
@@ -219,14 +218,18 @@ merge_sce_list <- function(
   # Replace existing metadata list with merged metadata
   metadata(merged_sce) <- metadata_list
 
-
+  # Add the merged altE into the main merged_sce
   if (include_altexp) {
-    # Apply column names
+
+    # Ensure compatible column names
+    # (this is probably not necessary but doesn't hurt...)
     merged_sce <- merged_sce[,merged_colnames]
 
-    ## TODO: ADD THE `merged_altexps` INTO `merged_sce`
+    # Add the merged altexps into the merged sce
+    for (altexp_name in names(merged_altexps)) {
+      altExp(merged_sce, altexp_name) <- merged_altexps[[altexp_name]]
+    }
   }
-
 
   return(merged_sce)
 }
