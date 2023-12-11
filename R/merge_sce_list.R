@@ -190,12 +190,8 @@ merge_sce_list <- function(
 
     for (altexp_name in altexp_names) {
       # Determine which SCEs contain this altExp, and create list of those altExps
-      has_altexp_name <- sce_list |>
-        purrr::map_lgl(
-          \(sce, altexp_name) altexp_name %in% altExpNames(sce),
-          altexp_name
-        )
-      altexp_list <- sce_list[has_altexp_name] |>
+      altexp_list <- sce_list |>
+        purrr::keep(\(sce) altexp_name %in% altExpNames(sce))
         purrr::map(altExp)
 
       # Create and save the merged altExp for this altexp_name
