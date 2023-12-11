@@ -197,7 +197,7 @@ merge_sce_list <- function(
       # Create and save the merged altExp for this altexp_name
       merged_altexps[[altexp_name]] <- create_merged_altexp(
         altexp_list,
-        merged_colnames
+        all_merged_barcodes
       )
 
     }
@@ -219,7 +219,7 @@ merge_sce_list <- function(
 
     # Ensure compatible column names
     # (this is probably not necessary but doesn't hurt...)
-    merged_sce <- merged_sce[,merged_colnames]
+    merged_sce <- merged_sce[,all_merged_barcodes]
 
     # Add the merged altexps into the merged sce
     for (altexp_name in names(merged_altexps)) {
@@ -338,14 +338,14 @@ prepare_sce_for_merge <- function(
 #'
 #'
 #' @param altexp_list List of altexps to merge
-#' @param merged_colnames Vector of column names (`{sce_name}-{barcode}`) to include
+#' @param all_merged_barcodes Vector of column names (`{sce_name}-{barcode}`) to include
 #'   in the final merged altExp. This vector includes _all_ SCEs, not only those
 #'   with this altExp name.
 #'
 #' @return A list of merged altExps to include the final merged SCE object
 create_merged_altexp <- function(
     altexp_list,
-    merged_colnames) {
+    all_merged_barcodes) {
 
   # Create vector of all features
   # this order will be used for the final assay matrix/ces
@@ -365,7 +365,7 @@ create_merged_altexp <- function(
       build_new_altexp_assay,
       altexp_list,
       altexp_features,
-      merged_colnames
+      all_merged_barcodes
     )
   names(new_assays) <- altexp_assay_names
 
@@ -373,7 +373,7 @@ create_merged_altexp <- function(
   # Create merged altExp
   merged_altexp <- SingleCellExperiment(assays = new_assays)
 
-  # TODO: Add rowData (and colData, if we need it) to merged_altexp
+  # TODO: Add rowData and colData to merged_altexp
 
   return(merged_altexp)
 
@@ -396,7 +396,7 @@ build_new_altexp_assay <- function(
     assay_name,
     altexp_list,
     merged_rownames,
-    merged_colnames) {
+    all_merged_barcodes) {
 
   # Establish new matrix with all NA values
   new_matrix <- matrix(

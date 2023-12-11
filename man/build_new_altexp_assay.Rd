@@ -7,8 +7,8 @@
 build_new_altexp_assay(
   assay_name,
   altexp_list,
-  merged_row_names,
-  merged_col_names
+  merged_rownames,
+  all_merged_barcodes
 )
 }
 \arguments{

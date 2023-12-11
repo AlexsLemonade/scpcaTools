@@ -4,12 +4,12 @@
 \alias{create_merged_altexp}
 \title{Prepare altExps for merge and create a list of merged altExps for each altExp name}
 \usage{
-create_merged_altexp(altexp_list, merged_colnames)
+create_merged_altexp(altexp_list, all_merged_barcodes)
 }
 \arguments{
 \item{altexp_list}{List of altexps to merge}
 
-\item{merged_colnames}{Vector of column names (`{sce_name}-{barcode}`) to include
+\item{all_merged_barcodes}{Vector of column names (`{sce_name}-{barcode}`) to include
 in the final merged altExp. This vector includes _all_ SCEs, not only those
 with this altExp name.}
 }
