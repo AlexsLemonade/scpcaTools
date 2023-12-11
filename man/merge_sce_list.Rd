@@ -2,16 +2,17 @@
 % Please edit documentation in R/merge_sce_list.R
 \name{merge_sce_list}
 \alias{merge_sce_list}
-\title{Merge a list of SCEs as preparation for formal integration}
+\title{Merge a list of SCEs into one SCE object}
 \usage{
 merge_sce_list(
   sce_list = list(),
   batch_column = "library_id",
   retain_coldata_cols = c("sum", "detected", "total", "subsets_mito_sum",
     "subsets_mito_detected", "subsets_mito_percent", "miQC_pass", "prob_compromised",
-    "barcode"),
+    "barcodes"),
   preserve_rowdata_cols = NULL,
-  cell_id_column = "cell_id"
+  cell_id_column = "cell_id",
+  include_altexp = TRUE
 )
 }
 \arguments{
@@ -35,6 +36,9 @@ For example, such a vector might contain items like "Gene", "ensembl_ids", etc.}
 \item{cell_id_column}{A character value giving the resulting colData column name
 to hold unique cell IDs formatted as their original row name. Default
 value is `cell_id`.}
+
+\item{include_altexp}{Boolean for whether or not any present alternative experiments
+should be included in the final merged object. Default is TRUE.}
 }
 \value{
 A SingleCellExperiment object containing all SingleCellExperiment objects
