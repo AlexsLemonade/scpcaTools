@@ -7,7 +7,7 @@
 build_new_altexp_assay(
   assay_name,
   altexp_list,
-  merged_rownames,
+  all_merged_features,
   all_merged_barcodes
 )
 }
@@ -16,10 +16,10 @@ build_new_altexp_assay(
 
 \item{altexp_list}{List of altExps which should be included in the new matrix}
 
-\item{merged_row_names}{Vector of matrix row names, corresponding to the full
+\item{all_merged_features}{Vector of matrix row names, corresponding to the full
 set of features for this altExp}
 
-\item{merged_col_names}{Vector of matrix column names, corresponding to all cells
+\item{all_merged_barcodes}{Vector of matrix column names, corresponding to all cells
 which will be in the final merged altExp}
 }
 \value{
