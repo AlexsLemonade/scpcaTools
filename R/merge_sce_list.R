@@ -200,7 +200,7 @@ merge_sce_list <- function(
         purrr::map(altExp)
 
       # Create and save the merged altExp for this altexp_name
-      merged_altexps[[altexp_name]] <- create_merged_altexps(
+      merged_altexps[[altexp_name]] <- create_merged_altexp(
         altexp_list,
         merged_colnames
       )
@@ -344,7 +344,7 @@ prepare_sce_for_merge <- function(
 #'   with this altExp name.
 #'
 #' @return A list of merged altExps to include the final merged SCE object
-create_merged_altexps <- function(
+create_merged_altexp <- function(
     altexp_list,
     merged_colnames) {
 
