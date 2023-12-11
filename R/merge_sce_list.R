@@ -191,7 +191,7 @@ merge_sce_list <- function(
     for (altexp_name in altexp_names) {
       # Determine which SCEs contain this altExp, and create list of those altExps
       altexp_list <- sce_list |>
-        purrr::keep(\(sce) altexp_name %in% altExpNames(sce))
+        purrr::keep(\(sce) altexp_name %in% altExpNames(sce)) |>
         purrr::map(altExp)
 
       # Create and save the merged altExp for this altexp_name
@@ -386,37 +386,35 @@ create_merged_altexp <- function(
 #'
 #' @param assay_name Name of assay of interest (e.g., "counts")
 #' @param altexp_list List of altExps which should be included in the new matrix
-#' @param merged_row_names Vector of matrix row names, corresponding to the full
+#' @param all_merged_features Vector of matrix row names, corresponding to the full
 #'   set of features for this altExp
-#' @param merged_col_names Vector of matrix column names, corresponding to all cells
+#' @param all_merged_barcodes Vector of matrix column names, corresponding to all cells
 #'   which will be in the final merged altExp
 #'
 #' @return Sparse matrix
 build_new_altexp_assay <- function(
     assay_name,
     altexp_list,
-    merged_rownames,
+    all_merged_features,
     all_merged_barcodes) {
 
   # Establish new matrix with all NA values
   new_matrix <- matrix(
     data = NA,
-    nrow = length(merged_row_names),
-    ncol = length(merged_col_names),
+    nrow = length(all_merged_features),
+    ncol = length(all_merged_barcodes),
     dimnames = list(
-      merged_row_names,
-      merged_col_names
+      all_merged_features,
+      all_merged_barcodes
     )
   )
 
-  # Substitute existing assays into the matrix
-  # Note we need `sce_name` to reform column names
+  # Substitute existing assays into the matrix, if they exist
   for (altexp in altexp_list) {
-
-    # Add assay into matrix if it exists
     # Note that column names were already formatted as `{sce_name}-{barcode}` by
     #  the main SCE merging code
     if (assay_name %in% assayNames(altexp)) {
+      # as.matrix() is needed here
       new_matrix[rownames(altexp), colnames(altexp)] <- as.matrix( assay(altexp, assay_name) )
     }
 
