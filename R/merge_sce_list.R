@@ -86,14 +86,14 @@ merge_sce_list <- function(
   }
 
   # If we are including altExps, extract them now for separate merging, to be
-  #  added back into the final merged SCE at the end.
-  # Each SCE will need an altExp for each of the altExp names that are present anywhere.
+  #  added back into the final merged SCE at the end
   if (include_altexp) {
-    # Find all the altExp names
-    altexp_names <- sce_list |>
-      purrr::map_chr(altExpNames) |>
-      unique()
+    altexp_list <- sce_list |>
+      purrr::map(altExp)
   }
+  sce_list <- sce_list |>
+    purrr::map(removeAltExps)
+
 
   # Subset SCEs to shared features and ensure appropriate naming ------------------
 
@@ -132,18 +132,6 @@ merge_sce_list <- function(
   if (!all(id_checks)) {
     stop("The metadata for each SCE object must contain `library_id` and `sample_id`.")
   }
-
-  # Prepare altExps here, so we can remove them before main merging
-  # This will be a list of lists.
-  # For each altexp name, we'll have a list of the altexp sces
-  altexp_lists <- prepare_altexps_for_merge(
-    sce_list,
-    altexp_names
-  )
-
-  # Remove altexps from sce_list
-  sce_list <- sce_list |>
-    purrr::map(removeAltExps)
 
   # Prepare main experiment of SCEs for merging
   sce_list <- sce_list |>
@@ -191,16 +179,29 @@ merge_sce_list <- function(
   metadata(merged_sce) <- metadata_list
 
   # If we are including altExps, process them and add to the merged sce
-  #if (include_altexp) {
-  #
-  #  # TODO: merge and add back in each altexp.
-  #  # merge altExps
-  #  merged_altexps <- do.call(cbind, altexp_list)
-  #
-  #  # add the merged altExp to the merged_sce
-  #  # arbitrarily select the first altExp name to use here, since they are all the same
-  #  altExp(merged_sce, altExpNames(sce_list[[1]])) <- merged_altexps
-  #}
+  if (include_altexp) {
+
+    # Find all shared features
+    altexp_features <- sce_list |>
+      purrr::map(
+        \(sce) rownames(altExp(sce))
+      ) |>
+      purrr::reduce(union)
+
+    # Add NA values for features where needed, and otherwise prepare for merging
+    altexp_list <- altexp_list |>
+      purrr::imap(
+        prepare_altexps_for_merge,
+        altexp_features
+      )
+
+    # merge altExps
+    merged_altexps <- do.call(cbind, altexp_list)
+
+    # add the merged altExp to the merged_sce
+    # arbitrarily select the first altExp name to use here, since they are all the same
+    altExp(merged_sce, altExpNames(sce_list[[1]])) <- merged_altexps
+  }
 
   return(merged_sce)
 }
@@ -320,9 +321,7 @@ prepare_sce_for_merge <- function(
 prepare_altexps_for_merge <- function(
     sce,
     sce_name,
-    altexp_name,
-    altexp_features,
-    dummy_altexp) {
+    altexp_features) {
 
   sce_altexp <- altExp(sce)
 
@@ -421,47 +420,4 @@ update_altexp_assay <- function(
 
   return(new_matrix)
 
-}
-
-
-prepare_altexps_for_merge <- function(
-    sce_list,
-    altexp_names) {
-
-  for (altexp_name in altexp_names) {
-
-    # determine which SCEs contain this altexp
-    altexps_present <- sce_list |>
-      purrr::map_lgl(
-        \(sce, altexp_name) altname %in% altExpNames(sce),
-        altname
-      )
-
-    # for SCEs with this altexp, find union of features
-    altexp_features <- sce_list[altexps_present] |>
-      purrr::map(
-        \(sce) rownames(altExp(sce))
-      ) |>
-      purrr::reduce(union)
-
-    # create dummy altexp as if any altexps_present are FALSE
-    if (all(altexps_present)) {
-      dummy_altexp <- NULL # just need something to pass in
-    } else {
-      dummy_altexp <- make_dummy_altexp(
-        altexp_features,
-        colnames(sce_list[[1]]) # arbitrary SCE just to get barcodes
-      )
-    }
-
-    # Prepare a list of altexps for merging
-    altexp_list <- sce_list |>
-      purrr::imap(
-        prepare_altexps_for_merge,
-        sce_name,
-        altexp_name,
-        altexp_features,
-        dummy_altexp
-      )
-  }
 }
