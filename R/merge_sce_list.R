@@ -175,7 +175,7 @@ merge_sce_list <- function(
 
     # First we need to determine the final column names of the merged_sce (not yet made)
     #  for use in altExp code. Later we'll apply this order to the merged_sce itself.
-    merged_colnames <- sce_list |>
+    all_merged_barcodes <- sce_list |>
       purrr::map(colnames) |>
       unlist() |>
       unname()
@@ -326,7 +326,7 @@ prepare_sce_for_merge <- function(
     library_id = metadata(sce)[["library_id"]],
     sample_id = metadata(sce)[["sample_id"]],
     library_metadata = library_metadata, # this will be all previous metadata for the given library
-    sample_metadata = sample_metadata # this will be the same as the previous sample_metadata column
+    sample_metadata = sample_metadata # this will be the same as the previous sample_metadata
   )
 
   # replace existing metadata
@@ -399,8 +399,8 @@ create_merged_altexp <- function(
 build_new_altexp_assay <- function(
     assay_name,
     altexp_list,
-    merged_row_names,
-    merged_col_names) {
+    merged_rownames,
+    merged_colnames) {
 
   # Establish new matrix with all NA values
   new_matrix <- matrix(
@@ -415,8 +415,7 @@ build_new_altexp_assay <- function(
 
   # Substitute existing assays into the matrix
   # Note we need `sce_name` to reform column names
-  for (sce_name in names(altexp_list)) {
-    altexp <- altexp_list[[sce_name]]
+  for (altexp in altexp_list) {
 
     # Add assay into matrix if it exists
     # Note that column names were already formatted as `{sce_name}-{barcode}` by
