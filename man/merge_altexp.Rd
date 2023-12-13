@@ -23,4 +23,5 @@ This function takes SingleCellExperiment (SCE) and adds an Alternative Experimen
 If the two experiments do not have the same set of cells, this will use the first
 SCE as the base set, adding columns (cells) to the AltExp so that the matrices match on that dimension.
 Columns (cells) that are not found in the base experiment are discarded.
+Note that this function is not related to merging multiple SCE objects.
 }
