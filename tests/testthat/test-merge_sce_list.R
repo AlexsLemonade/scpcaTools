@@ -351,8 +351,8 @@ add_sce_altexp <- function(
   metadata(sce_alt)$sample_id <- sample_id
   metadata(sce_alt)$mapped_reads <- 100
 
-  # add sce_alt as sce's altExp, named "adt"
-  altExp(sce, "adt") <- sce_alt
+  # add sce_alt as sce's altExp
+  altExp(sce, altexp_name) <- sce_alt
 
   return(sce)
 }
