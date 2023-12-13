@@ -108,7 +108,9 @@ altExp(sce_list_with_altexp[[1]]) <- altExp(sce_list_with_altexp[[1]])[1:3]
 # vector of all expected names
 full_altexp_names <- names(altExp(sce_list_with_altexp[[2]]))
 
-test_that("`prepare_sce_for_merge` works as expected when all columns are present", {
+# Tests without altexps ----------------------------------------------
+
+test_that("`prepare_sce_for_merge` works as expected when all columns are present, no altexps", {
   result_sce <- prepare_sce_for_merge(
     sce,
     sce_name,
@@ -170,7 +172,7 @@ test_that("`prepare_sce_for_merge` works as expected when all columns are presen
 
 
 
-test_that("`prepare_sce_for_merge` works as expected when an expected column is missing", {
+test_that("`prepare_sce_for_merge` works as expected when an expected column is missing, no altexps", {
   # REMOVE "detected" column first
   # It should get re-added in as all NAs
   colData(sce)$detected <- NULL
@@ -190,11 +192,7 @@ test_that("`prepare_sce_for_merge` works as expected when an expected column is 
 })
 
 
-####################################################################
-####################################################################
-
-
-test_that("merging SCEs with matching genes works as expected", {
+test_that("merging SCEs with matching genes works as expected, no altexps", {
   # First a warning for this early-return scenario
   expect_warning(merge_sce_list(sce_list = list("sce1" = sce1)))
 
@@ -294,7 +292,7 @@ test_that("merging SCEs with matching genes works as expected", {
 })
 
 
-test_that("merging SCEs with different genes among input SCEs works as expected", {
+test_that("merging SCEs with different genes among input SCEs works as expected, no altexps", {
   # rename sce2 and sce3 genes so that only 1-6 are overlapping
   # hence, we started with 12 genes.
   rownames(sce_list[[2]]) <- c(
@@ -318,7 +316,7 @@ test_that("merging SCEs with different genes among input SCEs works as expected"
 
 
 
-test_that("merging SCEs with no matching genes fails as expected", {
+test_that("merging SCEs with no matching genes fails as expected, no altexps, no altexps", {
   # ensure different gene names entirely
   rownames(sce_list[[1]]) <- rownames(sce_list[[2]])
   rownames(sce_list[[1]]) <- paste0(rownames(sce_list[[1]]), "-new")
@@ -335,7 +333,7 @@ test_that("merging SCEs with no matching genes fails as expected", {
 
 
 
-test_that("merging SCEs without names works as expected", {
+test_that("merging SCEs without names works as expected, no altexps", {
   # First make sure it generates a warning -
   expect_warning(
     merged_sce <- merge_sce_list(
@@ -355,7 +353,7 @@ test_that("merging SCEs without names works as expected", {
   )
 })
 
-test_that("merging SCEs with library metadata fails as expected", {
+test_that("merging SCEs with library metadata fails as expected, no altexps", {
   # add library metadata to one of the objects in the list
   metadata(sce_list$sce1)$library_metadata <- "library_metadata"
 
