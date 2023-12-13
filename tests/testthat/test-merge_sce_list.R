@@ -41,7 +41,6 @@ shared_features <- rownames(sce)[1:10]
 retain_coldata_cols <- c("sum", "detected")
 preserve_rowdata_cols <- "gene_names"
 expected_coldata_cols <- sort(c("sum", "detected", batch_column, cell_id_column))
-num_altexp_features <- 5
 
 sce1 <- sim_sce(n_cells = total_cells / 3, n_genes = total_genes, n_empty = 0)
 sce2 <- sim_sce(n_cells = total_cells / 3, n_genes = total_genes, n_empty = 0)
@@ -322,6 +321,7 @@ test_that("merging SCEs with library metadata fails as expected, no altexps", {
 add_sce_altexp <- function(
     sce,
     batch,
+    altexp_name,
     num_altexp_features,
     n_cells) {
 
@@ -351,35 +351,27 @@ add_sce_altexp <- function(
   metadata(sce_alt)$sample_id <- sample_id
   metadata(sce_alt)$mapped_reads <- 100
 
-  # add sce_alt as sce's altExp
+  # add sce_alt as sce's altExp, named "adt"
   altExp(sce, "adt") <- sce_alt
 
   return(sce)
 }
 
+num_altexp_features <- 5
+altexp_name <- "adt"
 sce_list_with_altexp <- sce_list |>
   purrr::imap(
     add_sce_altexp,
+    altexp_name,
     num_altexp_features,
     total_cells / 3
   )
-# keep only the first 3 features from the first SCE
-altExp(sce_list_with_altexp[[1]]) <- altExp(sce_list_with_altexp[[1]])[1:3]
 
 # vector of all expected names
-full_altexp_names <- names(altExp(sce_list_with_altexp[[2]]))
+full_altexp_features <- rownames(altExp(sce_list_with_altexp[[1]]))
 
-# set altExp names themselves - all altexp are the same name here
-altexp_name <- "adt"
-sce_list_with_altexp <- sce_list_with_altexp |>
-  purrr::map(
-    \(sce) {
-      altExpNames(sce) <- altexp_name
-      sce # return the sce
-    }
-  )
 
-test_that("merging SCEs with matching features works as expected, with altexps", {
+test_that("merging SCEs with same altExp features works as expected, with altexps", {
 
   merged_sce <- merge_sce_list(
     sce_list_with_altexp,
@@ -395,7 +387,42 @@ test_that("merging SCEs with matching features works as expected, with altexps",
 
   expect_true(altExpNames(merged_sce) == altexp_name)
   expect_equal(dim(merged_altexp), c(num_altexp_features, total_cells))
-  expect_equal(rownames(merged_altexp), full_altexp_names)
+  expect_equal(rownames(merged_altexp), full_altexp_features)
+
+  expected_colnames <- sce_list_with_altexp |>
+    purrr::imap(
+      \(sce, sce_name) glue::glue("{sce_name}-{colnames(sce)}")
+    ) |>
+    unlist() |>
+    unname()
+  expect_equal(colnames(merged_altexp), expected_colnames)
+
+})
+
+
+
+
+test_that("merging SCEs with different altExp features works as expected, with altexps", {
+
+  # keep only the first 3 features from the first SCE
+  altExp(sce_list_with_altexp[[1]]) <- altExp(sce_list_with_altexp[[1]])[1:3]
+
+
+  merged_sce <- merge_sce_list(
+    sce_list_with_altexp,
+    batch_column = batch_column,
+    # "total" should get removed
+    retain_coldata_cols = retain_coldata_cols,
+    # this row name should not be modified:
+    preserve_rowdata_cols = c("gene_names")
+  )
+
+  merged_altexp <- altExp(merged_sce)
+
+
+  expect_true(altExpNames(merged_sce) == altexp_name)
+  expect_equal(dim(merged_altexp), c(num_altexp_features, total_cells))
+  expect_equal(rownames(merged_altexp), full_altexp_features)
 
   expected_colnames <- sce_list_with_altexp |>
     purrr::imap(
@@ -424,3 +451,5 @@ test_that("merging SCEs with altExps works as expected when include_altexps = FA
   expect_length(altExpNames(merged_sce), 0)
 
 })
+
+
