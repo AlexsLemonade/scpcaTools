@@ -183,7 +183,7 @@ merge_sce_list <- function(
     # Find all altExp names present in the SCE objects.
     # We will prepare a merged altExp for each of these.
     altexp_names <- sce_list |>
-      purrr::map_chr(
+      purrr::map(
         \(sce) altExpNames(sce)
       ) |>
       purrr::reduce(union)
