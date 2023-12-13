@@ -406,3 +406,21 @@ test_that("merging SCEs with matching features works as expected, with altexps",
   expect_equal(colnames(merged_altexp), expected_colnames)
 
 })
+
+
+test_that("merging SCEs with altExps works as expected when include_altexps = FALSE", {
+
+  merged_sce <- merge_sce_list(
+    sce_list_with_altexp,
+    batch_column = batch_column,
+    # "total" should get removed
+    retain_coldata_cols = retain_coldata_cols,
+    # this row name should not be modified:
+    preserve_rowdata_cols = c("gene_names"),
+    include_altexp = FALSE
+  )
+
+  # this should fail if no altExp exists
+  expect_error( altExp(merged_sce) )
+
+})
