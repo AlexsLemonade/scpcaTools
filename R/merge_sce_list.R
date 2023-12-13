@@ -447,11 +447,13 @@ build_new_altexp_rowdata <- function(
     preserve_rowdata_cols = c("target_type")) {
 
   # First, we need to handle the `preserve_rowdata_cols`
-  # We'll identify which one to extract, and we'll save it to add back into the final
+  # We'll identify which version of each column to extract, and save it in
+  #  `preserved_columns` to cbind into the `new_rowdata` at the end
   preserved_columns <- list()
   for (colname in preserve_rowdata_cols) {
 
-    # We only want to work with rowDatas which contain this list
+    # We only want to work with rowDatas which contain this colname of interest,
+    # for dplyr::select appeasement
     rowdata_list_with_colname <- rowdata_list |>
       purrr::map(
         \(rowdata) {
@@ -478,6 +480,7 @@ build_new_altexp_rowdata <- function(
         }
       ) |>
       # combine all versions of `colname` into one data frame
+      # this way, we ensure that we consider _all features_
       purrr::reduce(dplyr::full_join, by = "temp") |>
       # back to data frame with rownames, and drop temp
       as.data.frame()
@@ -547,7 +550,7 @@ build_new_altexp_rowdata <- function(
     purrr::list_cbind()
 
   # Add back the preserved columns, if they exist
-  # these columns should appear first
+  # We want these columns to appear first, so they are the first arg to cbind
   if (nrow(preserved_columns_df) > 0) {
     new_rowdata <- preserved_columns |>
       cbind(new_rowdata)
@@ -555,7 +558,7 @@ build_new_altexp_rowdata <- function(
   # Convert to DataFrame and ensure row names are set
   new_rowdata <- DataFrame(new_rowdata,
                            row.names = rownames(new_rowdata),
-                           # preserve dashes in column names
+                           # we want to preserve dashes in column names
                            check.names = FALSE)
 
   return(new_rowdata)
