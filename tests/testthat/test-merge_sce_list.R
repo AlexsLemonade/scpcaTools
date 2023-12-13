@@ -334,8 +334,8 @@ add_sce_altexp <- function(
   colnames(sce_alt) <- colnames(sce)
 
   # add some rowdata columns
-  rowData(sce_alt)[["feature_column"]] <- rownames(sce_alt)
-  rowData(sce_alt)[["other_column"]] <- runif(nrow(sce_alt))
+  rowData(sce_alt)[["target_type"]] <- rownames(sce_alt)
+  rowData(sce_alt)[["feature_column"]] <- runif(nrow(sce_alt))
 
   # add a coldata columns
   colData(sce_alt)[["coldata_column"]] <- runif(ncol(sce_alt))
@@ -396,6 +396,12 @@ test_that("merging SCEs with same altExp features works as expected, with altexp
     unlist() |>
     unname()
   expect_equal(colnames(merged_altexp), expected_colnames)
+
+  expected_rowdata_names <- c("target_type",
+                              "sce1-feature_column",
+                              "sce2-feature_column",
+                              "sce3-feature_column")
+  expect_equal(colnames(rowData(merged_altexp)), expected_rowdata_names)
 
 })
 

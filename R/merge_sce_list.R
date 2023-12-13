@@ -378,7 +378,7 @@ create_merged_altexp <- function(
     purrr::map(
       \(altexp) { as.data.frame(rowData(altexp)) }
     ) |>
-    build_new_altexp_rowdata()
+    build_new_altexp_rowdata(altexp_features)
 
   return(merged_altexp)
 
@@ -436,27 +436,46 @@ build_new_altexp_assay <- function(
 #' Build a new rowData slot for the merged altExp
 #'
 #' @param rowdata_list Names list of current rowData slots, in `data.frame` format
+#' @param all_merged_features Vector of the full set of features for this altExp
 #' @param preserve_rowdata_cols Vector of columns whose names should not be changed
 #'   and whose values are expected to apply to all altExps.
 #'
 #' @return Updated rowData slot object in `DataFrame` format
 build_new_altexp_rowdata <- function(
     rowdata_list,
+    all_merged_features,
     preserve_rowdata_cols = c("target_type")) {
 
   # First, we need to handle the `preserve_rowdata_cols`
   # We'll identify which one to extract, and we'll save it to add back into the final
-  #  rowdata
   preserved_columns <- list()
   for (colname in preserve_rowdata_cols) {
-    colname_df <- rowdata_list |>
+
+    # We only want to work with rowDatas which contain this list
+    rowdata_list_with_colname <- rowdata_list |>
+      purrr::map(
+        \(rowdata) {
+          if (colname %in% colnames(rowdata)) {
+            return(rowdata)
+          } else {
+            return(NULL)
+          }
+        }
+      ) |>
+      purrr::discard(is.null)
+
+    if (length(rowdata_list_with_colname) == 0) {
+      next
+    }
+    colname_df <- rowdata_list_with_colname |>
       # Subset to only this `colname`, with rownames stored in `temp` for joining
       purrr::map(
         \(rowdata) {
-          rowdata |>
-            dplyr::select(all_of(colname))} |>
-            # pull out temp for joining
-            tibble::rownames_to_column("temp")
+            rowdata |>
+              dplyr::select(all_of(colname)) |>
+              # pull out temp for joining
+              tibble::rownames_to_column("temp")
+        }
       ) |>
       # combine all versions of `colname` into one data frame
       purrr::reduce(dplyr::full_join, by = "temp") |>
@@ -475,6 +494,7 @@ build_new_altexp_rowdata <- function(
 
     # Save for later use
     preserved_columns[[colname]] <- colname_df |>
+      # {{}} and := set the colname to the actual value
       dplyr::select({{colname}} := all_of(keep_column_name))
   }
   # Convert to data frame for easily adding into the rowData later
@@ -485,7 +505,13 @@ build_new_altexp_rowdata <- function(
   new_rowdata <- rowdata_list |>
     # Remove all of the `preserve_rowdata_cols`
     purrr::map(
-      \(rowdata) rowdata |> dplyr::select(-all_of(preserve_rowdata_cols))
+      \(rowdata) {
+        if (colname %in% colnames(rowdata)) {
+          return(rowdata |> dplyr::select(-all_of(preserve_rowdata_cols)))
+        } else {
+          return(rowdata)
+        }
+      }
     ) |>
     # Rename remaining columns as `{sce_name}-{column}`
     purrr::imap(
@@ -501,10 +527,12 @@ build_new_altexp_rowdata <- function(
         present_features <- rownames(rowdata)
 
         # how many are missing?
-        missing_features <- setdiff(altexp_features, present_features)
+        missing_features <- setdiff(all_merged_features, present_features)
 
         # add this number of new rows with all NA values
-        rowdata[nrow(rowdata) + length(missing_features),] <- NA
+        if (length(missing_features) > 0) {
+          rowdata[nrow(rowdata) + length(missing_features),] <- NA
+        }
 
         # name those rows
         rownames(rowdata) <- c(present_features, missing_features)
@@ -518,11 +546,17 @@ build_new_altexp_rowdata <- function(
     # Combine into final rowData data.frame
     purrr::list_cbind()
 
-  new_rowdata <- preserved_columns |>
-    # Add back the preserved_columns, which should appear _first_
-    cbind(new_rowdata) |>
-    # Convert to DataFrame and ensure row names are set
-    DataFrame(row.names = rownames(new_rowdata))
+  # Add back the preserved columns, if they exist
+  # these columns should appear first
+  if (nrow(preserved_columns_df) > 0) {
+    new_rowdata <- preserved_columns |>
+      cbind(new_rowdata)
+  }
+  # Convert to DataFrame and ensure row names are set
+  new_rowdata <- DataFrame(new_rowdata,
+                           row.names = rownames(new_rowdata),
+                           # preserve dashes in column names
+                           check.names = FALSE)
 
   return(new_rowdata)
 
