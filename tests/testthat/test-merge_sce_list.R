@@ -1,4 +1,4 @@
-# helper function to add more info to a simulated SCE ----
+## helper function to add more info to a simulated SCE ----
 add_sce_data <- function(sce, batch) {
   # add some coldata columns
   colData(sce)[["sum"]] <- runif(ncol(sce))
@@ -27,7 +27,7 @@ add_sce_data <- function(sce, batch) {
 }
 
 
-# helper function to add an altExp to a simulated SCE
+## helper function to add an altExp to a simulated SCE ----
 add_sce_altexp <- function(
     sce,
     batch,
@@ -66,7 +66,7 @@ add_sce_altexp <- function(
   return(sce)
 }
 
-# Generate some shared data for testing `prepare_sce_for_merge()` ---
+# Generate some shared data for testing `prepare_sce_for_merge()` -----
 set.seed(1665)
 total_cells <- 24 # divisible by 3
 total_genes <- 12 # number of months intentionally.
@@ -105,8 +105,19 @@ sce_list_with_altexp <- sce_list |>
   )
 # keep only the first 3 features from the first SCE
 altExp(sce_list_with_altexp[[1]]) <- altExp(sce_list_with_altexp[[1]])[1:3]
+
 # vector of all expected names
 full_altexp_names <- names(altExp(sce_list_with_altexp[[2]]))
+
+# set altExp names themselves - all altexp are the same name here
+altexp_name <- "adt"
+sce_list_with_altexp <- sce_list_with_altexp |>
+  purrr::map(
+    \(sce) {
+      altExpNames(sce) <- altexp_name
+      sce # return the sce
+    }
+  )
 
 # Tests without altexps ----------------------------------------------
 
@@ -364,3 +375,35 @@ test_that("merging SCEs with library metadata fails as expected, no altexps", {
   )
 })
 
+
+# Tests with altexps -------------------------------------------------------
+
+
+
+test_that("merging SCEs with matching features works as expected, with altexps", {
+
+  merged_sce <- merge_sce_list(
+    sce_list_with_altexp,
+    batch_column = batch_column,
+    # "total" should get removed
+    retain_coldata_cols = retain_coldata_cols,
+    # this row name should not be modified:
+    preserve_rowdata_cols = c("gene_names")
+  )
+
+  merged_altexp <- altExp(merged_sce)
+
+
+  expect_true(altExpNames(merged_sce) == altexp_name)
+  expect_equal(dim(merged_altexp), c(num_altexp_features, total_cells))
+  expect_equal(rownames(merged_altexp), full_altexp_names)
+
+  expected_colnames <- sce_list_with_altexp |>
+    purrr::imap(
+      \(sce, sce_name) glue::glue("{sce_name}-{colnames(sce)}")
+    ) |>
+    unlist() |>
+    unname()
+  expect_equal(colnames(merged_altexp), expected_colnames)
+
+})
