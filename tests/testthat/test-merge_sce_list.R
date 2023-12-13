@@ -26,46 +26,6 @@ add_sce_data <- function(sce, batch) {
   return(sce)
 }
 
-
-## helper function to add an altExp to a simulated SCE ----
-add_sce_altexp <- function(
-    sce,
-    batch,
-    num_altexp_features,
-    n_cells) {
-
-  sce_alt <- sim_sce(
-    n_genes = num_altexp_features,
-    n_cells = n_cells,
-    n_empty = 0)
-
-  # ensure matching barcodes
-  colnames(sce_alt) <- colnames(sce)
-
-  # add some rowdata columns
-  rowData(sce_alt)[["feature_column"]] <- rownames(sce_alt)
-  rowData(sce_alt)[["other_column"]] <- runif(nrow(sce_alt))
-
-  # add a coldata columns
-  colData(sce_alt)[["coldata_column"]] <- runif(ncol(sce_alt))
-
-  # add logcounts
-  logcounts(sce_alt) <- counts(sce_alt)
-
-  # add metadata
-  library_id <- glue::glue("library-{batch}")
-  sample_id <- glue::glue("sample-{batch}")
-
-  metadata(sce_alt)$library_id <- library_id
-  metadata(sce_alt)$sample_id <- sample_id
-  metadata(sce_alt)$mapped_reads <- 100
-
-  # add sce_alt as sce's altExp
-  altExp(sce) <- sce_alt
-
-  return(sce)
-}
-
 # Generate some shared data for testing `prepare_sce_for_merge()` -----
 set.seed(1665)
 total_cells <- 24 # divisible by 3
@@ -97,27 +57,6 @@ sce_list <- list(
     add_sce_data
   )
 
-sce_list_with_altexp <- sce_list |>
-  purrr::imap(
-    add_sce_altexp,
-    num_altexp_features,
-    total_cells / 3
-  )
-# keep only the first 3 features from the first SCE
-altExp(sce_list_with_altexp[[1]]) <- altExp(sce_list_with_altexp[[1]])[1:3]
-
-# vector of all expected names
-full_altexp_names <- names(altExp(sce_list_with_altexp[[2]]))
-
-# set altExp names themselves - all altexp are the same name here
-altexp_name <- "adt"
-sce_list_with_altexp <- sce_list_with_altexp |>
-  purrr::map(
-    \(sce) {
-      altExpNames(sce) <- altexp_name
-      sce # return the sce
-    }
-  )
 
 # Tests without altexps ----------------------------------------------
 
@@ -379,6 +318,66 @@ test_that("merging SCEs with library metadata fails as expected, no altexps", {
 # Tests with altexps -------------------------------------------------------
 
 
+## helper function to add an altExp to a simulated SCE ----
+add_sce_altexp <- function(
+    sce,
+    batch,
+    num_altexp_features,
+    n_cells) {
+
+  sce_alt <- sim_sce(
+    n_genes = num_altexp_features,
+    n_cells = n_cells,
+    n_empty = 0)
+
+  # ensure matching barcodes
+  colnames(sce_alt) <- colnames(sce)
+
+  # add some rowdata columns
+  rowData(sce_alt)[["feature_column"]] <- rownames(sce_alt)
+  rowData(sce_alt)[["other_column"]] <- runif(nrow(sce_alt))
+
+  # add a coldata columns
+  colData(sce_alt)[["coldata_column"]] <- runif(ncol(sce_alt))
+
+  # add logcounts
+  logcounts(sce_alt) <- counts(sce_alt)
+
+  # add metadata
+  library_id <- glue::glue("library-{batch}")
+  sample_id <- glue::glue("sample-{batch}")
+
+  metadata(sce_alt)$library_id <- library_id
+  metadata(sce_alt)$sample_id <- sample_id
+  metadata(sce_alt)$mapped_reads <- 100
+
+  # add sce_alt as sce's altExp
+  altExp(sce) <- sce_alt
+
+  return(sce)
+}
+
+sce_list_with_altexp <- sce_list |>
+  purrr::imap(
+    add_sce_altexp,
+    num_altexp_features,
+    total_cells / 3
+  )
+# keep only the first 3 features from the first SCE
+altExp(sce_list_with_altexp[[1]]) <- altExp(sce_list_with_altexp[[1]])[1:3]
+
+# vector of all expected names
+full_altexp_names <- names(altExp(sce_list_with_altexp[[2]]))
+
+# set altExp names themselves - all altexp are the same name here
+altexp_name <- "adt"
+sce_list_with_altexp <- sce_list_with_altexp |>
+  purrr::map(
+    \(sce) {
+      altExpNames(sce) <- altexp_name
+      sce # return the sce
+    }
+  )
 
 test_that("merging SCEs with matching features works as expected, with altexps", {
 
