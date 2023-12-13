@@ -437,39 +437,79 @@ build_new_altexp_assay <- function(
 #'
 #' @param rowdata_list Names list of current rowData slots, in `data.frame` format
 #' @param preserve_rowdata_cols Vector of columns whose names should not be changed
+#'   and whose values are expected to apply to all altExps.
 #'
 #' @return Updated rowData slot object in `DataFrame` format
 build_new_altexp_rowdata <- function(
     rowdata_list,
     preserve_rowdata_cols = c("target_type")) {
 
+  # First, we need to handle the `preserve_rowdata_cols`
+  # We'll identify which one to extract, and we'll save it to add back into the final
+  #  rowdata
+  preserved_columns <- list()
+  for (colname in preserve_rowdata_cols) {
+    colname_df <- rowdata_list |>
+      # Subset to only this `colname`, with rownames stored in `temp` for joining
+      purrr::map(
+        \(rowdata) {
+          rowdata |>
+            dplyr::select(all_of(colname))} |>
+            # pull out temp for joining
+            tibble::rownames_to_column("temp")
+      ) |>
+      # combine all versions of `colname` into one data frame
+      purrr::reduce(dplyr::full_join, by = "temp") |>
+      # back to data frame with rownames, and drop temp
+      as.data.frame()
+    rownames(colname_df) <- colname_df$temp
+    colname_df$temp <- NULL
+
+    # The column with the fewest NAs is what we want to use
+    keep_column_name <- colname_df |>
+      is.na() |>
+      colSums() |>
+      # which is the minimum? If ties, this returns the first occurrence only.
+      which.min() |>
+      names()
+
+    # Save for later use
+    preserved_columns[[colname]] <- colname_df |>
+      dplyr::select({{colname}} := all_of(keep_column_name))
+  }
+  # Convert to data frame for easily adding into the rowData later
+  preserved_columns_df <- purrr::list_cbind(preserved_columns)
+
+
+
   new_rowdata <- rowdata_list |>
-    # First, rename columns `{sce_name}-{column}` unless the name is in preserve_rowdata_cols
+    # Remove all of the `preserve_rowdata_cols`
+    purrr::map(
+      \(rowdata) rowdata |> dplyr::select(-all_of(preserve_rowdata_cols))
+    ) |>
+    # Rename remaining columns as `{sce_name}-{column}`
     purrr::imap(
       \(rowdata, sce_name) {
-        purrr::set_names(
-          rowdata,
-          # TODO: will this end up duplicating `target_type`?
-          ifelse(
-            names(rowdata) %in% preserve_rowdata_cols,
-            names(rowdata),
-            glue::glue("{sce_name}-{names(rowdata)}")
-          )
-        )
+        rowdata |>
+          purrr::set_names( glue::glue("{sce_name}-{names(rowdata)}") )
       }
     ) |>
     # Next, ensure all rows are present. For any missing rows, add all `NA` values
     purrr::map(
       \(rowdata) {
+        # find the features in this rowdata
         present_features <- rownames(rowdata)
+
         # how many are missing?
         missing_features <- setdiff(altexp_features, present_features)
+
         # add this number of new rows with all NA values
         rowdata[nrow(rowdata) + length(missing_features),] <- NA
+
         # name those rows
         rownames(rowdata) <- c(present_features, missing_features)
 
-        # return
+        # return updated rowdata
         rowdata
       }
     ) |>
@@ -478,8 +518,11 @@ build_new_altexp_rowdata <- function(
     # Combine into final rowData data.frame
     purrr::list_cbind()
 
-  # Convert to DataFrame and ensure row names are set
-  new_rowdata <- DataFrame(new_rowdata, row.names = rownames(new_rowdata))
+  new_rowdata <- preserved_columns |>
+    # Add back the preserved_columns, which should appear _first_
+    cbind(new_rowdata) |>
+    # Convert to DataFrame and ensure row names are set
+    DataFrame(row.names = rownames(new_rowdata))
 
   return(new_rowdata)
 
