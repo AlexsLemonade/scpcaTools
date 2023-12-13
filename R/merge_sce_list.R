@@ -373,7 +373,12 @@ create_merged_altexp <- function(
   # Create merged altExp
   merged_altexp <- SingleCellExperiment(assays = new_assays)
 
-  # TODO: Add rowData and colData to merged_altexp
+  # Create and add new rowData to the merged_altexp
+  rowData(merged_altexp) <- altexp_list |>
+    purrr::map(
+      \(altexp) { as.data.frame(rowData(altexp)) }
+    ) |>
+    build_new_altexp_rowdata()
 
   return(merged_altexp)
 
@@ -423,4 +428,59 @@ build_new_altexp_assay <- function(
   new_matrix <- as(new_matrix, "CsparseMatrix")
 
   return(new_matrix)
+}
+
+
+
+
+#' Build a new rowData slot for the merged altExp
+#'
+#' @param rowdata_list Names list of current rowData slots, in `data.frame` format
+#' @param preserve_rowdata_cols Vector of columns whose names should not be changed
+#'
+#' @return Updated rowData slot object in `DataFrame` format
+build_new_altexp_rowdata <- function(
+    rowdata_list,
+    preserve_rowdata_cols = c("target_type")) {
+
+  new_rowdata <- rowdata_list |>
+    # First, rename columns `{sce_name}-{column}` unless the name is in preserve_rowdata_cols
+    purrr::imap(
+      \(rowdata, sce_name) {
+        purrr::set_names(
+          rowdata,
+          # TODO: will this end up duplicating `target_type`?
+          ifelse(
+            names(rowdata) %in% preserve_rowdata_cols,
+            names(rowdata),
+            glue::glue("{sce_name}-{names(rowdata)}")
+          )
+        )
+      }
+    ) |>
+    # Next, ensure all rows are present. For any missing rows, add all `NA` values
+    purrr::map(
+      \(rowdata) {
+        present_features <- rownames(rowdata)
+        # how many are missing?
+        missing_features <- setdiff(altexp_features, present_features)
+        # add this number of new rows with all NA values
+        rowdata[nrow(rowdata) + length(missing_features),] <- NA
+        # name those rows
+        rownames(rowdata) <- c(present_features, missing_features)
+
+        # return
+        rowdata
+      }
+    ) |>
+    # Unname to avoid prefixing all column names with an additional `{sce_name}.`
+    unname() |>
+    # Combine into final rowData data.frame
+    purrr::list_cbind()
+
+  # Convert to DataFrame and ensure row names are set
+  new_rowdata <- DataFrame(new_rowdata, row.names = rownames(new_rowdata))
+
+  return(new_rowdata)
+
 }
