@@ -46,7 +46,7 @@ add_sce_altexp <- function(
   rowData(sce_alt)[["feature_column"]] <- rownames(sce_alt)
   rowData(sce_alt)[["other_column"]] <- runif(nrow(sce_alt))
 
-  # add a coldat columns
+  # add a coldata columns
   colData(sce_alt)[["coldata_column"]] <- runif(ncol(sce_alt))
 
   # add logcounts
@@ -58,7 +58,7 @@ add_sce_altexp <- function(
 
   metadata(sce_alt)$library_id <- library_id
   metadata(sce_alt)$sample_id <- sample_id
-  metadata(sce_alt)$mapped_reads <- ceiling(runif(1, 100, 1000))
+  metadata(sce_alt)$mapped_reads <- 100
 
   # add sce_alt as sce's altExp
   altExp(sce) <- sce_alt
@@ -95,16 +95,18 @@ sce_list <- list(
 ) |>
   purrr::imap(
     add_sce_data
-  ) |>
+  )
+
+sce_list_with_altexp <- sce_list |>
   purrr::imap(
     add_sce_altexp,
     num_altexp_features,
     total_cells / 3
   )
 # keep only the first 3 features from the first SCE
-altExp(sce_list[[1]]) <- altExp(sce_list[[1]])[1:3]
+altExp(sce_list_with_altexp[[1]]) <- altExp(sce_list_with_altexp[[1]])[1:3]
 # vector of all expected names
-full_altexp_names <- names(altExp(sce_list[[2]]))
+full_altexp_names <- names(altExp(sce_list_with_altexp[[2]]))
 
 test_that("`prepare_sce_for_merge` works as expected when all columns are present", {
   result_sce <- prepare_sce_for_merge(
@@ -203,8 +205,7 @@ test_that("merging SCEs with matching genes works as expected", {
     # "total" should get removed
     retain_coldata_cols = retain_coldata_cols,
     # this row name should not be modified:
-    preserve_rowdata_cols = c("gene_names"),
-    include_altexp = FALSE
+    preserve_rowdata_cols = c("gene_names")
   )
 
 
@@ -306,7 +307,7 @@ test_that("merging SCEs with different genes among input SCEs works as expected"
   )
 
   # Works as expected:
-  merged_sce <- merge_sce_list(sce_list, include_altexp = FALSE)
+  merged_sce <- merge_sce_list(sce_list)
 
 
   # correct number of genes and cells:
@@ -327,8 +328,7 @@ test_that("merging SCEs with no matching genes fails as expected", {
       sce_list = list(
         "sce1" = sce_list[[1]],
         "sce2" = sce_list[[2]]
-      ),
-      include_altexp = FALSE
+      )
     )
   )
 })
@@ -340,8 +340,7 @@ test_that("merging SCEs without names works as expected", {
   expect_warning(
     merged_sce <- merge_sce_list(
       unname(sce_list),
-      batch_column = batch_column,
-      include_altexp = FALSE
+      batch_column = batch_column
     )
   )
 
@@ -362,8 +361,7 @@ test_that("merging SCEs with library metadata fails as expected", {
 
   expect_error(
     merge_sce_list(
-      sce_list,
-      include_altexp = FALSE
+      sce_list
       )
   )
 })
