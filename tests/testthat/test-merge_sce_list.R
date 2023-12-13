@@ -43,7 +43,7 @@ preserve_rowdata_cols <- "gene_names"
 expected_coldata_cols <- sort(c("sum", "detected", batch_column, cell_id_column))
 num_altexp_features <- 5
 
-sce1 <-  sim_sce(n_cells = total_cells / 3, n_genes = total_genes, n_empty = 0)
+sce1 <- sim_sce(n_cells = total_cells / 3, n_genes = total_genes, n_empty = 0)
 sce2 <- sim_sce(n_cells = total_cells / 3, n_genes = total_genes, n_empty = 0)
 sce3 <- sim_sce(n_cells = total_cells / 3, n_genes = total_genes, n_empty = 0)
 
@@ -352,7 +352,7 @@ add_sce_altexp <- function(
   metadata(sce_alt)$mapped_reads <- 100
 
   # add sce_alt as sce's altExp
-  altExp(sce) <- sce_alt
+  altExp(sce, "adt") <- sce_alt
 
   return(sce)
 }
@@ -420,7 +420,7 @@ test_that("merging SCEs with altExps works as expected when include_altexps = FA
     include_altexp = FALSE
   )
 
-  # this should fail if no altExp exists
-  expect_error( altExp(merged_sce) )
+  # there should not be any altExps
+  expect_length(altExpNames(merged_sce), 0)
 
 })
