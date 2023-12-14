@@ -5,7 +5,7 @@
 #' @param x_assay_name Name of assay in SCE object to save as X in AnnData. Default is "counts".
 #' @param compression Type of compression to use when exporting hdf5 files. Options are
 #'   "none", "gzip", or "lzf". Default is "gzip".
-#' @param ... Any arguments to be passed into zellkonverter::writeH5AD or zellkonverter::SCE2AnnData
+#' @param ... Any arguments to be passed into zellkonverter::writeH5AD
 #'
 #' @return original SingleCellExperiment object used as input (invisibly)
 #' **Note that any columns present in the `rowData` of an SCE object that contains
@@ -23,7 +23,13 @@
 #'   anndata_file = "test_anndata.h5"
 #' )
 #' }
-sce_to_anndata <- function(sce, anndata_file, x_assay_name = "counts", compression = "gzip", ...) {
+sce_to_anndata <- function(
+  sce, 
+  anndata_file, 
+  x_assay_name = "counts", 
+  compression = c("gzip", "none", "lzf"), 
+  ...
+) {
   if (!requireNamespace("zellkonverter", quietly = TRUE)) {
     stop("The zellkonverter package must be installed to convert objects to AnnData. No output file written.")
   }
@@ -50,9 +56,7 @@ sce_to_anndata <- function(sce, anndata_file, x_assay_name = "counts", compressi
     stop("`x_assay_name` is not an assay in `sce`")
   }
 
-  if(!compression %in% c("none", "gzip", "lzf")){
-    stop("`compression` must be one of `none`, `gzip`, or `lzf`.")
-  }
+  compression <- match.arg(compression)
 
   # assign SCE to new variable to avoid modifying input SCE
   sce_to_convert <- sce
