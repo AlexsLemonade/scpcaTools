@@ -8,7 +8,7 @@ sce_to_anndata(
   sce,
   anndata_file,
   x_assay_name = "counts",
-  compression = "gzip",
+  compression = c("gzip", "none", "lzf"),
   ...
 )
 }
@@ -22,7 +22,7 @@ sce_to_anndata(
 \item{compression}{Type of compression to use when exporting hdf5 files. Options are
 "none", "gzip", or "lzf". Default is "gzip".}
 
-\item{...}{Any arguments to be passed into zellkonverter::writeH5AD or zellkonverter::SCE2AnnData}
+\item{...}{Any arguments to be passed into zellkonverter::writeH5AD}
 }
 \value{
 original SingleCellExperiment object used as input (invisibly)
