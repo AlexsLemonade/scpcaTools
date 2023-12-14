@@ -4,14 +4,25 @@
 \alias{sce_to_anndata}
 \title{Convert SingleCellExperiment objects to AnnData file stored as HDF5 file}
 \usage{
-sce_to_anndata(sce, anndata_file, x_assay_name = "counts")
+sce_to_anndata(
+  sce,
+  anndata_file,
+  x_assay_name = "counts",
+  compression = c("gzip", "none", "lzf"),
+  ...
+)
 }
 \arguments{
 \item{sce}{SingleCellExperiment object to be converted to AnnData as an HDF5 file}
 
-\item{anndata_file}{Path to output AnnData file. Must be an `.h5` or `.hdf5`}
+\item{anndata_file}{Path to output AnnData file. Must end in `.h5`, `.hdf5`, or `.h5ad`}
 
 \item{x_assay_name}{Name of assay in SCE object to save as X in AnnData. Default is "counts".}
+
+\item{compression}{Type of compression to use when exporting hdf5 files. Options are
+"none", "gzip", or "lzf". Default is "gzip".}
+
+\item{...}{Any arguments to be passed into zellkonverter::writeH5AD}
 }
 \value{
 original SingleCellExperiment object used as input (invisibly)
