@@ -269,7 +269,6 @@ test_that("create_sce_with_all_features works as expected with all features pres
 
 })
 
-# TODO: UPDATE THIS TEST
 test_that("merging SCEs with different genes among input SCEs works as expected, no altexps", {
 
   # Ensure different features across SCEs:
@@ -277,15 +276,17 @@ test_that("merging SCEs with different genes among input SCEs works as expected,
   ## first three genes in the second sce
 
   sce_list[[1]] <- sce_list[[1]][1:total_genes/2]
-
   rownames(sce_list[[2]][1:3]) <- LETTERS[1:3]
+
+  expected_rownames <- sce_list |>
+    purrr::map(rownames) |>
+    purrr::reduce(union)
 
   # Works as expected:
   merged_sce <- merge_sce_list(sce_list)
 
-
-  # correct number of genes and cells:
-  expect_equal(nrow(merged_sce), 6)
+  # correct rownames and number of cells:
+  expect_equal(rownames(merged_sce), expected_rownames)
   expect_equal(ncol(merged_sce), total_cells)
 })
 
