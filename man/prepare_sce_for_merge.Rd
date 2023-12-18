@@ -9,7 +9,7 @@ prepare_sce_for_merge(
   sce_name,
   batch_column,
   cell_id_column,
-  shared_features,
+  all_features,
   retain_coldata_cols,
   preserve_rowdata_cols
 )
@@ -25,8 +25,8 @@ colData slot}
 \item{cell_id_column}{The name of the cell_id column which will be added to the
 colData slot}
 
-\item{shared_features}{A vector of features (genes) that all SCEs to be merged
-have in common}
+\item{all_features}{A vector of features that all SCEs are expected to have.
+If any are missing, they will be added and filled with `NA` values.}
 
 \item{retain_coldata_cols}{A vector of columns to retain in the colData slot.
 If columns are missing from the data, they will be filled with `NA` values.
