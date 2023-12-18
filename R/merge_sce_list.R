@@ -85,6 +85,27 @@ merge_sce_list <- function(
      Please check that `retain_coldata_cols` was correctly specified.")
   }
 
+  # Check for shared features
+  shared_features <- sce_list |>
+    purrr::map(rownames) |>
+    purrr::reduce(intersect)
+
+  if (length(shared_features) == 0) {
+    stop("There are no shared features among provided SCE objects.
+         They cannot be merged.")
+  }
+
+  # Check that library id and sample id are present in main SCE metadata
+  id_checks <- sce_list |>
+    purrr::map(\(sce){
+      all(c("library_id", "sample_id") %in% names(metadata(sce)))
+    }) |>
+    unlist()
+
+  if (!all(id_checks)) {
+    stop("The metadata for each SCE object must contain `library_id` and `sample_id`.")
+  }
+
   # Check altExp compatibility, if we are including them
   if (include_altexp) {
 
@@ -124,18 +145,12 @@ merge_sce_list <- function(
     }
   }
 
-
   ## Subset SCEs to shared features and ensure appropriate naming ------------------
 
-  # First, obtain intersection among all SCE objects
-  shared_features <- sce_list |>
+  # First, obtain the union of features for all (main) SCE objects
+  sce_full_features <- sce_list |>
     purrr::map(rownames) |>
-    purrr::reduce(intersect)
-
-  if (length(shared_features) == 0) {
-    stop("There are no shared features among provided SCE objects.
-         They cannot be merged.")
-  }
+    purrr::reduce(union)
 
   # Second, determine all the column names that are present in any SCE so it can
   #  be created in any missing SCEs with `NA` values
@@ -152,17 +167,6 @@ merge_sce_list <- function(
     warning("The provided `retain_coldata_cols` are not present in any SCEs.")
   }
 
-  # check that library id and sample id are present in metadata
-  id_checks <- sce_list |>
-    purrr::map(\(sce){
-      all(c("library_id", "sample_id") %in% names(metadata(sce)))
-    }) |>
-    unlist()
-
-  if (!all(id_checks)) {
-    stop("The metadata for each SCE object must contain `library_id` and `sample_id`.")
-  }
-
   ## Prepare main experiment of SCEs for merging --------------------
   sce_list <- sce_list |>
     purrr::imap(
@@ -173,7 +177,6 @@ merge_sce_list <- function(
       retain_coldata_cols = retain_coldata_cols,
       preserve_rowdata_cols = preserve_rowdata_cols
     )
-
 
   ## Handle metadata ---------------------------------------------
   # get a list of metadata from the list of sce objects
@@ -280,8 +283,8 @@ merge_sce_list <- function(
 #'   colData slot
 #' @param cell_id_column The name of the cell_id column which will be added to the
 #'   colData slot
-#' @param shared_features A vector of features (genes) that all SCEs to be merged
-#'   have in common
+#' @param all_features A vector of features that all SCEs are expected to have.
+#'   If any are missing, they will be added and filled with `NA` values.
 #' @param retain_coldata_cols A vector of columns to retain in the colData slot.
 #'   If columns are missing from the data, they will be filled with `NA` values.
 #'   The exceptions to this are `barcode_column` and `batch_column` which will be
