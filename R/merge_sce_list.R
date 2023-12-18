@@ -148,6 +148,7 @@ merge_sce_list <- function(
   ## Subset SCEs to shared features and ensure appropriate naming ------------------
 
   # First, obtain the union of features for all (main) SCE objects
+  # this will also be the final order of features/rows in the final SCE
   sce_full_features <- sce_list |>
     purrr::map(rownames) |>
     purrr::reduce(union)
@@ -161,10 +162,9 @@ merge_sce_list <- function(
     unlist() |>
     unique()
 
-  # Check that the `retain_coldata_cols` are present in at least one SCE, and
-  #  error if the column exists nowhere.
+  # Check that the `retain_coldata_cols` are present in at least one SCE
   if (!(any(retain_coldata_cols %in% all_colnames))) {
-    warning("The provided `retain_coldata_cols` are not present in any SCEs.")
+    warning("The provided `retain_coldata_cols` are not present in any SCE colData.")
   }
 
   ## Prepare main experiment of SCEs for merging --------------------
@@ -173,7 +173,7 @@ merge_sce_list <- function(
       prepare_sce_for_merge,
       batch_column = batch_column,
       cell_id_column = cell_id_column,
-      shared_features = shared_features,
+      all_features = sce_full_features,
       retain_coldata_cols = retain_coldata_cols,
       preserve_rowdata_cols = preserve_rowdata_cols
     )
@@ -298,12 +298,20 @@ prepare_sce_for_merge <- function(
   sce_name,
   batch_column,
   cell_id_column,
-  shared_features,
+  all_features,
   retain_coldata_cols,
   preserve_rowdata_cols) {
 
-  # Subset to shared features
-  sce <- sce[shared_features, ]
+
+  #### assays #####
+  # If all features are present, order them to match `all_features` order
+  # If any features are missing, create a new SCE with those features and pop in
+  #  existing assays and rowData slot
+  sce <- create_sce_with_all_features(
+    sce,
+    all_features
+  )
+
 
   ##### rowData #####
   # Add `sce_name` ID to rowData column names except for those
@@ -374,6 +382,102 @@ prepare_sce_for_merge <- function(
   # return the processed SCE
   return(sce)
 }
+
+
+#' Create a new SCE that contains all provided features, or reorder a provided
+#'  SCE into the given feature order
+#'
+#' @param sce SCE from which a new SCE will be created, or which will be reordered
+#' @param all_features A vector of all features that need to be in the final SCE,
+#'   in this order
+#'
+#' @return SCE object with all features in the given order
+create_sce_with_all_features <- function(
+    sce,
+    all_features) {
+
+  present_features <- rownames(sce)
+  feature_diff <- setdiff(all_features, present_features)
+
+  if (length(feature_diff) == 0) {
+
+    # Simply reorder and return
+    return(sce[all_features,])
+
+  } else {
+
+    # new matrix with all NAs
+    new_matrix <- matrix(
+      data = NA,
+      nrow = length(all_features),
+      ncol = ncol(sce),
+      dimnames = list(
+        all_features,
+        colnames(sce)
+      )
+    )
+
+    # Create new matrix for each present assay
+    sce_assays <- assayNames(sce)
+    new_assays <- sce_assays |>
+      purrr::map(
+        \(assay_name) {
+
+
+          # fill in existing matrix values
+          new_matrix[present_features, colnames(sce)] <- as.matrix(
+            assay(sce, assay_name)[present_features, colnames(sce)]
+          )
+
+          return(new_matrix)
+        }
+      ) |>
+      purrr::set_names(sce_assays)
+
+    # Create a new SCE
+    new_sce <- SingleCellExperiment(assays = new_assays)
+
+    # Establish new rowData, filling in NAs for missing features
+    rowdata_colnames <- colnames(rowData(sce))
+    new_rowData <- matrix(
+      data = NA,
+      nrow = length(all_features),
+      ncol = ncol(rowData(sce)),
+      dimnames = list(
+        all_features,
+        rowdata_colnames
+      )
+    )
+
+    # Slot in existing rowData, ensuring correct order (as.matrix is needed)
+    new_rowData[present_features, rowdata_colnames] <- as.matrix(
+      rowData(sce)[present_features, rowdata_colnames]
+    )
+
+    # Add new rowData into new_sce
+    # TODO: We still need to handle columns like `gene_ids` which are now NAs
+    rowData(new_sce) <- new_rowData
+
+    # Add existing colData & metadata to the new SCE
+    colData(new_sce) <- colData(sce)
+    metadata(new_sce) <- metadata(sce)
+
+    # Return this new_sce
+    return(new_sce)
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

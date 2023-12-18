@@ -29,7 +29,7 @@ add_sce_data <- function(sce, batch) {
 # Generate some shared data for testing `prepare_sce_for_merge()` -----
 set.seed(1665)
 total_cells <- 24 # divisible by 3
-total_genes <- 12 # number of months intentionally.
+total_genes <- 12
 sce <- add_sce_data(
   sim_sce(n_cells = total_cells, n_genes = total_genes, n_empty = 0),
   batch = "1"
@@ -239,18 +239,46 @@ test_that("merging SCEs with matching genes works as expected, no altexps", {
   )
 })
 
+
+test_that("create_sce_with_all_features works as expected with all features present",{
+
+
+  all_features <- c(rownames(sce_list[[1]]), "feature1", "feature2")
+
+  new_sce <- create_sce_with_all_features(sce_list[[1]], all_features)
+
+  expect_equal(
+    all_features,
+    rownames(new_sce)
+  )
+
+  expect_equal(
+    colnames(sce_list[[1]]),
+    colnames(new_sce)
+  )
+
+  expect_equal(
+    assayNames(sce_list[[1]]),
+    assayNames(new_sce)
+  )
+
+  expect_equal(
+    metadata(sce_list[[1]]),
+    metadata(new_sce)
+  )
+
+})
+
 # TODO: UPDATE THIS TEST
 test_that("merging SCEs with different genes among input SCEs works as expected, no altexps", {
-  # rename sce2 and sce3 genes so that only 1-6 are overlapping
-  # hence, we started with 12 genes.
-  rownames(sce_list[[2]]) <- c(
-    rownames(sce_list[[2]])[1:6],
-    month.name[1:6]
-  )
-  rownames(sce_list[[3]]) <- c(
-    rownames(sce_list[[3]])[1:6],
-    month.name[7:12]
-  )
+
+  # Ensure different features across SCEs:
+  ## only keep the first half of the genes in the first sce, and rename the
+  ## first three genes in the second sce
+
+  sce_list[[1]] <- sce_list[[1]][1:total_genes/2]
+
+  rownames(sce_list[[2]][1:3]) <- LETTERS[1:3]
 
   # Works as expected:
   merged_sce <- merge_sce_list(sce_list)
