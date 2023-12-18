@@ -155,7 +155,6 @@ test_that("merging SCEs with matching genes works as expected, no altexps", {
     preserve_rowdata_cols = c("gene_names")
   )
 
-
   # correct number of genes and cells:
   expect_equal(nrow(merged_sce), total_genes)
   expect_equal(ncol(merged_sce), total_cells)
@@ -240,7 +239,7 @@ test_that("merging SCEs with matching genes works as expected, no altexps", {
   )
 })
 
-
+# TODO: UPDATE THIS TEST
 test_that("merging SCEs with different genes among input SCEs works as expected, no altexps", {
   # rename sce2 and sce3 genes so that only 1-6 are overlapping
   # hence, we started with 12 genes.
@@ -309,7 +308,7 @@ test_that("merging SCEs with library metadata fails as expected, no altexps", {
   expect_error(
     merge_sce_list(
       sce_list
-      )
+    )
   )
 })
 
