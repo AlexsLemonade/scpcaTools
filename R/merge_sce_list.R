@@ -62,7 +62,7 @@ merge_sce_list <- function(
     cell_id_column = "cell_id",
     include_altexp = TRUE) {
 
-  # Check `sce_list`----------------------
+  ## Checks --------------------------
   if (is.null(names(sce_list))) {
     warning(
       glue::glue(
@@ -79,13 +79,53 @@ merge_sce_list <- function(
     return(sce_list)
   }
 
-  # Check `retain_coldata_cols` ----------------
+  # Check `retain_coldata_cols`
   if (length(retain_coldata_cols) == 0) {
     warning("All pre-existing colData will be removed from the the merged SCE.
      Please check that `retain_coldata_cols` was correctly specified.")
   }
 
-  # Subset SCEs to shared features and ensure appropriate naming ------------------
+  # Check altExp compatibility, if we are including them
+  if (include_altexp) {
+
+    # Find all altExp names present in the SCE objects.
+    altexp_names <- sce_list |>
+      purrr::map(
+        \(sce) altExpNames(sce)
+      ) |>
+      purrr::reduce(union)
+
+    # For each in altexp_names (if present), do they have the same features?
+    # If not, error out
+    for (altexp_name in altexp_names) {
+
+      # all altExps for this name
+      altexp_list <- sce_list |>
+        purrr::keep(\(sce) altexp_name %in% altExpNames(sce)) |>
+        purrr::map(altExp, altexp_name)
+
+      # find their union of features
+      altexp_name_features <- altexp_list |>
+        purrr::map(rownames) |>
+        purrr::reduce(union) |>
+        sort()
+
+      # create logical vector for presence of all features
+      features_present <- altexp_list |>
+        purrr::map_lgl(
+          \(alt_sce) identical(altexp_name_features, sort(rownames(alt_sce)))
+        )
+
+      if (!all(features_present)) {
+        stop(
+          glue::glue("The {altexp_name} alternative experiments do not share the same set of features.")
+        )
+      }
+    }
+  }
+
+
+  ## Subset SCEs to shared features and ensure appropriate naming ------------------
 
   # First, obtain intersection among all SCE objects
   shared_features <- sce_list |>
@@ -123,7 +163,7 @@ merge_sce_list <- function(
     stop("The metadata for each SCE object must contain `library_id` and `sample_id`.")
   }
 
-  # Prepare main experiment of SCEs for merging --------------------
+  ## Prepare main experiment of SCEs for merging --------------------
   sce_list <- sce_list |>
     purrr::imap(
       prepare_sce_for_merge,
