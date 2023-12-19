@@ -86,42 +86,13 @@ merge_sce_list <- function(
   }
 
   # Check altExp compatibility, if we are including them
+  # altExps for a given name must all have the same features and the same assays
   if (include_altexp) {
 
-    # Find all altExp names present in the SCE objects.
-    altexp_names <- sce_list |>
-      purrr::map(
-        \(sce) altExpNames(sce)
-      ) |>
-      purrr::reduce(union)
+    # This is a list of lists of altexp information for later use:
+    # (altexp_name = list(  features = c(features), assays = c(assays) ))
+    altexp_attributes <- check_altexps(sce_list)
 
-    # For each in altexp_names (if present), do they have the same features?
-    # If not, error out
-    for (altexp_name in altexp_names) {
-
-      # all altExps for this name
-      altexp_list <- sce_list |>
-        purrr::keep(\(sce) altexp_name %in% altExpNames(sce)) |>
-        purrr::map(altExp, altexp_name)
-
-      # find their union of features
-      altexp_name_features <- altexp_list |>
-        purrr::map(rownames) |>
-        purrr::reduce(union) |>
-        sort()
-
-      # create logical vector for presence of all features
-      features_present <- altexp_list |>
-        purrr::map_lgl(
-          \(alt_sce) identical(altexp_name_features, sort(rownames(alt_sce)))
-        )
-
-      if (!all(features_present)) {
-        stop(
-          glue::glue("The {altexp_name} alternative experiments do not share the same set of features.")
-        )
-      }
-    }
   }
 
 
@@ -463,4 +434,85 @@ build_new_altexp_assay <- function(
   new_matrix <- as(new_matrix, "CsparseMatrix")
 
   return(new_matrix)
+}
+
+
+
+#' Helper function to check altExp compatibility
+#'
+#' @param sce_list List of SCEs with altExps to check
+#'
+#' @return List of named lists with altExp information for use when preparing to merge,
+#'   with each sublist formatted as:
+#'   altexp_name = list(features = c(features), assays = c(assays))
+check_altexps <- function(sce_list) {
+
+  # Attribute list to save for later use
+  altexp_attributes <- list()
+
+  # Find all altExp names present in the SCE objects.
+  altexp_names <- sce_list |>
+    purrr::map(
+      \(sce) altExpNames(sce)
+    ) |>
+    purrr::reduce(union)
+
+  # For each in altexp_names (if present), do they have the same features?
+  # If not, error out
+  for (altexp_name in altexp_names) {
+
+    # all altExps for this name
+    altexp_list <- sce_list |>
+      purrr::keep(\(sce) altexp_name %in% altExpNames(sce)) |>
+      purrr::map(altExp, altexp_name)
+
+    # find their union of features
+    all_features <- altexp_list |>
+      purrr::map(rownames) |>
+      purrr::reduce(union) |>
+      sort()
+
+    # create logical vector for presence of all features
+    features_present <- altexp_list |>
+      purrr::map_lgl(
+        \(alt_sce) identical(all_features, sort(rownames(alt_sce)))
+      )
+
+    if (!all(features_present)) {
+      stop(
+        glue::glue("The {altexp_name} alternative experiments do not share the same set of features.")
+      )
+    }
+
+    ################################################################################
+    # TODO: ALTERNATIVELY, we can just return the union of assays and make dummy
+    # matrices if any are missing, rather that requiring that all be present.
+    ################################################################################
+
+    # check for same assays
+    all_assays <- altexp_list |>
+      purrr::map(assayNames) |>
+      purrr::reduce(union)|>
+      sort()
+
+    # create logical vector for presence of all assays
+    assays_present <- altexp_list |>
+      purrr::map_lgl(
+        \(alt_sce) identical(all_assays, sort(assayNames(alt_sce)))
+      )
+
+    if (!all(assays_present)) {
+      stop(
+        glue::glue("The {altexp_name} alternative experiments do not share the same set of assays.")
+      )
+    }
+
+    # Save to altexp_attributes for later use
+    altexp_attributes[[altexp_name]] <- list(
+      "features" = all_features,
+      "assays"   = all_assays
+    )
+
+  }
+  return(altexp_attributes)
 }
