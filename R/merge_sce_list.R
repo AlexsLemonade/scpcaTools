@@ -484,11 +484,6 @@ check_altexps <- function(sce_list) {
       )
     }
 
-    ################################################################################
-    # TODO: ALTERNATIVELY, we can just return the union of assays and make dummy
-    # matrices if any are missing, rather that requiring that all be present.
-    ################################################################################
-
     # check for same assays
     all_assays <- altexp_list |>
       purrr::map(assayNames) |>
@@ -501,6 +496,7 @@ check_altexps <- function(sce_list) {
         \(alt_sce) identical(all_assays, sort(assayNames(alt_sce)))
       )
 
+    # TODO: we may want to drop assays that aren't present in all altexps, rather than dying.
     if (!all(assays_present)) {
       stop(
         glue::glue("The {altexp_name} alternative experiments do not share the same set of assays.")
