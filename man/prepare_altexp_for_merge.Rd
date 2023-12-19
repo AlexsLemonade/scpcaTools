@@ -10,6 +10,8 @@ prepare_altexp_for_merge(
   altexp_name,
   expected_assays,
   expected_features,
+  batch_column,
+  cell_id_column,
   preserve_rowdata_cols = c("target_type")
 )
 }
@@ -23,6 +25,12 @@ prepare_altexp_for_merge(
 \item{expected_assays}{Vector of assays that should be in each altExp}
 
 \item{expected_features}{Vector of features that should be in each altExp}
+
+\item{batch_column}{The name of the batch column which will be added to the
+colData slot.}
+
+\item{cell_id_column}{The name of the cell_id column which will be added to the
+colData slot.}
 
 \item{preserve_rowdata_cols}{altExp rowData columns which should not be renamed}
 }

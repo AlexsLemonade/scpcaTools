@@ -229,7 +229,7 @@ merge_sce_list <- function(
 #' @param preserve_rowdata_cols A vector of rowData columns which should not be
 #'   renamed
 #' @param is_altexp Boolean if we are preparing an altExp or not.
-#'   Default is `FALSE`.
+#'   Default is `FALSE`. If FALSE, the SCE colnames will not be modified.
 #'
 #' @return An updated SCE that is prepared for merging
 prepare_sce_for_merge <- function(

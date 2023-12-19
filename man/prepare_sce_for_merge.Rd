@@ -21,10 +21,10 @@ prepare_sce_for_merge(
 \item{sce_name}{The name of the SCE object}
 
 \item{batch_column}{The name of the batch column which will be added to the
-colData slot}
+colData slot.}
 
 \item{cell_id_column}{The name of the cell_id column which will be added to the
-colData slot}
+colData slot.}
 
 \item{shared_features}{A vector of features (genes) that all SCEs to be merged
 have in common}
@@ -38,7 +38,7 @@ populated with respective information.}
 renamed}
 
 \item{is_altexp}{Boolean if we are preparing an altExp or not.
-Default is `FALSE`.}
+Default is `FALSE`. If FALSE, the SCE colnames will not be modified.}
 }
 \value{
 An updated SCE that is prepared for merging
