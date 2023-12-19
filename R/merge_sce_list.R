@@ -315,8 +315,22 @@ prepare_sce_for_merge <- function(
   # Add `sce_name` to colnames so cell ids can be mapped to originating SCE
   colnames(sce) <- glue::glue("{sce_name}-{colnames(sce)}")
 
-  # get metadata list for updating it
-  metadata_list <- metadata(sce)
+  # Update metadata list
+  metadata(sce) <- update_sce_metadata(
+    metadata(sce)
+  )
+
+  # return the processed SCE
+  return(sce)
+}
+
+
+#' Helper function to update SCE metadata for merging
+#'
+#' @param metadata_list Current SCE metadata before modification
+#'
+#' @return Updated metadata list to store in the SCE
+update_sce_metadata <- function(metadata_list) {
 
   # first check that this library hasn't already been merged
   if ("library_metadata" %in% names(metadata_list)) {
@@ -330,19 +344,15 @@ prepare_sce_for_merge <- function(
 
   # combine into one list
   metadata_list <- list(
-    library_id = metadata(sce)[["library_id"]],
-    sample_id = metadata(sce)[["sample_id"]],
+    library_id = metadata_list[["library_id"]],
+    sample_id = metadata_list[["sample_id"]],
     library_metadata = library_metadata, # this will be all previous metadata for the given library
     sample_metadata = sample_metadata # this will be the same as the previous sample_metadata
   )
 
-  # replace existing metadata
-  metadata(sce) <- metadata_list
-
-  # return the processed SCE
-  return(sce)
+  # return updated metadata
+  return(metadata_list)
 }
-
 
 
 #' Prepare altExps for merge and create a list of merged altExps for each altExp name
