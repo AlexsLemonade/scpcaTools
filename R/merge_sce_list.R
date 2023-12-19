@@ -88,11 +88,13 @@ merge_sce_list <- function(
   # Check altExp compatibility, if we are including them
   # altExps for a given name must all have the same features and the same assays
   if (include_altexp) {
-
     # This is a list of lists of altexp information for later use:
     # (altexp_name = list(  features = c(features), assays = c(assays) ))
     altexp_attributes <- check_altexps(sce_list)
-
+  } else {
+    # Remove altexps if we are not including them
+    sce_list <- sce_list |>
+      purrr::map(removeAltExps)
   }
 
 
@@ -181,43 +183,22 @@ merge_sce_list <- function(
   ## Handle altExps ------------------------------------------------------
 
   # If we are including altExps, process them and save to list to add to merged SCE
-  merged_altexps <- list()
   if (include_altexp) {
 
-    # First we need to determine the final column names of the merged_sce (not yet made)
-    #  for use in altExp code. Later we'll apply this order to the merged_sce itself.
-    # These values are cell ids: `{sce_name}-{barcode}`
-    all_merged_barcodes <- sce_list |>
-      purrr::map(colnames) |>
-      purrr::reduce(union)
+    for (altexp_name in names(altexp_attributes)) {
 
-    # Find all altExp names present in the SCE objects.
-    # We will prepare a merged altExp for each of these.
-    altexp_names <- sce_list |>
-      purrr::map(
-        \(sce) altExpNames(sce)
-      ) |>
-      purrr::reduce(union)
+      expected_assays <- altexp_attributes[[altexp_name]][["assays"]]
+      expected_features <- altexp_attributes[[altexp_name]][["features"]]
 
-    for (altexp_name in altexp_names) {
-      # Determine which SCEs contain this altExp, and create list of those altExps
-      altexp_list <- sce_list |>
-        purrr::keep(\(sce) altexp_name %in% altExpNames(sce)) |>
-        purrr::map(altExp)
-
-      # Create and save the merged altExp for this altexp_name
-      merged_altexps[[altexp_name]] <- create_merged_altexp(
-        altexp_list,
-        all_merged_barcodes
-      )
-
+      sce_list <- sce_list |>
+        purrr::imap(
+          prepare_altexp_for_merge,
+          altexp_name,
+          expected_assays,
+          expected_features
+        )
     }
   }
-
-  # Remove altExps from SCEs prior to main experiment merge
-  # If none are present, this code has no effect.
-  sce_list <- sce_list |>
-    purrr::map(removeAltExps)
 
   # Create the merged SCE from the processed list
   merged_sce <- do.call(cbind, sce_list)
@@ -225,22 +206,8 @@ merge_sce_list <- function(
   # Replace existing metadata list with merged metadata
   metadata(merged_sce) <- metadata_list
 
-  # Add the merged altE into the main merged_sce
-  if (include_altexp) {
-
-    # Ensure compatible column names
-    # (this is probably not necessary but doesn't hurt...)
-    merged_sce <- merged_sce[,all_merged_barcodes]
-
-    # Add the merged altexps into the merged sce
-    for (altexp_name in names(merged_altexps)) {
-      altExp(merged_sce, altexp_name) <- merged_altexps[[altexp_name]]
-    }
-  }
-
   return(merged_sce)
 }
-
 
 
 #' Helper function to prepare an SCE object for merging
@@ -259,6 +226,8 @@ merge_sce_list <- function(
 #'   populated with respective information.
 #' @param preserve_rowdata_cols A vector of rowData columns which should not be
 #'   renamed
+#' @param is_altexp Boolean if we are preparing an altExp or not.
+#'   Default is `FALSE`.
 #'
 #' @return An updated SCE that is prepared for merging
 prepare_sce_for_merge <- function(
@@ -268,7 +237,8 @@ prepare_sce_for_merge <- function(
   cell_id_column,
   shared_features,
   retain_coldata_cols,
-  preserve_rowdata_cols) {
+  preserve_rowdata_cols,
+  is_altexp = FALSE) {
 
   # Subset to shared features
   sce <- sce[shared_features, ]
@@ -306,14 +276,17 @@ prepare_sce_for_merge <- function(
   # Use drop=FALSE to ensure result is a DataFrame
   colData(sce) <- colData(sce)[, retain_coldata_cols, drop = FALSE]
 
-  # Add batch column
-  sce[[batch_column]] <- sce_name
+  # Only make these changes if we are not working with an altExp
+  if (!is_altexp) {
+    # Add batch column
+    sce[[batch_column]] <- sce_name
 
-  # Add cell_id column
-  sce[[cell_id_column]] <- colnames(sce)
+    # Add cell_id column
+    sce[[cell_id_column]] <- colnames(sce)
 
-  # Add `sce_name` to colnames so cell ids can be mapped to originating SCE
-  colnames(sce) <- glue::glue("{sce_name}-{colnames(sce)}")
+    # Add `sce_name` to colnames so cell ids can be mapped to originating SCE
+    colnames(sce) <- glue::glue("{sce_name}-{colnames(sce)}")
+  }
 
   # Update metadata list
   metadata(sce) <- update_sce_metadata(
@@ -323,6 +296,57 @@ prepare_sce_for_merge <- function(
   # return the processed SCE
   return(sce)
 }
+
+
+
+#' Prepare an alternative experiment for merging
+#'
+#' If the given `altexp_name` name is missing from the SCE, a new one with all
+#'   NA assays will be created.
+#' @param sce SCE with altExp to prepare
+#' @param sce_name SCE name
+#' @param altexp_name Name of altExp of interest
+#' @param expected_assays Vector of assays that should be in each altExp
+#' @param expected_features Vector of features that should be in each altExp
+#' @param preserve_rowdata_cols altExp rowData columns which should not be renamed
+#'
+#' @return An SCE with an updated altEcp
+prepare_altexp_for_merge <- function(
+    sce,
+    sce_name,
+    altexp_name,
+    expected_assays,
+    expected_features,
+    preserve_rowdata_cols = c("target_type")) {
+
+  if (!altexp_name %in% altExpNames(sce) ) {
+
+    na_assays <- expected_assays |>
+      purrr::set_names() |>
+      purrr::map(
+        build_na_matrix,
+        expected_features,
+        colnames(sce)
+      )
+
+    altExp(sce, altexp_name) <- SingleCellExperiment(assays = na_assays)
+  }
+
+  # Now, prepare this altexp for merge
+  altExp(sce, altexp_name) <- prepare_sce_for_merge(
+    altExp(sce, altexp_name),
+    sce_name,
+    batch_column = NULL,
+    cell_id_column = NULL,
+    shared_features = expected_features,
+    retain_coldata_cols = NULL,
+    preserve_rowdata_cols = preserve_rowdata_cols,
+    is_altexp = TRUE
+  )
+
+  return(sce)
+}
+
 
 
 #' Helper function to update SCE metadata for merging
@@ -355,97 +379,30 @@ update_sce_metadata <- function(metadata_list) {
 }
 
 
-#' Prepare altExps for merge and create a list of merged altExps for each altExp name
+
+
+#' Create a sparse matrix with all NA values
 #'
-#'
-#' @param altexp_list List of altexps to merge
-#' @param all_merged_barcodes Vector of column names (`{sce_name}-{barcode}`) to include
-#'   in the final merged altExp. This vector includes _all_ SCEs, not only those
-#'   with this altExp name.
-#'
-#' @return A list of merged altExps to include the final merged SCE object
-create_merged_altexp <- function(
-    altexp_list,
-    all_merged_barcodes) {
-
-  # Create vector of all features
-  # this order will be used for the final assay matrix/ces
-  altexp_features <- altexp_list |>
-    purrr::map(rownames) |>
-    purrr::reduce(union)
-
-  # Determine which assays are present for this altexp_name. We'll need a matrix
-  # for each of these in the final merged object
-  altexp_assay_names <- altexp_list |>
-    purrr::map(assayNames) |>
-    purrr::reduce(union)
-
-  # Create new merged assay matrices
-  new_assays <- altexp_assay_names |>
-    purrr::map(
-      build_new_altexp_assay,
-      altexp_list,
-      altexp_features,
-      all_merged_barcodes
-    )
-  names(new_assays) <- altexp_assay_names
-
-
-  # Create merged altExp
-  merged_altexp <- SingleCellExperiment(assays = new_assays)
-
-  # TODO: Add rowData and colData to merged_altexp
-
-  return(merged_altexp)
-
-}
-
-
-
-
-#' Build a new sparse matrix for merging altExps
-#'
-#' @param assay_name Name of assay of interest (e.g., "counts")
-#' @param altexp_list List of altExps which should be included in the new matrix
-#' @param all_merged_features Vector of matrix row names, corresponding to the full
-#'   set of features for this altExp
-#' @param all_merged_barcodes Vector of matrix column names, corresponding to all cells
-#'   which will be in the final merged altExp
+#' @param assay_name Intended assay name for this matrix (e.g., "counts")
+#' @param matrix_rownames Vector of matrix rown ames
+#' @param matrix_colnames Vector of matrix column names
 #'
 #' @return Sparse matrix
-build_new_altexp_assay <- function(
+build_na_matrix <- function(
     assay_name,
-    altexp_list,
-    all_merged_features,
-    all_merged_barcodes) {
+    matrix_rownames,
+    matrix_colnames) {
 
-  # Establish new matrix with all NA values
-  new_matrix <- matrix(
+  Matrix::Matrix(
     data = NA,
-    nrow = length(all_merged_features),
-    ncol = length(all_merged_barcodes),
+    nrow = length(matrix_rownames),
+    ncol = length(matrix_colnames),
     dimnames = list(
-      all_merged_features,
-      all_merged_barcodes
+      matrix_rownames,
+      matrix_colnames
     )
   )
-
-  # Substitute existing assays into the matrix, if they exist
-  for (altexp in altexp_list) {
-    # Note that column names were already formatted as `{sce_name}-{barcode}` by
-    #  the main SCE merging code
-    if (assay_name %in% assayNames(altexp)) {
-      # as.matrix() is needed here
-      new_matrix[rownames(altexp), colnames(altexp)] <- as.matrix( assay(altexp, assay_name) )
-    }
-
-  }
-  # sparsify
-  new_matrix <- as(new_matrix, "CsparseMatrix")
-
-  return(new_matrix)
 }
-
 
 
 #' Helper function to check altExp compatibility
