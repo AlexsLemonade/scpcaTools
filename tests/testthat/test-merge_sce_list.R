@@ -334,7 +334,6 @@ test_that("merging SCEs with library metadata fails as expected, no altexps", {
 
 # Tests with altexps -------------------------------------------------------
 
-
 ## helper function to add an altExp to a simulated SCE ----
 add_sce_altexp <- function(
     sce,
@@ -386,6 +385,32 @@ sce_list_with_altexp <- sce_list |>
   )
 # vector of all expected names
 full_altexp_features <- rownames(altExp(sce_list_with_altexp[[1]]))
+
+
+
+test_that("prepare_sce_for_merge() works as expected with is_altexp=TRUE", {
+
+  test_altexp <- altExp(sce_list_with_altexp[[1]])
+  prepared_altexp <- prepare_sce_for_merge(
+    test_altexp,
+    "test",
+    batch_column = NULL,
+    cell_id_column = NULL,
+    full_altexp_features,
+    retain_coldata_cols = NULL,
+    preserve_rowdata_cols = "target_type",
+    is_altexp = TRUE
+  )
+
+  # rowdata names should start with test-, but NOT the overall column names
+  expect_true(
+    all(stringr::str_starts(colnames(rowData(prepared_altexp)), "test-"))
+  )
+
+  expect_true(
+    !all(stringr::str_starts(colnames(prepared_altexp), "test-"))
+  )
+})
 
 
 test_that("merging SCEs with altExps works as expected when include_altexps = FALSE", {
@@ -470,5 +495,60 @@ test_that("merging SCEs where 1 altExp is missing works as expected, with altexp
   )
 
   expect_true(altExpNames(merged_sce) == "adt")
+
+})
+
+
+## Other tests ------------------
+
+test_that("build_na_matrix works as expected",{
+
+  rows <- letters[1:5]
+  cols  <- letters[6:10]
+  sparse_mat <- build_na_matrix(
+    "name",
+    rows,
+    cols
+  )
+
+  expect_true(
+    class(sparse_mat) == "lgeMatrix"
+  )
+
+  expect_equal(
+    rownames(sparse_mat), rows
+  )
+
+  expect_equal(
+    colnames(sparse_mat), cols
+  )
+
+})
+
+
+test_that("check_altexps passes when it should pass", {
+
+  attribute_list <- check_altexps(sce_list_with_altexp)
+  expect_equal(
+    attribute_list[["adt"]][["assays"]], c("counts", "logcounts")
+  )
+  expect_equal(
+    attribute_list[["adt"]][["features"]], full_altexp_features
+  )
+
+})
+
+
+test_that("check_altexps throws an error as expected when assays do not match", {
+
+  logcounts(altExp(sce_list_with_altexp[[3]])) <- NULL
+  expect_error(check_altexps(sce_list_with_altexp))
+
+})
+
+test_that("check_altexps throws an error as expected when features do not match", {
+
+  altExp(sce_list_with_altexp[[1]]) <- altExp(sce_list_with_altexp[[1]])[1:3,]
+  expect_error(check_altexps(sce_list_with_altexp))
 
 })
