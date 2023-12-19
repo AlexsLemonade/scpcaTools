@@ -394,8 +394,8 @@ test_that("prepare_sce_for_merge() works as expected with is_altexp=TRUE", {
   prepared_altexp <- prepare_sce_for_merge(
     test_altexp,
     "test",
-    batch_column = NULL,
-    cell_id_column = NULL,
+    batch_column = "batch",
+    cell_id_column = "cell",
     full_altexp_features,
     retain_coldata_cols = NULL,
     preserve_rowdata_cols = "target_type",
@@ -409,6 +409,10 @@ test_that("prepare_sce_for_merge() works as expected with is_altexp=TRUE", {
 
   expect_true(
     !all(stringr::str_starts(colnames(prepared_altexp), "test-"))
+  )
+
+  expect_equal(
+    colnames(colData(prepared_altexp)), c("batch", "cell")
   )
 })
 

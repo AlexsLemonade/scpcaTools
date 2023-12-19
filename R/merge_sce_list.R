@@ -195,7 +195,9 @@ merge_sce_list <- function(
           prepare_altexp_for_merge,
           altexp_name,
           expected_assays,
-          expected_features
+          expected_features,
+          batch_column = batch_column,
+          cell_id_column = cell_id_column
         )
     }
   }
@@ -215,9 +217,9 @@ merge_sce_list <- function(
 #' @param sce The SCE object to be prepared
 #' @param sce_name The name of the SCE object
 #' @param batch_column The name of the batch column which will be added to the
-#'   colData slot
+#'   colData slot.
 #' @param cell_id_column The name of the cell_id column which will be added to the
-#'   colData slot
+#'   colData slot.
 #' @param shared_features A vector of features (genes) that all SCEs to be merged
 #'   have in common
 #' @param retain_coldata_cols A vector of columns to retain in the colData slot.
@@ -276,14 +278,15 @@ prepare_sce_for_merge <- function(
   # Use drop=FALSE to ensure result is a DataFrame
   colData(sce) <- colData(sce)[, retain_coldata_cols, drop = FALSE]
 
-  # Only make these changes if we are not working with an altExp
+  # Add batch column
+  sce[[batch_column]] <- sce_name
+
+  # Add cell_id column
+  sce[[cell_id_column]] <- colnames(sce)
+
+  # Only modify column names if we are not working with an altExp.
+  # This avoids having double `{sce_name}-{sce_name}` prefixes
   if (!is_altexp) {
-    # Add batch column
-    sce[[batch_column]] <- sce_name
-
-    # Add cell_id column
-    sce[[cell_id_column]] <- colnames(sce)
-
     # Add `sce_name` to colnames so cell ids can be mapped to originating SCE
     colnames(sce) <- glue::glue("{sce_name}-{colnames(sce)}")
   }
@@ -308,6 +311,10 @@ prepare_sce_for_merge <- function(
 #' @param altexp_name Name of altExp of interest
 #' @param expected_assays Vector of assays that should be in each altExp
 #' @param expected_features Vector of features that should be in each altExp
+#' @param batch_column The name of the batch column which will be added to the
+#'   colData slot.
+#' @param cell_id_column The name of the cell_id column which will be added to the
+#'   colData slot.
 #' @param preserve_rowdata_cols altExp rowData columns which should not be renamed
 #'
 #' @return An SCE with an updated altEcp
@@ -317,6 +324,8 @@ prepare_altexp_for_merge <- function(
     altexp_name,
     expected_assays,
     expected_features,
+    batch_column,
+    cell_id_column,
     preserve_rowdata_cols = c("target_type")) {
 
   if (!altexp_name %in% altExpNames(sce) ) {
@@ -336,10 +345,10 @@ prepare_altexp_for_merge <- function(
   altExp(sce, altexp_name) <- prepare_sce_for_merge(
     altExp(sce, altexp_name),
     sce_name,
-    batch_column = NULL,
-    cell_id_column = NULL,
+    batch_column = batch_column,
+    cell_id_column = cell_id_column,
     shared_features = expected_features,
-    retain_coldata_cols = NULL,
+    retain_coldata_cols = NULL, # Is this right?
     preserve_rowdata_cols = preserve_rowdata_cols,
     is_altexp = TRUE
   )
