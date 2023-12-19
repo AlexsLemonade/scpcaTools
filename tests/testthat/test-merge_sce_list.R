@@ -59,6 +59,24 @@ sce_list <- list(
 
 # Tests without altexps ----------------------------------------------
 
+test_that("`update_sce_metadata()` returns the expected list", {
+
+  metadata_list <- metadata(sce_list[[1]])
+
+  new_metadata <- update_sce_metadata(metadata_list)
+
+  expect_equal(
+    names(new_metadata),
+    c("library_id", "sample_id", "library_metadata", "sample_metadata")
+  )
+
+  expect_equal(
+    names(new_metadata$library_metadata),
+    c("library_id",  "sample_id", "total_reads")
+  )
+})
+
+
 test_that("`prepare_sce_for_merge` works as expected when all columns are present, no altexps", {
   result_sce <- prepare_sce_for_merge(
     sce,
