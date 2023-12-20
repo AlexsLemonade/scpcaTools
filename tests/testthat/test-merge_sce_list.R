@@ -467,7 +467,7 @@ test_that("merging SCEs with 1 altexp and same features works as expected, with 
 
 test_that("merging SCEs with 1 altexp but different features fails as expected, with altexps", {
 
-  # second list where 1 is missing all
+  # keep only the first 3 features from the first SCE
   altExp(sce_list_with_altexp[[1]]) <- altExp(sce_list_with_altexp[[1]])[1:3,]
 
   expect_error(
@@ -498,7 +498,7 @@ test_that("merging SCEs where 1 altExp is missing works as expected, with altexp
     preserve_rowdata_cols = c("gene_names")
   )
 
-  expect_true(altExpNames(merged_sce) == "adt")
+  expect_equal(altExpNames(merged_sce), "adt")
 
 })
 
@@ -516,7 +516,7 @@ test_that("build_na_matrix works as expected",{
   )
 
   expect_true(
-    class(sparse_mat) == "lgeMatrix"
+    class(sparse_mat) == "sparseMatrix"
   )
 
   expect_equal(

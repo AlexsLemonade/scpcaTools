@@ -217,9 +217,9 @@ merge_sce_list <- function(
 #' @param sce The SCE object to be prepared
 #' @param sce_name The name of the SCE object
 #' @param batch_column The name of the batch column which will be added to the
-#'   colData slot.
+#'   colData slot
 #' @param cell_id_column The name of the cell_id column which will be added to the
-#'   colData slot.
+#'   colData slot
 #' @param shared_features A vector of features (genes) that all SCEs to be merged
 #'   have in common
 #' @param retain_coldata_cols A vector of columns to retain in the colData slot.
@@ -292,9 +292,7 @@ prepare_sce_for_merge <- function(
   }
 
   # Update metadata list
-  metadata(sce) <- update_sce_metadata(
-    metadata(sce)
-  )
+  metadata(sce) <- update_sce_metadata(metadata(sce))
 
   # return the processed SCE
   return(sce)
@@ -317,7 +315,7 @@ prepare_sce_for_merge <- function(
 #'   colData slot.
 #' @param preserve_rowdata_cols altExp rowData columns which should not be renamed
 #'
-#' @return An SCE with an updated altEcp
+#' @return An SCE with an updated altExp
 prepare_altexp_for_merge <- function(
     sce,
     sce_name,
@@ -403,13 +401,14 @@ build_na_matrix <- function(
     matrix_colnames) {
 
   Matrix::Matrix(
-    data = NA,
+    data = NA_real_,
     nrow = length(matrix_rownames),
     ncol = length(matrix_colnames),
     dimnames = list(
       matrix_rownames,
       matrix_colnames
-    )
+    ),
+    sparse = TRUE
   )
 }
 
@@ -421,16 +420,14 @@ build_na_matrix <- function(
 #' @return List of named lists with altExp information for use when preparing to merge,
 #'   with each sublist formatted as:
 #'   altexp_name = list(features = c(features), assays = c(assays))
-check_altexps <- function(sce_list) {
+get_altexp_attributes <- function(sce_list) {
 
   # Attribute list to save for later use
   altexp_attributes <- list()
 
   # Find all altExp names present in the SCE objects.
   altexp_names <- sce_list |>
-    purrr::map(
-      \(sce) altExpNames(sce)
-    ) |>
+    purrr::map(altExpNames) |>
     purrr::reduce(union)
 
   # For each in altexp_names (if present), do they have the same features?
@@ -445,13 +442,12 @@ check_altexps <- function(sce_list) {
     # find their union of features
     all_features <- altexp_list |>
       purrr::map(rownames) |>
-      purrr::reduce(union) |>
-      sort()
+      purrr::reduce(union)
 
     # create logical vector for presence of all features
     features_present <- altexp_list |>
       purrr::map_lgl(
-        \(alt_sce) identical(all_features, sort(rownames(alt_sce)))
+        \(alt_sce) setequal(rownames(alt_sce), all_features)
       )
 
     if (!all(features_present)) {
@@ -463,13 +459,12 @@ check_altexps <- function(sce_list) {
     # check for same assays
     all_assays <- altexp_list |>
       purrr::map(assayNames) |>
-      purrr::reduce(union)|>
-      sort()
+      purrr::reduce(union)
 
     # create logical vector for presence of all assays
     assays_present <- altexp_list |>
       purrr::map_lgl(
-        \(alt_sce) identical(all_assays, sort(assayNames(alt_sce)))
+        \(alt_sce) setequal(assayNames(alt_sce), all_assays)
       )
 
     # TODO: we may want to drop assays that aren't present in all altexps, rather than dying.
