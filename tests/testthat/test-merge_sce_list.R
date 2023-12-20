@@ -515,9 +515,7 @@ test_that("build_na_matrix works as expected",{
     cols
   )
 
-  expect_true(
-    is(sparse_mat, "dgCMatrix")
-  )
+  expect_s4_class(sparse_mat, "sparseMatrix")
 
   expect_equal(
     rownames(sparse_mat), rows
