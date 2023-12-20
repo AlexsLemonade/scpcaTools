@@ -351,6 +351,7 @@ add_sce_altexp <- function(
   colnames(sce_alt) <- colnames(sce)
 
   # add some rowdata columns
+  rowData(sce_alt)[["target_type"]] <- "target" # should be retained
   rowData(sce_alt)[["feature_column"]] <- rownames(sce_alt)
   rowData(sce_alt)[["other_column"]] <- runif(nrow(sce_alt))
 
@@ -407,9 +408,9 @@ test_that("prepare_sce_for_merge() works as expected with is_altexp=TRUE", {
     is_altexp = TRUE
   )
 
-  # rowdata names should start with test-, but NOT the overall column names
-  expect_true(
-    all(stringr::str_starts(colnames(rowData(prepared_altexp)), "test-"))
+  expect_equal(
+    colnames(rowData(prepared_altexp)),
+    c("target_type", "test-feature_column", "test-other_column")
   )
 
   # column names should be unchanged
@@ -419,6 +420,49 @@ test_that("prepare_sce_for_merge() works as expected with is_altexp=TRUE", {
 
   expect_equal(
     colnames(colData(prepared_altexp)), c("batch", "cell")
+  )
+})
+
+
+test_that("prepare_sce_for_merge() works from an NA matrix", {
+
+
+  assay_names <- c("counts", "logcounts")
+  sce <- sce_list_with_altexp[[1]]
+  na_assays <- assay_names |>
+    purrr::set_names() |>
+    purrr::map(
+      build_na_matrix,
+      full_altexp_features,
+      colnames(sce)
+    )
+  test_altexp <- SingleCellExperiment(assays = na_assays)
+
+  prepared_altexp <- prepare_sce_for_merge(
+    test_altexp,
+    "test",
+    batch_column = batch_column,
+    cell_id_column = cell_id_column,
+    shared_features = full_altexp_features,
+    retain_coldata_cols = NULL,
+    preserve_rowdata_cols = c("target_type"),
+    is_altexp = TRUE
+  )
+
+  expect_equal(
+    assayNames(prepared_altexp), assay_names
+  )
+
+  expect_equal(
+    colnames(colData(prepared_altexp)), c("batch", "cell_id")
+  )
+
+  expect_equal(
+    colnames(prepared_altexp), colnames(sce)
+  )
+
+  expect_equal(
+    rownames(prepared_altexp), full_altexp_features
   )
 })
 
@@ -492,6 +536,7 @@ test_that("merging SCEs with 1 altexp but different features fails as expected, 
   # keep only the first 3 features from the first SCE
   altExp(sce_list_with_altexp[[1]]) <- altExp(sce_list_with_altexp[[1]])[1:3,]
 
+
   expect_error(
     merge_sce_list(
       sce_list_with_altexp,
@@ -510,6 +555,10 @@ test_that("merging SCEs with 1 altexp but different features fails as expected, 
 test_that("merging SCEs where 1 altExp is missing works as expected, with altexps", {
 
   sce_list_with_altexp[["sce4"]] <- removeAltExps(sce_list_with_altexp[[1]])
+
+  # from cbind docs:
+  #The colnames in colData(SummarizedExperiment) must match or an error is thrown.
+  #Duplicate columns of rowData(SummarizedExperiment) must contain the same data.
 
   merged_sce <- merge_sce_list(
     sce_list_with_altexp,
