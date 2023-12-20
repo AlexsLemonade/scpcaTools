@@ -156,7 +156,7 @@ merge_sce_list <- function(
     sample_metadata <- metadata_list$sample_metadata |>
       purrr::map(\(df) {
         # make sure all column types are compatible first
-        df <- df |>
+        df |>
           dplyr::mutate(across(everything(), as.character))
         }) |>
       dplyr::bind_rows() |>
