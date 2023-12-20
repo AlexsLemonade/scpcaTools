@@ -354,7 +354,7 @@ add_sce_altexp <- function(
   rowData(sce_alt)[["feature_column"]] <- rownames(sce_alt)
   rowData(sce_alt)[["other_column"]] <- runif(nrow(sce_alt))
 
-  # add a coldata columns
+  # add a coldata column
   colData(sce_alt)[["coldata_column"]] <- runif(ncol(sce_alt))
 
   # add logcounts
@@ -367,6 +367,11 @@ add_sce_altexp <- function(
   metadata(sce_alt)$library_id <- library_id
   metadata(sce_alt)$sample_id <- sample_id
   metadata(sce_alt)$mapped_reads <- 100
+
+  # Add some more columns to retain to the SCE based on this altExp
+  colData(sce)[[glue::glue("altexps_{altexp_name}_sum")]] <- runif(ncol(sce))
+  colData(sce)[[glue::glue("altexps_{altexp_name}_percent")]] <- runif(ncol(sce))
+  colData(sce)[[glue::glue("altexps_{altexp_name}_detected")]] <- runif(ncol(sce))
 
   # add sce_alt as sce's altExp
   altExp(sce, altexp_name) <- sce_alt
@@ -459,6 +464,22 @@ test_that("merging SCEs with 1 altexp and same features works as expected, with 
     unlist() |>
     unname()
   expect_equal(colnames(merged_altexp), expected_colnames)
+
+  # Check colData columns
+  expected_coldata <- c("sum",
+                        "detected",
+                        "altexps_adt_sum",
+                        "altexps_adt_detected",
+                        "altexps_adt_percent",
+                        batch_column,
+                        "cell_id")
+
+  expect_true(
+    setequal(
+      colnames(colData(merged_sce)),
+      expected_coldata
+    )
+  )
 
 })
 
