@@ -89,7 +89,7 @@ merge_sce_list <- function(
   # altExps for a given name must all have the same features and the same assays
   if (include_altexp) {
     # This is a list of lists of altexp information for later use:
-    # (altexp_name = list(  features = c(features), assays = c(assays), coldata = c(column, names) ))
+    # (altexp_name = list(  features = c(features), assays = c(assays) ))
     altexp_attributes <- get_altexp_attributes(sce_list)
   } else {
     # Remove altexps if we are not including them
@@ -419,10 +419,7 @@ build_na_matrix <- function(
 #'
 #' @return List of named lists with altExp information for use when preparing to merge,
 #'   with each sublist formatted as:
-#'   altexp_name = list(features = c(features), assays = c(assays), coldata = c(column, names))
-#'   - features are the full set of altExp features
-#'   - assays are the set of assays for the given altExp (e.g. counts and logcounts)
-#'   - coldata are the colData columns associated with this altxp to retain in the main SCE
+#'   altexp_name = list(features = c(features), assays = c(assays))
 get_altexp_attributes <- function(sce_list) {
 
   # Attribute list to save for later use
@@ -477,18 +474,10 @@ get_altexp_attributes <- function(sce_list) {
       )
     }
 
-
-    # Add a vector of colData names we would like to retain in the main SCE
-    # We'll need one for each {name}
-    # altexps_{name}_sum, altexps_{name}_detected, and altexps_{name}_percent
-    coldata_suffixes <- c("sum", "detected", "percent")
-    coldata_names <- glue::glue("altexps_{altexp_name}_{coldata_suffixes}")
-
     # Save to altexp_attributes for later use
     altexp_attributes[[altexp_name]] <- list(
       "features" = all_features,
-      "assays"   = all_assays,
-      "coldata"  = coldata_names
+      "assays"   = all_assays
     )
 
   }

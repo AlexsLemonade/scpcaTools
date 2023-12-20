@@ -12,10 +12,7 @@ get_altexp_attributes(sce_list)
 \value{
 List of named lists with altExp information for use when preparing to merge,
   with each sublist formatted as:
-  altexp_name = list(features = c(features), assays = c(assays), coldata = c(column, names))
-  - features are the full set of altExp features
-  - assays are the set of assays for the given altExp (e.g. counts and logcounts)
-  - coldata are the colData columns associated with this altxp to retain in the main SCE
+  altexp_name = list(features = c(features), assays = c(assays))
 }
 \description{
 Helper function to check altExp compatibility

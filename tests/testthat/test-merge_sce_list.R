@@ -516,7 +516,7 @@ test_that("build_na_matrix works as expected",{
   )
 
   expect_true(
-    is(sparse_mat, "dgCMatrix")
+    class(sparse_mat) == "dgCMatrix"
   )
 
   expect_equal(
@@ -538,10 +538,6 @@ test_that("get_altexp_attributes passes when it should pass", {
   )
   expect_equal(
     attribute_list[["adt"]][["features"]], full_altexp_features
-  )
-  expect_equal(
-    attribute_list[["adt"]][["coldata"]],
-    glue::glue("altexps_adt_{c('sum', 'detected', 'percent')}")
   )
 
 })
