@@ -530,9 +530,9 @@ test_that("build_na_matrix works as expected",{
 })
 
 
-test_that("check_altexps passes when it should pass", {
+test_that("get_altexp_attributes passes when it should pass", {
 
-  attribute_list <- check_altexps(sce_list_with_altexp)
+  attribute_list <- get_altexp_attributes(sce_list_with_altexp)
   expect_equal(
     attribute_list[["adt"]][["assays"]], c("counts", "logcounts")
   )
@@ -543,16 +543,16 @@ test_that("check_altexps passes when it should pass", {
 })
 
 
-test_that("check_altexps throws an error as expected when assays do not match", {
+test_that("get_altexp_attributes throws an error as expected when assays do not match", {
 
   logcounts(altExp(sce_list_with_altexp[[3]])) <- NULL
-  expect_error(check_altexps(sce_list_with_altexp))
+  expect_error(get_altexp_attributes(sce_list_with_altexp))
 
 })
 
-test_that("check_altexps throws an error as expected when features do not match", {
+test_that("get_altexp_attributes throws an error as expected when features do not match", {
 
   altExp(sce_list_with_altexp[[1]]) <- altExp(sce_list_with_altexp[[1]])[1:3,]
-  expect_error(check_altexps(sce_list_with_altexp))
+  expect_error(get_altexp_attributes(sce_list_with_altexp))
 
 })

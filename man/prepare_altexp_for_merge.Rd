@@ -35,7 +35,7 @@ colData slot.}
 \item{preserve_rowdata_cols}{altExp rowData columns which should not be renamed}
 }
 \value{
-An SCE with an updated altEcp
+An SCE with an updated altExp
 }
 \description{
 If the given `altexp_name` name is missing from the SCE, a new one with all

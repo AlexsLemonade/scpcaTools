@@ -90,7 +90,7 @@ merge_sce_list <- function(
   if (include_altexp) {
     # This is a list of lists of altexp information for later use:
     # (altexp_name = list(  features = c(features), assays = c(assays) ))
-    altexp_attributes <- check_altexps(sce_list)
+    altexp_attributes <- get_altexp_attributes(sce_list)
   } else {
     # Remove altexps if we are not including them
     sce_list <- sce_list |>
