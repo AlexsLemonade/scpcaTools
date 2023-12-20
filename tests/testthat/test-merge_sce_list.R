@@ -412,8 +412,9 @@ test_that("prepare_sce_for_merge() works as expected with is_altexp=TRUE", {
     all(stringr::str_starts(colnames(rowData(prepared_altexp)), "test-"))
   )
 
-  expect_true(
-    !all(stringr::str_starts(colnames(prepared_altexp), "test-"))
+  # column names should be unchanged
+  expect_equal(
+    colnames(prepared_altexp), colnames(test_altexp)
   )
 
   expect_equal(
