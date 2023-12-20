@@ -154,6 +154,11 @@ merge_sce_list <- function(
   # if object has sample metadata then combine into a single data frame
   if ("sample_metadata" %in% names(metadata_list)) {
     sample_metadata <- metadata_list$sample_metadata |>
+      purrr::map(\(df) {
+        # make sure all column types are compatible first
+        df <- df |>
+          dplyr::mutate(across(everything(), as.character))
+        }) |>
       dplyr::bind_rows() |>
       unique()
 
