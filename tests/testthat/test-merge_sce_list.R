@@ -516,7 +516,7 @@ test_that("build_na_matrix works as expected",{
   )
 
   expect_true(
-    class(sparse_mat) == "dgCMatrix"
+    is(sparse_mat, "dgCMatrix")
   )
 
   expect_equal(
