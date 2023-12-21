@@ -11,7 +11,8 @@ prepare_sce_for_merge(
   cell_id_column,
   shared_features,
   retain_coldata_cols,
-  preserve_rowdata_cols
+  preserve_rowdata_cols,
+  is_altexp = FALSE
 )
 }
 \arguments{
@@ -35,6 +36,9 @@ populated with respective information.}
 
 \item{preserve_rowdata_cols}{A vector of rowData columns which should not be
 renamed}
+
+\item{is_altexp}{Boolean if we are preparing an altExp or not.
+Default is `FALSE`. If FALSE, the SCE colnames will not be modified.}
 }
 \value{
 An updated SCE that is prepared for merging
