@@ -195,7 +195,7 @@ merge_sce_list <- function(
       # For any SCEs without this altExp, create the library_id and sample_id metadata
       additional_metadata <- sce_list |>
         purrr::keep(\(sce) !(altexp_name %in% altExpNames(sce))) |>
-        purrr::map(extract_metadata)
+        purrr::map(extract_metadata_for_altexp)
 
       # Update metadata in altExps that were originally present
       metadata_list <- sce_list |>
@@ -342,6 +342,64 @@ prepare_altexp_for_merge <- function(
 }
 
 
+#' Helper function to check altExp compatibility
+#'
+#' @param sce_list List of SCEs with altExps to check
+#'
+#' @return List of named lists with altExp information for use when preparing to merge,
+#'   with each sublist formatted as:
+#'   altexp_name = list(features = c(features), assays = c(assays))
+get_altexp_attributes <- function(sce_list) {
+  # Attribute list to save for later use
+  altexp_attributes <- list()
+
+  # Find all altExp names present in the SCE objects.
+  altexp_names <- sce_list |>
+    purrr::map(altExpNames) |>
+    purrr::reduce(union)
+
+  # For each in altexp_names (if present), do they have the same features?
+  # If not, error out
+  for (altexp_name in altexp_names) {
+    # all altExps for this name
+    altexp_list <- sce_list |>
+      purrr::keep(\(sce) altexp_name %in% altExpNames(sce)) |>
+      purrr::map(altExp, altexp_name)
+
+    # find their union of features
+    all_features <- altexp_list |>
+      purrr::map(rownames) |>
+      purrr::reduce(union)
+
+    # create logical vector for presence of all features
+    features_present <- altexp_list |>
+      purrr::map_lgl(
+        \(alt_sce) setequal(rownames(alt_sce), all_features)
+      )
+
+    if (!all(features_present)) {
+      stop(
+        glue::glue("The {altexp_name} alternative experiments do not share the same set of features.")
+      )
+    }
+
+    # check for same assays
+    all_assays <- altexp_list |>
+      purrr::map(assayNames) |>
+      purrr::reduce(union)
+
+    # Save to altexp_attributes for later use
+    altexp_attributes[[altexp_name]] <- list(
+      "features" = all_features,
+      "assays"   = all_assays
+    )
+  }
+  return(altexp_attributes)
+}
+
+
+
+
 
 #' Prepare an updated list of metadata for the merged SCE
 #'
@@ -412,62 +470,13 @@ prepare_merged_metadata <- function(metadata_list) {
 
 
 
-#' Helper function to check altExp compatibility
+#' Helper function to check that expected metadata fields are present in a given
+#' list of SCEs.
 #'
-#' @param sce_list List of SCEs with altExps to check
+#' The fields `library_id` and `sample_id` must be present. If either is missig from
+#'   any SCE, an error is thrown.
 #'
-#' @return List of named lists with altExp information for use when preparing to merge,
-#'   with each sublist formatted as:
-#'   altexp_name = list(features = c(features), assays = c(assays))
-get_altexp_attributes <- function(sce_list) {
-  # Attribute list to save for later use
-  altexp_attributes <- list()
-
-  # Find all altExp names present in the SCE objects.
-  altexp_names <- sce_list |>
-    purrr::map(altExpNames) |>
-    purrr::reduce(union)
-
-  # For each in altexp_names (if present), do they have the same features?
-  # If not, error out
-  for (altexp_name in altexp_names) {
-    # all altExps for this name
-    altexp_list <- sce_list |>
-      purrr::keep(\(sce) altexp_name %in% altExpNames(sce)) |>
-      purrr::map(altExp, altexp_name)
-
-    # find their union of features
-    all_features <- altexp_list |>
-      purrr::map(rownames) |>
-      purrr::reduce(union)
-
-    # create logical vector for presence of all features
-    features_present <- altexp_list |>
-      purrr::map_lgl(
-        \(alt_sce) setequal(rownames(alt_sce), all_features)
-      )
-
-    if (!all(features_present)) {
-      stop(
-        glue::glue("The {altexp_name} alternative experiments do not share the same set of features.")
-      )
-    }
-
-    # check for same assays
-    all_assays <- altexp_list |>
-      purrr::map(assayNames) |>
-      purrr::reduce(union)
-
-    # Save to altexp_attributes for later use
-    altexp_attributes[[altexp_name]] <- list(
-      "features" = all_features,
-      "assays"   = all_assays
-    )
-  }
-  return(altexp_attributes)
-}
-
-
+#' @param sce_list List of SCEs to check
 check_metadata <- function(sce_list) {
   expected_fields <- c("library_id", "sample_id")
   metadata_checks <- sce_list |>
@@ -482,10 +491,14 @@ check_metadata <- function(sce_list) {
   }
 }
 
-extract_metadata <- function(sce) {
+#' Helper function to extract main SCE metadata for inclusion in an altExp
+#'
+#' @param sce SCE object to extract metadata from
+#'
+#' @return List with fields `library_id` and `sample_id`
+extract_metadata_for_altexp <- function(sce) {
   list(
     library_id = metadata(sce)$library_id,
-    sample_id = metadata(sce)$sample_id,
-    sample_metadata = metadata(sce)$sample_metadata
+    sample_id = metadata(sce)$sample_id
   )
 }
