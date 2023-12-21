@@ -374,6 +374,7 @@ add_sce_altexp <- function(
   metadata(sce_alt)$library_id <- library_id
   metadata(sce_alt)$sample_id <- sample_id
   metadata(sce_alt)$mapped_reads <- 100
+  metadata(sce_alt)$ambient_profile <- runif(num_altexp_features)
 
   # Add some more columns to retain to the SCE based on this altExp
   colData(sce)[[glue::glue("altexps_{altexp_name}_sum")]] <- runif(ncol(sce))
@@ -512,10 +513,6 @@ test_that("merging SCEs with 1 altexp but different features fails as expected, 
 test_that("merging SCEs where 1 altExp is missing works as expected, with altexps", {
   sce_list_with_altexp[["sce4"]] <- sce_list[[1]]
 
-  # from cbind docs:
-  # The colnames in colData(SummarizedExperiment) must match or an error is thrown.
-  # Duplicate columns of rowData(SummarizedExperiment) must contain the same data.
-
   merged_sce <- merge_sce_list(
     sce_list_with_altexp,
     batch_column = batch_column,
@@ -526,6 +523,14 @@ test_that("merging SCEs where 1 altExp is missing works as expected, with altexp
   )
 
   expect_equal(altExpNames(merged_sce), "adt")
+
+  merged_altexp <- altExp(merged_sce, "adt")
+
+  # check number of columns
+
+  # check colData names are as expected
+
+  # check that the NAs are as expected
 })
 
 
