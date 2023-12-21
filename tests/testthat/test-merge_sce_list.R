@@ -541,7 +541,11 @@ test_that("merging SCEs where 1 altExp is missing works as expected, with altexp
   # check dimensions
   expect_equal(
     dim(merged_sce),
-    c(12, 32)
+    c(total_genes, total_cells * 4 / 3)
+  )
+  expect_equal(
+    dim(merged_altexp),
+    c(num_altexp_features, total_cells * 4 / 3 )
   )
 
   # check colData names are as expected
@@ -560,14 +564,14 @@ test_that("merging SCEs where 1 altExp is missing works as expected, with altexp
   )
 
   # check that the NAs are as expected
-  counts_mat <- as.matrix(counts(merged_altexp))
-  sce4_counts <- counts_mat[, stringr::str_starts(colnames(counts_mat), "sce4-")]
+  counts_mat <- counts(merged_altexp)
+  sce4_counts <- counts_mat[, merged_sce$library_id == "sce4"]
   expect_true(
     all(is.na(sce4_counts))
   )
-  numeric_counts <- counts_mat[, !stringr::str_starts(colnames(counts_mat), "sce4-")]
+  numeric_counts <- counts_mat[, merged_sce$library_id != "sce4"]
   expect_true(
-    all(is.numeric(numeric_counts))
+    all(is.finite(numeric_counts))
   )
 })
 
