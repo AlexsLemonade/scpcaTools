@@ -526,11 +526,36 @@ test_that("merging SCEs where 1 altExp is missing works as expected, with altexp
 
   merged_altexp <- altExp(merged_sce, "adt")
 
-  # check number of columns
-
+  # check dimensions
+  expect_equal(
+    dim(merged_sce),
+    c(12, 32)
+  )
   # check colData names are as expected
+  expected_coldata <- c(
+    "sum",
+    "detected",
+    "altexps_adt_sum",
+    "altexps_adt_detected",
+    "altexps_adt_percent",
+    batch_column,
+    cell_id_column
+  )
+  expect_setequal(
+    colnames(colData(merged_sce)),
+    expected_coldata
+  )
 
   # check that the NAs are as expected
+  counts_mat <- as.matrix(counts(merged_altexp))
+  sce4_counts <- counts_mat[, stringr::str_starts(colnames(counts_mat), "sce4-")]
+  expect_true(
+    all(is.na(sce4_counts))
+  )
+  numeric_counts <- counts_mat[, !stringr::str_starts(colnames(counts_mat), "sce4-")]
+  expect_true(
+    all(is.numeric(numeric_counts))
+  )
 })
 
 
