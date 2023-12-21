@@ -61,8 +61,6 @@ merge_sce_list <- function(
     preserve_rowdata_cols = NULL,
     cell_id_column = "cell_id",
     include_altexp = TRUE) {
-
-  ## Checks --------------------------
   if (is.null(names(sce_list))) {
     warning(
       glue::glue(
@@ -70,7 +68,7 @@ merge_sce_list <- function(
         named based on their list index in the merged SCE object."
       )
     )
-    names(sce_list) <- 1:length(sce_list)
+    names(sce_list) <- seq_along(sce_list)
   }
 
   if (length(sce_list) < 2) {
@@ -96,13 +94,14 @@ merge_sce_list <- function(
     coldata_suffixes <- c("sum", "detected", "percent")
     altexp_columns <- glue::glue("altexps_{names(altexp_attributes)}") |>
       purrr::map(
-        \(prefix) { glue::glue("{prefix}_{coldata_suffixes}")}
+        \(prefix) {
+          glue::glue("{prefix}_{coldata_suffixes}")
+        }
       ) |>
       unlist()
 
     # Update retain_coldata_cols
     retain_coldata_cols <- c(retain_coldata_cols, altexp_columns)
-
   } else {
     # Remove altexps if we are not including them
     sce_list <- sce_list |>
@@ -139,7 +138,7 @@ merge_sce_list <- function(
 
   # check that library id and sample id are present in metadata
   id_checks <- sce_list |>
-    purrr::map(\(sce){
+    purrr::map(\(sce) {
       all(c("library_id", "sample_id") %in% names(metadata(sce)))
     }) |>
     unlist()
@@ -196,9 +195,7 @@ merge_sce_list <- function(
 
   # If we are including altExps, process them and save to list to add to merged SCE
   if (include_altexp) {
-
     for (altexp_name in names(altexp_attributes)) {
-
       expected_assays <- altexp_attributes[[altexp_name]][["assays"]]
       expected_features <- altexp_attributes[[altexp_name]][["features"]]
 
@@ -215,7 +212,7 @@ merge_sce_list <- function(
   }
 
   # Create the merged SCE from the processed list
-  merged_sce <- do.call(cbind, sce_list)
+  merged_sce <- do.call(combineCols, unname(sce_list))
 
   # Replace existing metadata list with merged metadata
   metadata(merged_sce) <- metadata_list
@@ -245,15 +242,14 @@ merge_sce_list <- function(
 #'
 #' @return An updated SCE that is prepared for merging
 prepare_sce_for_merge <- function(
-  sce,
-  sce_name,
-  batch_column,
-  cell_id_column,
-  shared_features,
-  retain_coldata_cols,
-  preserve_rowdata_cols,
-  is_altexp = FALSE) {
-
+    sce,
+    sce_name,
+    batch_column,
+    cell_id_column,
+    shared_features,
+    retain_coldata_cols,
+    preserve_rowdata_cols,
+    is_altexp = FALSE) {
   # Subset to shared features
   sce <- sce[shared_features, ]
 
@@ -337,18 +333,8 @@ prepare_altexp_for_merge <- function(
     batch_column,
     cell_id_column,
     preserve_rowdata_cols = c("target_type")) {
-
-  if (!altexp_name %in% altExpNames(sce) ) {
-
-    na_assays <- expected_assays |>
-      purrr::set_names() |>
-      purrr::map(
-        build_na_matrix,
-        expected_features,
-        colnames(sce)
-      )
-
-    altExp(sce, altexp_name) <- SingleCellExperiment(assays = na_assays)
+  if (!altexp_name %in% altExpNames(sce)) {
+    return(sce)
   }
 
   # Now, prepare this altexp for merge
@@ -374,10 +360,12 @@ prepare_altexp_for_merge <- function(
 #'
 #' @return Updated metadata list to store in the SCE
 update_sce_metadata <- function(metadata_list) {
-
   # first check that this library hasn't already been merged
   if ("library_metadata" %in% names(metadata_list)) {
-    stop("This SCE object appears to be a merged object. We do not support merging objects with objects that have already been merged.")
+    stop(paste(
+      "This SCE object appears to be a merged object",
+      "We do not support merging objects with objects that have already been merged."
+    ))
   }
 
   # create library and sample metadata.
@@ -411,7 +399,6 @@ build_na_matrix <- function(
     assay_name,
     matrix_rownames,
     matrix_colnames) {
-
   Matrix::Matrix(
     data = NA_real_,
     nrow = length(matrix_rownames),
@@ -433,7 +420,6 @@ build_na_matrix <- function(
 #'   with each sublist formatted as:
 #'   altexp_name = list(features = c(features), assays = c(assays))
 get_altexp_attributes <- function(sce_list) {
-
   # Attribute list to save for later use
   altexp_attributes <- list()
 
@@ -445,7 +431,6 @@ get_altexp_attributes <- function(sce_list) {
   # For each in altexp_names (if present), do they have the same features?
   # If not, error out
   for (altexp_name in altexp_names) {
-
     # all altExps for this name
     altexp_list <- sce_list |>
       purrr::keep(\(sce) altexp_name %in% altExpNames(sce)) |>
@@ -491,7 +476,6 @@ get_altexp_attributes <- function(sce_list) {
       "features" = all_features,
       "assays"   = all_assays
     )
-
   }
   return(altexp_attributes)
 }
