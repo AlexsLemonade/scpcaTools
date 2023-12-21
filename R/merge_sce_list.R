@@ -386,32 +386,6 @@ update_sce_metadata <- function(metadata_list) {
 }
 
 
-
-
-#' Create a sparse matrix with all NA values
-#'
-#' @param assay_name Intended assay name for this matrix (e.g., "counts")
-#' @param matrix_rownames Vector of matrix rown ames
-#' @param matrix_colnames Vector of matrix column names
-#'
-#' @return Sparse matrix
-build_na_matrix <- function(
-    assay_name,
-    matrix_rownames,
-    matrix_colnames) {
-  Matrix::Matrix(
-    data = NA_real_,
-    nrow = length(matrix_rownames),
-    ncol = length(matrix_colnames),
-    dimnames = list(
-      matrix_rownames,
-      matrix_colnames
-    ),
-    sparse = TRUE
-  )
-}
-
-
 #' Helper function to check altExp compatibility
 #'
 #' @param sce_list List of SCEs with altExps to check
@@ -457,19 +431,6 @@ get_altexp_attributes <- function(sce_list) {
     all_assays <- altexp_list |>
       purrr::map(assayNames) |>
       purrr::reduce(union)
-
-    # create logical vector for presence of all assays
-    assays_present <- altexp_list |>
-      purrr::map_lgl(
-        \(alt_sce) setequal(assayNames(alt_sce), all_assays)
-      )
-
-    # TODO: we may want to drop assays that aren't present in all altexps, rather than dying.
-    if (!all(assays_present)) {
-      stop(
-        glue::glue("The {altexp_name} alternative experiments do not share the same set of assays.")
-      )
-    }
 
     # Save to altexp_attributes for later use
     altexp_attributes[[altexp_name]] <- list(
