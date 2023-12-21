@@ -480,11 +480,9 @@ test_that("merging SCEs with 1 altexp and same features works as expected, with 
     "cell_id"
   )
 
-  expect_true(
-    setequal(
-      colnames(colData(merged_sce)),
-      expected_coldata
-    )
+  expect_setequal(
+    colnames(colData(merged_sce)),
+    expected_coldata
   )
 })
 
@@ -512,7 +510,7 @@ test_that("merging SCEs with 1 altexp but different features fails as expected, 
 
 
 test_that("merging SCEs where 1 altExp is missing works as expected, with altexps", {
-  sce_list_with_altexp[["sce4"]] <- removeAltExps(sce_list_with_altexp[[1]])
+  sce_list_with_altexp[["sce4"]] <- sce_list[[1]]
 
   # from cbind docs:
   # The colnames in colData(SummarizedExperiment) must match or an error is thrown.
