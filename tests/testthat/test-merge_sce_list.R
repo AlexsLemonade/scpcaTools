@@ -474,7 +474,18 @@ test_that("merging SCEs with 1 altexp but different features fails as expected, 
 
 
 test_that("merging SCEs where 1 altExp is missing works as expected, with altexps", {
-  sce_list_with_altexp[["sce4"]] <- sce_list[[1]]
+  sce_list_with_altexp$sce4 <- sce_list[[1]]
+
+  # update the metdata list with sce4 name
+  metadata(sce_list_with_altexp$sce4) <- list(
+    library_id = "library-sce4",
+    sample_id = "sample-sce4",
+    total_reads = 100,
+    sample_metadata = data.frame(
+      sample_id = "sample-sce4",
+      library_id = "library-sce4"
+    )
+  )
 
   merged_sce <- merge_sce_list(
     sce_list_with_altexp,
@@ -488,6 +499,44 @@ test_that("merging SCEs where 1 altExp is missing works as expected, with altexp
   expect_equal(altExpNames(merged_sce), "adt")
 
   merged_altexp <- altExp(merged_sce, "adt")
+
+  # check merged_altexp metadata
+  altexp_metadata <- metadata(merged_altexp)
+  expect_setequal(
+    names(altexp_metadata),
+    c("library_id", "sample_id", "library_metadata")
+  )
+  expect_setequal(
+    altexp_metadata$library_id,
+    glue::glue("library-{names(sce_list_with_altexp)}")
+  )
+  expect_setequal(
+    altexp_metadata$sample_id,
+    glue::glue("sample-{names(sce_list_with_altexp)}")
+  )
+  expect_setequal(
+    names(altexp_metadata$library_metadata),
+    c("library_id", "sample_id", "mapped_reads", "ambient_profile")
+  )
+  expect_true(
+    is.null(altexp_metadata$library_metadata$ambient_profile$sce4) &
+      is.null(altexp_metadata$library_metadata$mapped_reads$sce4)
+  )
+  expect_true(
+    all(
+      is.numeric(altexp_metadata$library_metadata$ambient_profile$sce1),
+      is.numeric(altexp_metadata$library_metadata$ambient_profile$sce2),
+      is.numeric(altexp_metadata$library_metadata$ambient_profile$sce3)
+    )
+  )
+  expect_true(
+    all(
+      altexp_metadata$library_metadata$library_id$sce1 == "library-sce1",
+      altexp_metadata$library_metadata$library_id$sce2 == "library-sce2",
+      altexp_metadata$library_metadata$library_id$sce3 == "library-sce3",
+      altexp_metadata$library_metadata$library_id$sce4 == "library-sce4"
+    )
+  )
 
   # check number of columns
 
