@@ -181,8 +181,8 @@ merge_sce_list <- function(
       purrr::map(\(df) {
         # make sure all column types are compatible first
         df |>
-          dplyr::mutate(across(everything(), as.character))
-        }) |>
+          dplyr::mutate(dplyr::across(dplyr::everything(), as.character))
+      }) |>
       dplyr::bind_rows() |>
       unique()
 
