@@ -59,7 +59,6 @@ sce_list <- list(
 
 # Tests without altexps ----------------------------------------------
 
-
 test_that("`prepare_sce_for_merge` works as expected when all columns are present, no altexps", {
   result_sce <- prepare_sce_for_merge(
     sce,
@@ -514,4 +513,77 @@ test_that("get_altexp_attributes passes when it should pass", {
 test_that("get_altexp_attributes throws an error as expected when features do not match", {
   altExp(sce_list_with_altexp[[1]]) <- altExp(sce_list_with_altexp[[1]])[1:3, ]
   expect_error(get_altexp_attributes(sce_list_with_altexp))
+})
+
+
+test_that("check_metadata throws an error when a field is missing", {
+  metadata(sce_list[[1]])$library_id <- NULL
+  expect_error(check_metadata(sce_list))
+})
+
+test_that("extract_metadata_for_altexp returns the correct values", {
+  expected_list <- list(
+    "library_id" = "library-sce1",
+    "sample_id"  = "sample-sce1"
+  )
+  observed_list <- extract_metadata_for_altexp(sce_list[[1]])
+  expect_equal(
+    names(observed_list), names(expected_list)
+  )
+  expect_equal(
+    unlist(observed_list), unlist(expected_list)
+  )
+})
+
+test_that("prepare_merged_metadata works as expected, with sample_metadata present", {
+  observed_metadata <- sce_list |>
+    purrr::map(metadata) |>
+    prepare_merged_metadata()
+
+  expect_setequal(
+    names(observed_metadata),
+    c("library_id", "sample_id", "library_metadata", "sample_metadata")
+  )
+
+  expect_setequal(
+    observed_metadata$library_id,
+    glue::glue("library-{names(sce_list)}")
+  )
+  expect_setequal(
+    observed_metadata$sample_id,
+    glue::glue("sample-{names(sce_list)}")
+  )
+  expect_setequal(
+    names(observed_metadata$library_metadata),
+    c("library_id", "sample_id", "total_reads")
+  )
+  expect_true(
+    class(observed_metadata$sample_metadata) == "data.frame"
+  )
+})
+
+
+test_that("prepare_merged_metadata works as expected from altExps metadata (aka, sample_metadata NOT present)", {
+  observed_metadata <- sce_list_with_altexp |>
+    purrr::map(altExp) |>
+    purrr::map(metadata) |>
+    prepare_merged_metadata()
+
+  expect_setequal(
+    names(observed_metadata),
+    c("library_id", "sample_id", "library_metadata")
+  )
+
+  expect_setequal(
+    observed_metadata$library_id,
+    glue::glue("library-{names(sce_list)}")
+  )
+  expect_setequal(
+    observed_metadata$sample_id,
+    glue::glue("sample-{names(sce_list)}")
+  )
+  expect_setequal(
+    names(observed_metadata$library_metadata),
+    c("library_id", "sample_id", "mapped_reads", "ambient_profile")
+  )
 })

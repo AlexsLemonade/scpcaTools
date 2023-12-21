@@ -434,7 +434,17 @@ prepare_merged_metadata <- function(metadata_list) {
     ptype = "character"
   )
 
-  # if object has sample metadata then combine into a single data frame
+  # combine into final metadata list
+  final_metadata_list <- list(
+    # vector of all library ids
+    library_id = metadata_library_ids,
+    # vector of all sample ids
+    sample_id = metadata_sample_ids,
+    library_metadata = metadata_list[names(metadata_list) != "sample_metadata"]
+  )
+
+  # if object has sample metadata then combine into a single data frame,
+  #  and add this to the final_metdata_list
   if ("sample_metadata" %in% names(metadata_list)) {
     sample_metadata <- metadata_list$sample_metadata |>
       purrr::map(\(df) {
@@ -450,20 +460,9 @@ prepare_merged_metadata <- function(metadata_list) {
       warning("Not all sample ids are present in metadata(merged_sce)$sample_metadata.")
     }
 
-    # replace sample metadata in metadata list
-    metadata_list$sample_metadata <- sample_metadata
+    # add to final_metadata_list
+    final_metadata_list$sample_metadata <- sample_metadata
   }
-
-
-  # combine into final metadata list
-  final_metadata_list <- list(
-    # vector of all library ids
-    library_id = metadata_library_ids,
-    # vector of all sample ids
-    sample_id = metadata_sample_ids,
-    library_metadata = metadata_list[names(metadata_list) != "sample_metadata"],
-    sample_metadata = metadata_list$sample_metadata # a data frame version of the previous sample_metadata
-  )
 
   return(final_metadata_list)
 }
