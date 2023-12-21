@@ -163,7 +163,6 @@ merge_sce_list <- function(
 
 
   ## Handle altExps ------------------------------------------------------
-
   # If we are including altExps, process them and save to list to add to merged SCE
   if (include_altexp) {
     for (altexp_name in names(altexp_attributes)) {
@@ -203,7 +202,7 @@ merge_sce_list <- function(
         purrr::map(altExp, altexp_name) |>
         purrr::map(metadata) |>
         # Tack on the metadata we created on the fly
-        purrr::list_modify(additional_metadata)
+        c(additional_metadata)
 
       metadata(altExp(merged_sce, altexp_name)) <- prepare_merged_metadata(metadata_list)
     }
