@@ -60,7 +60,6 @@ sce_list <- list(
 # Tests without altexps ----------------------------------------------
 
 test_that("`update_sce_metadata()` returns the expected list", {
-
   metadata_list <- metadata(sce_list[[1]])
 
   new_metadata <- update_sce_metadata(metadata_list)
@@ -72,7 +71,7 @@ test_that("`update_sce_metadata()` returns the expected list", {
 
   expect_equal(
     names(new_metadata$library_metadata),
-    c("library_id",  "sample_id", "total_reads")
+    c("library_id", "sample_id", "total_reads")
   )
 })
 
@@ -327,7 +326,7 @@ test_that("merging SCEs with library metadata fails as expected, no altexps", {
   expect_error(
     merge_sce_list(
       sce_list
-      )
+    )
   )
 })
 
@@ -341,14 +340,21 @@ add_sce_altexp <- function(
     altexp_name,
     num_altexp_features,
     n_cells) {
-
   sce_alt <- sim_sce(
     n_genes = num_altexp_features,
     n_cells = n_cells,
-    n_empty = 0)
+    n_empty = 0
+  )
 
   # ensure matching barcodes
   colnames(sce_alt) <- colnames(sce)
+
+  # change feature names
+  rownames(sce_alt) <- stringr::str_replace(
+    rownames(sce_alt),
+    "^GENE",
+    toupper(altexp_name)
+  )
 
   # add some rowdata columns
   rowData(sce_alt)[["target_type"]] <- "target" # should be retained
@@ -395,7 +401,6 @@ full_altexp_features <- rownames(altExp(sce_list_with_altexp[[1]]))
 
 
 test_that("prepare_sce_for_merge() works as expected with is_altexp=TRUE", {
-
   test_altexp <- altExp(sce_list_with_altexp[[1]])
   prepared_altexp <- prepare_sce_for_merge(
     test_altexp,
@@ -425,8 +430,6 @@ test_that("prepare_sce_for_merge() works as expected with is_altexp=TRUE", {
 
 
 test_that("prepare_sce_for_merge() works from an NA matrix", {
-
-
   assay_names <- c("counts", "logcounts")
   sce <- sce_list_with_altexp[[1]]
   na_assays <- assay_names |>
@@ -468,7 +471,6 @@ test_that("prepare_sce_for_merge() works from an NA matrix", {
 
 
 test_that("merging SCEs with altExps works as expected when include_altexps = FALSE", {
-
   merged_sce <- merge_sce_list(
     sce_list_with_altexp,
     batch_column = batch_column,
@@ -481,11 +483,9 @@ test_that("merging SCEs with altExps works as expected when include_altexps = FA
 
   # there should not be any altExps
   expect_length(altExpNames(merged_sce), 0)
-
 })
 
 test_that("merging SCEs with 1 altexp and same features works as expected, with altexps", {
-
   merged_sce <- merge_sce_list(
     sce_list_with_altexp,
     batch_column = batch_column,
@@ -511,13 +511,15 @@ test_that("merging SCEs with 1 altexp and same features works as expected, with 
   expect_equal(colnames(merged_altexp), expected_colnames)
 
   # Check colData columns
-  expected_coldata <- c("sum",
-                        "detected",
-                        "altexps_adt_sum",
-                        "altexps_adt_detected",
-                        "altexps_adt_percent",
-                        batch_column,
-                        "cell_id")
+  expected_coldata <- c(
+    "sum",
+    "detected",
+    "altexps_adt_sum",
+    "altexps_adt_detected",
+    "altexps_adt_percent",
+    batch_column,
+    "cell_id"
+  )
 
   expect_true(
     setequal(
@@ -525,16 +527,14 @@ test_that("merging SCEs with 1 altexp and same features works as expected, with 
       expected_coldata
     )
   )
-
 })
 
 
 
 
 test_that("merging SCEs with 1 altexp but different features fails as expected, with altexps", {
-
   # keep only the first 3 features from the first SCE
-  altExp(sce_list_with_altexp[[1]]) <- altExp(sce_list_with_altexp[[1]])[1:3,]
+  altExp(sce_list_with_altexp[[1]]) <- altExp(sce_list_with_altexp[[1]])[1:3, ]
 
 
   expect_error(
@@ -553,12 +553,11 @@ test_that("merging SCEs with 1 altexp but different features fails as expected, 
 
 
 test_that("merging SCEs where 1 altExp is missing works as expected, with altexps", {
-
   sce_list_with_altexp[["sce4"]] <- removeAltExps(sce_list_with_altexp[[1]])
 
   # from cbind docs:
-  #The colnames in colData(SummarizedExperiment) must match or an error is thrown.
-  #Duplicate columns of rowData(SummarizedExperiment) must contain the same data.
+  # The colnames in colData(SummarizedExperiment) must match or an error is thrown.
+  # Duplicate columns of rowData(SummarizedExperiment) must contain the same data.
 
   merged_sce <- merge_sce_list(
     sce_list_with_altexp,
@@ -570,16 +569,14 @@ test_that("merging SCEs where 1 altExp is missing works as expected, with altexp
   )
 
   expect_equal(altExpNames(merged_sce), "adt")
-
 })
 
 
 ## Other tests ------------------
 
-test_that("build_na_matrix works as expected",{
-
+test_that("build_na_matrix works as expected", {
   rows <- letters[1:5]
-  cols  <- letters[6:10]
+  cols <- letters[6:10]
   sparse_mat <- build_na_matrix(
     "name",
     rows,
@@ -595,12 +592,10 @@ test_that("build_na_matrix works as expected",{
   expect_equal(
     colnames(sparse_mat), cols
   )
-
 })
 
 
 test_that("get_altexp_attributes passes when it should pass", {
-
   attribute_list <- get_altexp_attributes(sce_list_with_altexp)
   expect_equal(
     attribute_list[["adt"]][["assays"]], c("counts", "logcounts")
@@ -608,20 +603,15 @@ test_that("get_altexp_attributes passes when it should pass", {
   expect_equal(
     attribute_list[["adt"]][["features"]], full_altexp_features
   )
-
 })
 
 
 test_that("get_altexp_attributes throws an error as expected when assays do not match", {
-
   logcounts(altExp(sce_list_with_altexp[[3]])) <- NULL
   expect_error(get_altexp_attributes(sce_list_with_altexp))
-
 })
 
 test_that("get_altexp_attributes throws an error as expected when features do not match", {
-
-  altExp(sce_list_with_altexp[[1]]) <- altExp(sce_list_with_altexp[[1]])[1:3,]
+  altExp(sce_list_with_altexp[[1]]) <- altExp(sce_list_with_altexp[[1]])[1:3, ]
   expect_error(get_altexp_attributes(sce_list_with_altexp))
-
 })
