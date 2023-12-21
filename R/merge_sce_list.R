@@ -83,6 +83,9 @@ merge_sce_list <- function(
      Please check that `retain_coldata_cols` was correctly specified.")
   }
 
+  # Check metadata - library_id and sample_id must be present
+  check_metadata(sce_list)
+
   # Check altExp compatibility, if we are including them
   # altExps for a given name must all have the same features and the same assays
   if (include_altexp) {
@@ -102,6 +105,17 @@ merge_sce_list <- function(
 
     # Update retain_coldata_cols
     retain_coldata_cols <- c(retain_coldata_cols, altexp_columns)
+
+    # Check each altExp metadata, for SCEs with the altExp
+    names(altexp_attributes) |>
+      purrr::walk(
+        \(altexp_name) {
+          sce_list |>
+            purrr::keep(\(sce) altexp_name %in% altExpNames(sce)) |>
+            purrr::map(altExp, altexp_name) |>
+            check_metadata()
+        }
+      )
   } else {
     # Remove altexps if we are not including them
     sce_list <- sce_list |>
@@ -136,17 +150,6 @@ merge_sce_list <- function(
     warning("The provided `retain_coldata_cols` are not present in any SCEs.")
   }
 
-  # check that library id and sample id are present in metadata
-  id_checks <- sce_list |>
-    purrr::map(\(sce) {
-      all(c("library_id", "sample_id") %in% names(metadata(sce)))
-    }) |>
-    unlist()
-
-  if (!all(id_checks)) {
-    stop("The metadata for each SCE object must contain `library_id` and `sample_id`.")
-  }
-
   ## Prepare main experiment of SCEs for merging --------------------
   sce_list <- sce_list |>
     purrr::imap(
@@ -157,43 +160,6 @@ merge_sce_list <- function(
       retain_coldata_cols = retain_coldata_cols,
       preserve_rowdata_cols = preserve_rowdata_cols
     )
-
-
-  ## Handle metadata ---------------------------------------------
-  # get a list of metadata from the list of sce objects
-  # each library becomes an element within the metadata components
-  metadata_list <- sce_list |>
-    purrr::map(metadata) |>
-    purrr::transpose()
-
-  # flatten and reduce the library ids and sample ids
-  metadata_list$library_id <- metadata_list$library_id |>
-    unlist() |>
-    unique()
-
-  metadata_list$sample_id <- metadata_list$sample_id |>
-    unlist() |>
-    unique()
-
-  # if object has sample metadata then combine into a single data frame
-  if ("sample_metadata" %in% names(metadata_list)) {
-    sample_metadata <- metadata_list$sample_metadata |>
-      purrr::map(\(df) {
-        # make sure all column types are compatible first
-        df |>
-          dplyr::mutate(dplyr::across(dplyr::everything(), as.character))
-      }) |>
-      dplyr::bind_rows() |>
-      unique()
-
-    # check that all sample ids are found in the new sample metadata and warn if not
-    if (!all(metadata_list$sample_id %in% sample_metadata$sample_id)) {
-      warning("Not all sample ids are present in metadata(merged_sce)$sample_metadata.")
-    }
-
-    # replace sample metadata in metadata list
-    metadata_list$sample_metadata <- sample_metadata
-  }
 
 
   ## Handle altExps ------------------------------------------------------
@@ -219,8 +185,29 @@ merge_sce_list <- function(
   # Create the merged SCE from the processed list
   merged_sce <- do.call(combineCols, unname(sce_list))
 
-  # Replace existing metadata list with merged metadata
-  metadata(merged_sce) <- metadata_list
+  # Update metadata in merged objects, using the unmerged sce_list
+  metadata(merged_sce) <- sce_list |>
+    purrr::map(metadata) |>
+    prepare_merged_metadata()
+
+  if (include_altexp) {
+    for (altexp_name in names(altexp_attributes)) {
+      # For any SCEs without this altExp, create the library_id and sample_id metadata
+      additional_metadata <- sce_list |>
+        purrr::keep(\(sce) !(altexp_name %in% altExpNames(sce))) |>
+        purrr::map(extract_metadata)
+
+      # Update metadata in altExps that were originally present
+      metadata_list <- sce_list |>
+        purrr::keep(\(sce) altexp_name %in% altExpNames(sce)) |>
+        purrr::map(altExp, altexp_name) |>
+        purrr::map(metadata) |>
+        # Tack on the metadata we created on the fly
+        purrr::list_modify(additional_metadata)
+
+      metadata(altExp(merged_sce, altexp_name)) <- prepare_merged_metadata(metadata_list)
+    }
+  }
 
   return(merged_sce)
 }
@@ -304,9 +291,6 @@ prepare_sce_for_merge <- function(
     colnames(sce) <- glue::glue("{sce_name}-{colnames(sce)}")
   }
 
-  # Update metadata list
-  metadata(sce) <- update_sce_metadata(metadata(sce))
-
   # return the processed SCE
   return(sce)
 }
@@ -359,12 +343,22 @@ prepare_altexp_for_merge <- function(
 
 
 
-#' Helper function to update SCE metadata for merging
+#' Prepare an updated list of metadata for the merged SCE
 #'
-#' @param metadata_list Current SCE metadata before modification
+#' The metadata will be reformatted to contain the following fields:
+#' - `library_id`:       vector of all library ids in the merged object
+#' - `sample_id`:        vector of all sample ids in the merged object
+#' - `library_metadata`: pre-merge metadata list for each library, transposed
+#' - `sample_metadata`:  the rbind of all pre-merge sample_metadata data frames,
+#'   with all values coerced to character
 #'
-#' @return Updated metadata list to store in the SCE
-update_sce_metadata <- function(metadata_list) {
+#' @param metadata_list List of metadata to update
+#'
+#' @return Updated metadata list to include in the merged SCE
+prepare_merged_metadata <- function(metadata_list) {
+  metadata_list <- metadata_list |>
+    purrr::transpose()
+
   # first check that this library hasn't already been merged
   if ("library_metadata" %in% names(metadata_list)) {
     stop(paste(
@@ -373,22 +367,49 @@ update_sce_metadata <- function(metadata_list) {
     ))
   }
 
-  # create library and sample metadata.
-  # library metadata will hold all the previous metadata fields, to avoid conflicts
-  library_metadata <- metadata_list[names(metadata_list) != "sample_metadata"]
-  sample_metadata <- metadata_list$sample_metadata
-
-  # combine into one list
-  metadata_list <- list(
-    library_id = metadata_list[["library_id"]],
-    sample_id = metadata_list[["sample_id"]],
-    library_metadata = library_metadata, # this will be all previous metadata for the given library
-    sample_metadata = sample_metadata # this will be the same as the previous sample_metadata
+  # Flatten each list of library ids and sample ids into vectors
+  metadata_library_ids <- purrr::list_c(metadata_list$library_id,
+    ptype = "character"
   )
 
-  # return updated metadata
-  return(metadata_list)
+  metadata_sample_ids <- purrr::list_c(metadata_list$sample_id,
+    ptype = "character"
+  )
+
+  # if object has sample metadata then combine into a single data frame
+  if ("sample_metadata" %in% names(metadata_list)) {
+    sample_metadata <- metadata_list$sample_metadata |>
+      purrr::map(\(df) {
+        # make sure all column types are compatible first
+        df |>
+          dplyr::mutate(dplyr::across(dplyr::everything(), as.character))
+      }) |>
+      dplyr::bind_rows() |>
+      unique()
+
+    # check that all sample ids are found in the new sample metadata and warn if not
+    if (!all(metadata_list$sample_id %in% sample_metadata$sample_id)) {
+      warning("Not all sample ids are present in metadata(merged_sce)$sample_metadata.")
+    }
+
+    # replace sample metadata in metadata list
+    metadata_list$sample_metadata <- sample_metadata
+  }
+
+
+  # combine into final metadata list
+  final_metadata_list <- list(
+    # vector of all library ids
+    library_id = metadata_library_ids,
+    # vector of all sample ids
+    sample_id = metadata_sample_ids,
+    library_metadata = metadata_list[names(metadata_list) != "sample_metadata"],
+    sample_metadata = metadata_list$sample_metadata # a data frame version of the previous sample_metadata
+  )
+
+  return(final_metadata_list)
 }
+
 
 
 #' Helper function to check altExp compatibility
@@ -444,4 +465,27 @@ get_altexp_attributes <- function(sce_list) {
     )
   }
   return(altexp_attributes)
+}
+
+
+check_metadata <- function(sce_list) {
+  expected_fields <- c("library_id", "sample_id")
+  metadata_checks <- sce_list |>
+    purrr::map(\(sce) {
+      all(expected_fields %in% names(metadata(sce)))
+    }) |>
+    unlist()
+
+  if (!all(metadata_checks)) {
+    stop("The metadata for each SCE object must contain `library_id` and `sample_id`.
+         If `include_altexp` is TRUE, these fields must also be present in all altExps.")
+  }
+}
+
+extract_metadata <- function(sce) {
+  list(
+    library_id = metadata(sce)$library_id,
+    sample_id = metadata(sce)$sample_id,
+    sample_metadata = metadata(sce)$sample_metadata
+  )
 }
