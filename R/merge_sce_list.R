@@ -427,7 +427,7 @@ prepare_merged_metadata <- function(metadata_list) {
 
   # Grab names to check contents
   transposed_names <- metadata_list |>
-    purrr::transpose() |>
+    purrr::list_transpose() |>
     names()
 
   # first check that this library hasn't already been merged
