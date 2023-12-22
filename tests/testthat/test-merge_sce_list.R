@@ -517,7 +517,7 @@ test_that("merging SCEs where 1 altExp is missing works as expected, with altexp
 
 
   expect_setequal(
-    # all but sce4
+    # all but sce4 contain all metadata components
     altexp_metadata$library_metadata[-4] |>
       purrr::map(names) |>
       purrr::reduce(intersect),
@@ -525,7 +525,7 @@ test_that("merging SCEs where 1 altExp is missing works as expected, with altexp
   )
 
   expect_setequal(
-    # only sce4
+    # sce4 has only library id and sample id, as it was missing the altExp
     names(altexp_metadata$library_metadata$sce4),
     c("library_id", "sample_id")
   )
@@ -611,6 +611,7 @@ test_that("get_altexp_attributes throws an error as expected when features do no
 test_that("check_metadata throws an error when a field is missing", {
   metadata(sce_list[[1]])$library_id <- NULL
   expect_error(check_metadata(sce_list))
+  expect_no_error(check_metadata(sce_list, expected_fields = "sample_id"))
 })
 
 test_that("extract_metadata_for_altexp returns the correct values", {
@@ -619,12 +620,7 @@ test_that("extract_metadata_for_altexp returns the correct values", {
     "sample_id"  = "sample-sce1"
   )
   observed_list <- extract_metadata_for_altexp(sce_list[[1]])
-  expect_equal(
-    names(observed_list), names(expected_list)
-  )
-  expect_equal(
-    unlist(observed_list), unlist(expected_list)
-  )
+  expect_equal(observed_list, expected_list)
 })
 
 test_that("prepare_merged_metadata works as expected, with sample_metadata present", {

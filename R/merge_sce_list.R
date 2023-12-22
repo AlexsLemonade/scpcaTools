@@ -201,7 +201,7 @@ merge_sce_list <- function(
         purrr::keep(\(sce) altexp_name %in% altExpNames(sce)) |>
         purrr::map(altExp, altexp_name) |>
         purrr::map(metadata) |>
-        # Tack on the metadata we created on the fly
+        # Tack on the metadata we created for libraries without altExps
         c(additional_metadata)
 
       # Ensure correct order
@@ -418,9 +418,7 @@ get_altexp_attributes <- function(sce_list) {
 prepare_merged_metadata <- function(metadata_list) {
   # Define vectors of library and sample ids
   metadata_library_ids <- metadata_list |>
-    purrr::map_chr(
-      purrr::pluck("library_id")
-    )
+    purrr::map_chr("library_id")
 
   metadata_sample_ids <- metadata_list |>
     purrr::map_chr(
@@ -430,8 +428,8 @@ prepare_merged_metadata <- function(metadata_list) {
 
   # Grab names to check contents
   transposed_names <- metadata_list |>
-    purrr::list_transpose() |>
-    names()
+    purrr::map(names) |>
+    purrr::reduce(union)
 
   # first check that this library hasn't already been merged
   if ("library_metadata" %in% transposed_names) {
@@ -462,9 +460,7 @@ prepare_merged_metadata <- function(metadata_list) {
   #  and add this to the final_metadata_list
   if ("sample_metadata" %in% transposed_names) {
     sample_metadata <- metadata_list |>
-      purrr::map(
-        purrr::pluck("sample_metadata")
-      ) |>
+      purrr::map("sample_metadata") |>
       purrr::map(\(df) {
         # make sure all column types are compatible first
         df |>
@@ -490,7 +486,7 @@ prepare_merged_metadata <- function(metadata_list) {
 #' Helper function to check that expected metadata fields are present in a given
 #' list of SCEs.
 #'
-#' The fields `library_id` and `sample_id` must be present. If either is missing from
+#' The default expected fields are `library_id` and `sample_id`. If either is missing from
 #'   any SCE, an error is thrown. This function does not return anything.
 #'
 #' @param sce_list List of SCEs to check
