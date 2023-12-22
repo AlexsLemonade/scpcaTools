@@ -443,7 +443,7 @@ prepare_merged_metadata <- function(metadata_list) {
   # Note that this will work even if `sample_metadata` is not present
   library_metadata <- metadata_list |>
     purrr::map(
-      \(meta) purrr::assign_in(meta, "sample_metadata", purrr::zap())
+      \(meta) meta[which(names(meta) != "sample_metadata")]
     )
 
   # combine into final metadata list
