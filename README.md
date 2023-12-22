@@ -3,7 +3,6 @@
 
   <!-- badges: start -->
   [![R-CMD-check](https://github.com/AlexsLemonade/scpcaTools/workflows/R-CMD-check/badge.svg)](https://github.com/AlexsLemonade/scpcaTools/actions/workflows/R-CMD-check-current.yaml)
-  [![R-CMD-check-renv](https://github.com/AlexsLemonade/scpcaTools/workflows/R-CMD-check-renv/badge.svg)](https://github.com/AlexsLemonade/scpcaTools/actions/workflows/R-CMD-check-renv.yaml)
   <!-- badges: end -->
 
 The `scpcaTools` package contains a set of tools for working with single-cell and single-nuclei RNA-seq counts data.
@@ -16,7 +15,7 @@ Note that this option is only for reading in data from Alevin, Alevin-fry, and K
 
 ## Installation
 
-The package can be installed from github with:
+The package can be installed from GitHub with:
 
 ```r
 remotes::install_github("AlexsLemonade/scpcaTools")
@@ -68,8 +67,3 @@ Note that `renv::status()` may not report that the `requirements.txt` file is ou
 ### Docker installation
 
 Any packages in `requirements.txt` will automatically be added to the Docker image when it is built, so you should not need to do anything special beyond the above steps to add them to the docker image.
-
-
-
-
-
