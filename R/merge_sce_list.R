@@ -191,14 +191,17 @@ merge_sce_list <- function(
 
   if (include_altexp) {
     for (altexp_name in names(altexp_attributes)) {
+      has_altexp_name <- sce_list |>
+        purrr::map_lgl(\(sce) (altexp_name %in% altExpNames(sce)))
+
       # For any SCEs without this altExp, create the library_id and sample_id metadata
       additional_metadata <- sce_list |>
-        purrr::keep(\(sce) !(altexp_name %in% altExpNames(sce))) |>
+        purrr::discard(has_altexp_name) |>
         purrr::map(extract_metadata_for_altexp)
 
       # Update metadata in altExps that were originally present
       metadata_list <- sce_list |>
-        purrr::keep(\(sce) altexp_name %in% altExpNames(sce)) |>
+        purrr::keep(has_altexp_name) |>
         purrr::map(altExp, altexp_name) |>
         purrr::map(metadata) |>
         # Tack on the metadata we created for libraries without altExps
@@ -424,7 +427,6 @@ prepare_merged_metadata <- function(metadata_list) {
     purrr::map_chr(
       purrr::pluck("sample_id")
     )
-
 
   # Grab names to check contents
   transposed_names <- metadata_list |>
