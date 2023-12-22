@@ -200,7 +200,7 @@ merge_sce_list <- function(
         purrr::map(extract_metadata_for_altexp)
 
       # Update metadata in altExps that were originally present
-      metadata_list <- sce_list |>
+      altexp_metadata_list <- sce_list |>
         purrr::keep(has_altexp_name) |>
         purrr::map(altExp, altexp_name) |>
         purrr::map(metadata) |>
@@ -208,9 +208,9 @@ merge_sce_list <- function(
         c(additional_metadata)
 
       # Ensure correct order
-      metadata_list <- metadata_list[names(sce_list)]
+      altexp_metadata_list <- metadata_list[names(sce_list)]
 
-      metadata(altExp(merged_sce, altexp_name)) <- prepare_merged_metadata(metadata_list)
+      metadata(altExp(merged_sce, altexp_name)) <- prepare_merged_metadata(altexp_metadata_list)
     }
   }
 
