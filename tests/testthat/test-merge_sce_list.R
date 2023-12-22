@@ -59,23 +59,6 @@ sce_list <- list(
 
 # Tests without altexps ----------------------------------------------
 
-test_that("`update_sce_metadata()` returns the expected list", {
-  metadata_list <- metadata(sce_list[[1]])
-
-  new_metadata <- update_sce_metadata(metadata_list)
-
-  expect_equal(
-    names(new_metadata),
-    c("library_id", "sample_id", "library_metadata", "sample_metadata")
-  )
-
-  expect_equal(
-    names(new_metadata$library_metadata),
-    c("library_id", "sample_id", "total_reads")
-  )
-})
-
-
 test_that("`prepare_sce_for_merge` works as expected when all columns are present, no altexps", {
   result_sce <- prepare_sce_for_merge(
     sce,
@@ -113,26 +96,6 @@ test_that("`prepare_sce_for_merge` works as expected when all columns are presen
   expect_setequal(
     names(rowData(result_sce)),
     c("gene_names", paste(sce_name, "other_column", sep = "-"))
-  )
-
-  # metadata names check
-  expect_contains(
-    names(metadata(result_sce)),
-    c("library_id", "sample_id", "library_metadata", "sample_metadata")
-  )
-
-  # check that sample metadata is a data frame
-  expect_s3_class(metadata(result_sce)$sample_metadata, "data.frame")
-
-  # check that contents of library id and sample id are correct
-  expect_equal(
-    metadata(result_sce)$library_id,
-    "library-1"
-  )
-
-  expect_equal(
-    metadata(result_sce)$sample_id,
-    "sample-1"
   )
 })
 
@@ -511,7 +474,18 @@ test_that("merging SCEs with 1 altexp but different features fails as expected, 
 
 
 test_that("merging SCEs where 1 altExp is missing works as expected, with altexps", {
-  sce_list_with_altexp[["sce4"]] <- sce_list[[1]]
+  sce_list_with_altexp$sce4 <- sce_list[[1]]
+
+  # update the metdata list with sce4 name
+  metadata(sce_list_with_altexp$sce4) <- list(
+    library_id = "library-sce4",
+    sample_id = "sample-sce4",
+    total_reads = 100,
+    sample_metadata = data.frame(
+      sample_id = "sample-sce4",
+      library_id = "library-sce4"
+    )
+  )
 
   merged_sce <- merge_sce_list(
     sce_list_with_altexp,
@@ -526,6 +500,57 @@ test_that("merging SCEs where 1 altExp is missing works as expected, with altexp
 
   merged_altexp <- altExp(merged_sce, "adt")
 
+  # check merged_altexp metadata
+  altexp_metadata <- metadata(merged_altexp)
+  expect_setequal(
+    names(altexp_metadata),
+    c("library_id", "sample_id", "library_metadata")
+  )
+  expect_setequal(
+    altexp_metadata$library_id,
+    glue::glue("library-{names(sce_list_with_altexp)}")
+  )
+  expect_setequal(
+    altexp_metadata$sample_id,
+    glue::glue("sample-{names(sce_list_with_altexp)}")
+  )
+
+
+  expect_setequal(
+    # all but sce4 contain all metadata components
+    altexp_metadata$library_metadata[-4] |>
+      purrr::map(names) |>
+      purrr::reduce(intersect),
+    c("library_id", "sample_id", "mapped_reads", "ambient_profile")
+  )
+
+  expect_setequal(
+    # sce4 has only library id and sample id, as it was missing the altExp
+    names(altexp_metadata$library_metadata$sce4),
+    c("library_id", "sample_id")
+  )
+
+
+  expect_true(
+    is.null(altexp_metadata$library_metadata$sce4$ambient_profile) &
+      is.null(altexp_metadata$library_metadata$sce4$mapped_reads)
+  )
+  expect_true(
+    all(
+      is.numeric(altexp_metadata$library_metadata$sce1$ambient_profile),
+      is.numeric(altexp_metadata$library_metadata$sce2$ambient_profile),
+      is.numeric(altexp_metadata$library_metadata$sce3$ambient_profile)
+    )
+  )
+  expect_true(
+    all(
+      altexp_metadata$library_metadata$sce1$library_id == "library-sce1",
+      altexp_metadata$library_metadata$sce2$library_id == "library-sce2",
+      altexp_metadata$library_metadata$sce3$library_id == "library-sce3",
+      altexp_metadata$library_metadata$sce4$library_id == "library-sce4"
+    )
+  )
+
   # check dimensions
   expect_equal(
     dim(merged_sce),
@@ -533,8 +558,9 @@ test_that("merging SCEs where 1 altExp is missing works as expected, with altexp
   )
   expect_equal(
     dim(merged_altexp),
-    c(num_altexp_features, total_cells * 4 / 3 )
+    c(num_altexp_features, total_cells * 4 / 3)
   )
+
   # check colData names are as expected
   expected_coldata <- c(
     "sum",
@@ -579,4 +605,87 @@ test_that("get_altexp_attributes passes when it should pass", {
 test_that("get_altexp_attributes throws an error as expected when features do not match", {
   altExp(sce_list_with_altexp[[1]]) <- altExp(sce_list_with_altexp[[1]])[1:3, ]
   expect_error(get_altexp_attributes(sce_list_with_altexp))
+})
+
+
+test_that("check_metadata throws an error when a field is missing", {
+  metadata(sce_list[[1]])$library_id <- NULL
+  expect_error(check_metadata(sce_list))
+  expect_no_error(check_metadata(sce_list, expected_fields = "sample_id"))
+})
+
+test_that("extract_metadata_for_altexp returns the correct values", {
+  expected_list <- list(
+    "library_id" = "library-sce1",
+    "sample_id"  = "sample-sce1"
+  )
+  observed_list <- extract_metadata_for_altexp(sce_list[[1]])
+  expect_equal(observed_list, expected_list)
+})
+
+test_that("prepare_merged_metadata works as expected, with sample_metadata present", {
+  observed_metadata <- sce_list |>
+    purrr::map(metadata) |>
+    prepare_merged_metadata()
+
+  expect_setequal(
+    names(observed_metadata),
+    c("library_id", "sample_id", "library_metadata", "sample_metadata")
+  )
+
+  expected_library_ids <- glue::glue("library-{names(sce_list)}")
+  expected_sample_ids <- glue::glue("sample-{names(sce_list)}")
+  expect_setequal(
+    observed_metadata$library_id,
+    expected_library_ids
+  )
+  expect_setequal(
+    observed_metadata$sample_id,
+    expected_sample_ids
+  )
+  expect_setequal(
+    names(observed_metadata$library_metadata),
+    names(sce_list)
+  )
+  expect_setequal(
+    observed_metadata$library_metadata |>
+      purrr::map(names) |>
+      purrr::reduce(intersect),
+    c("library_id", "sample_id", "total_reads")
+  )
+  expect_equal(
+    data.frame(
+      sample_id = expected_sample_ids,
+      library_id = expected_library_ids
+    ),
+    observed_metadata$sample_metadata
+  )
+})
+
+
+test_that("prepare_merged_metadata works as expected from altExps metadata (aka, sample_metadata NOT present)", {
+  observed_metadata <- sce_list_with_altexp |>
+    purrr::map(altExp) |>
+    purrr::map(metadata) |>
+    prepare_merged_metadata()
+
+  expect_setequal(
+    names(observed_metadata),
+    c("library_id", "sample_id", "library_metadata")
+  )
+
+  expect_setequal(
+    observed_metadata$library_id,
+    glue::glue("library-{names(sce_list)}")
+  )
+  expect_setequal(
+    observed_metadata$sample_id,
+    glue::glue("sample-{names(sce_list)}")
+  )
+  expect_setequal(
+    observed_metadata$library_metadata |>
+      purrr::map(names) |>
+      purrr::reduce(intersect),
+    c("library_id", "sample_id", "mapped_reads", "ambient_profile")
+  )
 })
