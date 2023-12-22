@@ -424,9 +424,7 @@ prepare_merged_metadata <- function(metadata_list) {
     purrr::map_chr("library_id")
 
   metadata_sample_ids <- metadata_list |>
-    purrr::map_chr(
-      purrr::pluck("sample_id")
-    )
+    purrr::map_chr("sample_id")
 
   # Grab names to check contents
   transposed_names <- metadata_list |>
