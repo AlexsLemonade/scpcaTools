@@ -7,7 +7,7 @@
 prepare_merged_metadata(metadata_list)
 }
 \arguments{
-\item{metadata_list}{List of metadata to update, named by SCE}
+\item{metadata_list}{List of metadata to update}
 }
 \value{
 Updated metadata list to include in the merged SCE
@@ -16,7 +16,7 @@ Updated metadata list to include in the merged SCE
 The metadata will be reformatted to contain the following fields:
 - `library_id`:       vector of all library ids in the merged object
 - `sample_id`:        vector of all sample ids in the merged object
-- `library_metadata`: pre-merge metadata list for each library, transposed
+- `library_metadata`: pre-merge metadata list for each library, named by SCE name
 - `sample_metadata`:  a data frame with all distinct rows from the pre-merge sample_metadata data frames,
   with all values coerced to character
 }

@@ -405,38 +405,45 @@ get_altexp_attributes <- function(sce_list) {
 #' The metadata will be reformatted to contain the following fields:
 #' - `library_id`:       vector of all library ids in the merged object
 #' - `sample_id`:        vector of all sample ids in the merged object
-#' - `library_metadata`: pre-merge metadata list for each library, transposed
+#' - `library_metadata`: pre-merge metadata list for each library, named by SCE name
 #' - `sample_metadata`:  a data frame with all distinct rows from the pre-merge sample_metadata data frames,
 #'   with all values coerced to character
 #'
-#' @param metadata_list List of metadata to update, named by SCE
+#' @param metadata_list List of metadata to update
 #'
 #' @return Updated metadata list to include in the merged SCE
 prepare_merged_metadata <- function(metadata_list) {
-  # Check names
-  if (is.null(names(metadata_list))) {
-    stop("Cannot prepare merged metadata; list is unnamed.")
-  }
-
-  metadata_library_ids <- names(metadata_list) |>
+  # Define vectors of library and sample ids
+  metadata_library_ids <- metadata_list |>
     purrr::map_chr(
-      \(sce_metadata) purrr::pluck(metadata_list[[sce_metadata]], "library_id")
+      purrr::pluck("library_id")
     )
 
-  metadata_sample_ids <- names(metadata_list) |>
+  metadata_sample_ids <- metadata_list |>
     purrr::map_chr(
-      \(sce_metadata) purrr::pluck(metadata_list[[sce_metadata]], "sample_id")
+      purrr::pluck("sample_id")
     )
 
 
+  # Grab names to check contents
+  transposed_names <- metadata_list |>
+    purrr::transpose() |>
+    names()
 
   # first check that this library hasn't already been merged
-  if ("library_metadata" %in% names(metadata_list)) {
+  if ("library_metadata" %in% transposed_names) {
     stop(paste(
       "This SCE object appears to be a merged object",
       "We do not support merging objects with objects that have already been merged."
     ))
   }
+
+  # Create new version of metadata_list without any sample_metadata fields
+  # Note that this will work even if `sample_metadata` is not present
+  library_metadata <- metadata_list |>
+    purrr::map(
+      \(meta) purrr::assign_in(meta, "sample_metadata", purrr::zap())
+    )
 
   # combine into final metadata list
   final_metadata_list <- list(
@@ -444,13 +451,17 @@ prepare_merged_metadata <- function(metadata_list) {
     library_id = metadata_library_ids,
     # vector of all sample ids
     sample_id = metadata_sample_ids,
-    library_metadata = metadata_list[names(metadata_list) != "sample_metadata"]
+    # list of existing metadata for each library, with sample_metadata removed
+    library_metadata = library_metadata
   )
 
   # if object has sample metadata then combine into a single data frame,
-  #  and add this to the final_metdata_list
-  if ("sample_metadata" %in% names(metadata_list)) {
-    sample_metadata <- metadata_list$sample_metadata |>
+  #  and add this to the final_metadata_list
+  if ("sample_metadata" %in% transposed_names) {
+    sample_metadata <- metadata_list |>
+      purrr::map(
+        purrr::pluck("sample_metadata")
+      ) |>
       purrr::map(\(df) {
         # make sure all column types are compatible first
         df |>
@@ -460,7 +471,7 @@ prepare_merged_metadata <- function(metadata_list) {
       dplyr::distinct()
 
     # check that all sample ids are found in the new sample metadata and warn if not
-    if (!all(metadata_list$sample_id %in% sample_metadata$sample_id)) {
+    if (!all(metadata_sample_ids %in% sample_metadata$sample_id)) {
       warning("Not all sample ids are present in metadata(merged_sce)$sample_metadata.")
     }
 
