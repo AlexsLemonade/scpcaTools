@@ -409,12 +409,26 @@ get_altexp_attributes <- function(sce_list) {
 #' - `sample_metadata`:  a data frame with all distinct rows from the pre-merge sample_metadata data frames,
 #'   with all values coerced to character
 #'
-#' @param metadata_list List of metadata to update
+#' @param metadata_list List of metadata to update, named by SCE
 #'
 #' @return Updated metadata list to include in the merged SCE
 prepare_merged_metadata <- function(metadata_list) {
-  metadata_list <- metadata_list |>
-    purrr::transpose()
+  # Check names
+  if (is.null(names(metadata_list))) {
+    stop("Cannot prepare merged metadata; list is unnamed.")
+  }
+
+  metadata_library_ids <- names(metadata_list) |>
+    purrr::map_chr(
+      \(sce_metadata) purrr::pluck(metadata_list[[sce_metadata]], "library_id")
+    )
+
+  metadata_sample_ids <- names(metadata_list) |>
+    purrr::map_chr(
+      \(sce_metadata) purrr::pluck(metadata_list[[sce_metadata]], "sample_id")
+    )
+
+
 
   # first check that this library hasn't already been merged
   if ("library_metadata" %in% names(metadata_list)) {
@@ -423,15 +437,6 @@ prepare_merged_metadata <- function(metadata_list) {
       "We do not support merging objects with objects that have already been merged."
     ))
   }
-
-  # Flatten each list of library ids and sample ids into vectors
-  metadata_library_ids <- purrr::list_c(metadata_list$library_id,
-    ptype = "character"
-  )
-
-  metadata_sample_ids <- purrr::list_c(metadata_list$sample_id,
-    ptype = "character"
-  )
 
   # combine into final metadata list
   final_metadata_list <- list(
@@ -471,8 +476,8 @@ prepare_merged_metadata <- function(metadata_list) {
 #' Helper function to check that expected metadata fields are present in a given
 #' list of SCEs.
 #'
-#' The fields `library_id` and `sample_id` must be present. If either is missig from
-#'   any SCE, an error is thrown.
+#' The fields `library_id` and `sample_id` must be present. If either is missing from
+#'   any SCE, an error is thrown. This function does not return anything.
 #'
 #' @param sce_list List of SCEs to check
 #' @param expected_fields a vector of metadata fields that should be present
