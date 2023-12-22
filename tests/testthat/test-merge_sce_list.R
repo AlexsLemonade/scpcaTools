@@ -514,27 +514,40 @@ test_that("merging SCEs where 1 altExp is missing works as expected, with altexp
     altexp_metadata$sample_id,
     glue::glue("sample-{names(sce_list_with_altexp)}")
   )
+
+
   expect_setequal(
-    names(altexp_metadata$library_metadata),
+    # all but sce4
+    altexp_metadata$library_metadata[-4] |>
+      purrr::map(names) |>
+      purrr::reduce(intersect),
     c("library_id", "sample_id", "mapped_reads", "ambient_profile")
   )
+
+  expect_setequal(
+    # only sce4
+    names(altexp_metadata$library_metadata$sce4),
+    c("library_id", "sample_id")
+  )
+
+
   expect_true(
-    is.null(altexp_metadata$library_metadata$ambient_profile$sce4) &
-      is.null(altexp_metadata$library_metadata$mapped_reads$sce4)
+    is.null(altexp_metadata$library_metadata$sce4$ambient_profile) &
+      is.null(altexp_metadata$library_metadata$sce4$mapped_reads)
   )
   expect_true(
     all(
-      is.numeric(altexp_metadata$library_metadata$ambient_profile$sce1),
-      is.numeric(altexp_metadata$library_metadata$ambient_profile$sce2),
-      is.numeric(altexp_metadata$library_metadata$ambient_profile$sce3)
+      is.numeric(altexp_metadata$library_metadata$sce1$ambient_profile),
+      is.numeric(altexp_metadata$library_metadata$sce2$ambient_profile),
+      is.numeric(altexp_metadata$library_metadata$sce3$ambient_profile)
     )
   )
   expect_true(
     all(
-      altexp_metadata$library_metadata$library_id$sce1 == "library-sce1",
-      altexp_metadata$library_metadata$library_id$sce2 == "library-sce2",
-      altexp_metadata$library_metadata$library_id$sce3 == "library-sce3",
-      altexp_metadata$library_metadata$library_id$sce4 == "library-sce4"
+      altexp_metadata$library_metadata$sce1$library_id == "library-sce1",
+      altexp_metadata$library_metadata$sce2$library_id == "library-sce2",
+      altexp_metadata$library_metadata$sce3$library_id == "library-sce3",
+      altexp_metadata$library_metadata$sce4$library_id == "library-sce4"
     )
   )
 
@@ -545,7 +558,7 @@ test_that("merging SCEs where 1 altExp is missing works as expected, with altexp
   )
   expect_equal(
     dim(merged_altexp),
-    c(num_altexp_features, total_cells * 4 / 3 )
+    c(num_altexp_features, total_cells * 4 / 3)
   )
 
   # check colData names are as expected
@@ -634,10 +647,13 @@ test_that("prepare_merged_metadata works as expected, with sample_metadata prese
   )
   expect_setequal(
     names(observed_metadata$library_metadata),
-    c("library_id", "sample_id", "total_reads")
+    names(sce_list)
   )
-  expect_true(
-    class(observed_metadata$sample_metadata) == "data.frame"
+  expect_setequal(
+    observed_metadata$library_metadata |>
+      purrr::map(names) |>
+      purrr::reduce(intersect),
+    c("library_id", "sample_id", "total_reads")
   )
 })
 
@@ -662,7 +678,9 @@ test_that("prepare_merged_metadata works as expected from altExps metadata (aka,
     glue::glue("sample-{names(sce_list)}")
   )
   expect_setequal(
-    names(observed_metadata$library_metadata),
+    observed_metadata$library_metadata |>
+      purrr::map(names) |>
+      purrr::reduce(intersect),
     c("library_id", "sample_id", "mapped_reads", "ambient_profile")
   )
 })
