@@ -204,6 +204,9 @@ merge_sce_list <- function(
         # Tack on the metadata we created on the fly
         c(additional_metadata)
 
+      # Ensure correct order
+      metadata_list <- metadata_list[names(sce_list)]
+
       metadata(altExp(merged_sce, altexp_name)) <- prepare_merged_metadata(metadata_list)
     }
   }
