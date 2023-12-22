@@ -406,7 +406,7 @@ get_altexp_attributes <- function(sce_list) {
 #' - `library_id`:       vector of all library ids in the merged object
 #' - `sample_id`:        vector of all sample ids in the merged object
 #' - `library_metadata`: pre-merge metadata list for each library, transposed
-#' - `sample_metadata`:  the rbind of all pre-merge sample_metadata data frames,
+#' - `sample_metadata`:  a data frame with all distinct rows from the pre-merge sample_metadata data frames,
 #'   with all values coerced to character
 #'
 #' @param metadata_list List of metadata to update
@@ -452,7 +452,7 @@ prepare_merged_metadata <- function(metadata_list) {
           dplyr::mutate(dplyr::across(dplyr::everything(), as.character))
       }) |>
       dplyr::bind_rows() |>
-      unique()
+      dplyr::distinct()
 
     # check that all sample ids are found in the new sample metadata and warn if not
     if (!all(metadata_list$sample_id %in% sample_metadata$sample_id)) {
@@ -475,17 +475,18 @@ prepare_merged_metadata <- function(metadata_list) {
 #'   any SCE, an error is thrown.
 #'
 #' @param sce_list List of SCEs to check
-check_metadata <- function(sce_list) {
-  expected_fields <- c("library_id", "sample_id")
+#' @param expected_fields a vector of metadata fields that should be present
+check_metadata <- function(sce_list, expected_fields = c("library_id", "sample_id")) {
   metadata_checks <- sce_list |>
-    purrr::map(\(sce) {
+    purrr::map_lgl(\(sce) {
       all(expected_fields %in% names(metadata(sce)))
-    }) |>
-    unlist()
+    })
 
   if (!all(metadata_checks)) {
-    stop("The metadata for each SCE object must contain `library_id` and `sample_id`.
-         If `include_altexp` is TRUE, these fields must also be present in all altExps.")
+    stop(glue::glue("
+       The metadata for each SCE object must contain {stringr::str_flatten_comma(expected_fields, ', and ')}.
+       If `include_altexp` is TRUE, these fields must also be present in all altExps.
+     "))
   }
 }
 
