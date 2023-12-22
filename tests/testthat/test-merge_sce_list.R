@@ -633,13 +633,15 @@ test_that("prepare_merged_metadata works as expected, with sample_metadata prese
     c("library_id", "sample_id", "library_metadata", "sample_metadata")
   )
 
+  expected_library_ids <- glue::glue("library-{names(sce_list)}")
+  expected_sample_ids <- glue::glue("sample-{names(sce_list)}")
   expect_setequal(
     observed_metadata$library_id,
-    glue::glue("library-{names(sce_list)}")
+    expected_library_ids
   )
   expect_setequal(
     observed_metadata$sample_id,
-    glue::glue("sample-{names(sce_list)}")
+    expected_sample_ids
   )
   expect_setequal(
     names(observed_metadata$library_metadata),
@@ -650,6 +652,13 @@ test_that("prepare_merged_metadata works as expected, with sample_metadata prese
       purrr::map(names) |>
       purrr::reduce(intersect),
     c("library_id", "sample_id", "total_reads")
+  )
+  expect_equal(
+    data.frame(
+      sample_id = expected_sample_ids,
+      library_id = expected_library_ids
+    ),
+    observed_metadata$sample_metadata
   )
 })
 
