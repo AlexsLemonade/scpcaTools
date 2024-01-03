@@ -592,8 +592,8 @@ test_that("merging SCEs where 1 altExp is missing works as expected, with altexp
 test_that("merging SCEs with different altExps works as expected; each SCE has 1 altExp of a different name", {
   sce1 <- sce_list_with_altexp[[1]]
   sce2 <- sce_list_with_altexp[[2]]
-
-  altExpNames(sce2) <- "other"
+  other_altexp_name <- "other"
+  altExpNames(sce2) <- other_altexp_name
   rownames(altExp(sce2)) <- c("ADT-A", "ADT-B", "ADT-C", "ADT-D", "ADT-E")
 
   sce_list <- list(
@@ -614,7 +614,7 @@ test_that("merging SCEs with different altExps works as expected; each SCE has 1
   # Correct names
   expect_equal(
     altExpNames(merged_sce),
-    c(altexp_name, "other")
+    c(altexp_name, other_altexp_name)
   )
 
   # Check the "adt" (`altexp_name`) altexp
@@ -656,8 +656,105 @@ test_that("merging SCEs with different altExps works as expected; each SCE has 1
 
 
 
+test_that("merging SCEs with different altExps works as expected; each SCE has 2 different altExps", {
+  other_altexp_name <- "other"
+  other_n_features <- 3
+  sce1 <- sce_list_with_altexp[[1]]
+  sce2 <- sce_list_with_altexp[[2]]
 
-# TODO: ANOTHER TEST WHERE THERE ARE MUTLIPLE ALTEXPS IN THE SAME
+  sce_list <- list(
+    "sce1" = sce_list_with_altexp[[1]],
+    "sce2" = sce_list_with_altexp[[2]]
+  ) |>
+    # add "other" altExp to each sce
+    purrr::imap(
+      add_sce_altexp,
+      other_altexp_name,
+      other_n_features,
+      ncol(sce1)
+    )
+
+  # Merge
+  merged_sce <- merge_sce_list(
+    sce_list,
+    batch_column = batch_column,
+    # "total" should get removed
+    retain_coldata_cols = retain_coldata_cols,
+    # this row name should not be modified:
+    preserve_rowdata_cols = c("gene_names")
+  )
+
+  # Correct names
+  expect_equal(
+    altExpNames(merged_sce),
+    c(altexp_name, other_altexp_name)
+  )
+
+  # Check the "adt" (`altexp_name`) altexp
+  adt_merged <- altExp(merged_sce, altexp_name)
+  expect_equal(
+    dim(adt_merged),
+    c(num_altexp_features, ncol(merged_sce))
+  )
+  expect_equal(
+    rownames(adt_merged),
+    rownames(altExp(sce1, altexp_name))
+  )
+  expect_equal(
+    colnames(adt_merged),
+    colnames(merged_sce)
+  )
+
+  # next two tests check matrix values
+  expect_equal(
+    counts(adt_merged)[, merged_sce[[batch_column]] == "sce1"] |>
+      as.matrix() |>
+      unname(),
+    counts(altExp(sce_list[[1]], altexp_name)) |>
+      as.matrix() |>
+      unname()
+  )
+  expect_equal(
+    counts(adt_merged)[, merged_sce[[batch_column]] == "sce2"] |>
+      as.matrix() |>
+      unname(),
+    counts(altExp(sce_list[[2]], altexp_name)) |>
+      as.matrix() |>
+      unname()
+  )
+
+  # Check the "other"  altexp
+  other_merged <- altExp(merged_sce, other_altexp_name)
+  expect_equal(
+    dim(other_merged),
+    c(other_n_features, ncol(merged_sce))
+  )
+  expect_equal(
+    rownames(other_merged),
+    rownames(altExp(sce_list[[1]], other_altexp_name))
+  )
+  expect_equal(
+    colnames(other_merged),
+    colnames(merged_sce)
+  )
+  # next two tests check matrix values
+  expect_equal(
+    counts(other_merged)[, merged_sce[[batch_column]] == "sce1"] |>
+      as.matrix() |>
+      unname(),
+    counts(altExp(sce_list[[1]], other_altexp_name)) |>
+      as.matrix() |>
+      unname()
+  )
+  expect_equal(
+    counts(other_merged)[, merged_sce[[batch_column]] == "sce2"] |>
+      as.matrix() |>
+      unname(),
+    counts(altExp(sce_list[[2]], other_altexp_name)) |>
+      as.matrix() |>
+      unname()
+  )
+})
 
 
 
