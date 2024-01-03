@@ -714,11 +714,9 @@ test_that("merging SCEs with different altExps works as expected; each SCE has 2
   )
   expect_equal(
     counts(adt_merged)[, merged_sce[[batch_column]] == "sce2"] |>
-      as.matrix() |>
-      unname(),
+      as.numeric(),
     counts(altExp(sce_list[[2]], altexp_name)) |>
-      as.matrix() |>
-      unname()
+      as.numeric()
   )
 
   # Check the "other"  altexp
@@ -738,19 +736,15 @@ test_that("merging SCEs with different altExps works as expected; each SCE has 2
   # next two tests check matrix values
   expect_equal(
     counts(other_merged)[, merged_sce[[batch_column]] == "sce1"] |>
-      as.matrix() |>
-      unname(),
+      as.numeric(),
     counts(altExp(sce_list[[1]], other_altexp_name)) |>
-      as.matrix() |>
-      unname()
+      as.numeric()
   )
   expect_equal(
     counts(other_merged)[, merged_sce[[batch_column]] == "sce2"] |>
-      as.matrix() |>
-      unname(),
+      as.numeric(),
     counts(altExp(sce_list[[2]], other_altexp_name)) |>
-      as.matrix() |>
-      unname()
+      as.numeric()
   )
 })
 
