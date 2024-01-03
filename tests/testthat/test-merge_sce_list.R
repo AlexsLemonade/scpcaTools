@@ -595,8 +595,6 @@ test_that("merging SCEs with different altExps works as expected; each SCE has 1
 
   altExpNames(sce2) <- "other"
   rownames(altExp(sce2)) <- c("ADT-A", "ADT-B", "ADT-C", "ADT-D", "ADT-E")
-  colnames(colData(altExp(sce2))) <- c("col1")
-  colnames(rowData(altExp(sce2))) <- c("rcol1", "rcol2", "rcol3")
 
   sce_list <- list(
     "sce1" = sce1,
@@ -655,6 +653,7 @@ test_that("merging SCEs with different altExps works as expected; each SCE has 1
     all(is.na(counts(other_merged)[, merged_sce[[batch_column]] == "sce1"]))
   )
 })
+
 
 
 
