@@ -658,9 +658,6 @@ test_that("merging SCEs with different altExps works as expected; each SCE has 1
 
 
 
-
-
-# TODO: ANOTHER TEST FOR CITE AND HASH TOGETHER - ONLY CITE SHOULD MAKE IT IN
 # TODO: ANOTHER TEST WHERE THERE ARE MUTLIPLE ALTEXPS IN THE SAME
 
 
