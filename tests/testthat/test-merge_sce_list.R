@@ -578,15 +578,92 @@ test_that("merging SCEs where 1 altExp is missing works as expected, with altexp
 
   # check that the NAs are as expected
   counts_mat <- counts(merged_altexp)
-  sce4_counts <- counts_mat[, merged_sce$library_id == "sce4"]
+  sce4_counts <- counts_mat[, merged_sce[[batch_column]] == "sce4"]
   expect_true(
     all(is.na(sce4_counts))
   )
-  numeric_counts <- counts_mat[, merged_sce$library_id != "sce4"]
+  numeric_counts <- counts_mat[, merged_sce[[batch_column]] != "sce4"]
   expect_true(
     all(is.finite(numeric_counts))
   )
 })
+
+
+test_that("merging SCEs with different altExps works as expected; each SCE has 1 altExp of a different name", {
+  sce1 <- sce_list_with_altexp[[1]]
+  sce2 <- sce_list_with_altexp[[2]]
+
+  altExpNames(sce2) <- "other"
+  rownames(altExp(sce2)) <- c("ADT-A", "ADT-B", "ADT-C", "ADT-D", "ADT-E")
+  colnames(colData(altExp(sce2))) <- c("col1")
+  colnames(rowData(altExp(sce2))) <- c("rcol1", "rcol2", "rcol3")
+
+  sce_list <- list(
+    "sce1" = sce1,
+    "sce2" = sce2
+  )
+
+  # Merge:
+  merged_sce <- merge_sce_list(
+    sce_list,
+    batch_column = batch_column,
+    # "total" should get removed
+    retain_coldata_cols = retain_coldata_cols,
+    # this row name should not be modified:
+    preserve_rowdata_cols = c("gene_names")
+  )
+
+  # Correct names
+  expect_equal(
+    altExpNames(merged_sce),
+    c(altexp_name, "other")
+  )
+
+  # Check the "adt" (`altexp_name`) altexp
+  adt_merged <- altExp(merged_sce, altexp_name)
+  expect_equal(
+    dim(adt_merged),
+    c(num_altexp_features, ncol(merged_sce))
+  )
+  expect_equal(
+    rownames(adt_merged),
+    rownames(altExp(sce1))
+  )
+  expect_equal(
+    colnames(adt_merged),
+    colnames(merged_sce)
+  )
+  expect_true(
+    all(is.na(counts(adt_merged)[, merged_sce[[batch_column]] == "sce2"]))
+  )
+
+  # Check the "other"  altexp
+  other_merged <- altExp(merged_sce, "other")
+  expect_equal(
+    dim(other_merged),
+    c(num_altexp_features, ncol(merged_sce))
+  )
+  expect_equal(
+    rownames(other_merged),
+    rownames(altExp(sce2))
+  )
+  expect_equal(
+    colnames(adt_merged),
+    colnames(merged_sce)
+  )
+  expect_true(
+    all(is.na(counts(other_merged)[, merged_sce[[batch_column]] == "sce1"]))
+  )
+})
+
+
+
+
+
+# TODO: ANOTHER TEST FOR CITE AND HASH TOGETHER - ONLY CITE SHOULD MAKE IT IN
+# TODO: ANOTHER TEST WHERE THERE ARE MUTLIPLE ALTEXPS IN THE SAME
+
+
 
 
 ## Other tests ------------------
