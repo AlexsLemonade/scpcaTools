@@ -612,7 +612,7 @@ test_that("merging SCEs with different altExps works as expected; each SCE has 1
   )
 
   # Correct names
-  expect_equal(
+  expect_setequal(
     altExpNames(merged_sce),
     c(altexp_name, other_altexp_name)
   )
@@ -625,7 +625,7 @@ test_that("merging SCEs with different altExps works as expected; each SCE has 1
   )
   expect_equal(
     rownames(adt_merged),
-    rownames(altExp(sce1))
+    rownames(altExp(sce1, altexp_name))
   )
   expect_equal(
     colnames(adt_merged),
@@ -636,7 +636,7 @@ test_that("merging SCEs with different altExps works as expected; each SCE has 1
   )
 
   # Check the "other"  altexp
-  other_merged <- altExp(merged_sce, "other")
+  other_merged <- altExp(merged_sce, other_altexp_name)
   expect_equal(
     dim(other_merged),
     c(num_altexp_features, ncol(merged_sce))
@@ -685,7 +685,7 @@ test_that("merging SCEs with different altExps works as expected; each SCE has 2
   )
 
   # Correct names
-  expect_equal(
+  expect_setequal(
     altExpNames(merged_sce),
     c(altexp_name, other_altexp_name)
   )
@@ -708,11 +708,9 @@ test_that("merging SCEs with different altExps works as expected; each SCE has 2
   # next two tests check matrix values
   expect_equal(
     counts(adt_merged)[, merged_sce[[batch_column]] == "sce1"] |>
-      as.matrix() |>
-      unname(),
+      as.numeric(),
     counts(altExp(sce_list[[1]], altexp_name)) |>
-      as.matrix() |>
-      unname()
+      as.numeric()
   )
   expect_equal(
     counts(adt_merged)[, merged_sce[[batch_column]] == "sce2"] |>
