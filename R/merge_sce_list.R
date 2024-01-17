@@ -309,7 +309,7 @@ prepare_sce_for_merge <- function(
 
   # Retain only the columns present in `retain_coldata_cols`
   # Use drop=FALSE to ensure result is a DataFrame
-  colData(sce) <- colData(sce)[, c(retain_coldata_cols, celltype_coldata_cols), drop = FALSE]
+  colData(sce) <- colData(sce)[, retain_coldata_cols, drop = FALSE]
 
   # Add batch column
   sce[[batch_column]] <- sce_name
