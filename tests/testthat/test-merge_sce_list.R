@@ -41,6 +41,13 @@ shared_features <- rownames(sce)[1:10]
 retain_coldata_cols <- c("sum", "detected")
 preserve_rowdata_cols <- "gene_names"
 expected_coldata_cols <- sort(c("sum", "detected", batch_column, cell_id_column))
+celltype_coldata_cols <- c(
+  "submitter_celltype_annotation",
+  "singler_celltype_annotation",
+  "singler_celltype_ontology",
+  "cellassign_celltype_annotation",
+  "cellassign_max_prediction"
+)
 
 sce1 <- sim_sce(n_cells = total_cells / 3, n_genes = total_genes, n_empty = 0)
 sce2 <- sim_sce(n_cells = total_cells / 3, n_genes = total_genes, n_empty = 0)
@@ -100,6 +107,46 @@ test_that("`prepare_sce_for_merge` works as expected when all columns are presen
 })
 
 
+
+test_that("`prepare_sce_for_merge` works when celltype annotation columns are provided but not present, no altexps", {
+  result_sce <- prepare_sce_for_merge(
+    sce,
+    sce_name,
+    batch_column,
+    cell_id_column,
+    shared_features,
+    retain_coldata_cols,
+    preserve_rowdata_cols,
+    celltype_coldata_cols
+  )
+  expect_equal(
+    sort(names(colData(result_sce))),
+    expected_coldata_cols
+  )
+})
+
+test_that("`prepare_sce_for_merge` works as expected with celltype annotation columns, no altexps", {
+  sce$submitter_celltype_annotation <- "submitter"
+  sce$singler_celltype_annotation <- "singler"
+  sce$singler_celltype_ontology <- "singler-ontology"
+  sce$cellassign_celltype_annotation <- "cellassign"
+  sce$cellassign_max_prediction <- 0.75
+
+  result_sce <- prepare_sce_for_merge(
+    sce,
+    sce_name,
+    batch_column,
+    cell_id_column,
+    shared_features,
+    retain_coldata_cols,
+    preserve_rowdata_cols,
+    celltype_coldata_cols
+  )
+  expect_setequal(
+    names(colData(result_sce)),
+    c(expected_coldata_cols, celltype_coldata_cols)
+  )
+})
 
 test_that("`prepare_sce_for_merge` works as expected when an expected column is missing, no altexps", {
   # REMOVE "detected" column first
