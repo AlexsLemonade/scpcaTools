@@ -10,6 +10,9 @@ merge_sce_list(
   retain_coldata_cols = c("sum", "detected", "total", "subsets_mito_sum",
     "subsets_mito_detected", "subsets_mito_percent", "miQC_pass", "prob_compromised",
     "barcodes"),
+  celltype_coldata_cols = c("submitter_celltype_annotation",
+    "singler_celltype_annotation", "singler_celltype_ontology",
+    "cellassign_celltype_annotation", "cellassign_max_prediction"),
   preserve_rowdata_cols = NULL,
   cell_id_column = "cell_id",
   include_altexp = TRUE
@@ -25,7 +28,14 @@ to differentiate originating SingleCellExperiment objects. Often these values
 are unique library IDs. Default value is `library_id`.}
 
 \item{retain_coldata_cols}{A vector of colData columns which should be retained
-in the the final merged SCE object.}
+in the the final merged SCE object. Any colData columns representing altExp
+QC stats, if present, named as `{altexpname}_sum_`, `{altexpname}_detected`, and
+`{altexpname}_percent` will also be retained. If any of these columns (except
+altExp QC stats) are missing, they will be created and filled with `NA` values.}
+
+\item{celltype_coldata_cols}{A vector of cell type annotation columns to retain in
+the final merged SCE object. If these columns are not present, they should not be
+created and filled with `NA` values.}
 
 \item{preserve_rowdata_cols}{A vector of column names that appear in originating
 SCE objects' rowData slots which should not be renamed with

@@ -12,6 +12,7 @@ prepare_sce_for_merge(
   shared_features,
   retain_coldata_cols,
   preserve_rowdata_cols,
+  celltype_coldata_cols = NULL,
   is_altexp = FALSE
 )
 }
@@ -32,10 +33,14 @@ have in common}
 \item{retain_coldata_cols}{A vector of columns to retain in the colData slot.
 If columns are missing from the data, they will be filled with `NA` values.
 The exceptions to this are `barcode_column` and `batch_column` which will be
-populated with respective information.}
+populated with respective information}
 
 \item{preserve_rowdata_cols}{A vector of rowData columns which should not be
 renamed}
+
+\item{celltype_coldata_cols}{Optional vector of cell type annotation columns to retain
+in the colData slot. These should _not_ be filled with `NA` values if missing
+from the data.}
 
 \item{is_altexp}{Boolean if we are preparing an altExp or not.
 Default is `FALSE`. If FALSE, the SCE colnames will not be modified.}

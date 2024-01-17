@@ -27,7 +27,13 @@
 #'  to differentiate originating SingleCellExperiment objects. Often these values
 #'  are unique library IDs. Default value is `library_id`.
 #' @param retain_coldata_cols A vector of colData columns which should be retained
-#'  in the the final merged SCE object.
+#'  in the the final merged SCE object. Any colData columns representing altExp
+#'  QC stats, if present, named as `{altexpname}_sum_`, `{altexpname}_detected`, and
+#'  `{altexpname}_percent` will also be retained. If any of these columns (except
+#'  altExp QC stats) are missing, they will be created and filled with `NA` values.
+#' @param celltype_coldata_cols A vector of cell type annotation columns to retain in
+#'  the final merged SCE object. If these columns are not present, they should not be
+#'  created and filled with `NA` values.
 #' @param preserve_rowdata_cols A vector of column names that appear in originating
 #'  SCE objects' rowData slots which should not be renamed with
 #'  the given SCE object name or index is name is not given. These are generally
@@ -57,6 +63,13 @@ merge_sce_list <- function(
       "miQC_pass",
       "prob_compromised",
       "barcodes"
+    ),
+    celltype_coldata_cols = c(
+      "submitter_celltype_annotation",
+      "singler_celltype_annotation",
+      "singler_celltype_ontology",
+      "cellassign_celltype_annotation",
+      "cellassign_max_prediction"
     ),
     preserve_rowdata_cols = NULL,
     cell_id_column = "cell_id",
@@ -158,6 +171,7 @@ merge_sce_list <- function(
       cell_id_column = cell_id_column,
       shared_features = shared_features,
       retain_coldata_cols = retain_coldata_cols,
+      celltype_coldata_cols = celltype_coldata_cols,
       preserve_rowdata_cols = preserve_rowdata_cols
     )
 
@@ -231,7 +245,10 @@ merge_sce_list <- function(
 #' @param retain_coldata_cols A vector of columns to retain in the colData slot.
 #'   If columns are missing from the data, they will be filled with `NA` values.
 #'   The exceptions to this are `barcode_column` and `batch_column` which will be
-#'   populated with respective information.
+#'   populated with respective information
+#' @param celltype_coldata_cols Optional vector of cell type annotation columns to retain
+#'   in the colData slot. These should _not_ be filled with `NA` values if missing
+#'   from the data.
 #' @param preserve_rowdata_cols A vector of rowData columns which should not be
 #'   renamed
 #' @param is_altexp Boolean if we are preparing an altExp or not.
@@ -246,6 +263,7 @@ prepare_sce_for_merge <- function(
     shared_features,
     retain_coldata_cols,
     preserve_rowdata_cols,
+    celltype_coldata_cols = NULL,
     is_altexp = FALSE) {
   # Subset to shared features
   sce <- sce[shared_features, ]
@@ -267,11 +285,12 @@ prepare_sce_for_merge <- function(
   ##### colData #####
   observed_coldata_names <- names(colData(sce))
 
-  # Ensure all columns are present in all SCEs by adding `NA` columns as needed
+  # Ensure all columns are present in all SCEs by adding `NA` columns as needed,
   missing_columns <- setdiff(
     retain_coldata_cols,
     observed_coldata_names
   )
+
   for (missing_col in missing_columns) {
     # Create the missing column only if it should be retained
     if (missing_col %in% retain_coldata_cols) {
@@ -279,9 +298,18 @@ prepare_sce_for_merge <- function(
     }
   }
 
+  # If not NULL, only consider existing `celltype_coldata_cols` to avoid indexing error
+  if (!is.null(celltype_coldata_cols)) {
+    celltype_coldata_cols <- intersect(
+      names(colData(sce)),
+      celltype_coldata_cols
+    )
+    retain_coldata_cols <- c(retain_coldata_cols, celltype_coldata_cols)
+  }
+
   # Retain only the columns present in `retain_coldata_cols`
   # Use drop=FALSE to ensure result is a DataFrame
-  colData(sce) <- colData(sce)[, retain_coldata_cols, drop = FALSE]
+  colData(sce) <- colData(sce)[, c(retain_coldata_cols, celltype_coldata_cols), drop = FALSE]
 
   # Add batch column
   sce[[batch_column]] <- sce_name
