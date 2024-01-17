@@ -40,7 +40,7 @@ cell_id_column <- "cell_id"
 shared_features <- rownames(sce)[1:10]
 retain_coldata_cols <- c("sum", "detected")
 preserve_rowdata_cols <- "gene_names"
-expected_coldata_cols <- sort(c("sum", "detected", batch_column, cell_id_column))
+expected_coldata_cols <- c("sum", "detected", batch_column, cell_id_column)
 celltype_coldata_cols <- c(
   "submitter_celltype_annotation",
   "singler_celltype_annotation",
@@ -81,8 +81,8 @@ test_that("`prepare_sce_for_merge` works as expected when all columns are presen
   expect_equal(nrow(result_sce), length(shared_features)) # genes
 
   # colData names and contents:
-  expect_equal(
-    sort(names(colData(result_sce))),
+  expect_setequal(
+    names(colData(result_sce)),
     expected_coldata_cols
   )
   expect_equal(unique(result_sce[[batch_column]]), sce_name)
@@ -119,8 +119,8 @@ test_that("`prepare_sce_for_merge` works when celltype annotation columns are pr
     preserve_rowdata_cols,
     celltype_coldata_cols
   )
-  expect_equal(
-    sort(names(colData(result_sce))),
+  expect_setequal(
+    names(colData(result_sce)),
     expected_coldata_cols
   )
 })
