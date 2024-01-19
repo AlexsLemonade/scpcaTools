@@ -12,7 +12,8 @@ merge_sce_list(
     "barcodes"),
   preserve_rowdata_cols = NULL,
   cell_id_column = "cell_id",
-  include_altexp = TRUE
+  include_altexp = TRUE,
+  retain_altexp_coldata_cols = NULL
 )
 }
 \arguments{
@@ -39,6 +40,8 @@ value is `cell_id`.}
 
 \item{include_altexp}{Boolean for whether or not any present alternative experiments
 should be included in the final merged object. Default is TRUE.}
+
+\item{retain_altexp_coldata_cols}{DESCRIPTION}
 }
 \value{
 A SingleCellExperiment object containing all SingleCellExperiment objects

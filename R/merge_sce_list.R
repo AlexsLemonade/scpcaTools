@@ -38,6 +38,7 @@
 #'  value is `cell_id`.
 #' @param include_altexp Boolean for whether or not any present alternative experiments
 #'  should be included in the final merged object. Default is TRUE.
+#' @param retain_altexp_coldata_cols DESCRIPTION
 #'
 #' @return A SingleCellExperiment object containing all SingleCellExperiment objects
 #'   present in the inputted list
@@ -60,7 +61,8 @@ merge_sce_list <- function(
     ),
     preserve_rowdata_cols = NULL,
     cell_id_column = "cell_id",
-    include_altexp = TRUE) {
+    include_altexp = TRUE,
+    retain_altexp_coldata_cols = NULL) {
   if (is.null(names(sce_list))) {
     warning(
       glue::glue(
@@ -168,6 +170,7 @@ merge_sce_list <- function(
     for (altexp_name in names(altexp_attributes)) {
       expected_assays <- altexp_attributes[[altexp_name]][["assays"]]
       expected_features <- altexp_attributes[[altexp_name]][["features"]]
+      altexp_coldata_cols <- purrr::pluck(retain_altexp_coldata_cols, altexp_name)
 
       sce_list <- sce_list |>
         purrr::imap(
@@ -176,7 +179,8 @@ merge_sce_list <- function(
           expected_assays,
           expected_features,
           batch_column = batch_column,
-          cell_id_column = cell_id_column
+          cell_id_column = cell_id_column,
+          retain_altexp_coldata_cols = altexp_coldata_cols
         )
     }
   }
@@ -315,6 +319,7 @@ prepare_sce_for_merge <- function(
 #'   colData slot.
 #' @param cell_id_column The name of the cell_id column which will be added to the
 #'   colData slot.
+#' @param retain_altexp_coldata_cols DESCRIPTION
 #' @param preserve_rowdata_cols altExp rowData columns which should not be renamed
 #'
 #' @return An SCE with an updated altExp
@@ -326,6 +331,7 @@ prepare_altexp_for_merge <- function(
     expected_features,
     batch_column,
     cell_id_column,
+    retain_altexp_coldata_cols,
     preserve_rowdata_cols = c("target_type")) {
   if (!altexp_name %in% altExpNames(sce)) {
     return(sce)
@@ -338,7 +344,7 @@ prepare_altexp_for_merge <- function(
     batch_column = batch_column,
     cell_id_column = cell_id_column,
     shared_features = expected_features,
-    retain_coldata_cols = NULL, # Is this right?
+    retain_coldata_cols = retain_altexp_coldata_cols,
     preserve_rowdata_cols = preserve_rowdata_cols,
     is_altexp = TRUE
   )

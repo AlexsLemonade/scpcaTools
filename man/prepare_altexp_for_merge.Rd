@@ -12,6 +12,7 @@ prepare_altexp_for_merge(
   expected_features,
   batch_column,
   cell_id_column,
+  retain_altexp_coldata_cols,
   preserve_rowdata_cols = c("target_type")
 )
 }
@@ -31,6 +32,8 @@ colData slot.}
 
 \item{cell_id_column}{The name of the cell_id column which will be added to the
 colData slot.}
+
+\item{retain_altexp_coldata_cols}{DESCRIPTION}
 
 \item{preserve_rowdata_cols}{altExp rowData columns which should not be renamed}
 }
