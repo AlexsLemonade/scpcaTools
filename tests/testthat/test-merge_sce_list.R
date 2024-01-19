@@ -40,7 +40,7 @@ cell_id_column <- "cell_id"
 shared_features <- rownames(sce)[1:10]
 retain_coldata_cols <- c("sum", "detected")
 preserve_rowdata_cols <- "gene_names"
-expected_coldata_cols <- sort(c("sum", "detected", batch_column, cell_id_column))
+expected_coldata_cols <- c("sum", "detected", batch_column, cell_id_column)
 
 sce1 <- sim_sce(n_cells = total_cells / 3, n_genes = total_genes, n_empty = 0)
 sce2 <- sim_sce(n_cells = total_cells / 3, n_genes = total_genes, n_empty = 0)
@@ -74,8 +74,8 @@ test_that("`prepare_sce_for_merge` works as expected when all columns are presen
   expect_equal(nrow(result_sce), length(shared_features)) # genes
 
   # colData names and contents:
-  expect_equal(
-    sort(names(colData(result_sce))),
+  expect_setequal(
+    names(colData(result_sce)),
     expected_coldata_cols
   )
   expect_equal(unique(result_sce[[batch_column]]), sce_name)
