@@ -41,7 +41,9 @@ value is `cell_id`.}
 \item{include_altexp}{Boolean for whether or not any present alternative experiments
 should be included in the final merged object. Default is TRUE.}
 
-\item{retain_altexp_coldata_cols}{DESCRIPTION}
+\item{retain_altexp_coldata_cols}{Named list of columns that should be retained
+in alternative experiment colData. Each name should correspond to the alternative
+experiment in which it should be retained. Default is `NULL`.}
 }
 \value{
 A SingleCellExperiment object containing all SingleCellExperiment objects
