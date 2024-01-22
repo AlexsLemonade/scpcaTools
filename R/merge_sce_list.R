@@ -48,12 +48,27 @@
 #'
 #' @examples
 #' \dontrun{
+#' # Merge list of SCEs and include alternative experiments in the merged object
 #' merge_sce_list(
 #'   sce_list = list("sce1" = sce1, "sce2" = sce2),
 #'   retain_altexp_coldata_cols = list(
 #'     "adt" = c("discard", "high.controls"),
 #'     "other_altexp" = c("first_column", "second_column")
 #'   )
+#' )
+#'
+#'
+#' # Merge list of SCEs but do include any alternative experiments in the merged object
+#' merge_sce_list(
+#'   sce_list = list("sce1" = sce1, "sce2" = sce2),
+#'   include_altexp = FALSE
+#' )
+#'
+#'
+#' # Merge list of SCEs, specifying a different batch column name
+#' merge_sce_list(
+#'   sce_list = list("sce1" = sce1, "sce2" = sce2),
+#'   batch_column = "batch"
 #' )
 #' }
 #'
