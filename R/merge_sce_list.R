@@ -431,10 +431,14 @@ get_altexp_attributes <- function(sce_list) {
 prepare_merged_metadata <- function(metadata_list) {
   # Define vectors of library and sample ids
   metadata_library_ids <- metadata_list |>
-    purrr::map_chr("library_id")
+    purrr::map_chr("library_id") |>
+    unname()
 
   metadata_sample_ids <- metadata_list |>
-    purrr::map_chr("sample_id")
+    # can't use map_chr in case we have multiplexed
+    purrr::map("sample_id") |>
+    unlist() |>
+    unname()
 
   # Grab names to check contents
   transposed_names <- metadata_list |>
