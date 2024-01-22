@@ -23,27 +23,32 @@ based on the SCE's index.}
 
 \item{batch_column}{A character value giving the resulting colData column name
 to differentiate originating SingleCellExperiment objects. Often these values
-are unique library IDs. Default value is `library_id`.}
+are unique library IDs. Default value is `"library_id"`.}
 
 \item{retain_coldata_cols}{A vector of colData columns which should be retained
-in the the final merged SCE object.}
+in the the final merged SCE object. If columns are missing from any SCE to be merged,
+they will be created and populated with `NA` values.}
 
 \item{preserve_rowdata_cols}{A vector of column names that appear in originating
 SCE objects' rowData slots which should not be renamed with
 the given SCE object name or index is name is not given. These are generally
 columns which are not specific to the given library's preparation or statistics.
-For example, such a vector might contain items like "Gene", "ensembl_ids", etc.}
+For example, such a vector might contain items like "Gene", "ensembl_ids", etc.
+Default value is `NULL`.}
 
 \item{cell_id_column}{A character value giving the resulting colData column name
 to hold unique cell IDs formatted as their original row name. Default
-value is `cell_id`.}
+value is `"cell_id"`.}
 
 \item{include_altexp}{Boolean for whether or not any present alternative experiments
-should be included in the final merged object. Default is TRUE.}
+should be included in the final merged object. Default is `TRUE`.}
 
-\item{retain_altexp_coldata_cols}{Named list of columns that should be retained
-in alternative experiment colData. Each name should correspond to the alternative
-experiment in which it should be retained. Default is `NULL`.}
+\item{retain_altexp_coldata_cols}{Named list containing vectors of column names
+that should be retained in alternative experiment colData. Elements are named by
+the altExp for which the columns should be retained. If any given altExp name is not
+present in any SCE, it will be ignored. If columns are missing from any given altExp
+to be merged, they will be created and populated with `NA` values.
+Default value is `NULL`.}
 }
 \value{
 A SingleCellExperiment object containing all SingleCellExperiment objects
@@ -69,4 +74,35 @@ Original SCE contents are modified or retained as follows:
  - The resulting rowData slot column names will be appended with the given
    SCE's name, as `{sce_name}-{column_name}` except for columns whose names
    are indicated to preserve with the `preserve_rowdata_cols` argument.
+}
+\examples{
+\dontrun{
+# Merge list of SCEs, specifying a different batch column name
+merge_sce_list(
+  sce_list = list("sce1" = sce1, "sce2" = sce2),
+  batch_column = "batch"
+)
+
+
+#' # Merge list of SCEs but do include any alternative experiments in the merged object
+merge_sce_list(
+  sce_list = list("sce1" = sce1, "sce2" = sce2),
+  include_altexp = FALSE
+)
+
+
+# Merge list of SCEs and include alternative experiments in the merged object.
+# The provided list of SCEs may contain alternative experiments named `"adt"`
+#  and/or `"other_altexp"` which, if present, are expected to respectively
+#  have the columns shown in the `retain_altexp_coldata_cols`.
+merge_sce_list(
+  sce_list = list("sce1" = sce1, "sce2" = sce2),
+  # columns to retain in the given alternative experiment, if it is present
+  retain_altexp_coldata_cols = list(
+    "adt" = c("discard", "high.controls"),
+    "other_altexp" = c("first_column", "second_column")
+  )
+)
+}
+
 }
