@@ -483,8 +483,14 @@ prepare_merged_metadata <- function(metadata_list) {
       dplyr::bind_rows() |>
       dplyr::distinct()
 
+    # separate into individual sample ids for the check below
+    # to help checking cellhash samples w/ multiple sample_ids per library_id
+    all_sample_ids <- sample_metadata$sample_id |>
+      purrr::map(\(x) stringr::str_split_1(x, pattern = ",")) |>
+      unlist()
+
     # check that all sample ids are found in the new sample metadata and warn if not
-    if (!all(metadata_sample_ids %in% sample_metadata$sample_id)) {
+    if (!all(metadata_sample_ids %in% all_sample_ids)) {
       warning("Not all sample ids are present in metadata(merged_sce)$sample_metadata.")
     }
 
