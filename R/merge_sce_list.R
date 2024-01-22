@@ -46,6 +46,14 @@
 #'   present in the inputted list
 #' @export
 #'
+#' @examples
+#' \dontrun{
+#' merge_sce_list(
+#'   sce_list = list("sce1" = sce1, "sce2" = sce2),
+#'   retain_altexp_coldata_cols = list("adt" = c("discard", "high.controls"))
+#' )
+#' }
+#'
 #' @import SingleCellExperiment
 merge_sce_list <- function(
     sce_list = list(),
