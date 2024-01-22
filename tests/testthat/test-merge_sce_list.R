@@ -220,6 +220,41 @@ test_that("merging SCEs with matching genes works as expected, no altexps", {
   )
 })
 
+test_that("merging SCEs with multiple sample ids per library to mirror cellhash works as expected", {
+  # add multiple sample ids per library into the metadata to mirror cellhash data
+  sce_list <- sce_list |>
+    purrr::map2(
+      c("sample4", "sample5", "sample6"),
+      \(sce, other_sample)      {
+        metadata(sce)$sample_id <- c(metadata(sce)$sample_id, other_sample)
+        metadata(sce)$sample_metadata <- data.frame(
+          sample_id = paste0(metadata(sce)$sample_id, collapse = ","),
+          library_id = metadata(sce)$library_id
+        )
+        return(sce)
+      }
+    )
+
+
+  # merge
+  merged_sce <- merge_sce_list(
+    sce_list,
+    batch_column = batch_column,
+    # "total" should get removed
+    retain_coldata_cols = retain_coldata_cols,
+    # this row name should not be modified:
+    preserve_rowdata_cols = c("gene_names"),
+    # explicit false here -
+    include_altexp = FALSE
+  )
+
+  # Check that all sample ids are present
+  expect_setequal(
+    metadata(merged_sce)$sample_id,
+    sce_list |> purrr::map(\(x) metadata(x)$sample_id) |> purrr::reduce(c)
+  )
+})
+
 
 test_that("merging SCEs with different genes among input SCEs works as expected, no altexps", {
   # rename sce2 and sce3 genes so that only 1-6 are overlapping
