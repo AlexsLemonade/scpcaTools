@@ -38,9 +38,9 @@
 #'  value is `cell_id`.
 #' @param include_altexp Boolean for whether or not any present alternative experiments
 #'  should be included in the final merged object. Default is TRUE.
-#' @param retain_altexp_coldata_cols Named list of columns that should be retained
-#'  in alternative experiment colData. Each name should correspond to the alternative
-#'  experiment in which it should be retained. Default is `NULL`.
+#' @param retain_altexp_coldata_cols Named list containing vectors of column names
+#'  that should be retained in alternative experiment colData. Elements are named by the altExp
+#'  for which the columns should be retained. Default is `NULL`.
 #'
 #' @return A SingleCellExperiment object containing all SingleCellExperiment objects
 #'   present in the inputted list
