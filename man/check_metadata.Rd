@@ -13,6 +13,6 @@ check_metadata(sce_list, expected_fields = c("library_id", "sample_id"))
 \item{expected_fields}{a vector of metadata fields that should be present}
 }
 \description{
-The fields `library_id` and `sample_id` must be present. If either is missing from
+The default expected fields are `library_id` and `sample_id`. If either is missing from
   any SCE, an error is thrown. This function does not return anything.
 }

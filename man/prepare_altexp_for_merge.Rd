@@ -12,7 +12,8 @@ prepare_altexp_for_merge(
   expected_features,
   batch_column,
   cell_id_column,
-  preserve_rowdata_cols = c("target_type")
+  retain_coldata_cols,
+  preserve_rowdata_cols
 )
 }
 \arguments{
@@ -31,6 +32,10 @@ colData slot.}
 
 \item{cell_id_column}{The name of the cell_id column which will be added to the
 colData slot.}
+
+\item{retain_coldata_cols}{Named list of columns that should be retained
+in alternative experiment colData. Each name should correspond to the alternative
+experiment in which it should be retained.}
 
 \item{preserve_rowdata_cols}{altExp rowData columns which should not be renamed}
 }

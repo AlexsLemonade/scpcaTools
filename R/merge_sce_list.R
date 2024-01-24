@@ -3,7 +3,9 @@
 #' This function takes an optionally-named (if named, ideally by a form of
 #'  library ID) list of SingleCellExperiment (SCE) objects and merges them into
 #'  one SCE object. At least some genes must be present in all SCEs in order to
-#'  merge them. Currently any present altExps are not retained.
+#'  merge them. By default, alternative experiments (altExps) are retained in the
+#'  final merged object, but each altExp of a given name is required to have identical
+#'  features.
 #'
 #'  Original SCE contents are modified or retained as follows:
 #'  - The resulting colData slot will include a new column specified by
@@ -12,12 +14,24 @@
 #'    its index in the provided `sce_list`.
 #'  - The resulting colData slot will include another new column `cell_id_column`
 #'    (default "cell_id") that will contain the SCE's original column names (i.e.
-#'    original colData rownames). Often, but not always, this rowname holds a
+#'    original colData row names). Often, but not always, this row name holds a
 #'    unique cell barcode.
-#'  - The resulting colData rownames will be be prefixed with `{sce_name-}`.
+#'  - Of the original colData columns, only column names provided in the argument
+#'    `retain_coldata_cols` will be retained.
+#'  - The resulting colData row names will be be prefixed with `{sce_name-}`.
 #'  - The resulting rowData slot column names will be appended with the given
 #'    SCE's name, as `{sce_name}-{column_name}` except for columns whose names
 #'    are indicated to preserve with the `preserve_rowdata_cols` argument.
+#'
+#'  SCE altExp contents are modified or retained as follows:
+#'  - As with the main experiment, the additional columns `batch_column` and
+#'  `cell_id_column` will be added to the colData slot.
+#'  - Of the original altExp colData columns, only column names provided in
+#'    the argument `retain_altexp_coldata_cols`, as specified for each named
+#'    altExp will be retained.
+#'  - The resulting rowData slot column names will be appended with the given
+#'    SCE's name, as `{sce_name}-{column_name}` except for columns whose names
+#'    are indicated to preserve with the `preserve_altexp_rowdata_cols` argument.
 #'
 #'
 #' @param sce_list A list of SingleCellExperiment objects. The list may optionally
@@ -25,28 +39,75 @@
 #'  based on the SCE's index.
 #' @param batch_column A character value giving the resulting colData column name
 #'  to differentiate originating SingleCellExperiment objects. Often these values
-#'  are unique library IDs. Default value is `library_id`.
-#' @param retain_coldata_cols A vector of colData columns which should be retained
-#'  in the the final merged SCE object.
-#' @param preserve_rowdata_cols A vector of column names that appear in originating
-#'  SCE objects' rowData slots which should not be renamed with
-#'  the given SCE object name or index is name is not given. These are generally
-#'  columns which are not specific to the given library's preparation or statistics.
-#'  For example, such a vector might contain items like "Gene", "ensembl_ids", etc.
+#'  are unique library IDs. Default value is `"library_id"`.
 #' @param cell_id_column A character value giving the resulting colData column name
 #'  to hold unique cell IDs formatted as their original row name. Default
-#'  value is `cell_id`.
-#' @param include_altexp Boolean for whether or not any present alternative experiments
-#'  should be included in the final merged object. Default is TRUE.
+#'  value is `"cell_id"`.
+#' @param retain_coldata_cols A vector of colData columns which should be retained
+#'  in the the final merged SCE object. If columns are missing from any SCE to be merged,
+#'  they will be created and populated with `NA` values. A vector of default columns
+#'  to retain is given in the function definition.
+#' @param include_altexp Boolean for whether altExps, if present, should be
+#' included in the final merged object. Default is `TRUE`.
+#' @param preserve_rowdata_cols A vector of column names that appear in originating
+#'  SCE objects' rowData slots which should not be renamed. These are generally
+#'  columns which are not specific to the given library's preparation or statistics.
+#'  For example, such a vector might contain items like "Gene", "ensembl_ids", etc.
+#'  Default value is `NULL`.
+#' @param retain_altexp_coldata_cols Named list containing vectors of column names
+#'  that should be retained in altExp colData. Elements are named by the altExp
+#'  for which the columns should be retained. If any given altExp name is not
+#'  present in any SCE, it will be ignored. If columns are missing from any given
+#'  altExp to be merged, they will be created and populated with `NA` values.
+#'  Default value is `NULL`.
+#' @param preserve_altexp_rowdata_cols Named list containing vectors of column names
+#'  that should not be renamed in altExp rowData. These are generally
+#'  columns which are not specific to the given library's preparation or statistics.
+#'  Default value is `NULL`.
 #'
 #' @return A SingleCellExperiment object containing all SingleCellExperiment objects
 #'   present in the inputted list
 #' @export
 #'
+#' @examples
+#' \dontrun{
+#' # Merge list of SCEs, specifying a different batch column name
+#' merge_sce_list(
+#'   sce_list = list("sce1" = sce1, "sce2" = sce2),
+#'   batch_column = "batch"
+#' )
+#'
+#'
+#' #' # Merge list of SCEs but do include any alternative experiments in the merged object
+#' merge_sce_list(
+#'   sce_list = list("sce1" = sce1, "sce2" = sce2),
+#'   include_altexp = FALSE
+#' )
+#'
+#'
+#' # Merge list of SCEs and include alternative experiments in the merged object.
+#' # The provided list of SCEs may contain alternative experiments named `"adt"`
+#' #  and/or `"other_altexp"` which, if present, are expected to respectively
+#' #  have the colData columns given in the `retain_altexp_coldata_cols` and the
+#' #  rowData columns given in `preserve_altexp_rowdata_cols`
+#' merge_sce_list(
+#'   sce_list = list("sce1" = sce1, "sce2" = sce2),
+#'   # columns to retain in the given alternative experiment, if it is present
+#'   retain_altexp_coldata_cols = list(
+#'     "adt" = c("discard", "high.controls"),
+#'     "other_altexp" = c("first_column", "second_column")
+#'   ),
+#'   preserve_altexp_rowdata_cols = list(
+#'     "adt" = "target_type"
+#'   )
+#' )
+#' }
+#'
 #' @import SingleCellExperiment
 merge_sce_list <- function(
     sce_list = list(),
     batch_column = "library_id",
+    cell_id_column = "cell_id",
     retain_coldata_cols = c(
       "sum",
       "detected",
@@ -58,9 +119,10 @@ merge_sce_list <- function(
       "prob_compromised",
       "barcodes"
     ),
+    include_altexp = TRUE,
     preserve_rowdata_cols = NULL,
-    cell_id_column = "cell_id",
-    include_altexp = TRUE) {
+    retain_altexp_coldata_cols = NULL,
+    preserve_altexp_rowdata_cols = NULL) {
   if (is.null(names(sce_list))) {
     warning(
       glue::glue(
@@ -168,15 +230,19 @@ merge_sce_list <- function(
     for (altexp_name in names(altexp_attributes)) {
       expected_assays <- altexp_attributes[[altexp_name]][["assays"]]
       expected_features <- altexp_attributes[[altexp_name]][["features"]]
+      altexp_coldata_cols <- purrr::pluck(retain_altexp_coldata_cols, altexp_name)
+      altexp_rowdata_cols <- purrr::pluck(preserve_altexp_rowdata_cols, altexp_name)
 
       sce_list <- sce_list |>
         purrr::imap(
           prepare_altexp_for_merge,
           altexp_name,
-          expected_assays,
-          expected_features,
+          expected_assays = expected_assays,
+          expected_features = expected_features,
           batch_column = batch_column,
-          cell_id_column = cell_id_column
+          cell_id_column = cell_id_column,
+          retain_coldata_cols = altexp_coldata_cols,
+          preserve_rowdata_cols = altexp_rowdata_cols
         )
     }
   }
@@ -315,6 +381,9 @@ prepare_sce_for_merge <- function(
 #'   colData slot.
 #' @param cell_id_column The name of the cell_id column which will be added to the
 #'   colData slot.
+#' @param retain_coldata_cols Named list of columns that should be retained
+#'  in alternative experiment colData. Each name should correspond to the alternative
+#'  experiment in which it should be retained.
 #' @param preserve_rowdata_cols altExp rowData columns which should not be renamed
 #'
 #' @return An SCE with an updated altExp
@@ -326,7 +395,8 @@ prepare_altexp_for_merge <- function(
     expected_features,
     batch_column,
     cell_id_column,
-    preserve_rowdata_cols = c("target_type")) {
+    retain_coldata_cols,
+    preserve_rowdata_cols) {
   if (!altexp_name %in% altExpNames(sce)) {
     return(sce)
   }
@@ -338,7 +408,7 @@ prepare_altexp_for_merge <- function(
     batch_column = batch_column,
     cell_id_column = cell_id_column,
     shared_features = expected_features,
-    retain_coldata_cols = NULL, # Is this right?
+    retain_coldata_cols = retain_coldata_cols,
     preserve_rowdata_cols = preserve_rowdata_cols,
     is_altexp = TRUE
   )
@@ -421,10 +491,14 @@ get_altexp_attributes <- function(sce_list) {
 prepare_merged_metadata <- function(metadata_list) {
   # Define vectors of library and sample ids
   metadata_library_ids <- metadata_list |>
-    purrr::map_chr("library_id")
+    purrr::map_chr("library_id") |>
+    unname()
 
   metadata_sample_ids <- metadata_list |>
-    purrr::map_chr("sample_id")
+    # can't use map_chr in case we have multiplexed
+    purrr::map("sample_id") |>
+    unlist() |>
+    unname()
 
   # Grab names to check contents
   transposed_names <- metadata_list |>
@@ -469,8 +543,14 @@ prepare_merged_metadata <- function(metadata_list) {
       dplyr::bind_rows() |>
       dplyr::distinct()
 
+    # separate into individual sample ids for the check below
+    # to help checking cellhash samples w/ multiple sample_ids per library_id
+    all_sample_ids <- sample_metadata$sample_id |>
+      purrr::map(\(x) stringr::str_split_1(x, pattern = ",")) |>
+      unlist()
+
     # check that all sample ids are found in the new sample metadata and warn if not
-    if (!all(metadata_sample_ids %in% sample_metadata$sample_id)) {
+    if (!all(metadata_sample_ids %in% all_sample_ids)) {
       warning("Not all sample ids are present in metadata(merged_sce)$sample_metadata.")
     }
 

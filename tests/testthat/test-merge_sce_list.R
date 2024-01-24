@@ -40,7 +40,7 @@ cell_id_column <- "cell_id"
 shared_features <- rownames(sce)[1:10]
 retain_coldata_cols <- c("sum", "detected")
 preserve_rowdata_cols <- "gene_names"
-expected_coldata_cols <- sort(c("sum", "detected", batch_column, cell_id_column))
+expected_coldata_cols <- c("sum", "detected", batch_column, cell_id_column)
 
 sce1 <- sim_sce(n_cells = total_cells / 3, n_genes = total_genes, n_empty = 0)
 sce2 <- sim_sce(n_cells = total_cells / 3, n_genes = total_genes, n_empty = 0)
@@ -74,8 +74,8 @@ test_that("`prepare_sce_for_merge` works as expected when all columns are presen
   expect_equal(nrow(result_sce), length(shared_features)) # genes
 
   # colData names and contents:
-  expect_equal(
-    sort(names(colData(result_sce))),
+  expect_setequal(
+    names(colData(result_sce)),
     expected_coldata_cols
   )
   expect_equal(unique(result_sce[[batch_column]]), sce_name)
@@ -217,6 +217,41 @@ test_that("merging SCEs with matching genes works as expected, no altexps", {
   expect_setequal(
     metadata(merged_sce)$sample_id,
     metadata(merged_sce)$sample_metadata$sample_id
+  )
+})
+
+test_that("merging SCEs with multiple sample ids per library to mirror cellhash works as expected", {
+  # add multiple sample ids per library into the metadata to mirror cellhash data
+  sce_list <- sce_list |>
+    purrr::map2(
+      c("sample4", "sample5", "sample6"),
+      \(sce, other_sample)      {
+        metadata(sce)$sample_id <- c(metadata(sce)$sample_id, other_sample)
+        metadata(sce)$sample_metadata <- data.frame(
+          sample_id = paste0(metadata(sce)$sample_id, collapse = ","),
+          library_id = metadata(sce)$library_id
+        )
+        return(sce)
+      }
+    )
+
+
+  # merge
+  merged_sce <- merge_sce_list(
+    sce_list,
+    batch_column = batch_column,
+    # "total" should get removed
+    retain_coldata_cols = retain_coldata_cols,
+    # this row name should not be modified:
+    preserve_rowdata_cols = c("gene_names"),
+    # explicit false here -
+    include_altexp = FALSE
+  )
+
+  # Check that all sample ids are present
+  expect_setequal(
+    metadata(merged_sce)$sample_id,
+    sce_list |> purrr::map(\(x) metadata(x)$sample_id) |> purrr::reduce(c)
   )
 })
 
@@ -407,6 +442,71 @@ test_that("merging SCEs with altExps works as expected when include_altexps = FA
   # there should not be any altExps
   expect_length(altExpNames(merged_sce), 0)
 })
+
+
+test_that("merging SCEs with altExps has correct altExp colData names when retaining altExps columns", {
+  merged_sce <- merge_sce_list(
+    sce_list_with_altexp,
+    batch_column = batch_column,
+    # "total" should get removed
+    retain_coldata_cols = retain_coldata_cols,
+    # this row name should not be modified:
+    preserve_rowdata_cols = c("gene_names"),
+    retain_altexp_coldata_cols = list("not_present" = c("coldata_column")),
+    preserve_altexp_rowdata_cols = list("adt" = c("target_type")),
+    include_altexp = TRUE
+  )
+
+  # test correct altExp colData names
+  expected_cols <- c(batch_column, cell_id_column)
+  observed_cols <- altExp(merged_sce) |>
+    colData() |>
+    names()
+  expect_setequal(
+    expected_cols,
+    observed_cols
+  )
+
+  # test correct altExp rowData names
+  expected_cols <- c(
+    "target_type",
+    "sce1-feature_column", "sce1-other_column",
+    "sce2-feature_column", "sce2-other_column",
+    "sce3-feature_column", "sce3-other_column"
+  )
+  observed_cols <- altExp(merged_sce) |>
+    rowData() |>
+    names()
+  expect_setequal(
+    expected_cols,
+    observed_cols
+  )
+})
+
+
+test_that("merging SCEs with altExps has correct altExp colData names when retaining _irrelevant_ altExps columns", {
+  merged_sce <- merge_sce_list(
+    sce_list_with_altexp,
+    batch_column = batch_column,
+    # "total" should get removed
+    retain_coldata_cols = retain_coldata_cols,
+    # this row name should not be modified:
+    preserve_rowdata_cols = c("gene_names"),
+    retain_altexp_coldata_cols = list("adt" = c("coldata_column")),
+    include_altexp = TRUE
+  )
+
+  # test correct altExp colData names
+  expected_cols <- c(batch_column, cell_id_column, "coldata_column")
+  observed_cols <- altExp(merged_sce) |>
+    colData() |>
+    names()
+  expect_setequal(
+    expected_cols,
+    observed_cols
+  )
+})
+
 
 test_that("merging SCEs with 1 altexp and same features works as expected, with altexps", {
   merged_sce <- merge_sce_list(
