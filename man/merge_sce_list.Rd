@@ -13,7 +13,8 @@ merge_sce_list(
     "barcodes"),
   include_altexp = TRUE,
   preserve_rowdata_cols = NULL,
-  retain_altexp_coldata_cols = NULL
+  retain_altexp_coldata_cols = NULL,
+  preserve_altexp_rowdata_cols = NULL
 )
 }
 \arguments{
@@ -38,8 +39,7 @@ to retain is given in the function definition.}
 included in the final merged object. Default is `TRUE`.}
 
 \item{preserve_rowdata_cols}{A vector of column names that appear in originating
-SCE objects' rowData slots which should not be renamed with
-the given SCE object name or index is name is not given. These are generally
+SCE objects' rowData slots which should not be renamed. These are generally
 columns which are not specific to the given library's preparation or statistics.
 For example, such a vector might contain items like "Gene", "ensembl_ids", etc.
 Default value is `NULL`.}
@@ -49,6 +49,11 @@ that should be retained in altExp colData. Elements are named by the altExp
 for which the columns should be retained. If any given altExp name is not
 present in any SCE, it will be ignored. If columns are missing from any given
 altExp to be merged, they will be created and populated with `NA` values.
+Default value is `NULL`.}
+
+\item{preserve_altexp_rowdata_cols}{Named list containing vectors of column names
+that should not be renamed in altExp rowData. These are generally
+columns which are not specific to the given library's preparation or statistics.
 Default value is `NULL`.}
 }
 \value{
@@ -75,7 +80,7 @@ Original SCE contents are modified or retained as follows:
    unique cell barcode.
  - Of the original colData columns, only column names provided in the argument
    `retain_coldata_cols` will be retained.
- - The resulting colData rownames will be be prefixed with `{sce_name-}`.
+ - The resulting colData row names will be be prefixed with `{sce_name-}`.
  - The resulting rowData slot column names will be appended with the given
    SCE's name, as `{sce_name}-{column_name}` except for columns whose names
    are indicated to preserve with the `preserve_rowdata_cols` argument.
@@ -87,8 +92,8 @@ Original SCE contents are modified or retained as follows:
    the argument `retain_altexp_coldata_cols`, as specified for each named
    altExp will be retained.
  - The resulting rowData slot column names will be appended with the given
-   SCE's name, as `{sce_name}-{column_name}` except for the column `target_type`
-   which is commonly present in CITE-seq alternative experiments.
+   SCE's name, as `{sce_name}-{column_name}` except for columns whose names
+   are indicated to preserve with the `preserve_altexp_rowdata_cols` argument.
 }
 \examples{
 \dontrun{
@@ -109,13 +114,17 @@ merge_sce_list(
 # Merge list of SCEs and include alternative experiments in the merged object.
 # The provided list of SCEs may contain alternative experiments named `"adt"`
 #  and/or `"other_altexp"` which, if present, are expected to respectively
-#  have the columns shown in the `retain_altexp_coldata_cols`.
+#  have the colData columns given in the `retain_altexp_coldata_cols` and the
+#  rowData columns given in `preserve_altexp_rowdata_cols`
 merge_sce_list(
   sce_list = list("sce1" = sce1, "sce2" = sce2),
   # columns to retain in the given alternative experiment, if it is present
   retain_altexp_coldata_cols = list(
     "adt" = c("discard", "high.controls"),
     "other_altexp" = c("first_column", "second_column")
+  ),
+  preserve_altexp_rowdata_cols = list(
+    "adt" = "target_type"
   )
 )
 }
