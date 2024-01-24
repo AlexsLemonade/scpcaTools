@@ -30,8 +30,8 @@
 #'    the argument `retain_altexp_coldata_cols`, as specified for each named
 #'    altExp will be retained.
 #'  - The resulting rowData slot column names will be appended with the given
-#'    SCE's name, as `{sce_name}-{column_name}` except for the column `target_type`
-#'    which is commonly present in CITE-seq alternative experiments.
+#'    SCE's name, as `{sce_name}-{column_name}` except for columns whose names
+#'    are indicated to preserve with the `preserve_altexp_rowdata_cols` argument.
 #'
 #'
 #' @param sce_list A list of SingleCellExperiment objects. The list may optionally
@@ -50,8 +50,7 @@
 #' @param include_altexp Boolean for whether altExps, if present, should be
 #' included in the final merged object. Default is `TRUE`.
 #' @param preserve_rowdata_cols A vector of column names that appear in originating
-#'  SCE objects' rowData slots which should not be renamed with
-#'  the given SCE object name or index is name is not given. These are generally
+#'  SCE objects' rowData slots which should not be renamed. These are generally
 #'  columns which are not specific to the given library's preparation or statistics.
 #'  For example, such a vector might contain items like "Gene", "ensembl_ids", etc.
 #'  Default value is `NULL`.
@@ -60,6 +59,10 @@
 #'  for which the columns should be retained. If any given altExp name is not
 #'  present in any SCE, it will be ignored. If columns are missing from any given
 #'  altExp to be merged, they will be created and populated with `NA` values.
+#'  Default value is `NULL`.
+#' @param preserve_altexp_rowdata_cols Named list containing vectors of column names
+#'  that should not be renamed in altExp rowData. These are generally
+#'  columns which are not specific to the given library's preparation or statistics.
 #'  Default value is `NULL`.
 #'
 #' @return A SingleCellExperiment object containing all SingleCellExperiment objects
@@ -85,13 +88,17 @@
 #' # Merge list of SCEs and include alternative experiments in the merged object.
 #' # The provided list of SCEs may contain alternative experiments named `"adt"`
 #' #  and/or `"other_altexp"` which, if present, are expected to respectively
-#' #  have the columns shown in the `retain_altexp_coldata_cols`.
+#' #  have the colData columns given in the `retain_altexp_coldata_cols` and the
+#' #  rowData columns given in `preserve_altexp_rowdata_cols`
 #' merge_sce_list(
 #'   sce_list = list("sce1" = sce1, "sce2" = sce2),
 #'   # columns to retain in the given alternative experiment, if it is present
 #'   retain_altexp_coldata_cols = list(
 #'     "adt" = c("discard", "high.controls"),
 #'     "other_altexp" = c("first_column", "second_column")
+#'   ),
+#'   preserve_altexp_rowdata_cols = list(
+#'     "adt" = "target_type"
 #'   )
 #' )
 #' }
@@ -114,7 +121,8 @@ merge_sce_list <- function(
     ),
     include_altexp = TRUE,
     preserve_rowdata_cols = NULL,
-    retain_altexp_coldata_cols = NULL) {
+    retain_altexp_coldata_cols = NULL,
+    preserve_altexp_rowdata_cols = NULL) {
   if (is.null(names(sce_list))) {
     warning(
       glue::glue(
@@ -223,16 +231,18 @@ merge_sce_list <- function(
       expected_assays <- altexp_attributes[[altexp_name]][["assays"]]
       expected_features <- altexp_attributes[[altexp_name]][["features"]]
       altexp_coldata_cols <- purrr::pluck(retain_altexp_coldata_cols, altexp_name)
+      altexp_rowdata_cols <- purrr::pluck(preserve_altexp_rowdata_cols, altexp_name)
 
       sce_list <- sce_list |>
         purrr::imap(
           prepare_altexp_for_merge,
           altexp_name,
-          expected_assays,
-          expected_features,
+          expected_assays = expected_assays,
+          expected_features = expected_features,
           batch_column = batch_column,
           cell_id_column = cell_id_column,
-          retain_altexp_coldata_cols = altexp_coldata_cols
+          retain_coldata_cols = altexp_coldata_cols,
+          preserve_rowdata_cols = altexp_rowdata_cols
         )
     }
   }
@@ -371,7 +381,7 @@ prepare_sce_for_merge <- function(
 #'   colData slot.
 #' @param cell_id_column The name of the cell_id column which will be added to the
 #'   colData slot.
-#' @param retain_altexp_coldata_cols Named list of columns that should be retained
+#' @param retain_coldata_cols Named list of columns that should be retained
 #'  in alternative experiment colData. Each name should correspond to the alternative
 #'  experiment in which it should be retained.
 #' @param preserve_rowdata_cols altExp rowData columns which should not be renamed
@@ -385,8 +395,8 @@ prepare_altexp_for_merge <- function(
     expected_features,
     batch_column,
     cell_id_column,
-    retain_altexp_coldata_cols,
-    preserve_rowdata_cols = c("target_type")) {
+    retain_coldata_cols,
+    preserve_rowdata_cols) {
   if (!altexp_name %in% altExpNames(sce)) {
     return(sce)
   }
@@ -398,7 +408,7 @@ prepare_altexp_for_merge <- function(
     batch_column = batch_column,
     cell_id_column = cell_id_column,
     shared_features = expected_features,
-    retain_coldata_cols = retain_altexp_coldata_cols,
+    retain_coldata_cols = retain_coldata_cols,
     preserve_rowdata_cols = preserve_rowdata_cols,
     is_altexp = TRUE
   )

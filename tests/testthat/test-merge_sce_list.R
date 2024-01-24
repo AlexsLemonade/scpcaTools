@@ -453,6 +453,7 @@ test_that("merging SCEs with altExps has correct altExp colData names when retai
     # this row name should not be modified:
     preserve_rowdata_cols = c("gene_names"),
     retain_altexp_coldata_cols = list("not_present" = c("coldata_column")),
+    preserve_altexp_rowdata_cols = list("adt" = c("target_type")),
     include_altexp = TRUE
   )
 
@@ -460,6 +461,21 @@ test_that("merging SCEs with altExps has correct altExp colData names when retai
   expected_cols <- c(batch_column, cell_id_column)
   observed_cols <- altExp(merged_sce) |>
     colData() |>
+    names()
+  expect_setequal(
+    expected_cols,
+    observed_cols
+  )
+
+  # test correct altExp rowData names
+  expected_cols <- c(
+    "target_type",
+    "sce1-feature_column", "sce1-other_column",
+    "sce2-feature_column", "sce2-other_column",
+    "sce3-feature_column", "sce3-other_column"
+  )
+  observed_cols <- altExp(merged_sce) |>
+    rowData() |>
     names()
   expect_setequal(
     expected_cols,
