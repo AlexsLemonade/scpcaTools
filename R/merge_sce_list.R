@@ -206,8 +206,8 @@ merge_sce_list <- function(
       batch_column = batch_column,
       cell_id_column = cell_id_column,
       shared_features = shared_features,
-      retain_coldata_cols = retain_coldata_cols,
-      preserve_rowdata_cols = preserve_rowdata_cols
+      retain_coldata_cols = unique(retain_coldata_cols),
+      preserve_rowdata_cols = unique(preserve_rowdata_cols)
     )
 
 
@@ -228,8 +228,8 @@ merge_sce_list <- function(
           expected_features = expected_features,
           batch_column = batch_column,
           cell_id_column = cell_id_column,
-          retain_coldata_cols = altexp_coldata_cols,
-          preserve_rowdata_cols = altexp_rowdata_cols
+          retain_coldata_cols = unique(altexp_coldata_cols),
+          preserve_rowdata_cols = unique(altexp_rowdata_cols)
         )
     }
   }
