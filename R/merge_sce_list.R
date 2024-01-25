@@ -155,19 +155,6 @@ merge_sce_list <- function(
     # (altexp_name = list(  features = c(features), assays = c(assays) ))
     altexp_attributes <- get_altexp_attributes(sce_list)
 
-    # Define more main SCE colData columns to keep, based on altExp names
-    coldata_suffixes <- c("sum", "detected", "percent")
-    altexp_columns <- glue::glue("altexps_{names(altexp_attributes)}") |>
-      purrr::map(
-        \(prefix) {
-          glue::glue("{prefix}_{coldata_suffixes}")
-        }
-      ) |>
-      unlist()
-
-    # Update retain_coldata_cols
-    retain_coldata_cols <- c(retain_coldata_cols, altexp_columns)
-
     # Check each altExp metadata, for SCEs with the altExp
     names(altexp_attributes) |>
       purrr::walk(
