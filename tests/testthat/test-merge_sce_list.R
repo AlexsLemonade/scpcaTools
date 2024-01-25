@@ -513,7 +513,12 @@ test_that("merging SCEs with 1 altexp and same features works as expected, with 
     sce_list_with_altexp,
     batch_column = batch_column,
     # "total" should get removed
-    retain_coldata_cols = retain_coldata_cols,
+    retain_coldata_cols = c(
+      retain_coldata_cols,
+      "altexps_adt_sum",
+      "altexps_adt_detected",
+      "altexps_adt_percent"
+    ),
     # this row name should not be modified:
     preserve_rowdata_cols = c("gene_names")
   )
@@ -665,9 +670,6 @@ test_that("merging SCEs where 1 altExp is missing works as expected, with altexp
   expected_coldata <- c(
     "sum",
     "detected",
-    "altexps_adt_sum",
-    "altexps_adt_detected",
-    "altexps_adt_percent",
     batch_column,
     cell_id_column
   )
