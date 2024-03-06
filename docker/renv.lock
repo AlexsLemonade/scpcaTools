@@ -41,6 +41,7 @@
       "Package": "AnnotationDbi",
       "Version": "1.62.2",
       "Source": "Bioconductor",
+      "Repository": "RSPM",
       "Requirements": [
         "Biobase",
         "BiocGenerics",
@@ -60,6 +61,7 @@
       "Package": "AnnotationFilter",
       "Version": "1.24.0",
       "Source": "Bioconductor",
+      "Repository": "RSPM",
       "Requirements": [
         "GenomicRanges",
         "R",
@@ -73,6 +75,7 @@
       "Package": "AnnotationHub",
       "Version": "3.8.0",
       "Source": "Bioconductor",
+      "Repository": "RSPM",
       "Requirements": [
         "AnnotationDbi",
         "BiocFileCache",
@@ -104,6 +107,7 @@
       "Package": "BSgenome",
       "Version": "1.68.0",
       "Source": "Bioconductor",
+      "Repository": "RSPM",
       "Requirements": [
         "BiocGenerics",
         "Biostrings",
@@ -126,6 +130,7 @@
       "Package": "Biobase",
       "Version": "2.60.0",
       "Source": "Bioconductor",
+      "Repository": "RSPM",
       "Requirements": [
         "BiocGenerics",
         "R",
@@ -138,6 +143,7 @@
       "Package": "BiocFileCache",
       "Version": "2.8.0",
       "Source": "Bioconductor",
+      "Repository": "RSPM",
       "Requirements": [
         "DBI",
         "R",
@@ -157,6 +163,7 @@
       "Package": "BiocGenerics",
       "Version": "0.46.0",
       "Source": "Bioconductor",
+      "Repository": "RSPM",
       "Requirements": [
         "R",
         "graphics",
@@ -170,6 +177,7 @@
       "Package": "BiocIO",
       "Version": "1.10.0",
       "Source": "Bioconductor",
+      "Repository": "RSPM",
       "Requirements": [
         "BiocGenerics",
         "R",
@@ -193,6 +201,7 @@
       "Package": "BiocNeighbors",
       "Version": "1.18.0",
       "Source": "Bioconductor",
+      "Repository": "RSPM",
       "Requirements": [
         "BiocParallel",
         "Matrix",
@@ -208,6 +217,7 @@
       "Package": "BiocParallel",
       "Version": "1.34.2",
       "Source": "Bioconductor",
+      "Repository": "RSPM",
       "Requirements": [
         "BH",
         "R",
@@ -226,6 +236,7 @@
       "Package": "BiocSingular",
       "Version": "1.16.0",
       "Source": "Bioconductor",
+      "Repository": "RSPM",
       "Requirements": [
         "BiocGenerics",
         "BiocParallel",
@@ -246,6 +257,7 @@
       "Package": "BiocVersion",
       "Version": "3.17.1",
       "Source": "Bioconductor",
+      "Repository": "RSPM",
       "Requirements": [
         "R"
       ],
@@ -255,6 +267,7 @@
       "Package": "Biostrings",
       "Version": "2.68.1",
       "Source": "Bioconductor",
+      "Repository": "RSPM",
       "Requirements": [
         "BiocGenerics",
         "GenomeInfoDb",
@@ -273,7 +286,7 @@
     },
     "Cairo": {
       "Package": "Cairo",
-      "Version": "1.6-1",
+      "Version": "1.6-2",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
@@ -281,12 +294,13 @@
         "grDevices",
         "graphics"
       ],
-      "Hash": "612c222e9a0369705e56ee482d201137"
+      "Hash": "3918e6b40d27984ca4a99c73b92406c3"
     },
     "ComplexHeatmap": {
       "Package": "ComplexHeatmap",
       "Version": "2.16.0",
       "Source": "Bioconductor",
+      "Repository": "RSPM",
       "Requirements": [
         "GetoptLong",
         "GlobalOptions",
@@ -342,6 +356,7 @@
       "Package": "DelayedArray",
       "Version": "0.26.7",
       "Source": "Bioconductor",
+      "Repository": "RSPM",
       "Requirements": [
         "BiocGenerics",
         "IRanges",
@@ -360,6 +375,7 @@
       "Package": "DelayedMatrixStats",
       "Version": "1.22.6",
       "Source": "Bioconductor",
+      "Repository": "RSPM",
       "Requirements": [
         "DelayedArray",
         "IRanges",
@@ -376,6 +392,7 @@
       "Package": "DropletUtils",
       "Version": "1.20.0",
       "Source": "Bioconductor",
+      "Repository": "RSPM",
       "Requirements": [
         "BH",
         "BiocGenerics",
@@ -407,6 +424,7 @@
       "Package": "ExperimentHub",
       "Version": "2.8.1",
       "Source": "Bioconductor",
+      "Repository": "RSPM",
       "Requirements": [
         "AnnotationHub",
         "BiocFileCache",
@@ -452,6 +470,7 @@
       "Package": "GenomeInfoDbData",
       "Version": "1.2.10",
       "Source": "Bioconductor",
+      "Repository": "RSPM",
       "Requirements": [
         "R"
       ],
@@ -461,6 +480,7 @@
       "Package": "GenomicAlignments",
       "Version": "1.36.0",
       "Source": "Bioconductor",
+      "Repository": "RSPM",
       "Requirements": [
         "BiocGenerics",
         "BiocParallel",
@@ -482,6 +502,7 @@
       "Package": "GenomicFeatures",
       "Version": "1.52.2",
       "Source": "Bioconductor",
+      "Repository": "RSPM",
       "Requirements": [
         "AnnotationDbi",
         "Biobase",
@@ -555,6 +576,7 @@
       "Package": "HDF5Array",
       "Version": "1.28.1",
       "Source": "Bioconductor",
+      "Repository": "RSPM",
       "Requirements": [
         "BiocGenerics",
         "DelayedArray",
@@ -577,6 +599,7 @@
       "Package": "IRanges",
       "Version": "2.34.1",
       "Source": "Bioconductor",
+      "Repository": "RSPM",
       "Requirements": [
         "BiocGenerics",
         "R",
@@ -649,6 +672,7 @@
       "Package": "MatrixGenerics",
       "Version": "1.12.3",
       "Source": "Bioconductor",
+      "Repository": "RSPM",
       "Requirements": [
         "matrixStats",
         "methods"
@@ -659,6 +683,7 @@
       "Package": "ProtGenerics",
       "Version": "1.32.0",
       "Source": "Bioconductor",
+      "Repository": "RSPM",
       "Requirements": [
         "methods"
       ],
@@ -885,6 +910,7 @@
       "Package": "ResidualMatrix",
       "Version": "1.10.0",
       "Source": "Bioconductor",
+      "Repository": "RSPM",
       "Requirements": [
         "DelayedArray",
         "Matrix",
@@ -897,6 +923,7 @@
       "Package": "Rgraphviz",
       "Version": "2.44.0",
       "Source": "Bioconductor",
+      "Repository": "RSPM",
       "Requirements": [
         "R",
         "grDevices",
@@ -913,6 +940,7 @@
       "Package": "Rhdf5lib",
       "Version": "1.22.1",
       "Source": "Bioconductor",
+      "Repository": "RSPM",
       "Requirements": [
         "R"
       ],
@@ -929,6 +957,7 @@
       "Package": "Rhtslib",
       "Version": "2.2.0",
       "Source": "Bioconductor",
+      "Repository": "RSPM",
       "Requirements": [
         "zlibbioc"
       ],
@@ -938,6 +967,7 @@
       "Package": "Rsamtools",
       "Version": "2.16.0",
       "Source": "Bioconductor",
+      "Repository": "RSPM",
       "Requirements": [
         "BiocGenerics",
         "BiocParallel",
@@ -972,6 +1002,7 @@
       "Package": "S4Arrays",
       "Version": "1.0.6",
       "Source": "Bioconductor",
+      "Repository": "RSPM",
       "Requirements": [
         "BiocGenerics",
         "IRanges",
@@ -1004,6 +1035,7 @@
       "Package": "ScaledMatrix",
       "Version": "1.8.1",
       "Source": "Bioconductor",
+      "Repository": "RSPM",
       "Requirements": [
         "DelayedArray",
         "Matrix",
@@ -1110,6 +1142,7 @@
       "Package": "SingleCellExperiment",
       "Version": "1.22.0",
       "Source": "Bioconductor",
+      "Repository": "RSPM",
       "Requirements": [
         "BiocGenerics",
         "DelayedArray",
@@ -1126,6 +1159,7 @@
       "Package": "SingleR",
       "Version": "2.2.0",
       "Source": "Bioconductor",
+      "Repository": "RSPM",
       "Requirements": [
         "BiocNeighbors",
         "BiocParallel",
@@ -1148,6 +1182,7 @@
       "Package": "SummarizedExperiment",
       "Version": "1.30.2",
       "Source": "Bioconductor",
+      "Repository": "RSPM",
       "Requirements": [
         "Biobase",
         "BiocGenerics",
@@ -1183,6 +1218,7 @@
       "Package": "XVector",
       "Version": "0.40.0",
       "Source": "Bioconductor",
+      "Repository": "RSPM",
       "Requirements": [
         "BiocGenerics",
         "IRanges",
@@ -1251,6 +1287,7 @@
       "Package": "basilisk",
       "Version": "1.12.1",
       "Source": "Bioconductor",
+      "Repository": "RSPM",
       "Requirements": [
         "basilisk.utils",
         "dir.expiry",
@@ -1265,6 +1302,7 @@
       "Package": "basilisk.utils",
       "Version": "1.12.1",
       "Source": "Bioconductor",
+      "Repository": "RSPM",
       "Requirements": [
         "dir.expiry",
         "methods",
@@ -1277,6 +1315,7 @@
       "Package": "batchelor",
       "Version": "1.16.0",
       "Source": "Bioconductor",
+      "Repository": "RSPM",
       "Requirements": [
         "BiocGenerics",
         "BiocNeighbors",
@@ -1304,6 +1343,7 @@
       "Package": "beachmat",
       "Version": "2.16.0",
       "Source": "Bioconductor",
+      "Repository": "RSPM",
       "Requirements": [
         "BiocGenerics",
         "DelayedArray",
@@ -1330,6 +1370,7 @@
       "Package": "biomaRt",
       "Version": "2.56.1",
       "Source": "Bioconductor",
+      "Repository": "RSPM",
       "Requirements": [
         "AnnotationDbi",
         "BiocFileCache",
@@ -1392,6 +1433,7 @@
       "Package": "bluster",
       "Version": "1.10.0",
       "Source": "Bioconductor",
+      "Repository": "RSPM",
       "Requirements": [
         "BiocNeighbors",
         "BiocParallel",
@@ -1493,6 +1535,7 @@
       "Package": "celldex",
       "Version": "1.10.1",
       "Source": "Bioconductor",
+      "Repository": "RSPM",
       "Requirements": [
         "AnnotationDbi",
         "AnnotationHub",
@@ -1746,6 +1789,7 @@
       "Package": "densvis",
       "Version": "1.10.3",
       "Source": "Bioconductor",
+      "Repository": "RSPM",
       "Requirements": [
         "Rcpp",
         "assertthat",
@@ -1799,6 +1843,7 @@
       "Package": "dir.expiry",
       "Version": "1.8.0",
       "Source": "Bioconductor",
+      "Repository": "RSPM",
       "Requirements": [
         "filelock",
         "utils"
@@ -1888,6 +1933,7 @@
       "Package": "edgeR",
       "Version": "3.42.4",
       "Source": "Bioconductor",
+      "Repository": "RSPM",
       "Requirements": [
         "R",
         "Rcpp",
@@ -1904,6 +1950,7 @@
       "Package": "eds",
       "Version": "1.2.0",
       "Source": "Bioconductor",
+      "Repository": "RSPM",
       "Requirements": [
         "Matrix",
         "Rcpp"
@@ -1914,6 +1961,7 @@
       "Package": "eisaR",
       "Version": "1.12.0",
       "Source": "Bioconductor",
+      "Repository": "RSPM",
       "Requirements": [
         "BiocGenerics",
         "GenomicRanges",
@@ -2029,6 +2077,7 @@
       "Package": "fishpond",
       "Version": "2.6.2",
       "Source": "Bioconductor",
+      "Repository": "RSPM",
       "Requirements": [
         "GenomicRanges",
         "IRanges",
@@ -2461,6 +2510,7 @@
       "Package": "graph",
       "Version": "1.78.0",
       "Source": "Bioconductor",
+      "Repository": "RSPM",
       "Requirements": [
         "BiocGenerics",
         "R",
@@ -2695,6 +2745,7 @@
       "Package": "interactiveDisplayBase",
       "Version": "1.38.0",
       "Source": "Bioconductor",
+      "Repository": "RSPM",
       "Requirements": [
         "BiocGenerics",
         "DT",
@@ -2891,6 +2942,7 @@
       "Package": "limma",
       "Version": "3.56.2",
       "Source": "Bioconductor",
+      "Repository": "RSPM",
       "Requirements": [
         "R",
         "grDevices",
@@ -3001,6 +3053,7 @@
       "Package": "metapod",
       "Version": "1.8.0",
       "Source": "Bioconductor",
+      "Repository": "RSPM",
       "Requirements": [
         "Rcpp"
       ],
@@ -3027,6 +3080,7 @@
       "Package": "miQC",
       "Version": "1.8.0",
       "Source": "Bioconductor",
+      "Repository": "RSPM",
       "Requirements": [
         "R",
         "SingleCellExperiment",
@@ -3129,6 +3183,7 @@
       "Package": "ontoProc",
       "Version": "1.22.0",
       "Source": "Bioconductor",
+      "Repository": "RSPM",
       "Requirements": [
         "AnnotationHub",
         "Biobase",
@@ -3499,6 +3554,7 @@
       "Package": "qvalue",
       "Version": "2.32.0",
       "Source": "Bioconductor",
+      "Repository": "RSPM",
       "Requirements": [
         "R",
         "ggplot2",
@@ -3671,6 +3727,7 @@
       "Package": "rhdf5",
       "Version": "2.44.0",
       "Source": "Bioconductor",
+      "Repository": "RSPM",
       "Requirements": [
         "R",
         "Rhdf5lib",
@@ -3683,6 +3740,7 @@
       "Package": "rhdf5filters",
       "Version": "1.12.1",
       "Source": "Bioconductor",
+      "Repository": "RSPM",
       "Requirements": [
         "Rhdf5lib"
       ],
@@ -3765,6 +3823,7 @@
       "Package": "rtracklayer",
       "Version": "1.60.1",
       "Source": "Bioconductor",
+      "Repository": "RSPM",
       "Requirements": [
         "BiocGenerics",
         "BiocIO",
@@ -3842,6 +3901,7 @@
       "Package": "scater",
       "Version": "1.28.0",
       "Source": "Bioconductor",
+      "Repository": "RSPM",
       "Requirements": [
         "BiocGenerics",
         "BiocNeighbors",
@@ -3891,6 +3951,7 @@
       "Package": "scran",
       "Version": "1.28.2",
       "Source": "Bioconductor",
+      "Repository": "RSPM",
       "Requirements": [
         "BH",
         "BiocGenerics",
@@ -4105,6 +4166,7 @@
       "Package": "sparseMatrixStats",
       "Version": "1.12.2",
       "Source": "Bioconductor",
+      "Repository": "RSPM",
       "Requirements": [
         "Matrix",
         "MatrixGenerics",
@@ -4292,15 +4354,15 @@
     },
     "svglite": {
       "Package": "svglite",
-      "Version": "2.1.2",
+      "Version": "2.1.3",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "RSPM",
       "Requirements": [
         "R",
         "cpp11",
         "systemfonts"
       ],
-      "Hash": "be5318f6b48c136ecd6b8b5de24cc0ae"
+      "Hash": "124a41fdfa23e8691cb744c762f10516"
     },
     "sys": {
       "Package": "sys",
@@ -4507,6 +4569,7 @@
       "Package": "tximport",
       "Version": "1.28.0",
       "Source": "Bioconductor",
+      "Repository": "RSPM",
       "Requirements": [
         "methods",
         "stats",
@@ -4726,6 +4789,7 @@
       "Package": "zellkonverter",
       "Version": "1.10.1",
       "Source": "Bioconductor",
+      "Repository": "RSPM",
       "Requirements": [
         "DelayedArray",
         "Matrix",
@@ -4744,6 +4808,7 @@
       "Package": "zlibbioc",
       "Version": "1.46.0",
       "Source": "Bioconductor",
+      "Repository": "RSPM",
       "Hash": "20158ef5adb641f0b4e8d63136f0e870"
     },
     "zoo": {
