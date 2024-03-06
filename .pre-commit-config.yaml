@@ -35,6 +35,7 @@ repos:
           (.*/|)DESCRIPTION|
           (.*/|)NAMESPACE|
           (.*/|)renv/settings\.dcf|
+          (.*/|)renv/settings\.json|
           (.*/|)renv\.lock|
           (.*/|)requirements\.txt|
           (.*/|)Dockerfile|
