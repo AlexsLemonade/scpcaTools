@@ -24,12 +24,11 @@
 #' )
 #' }
 sce_to_anndata <- function(
-  sce, 
-  anndata_file, 
-  x_assay_name = "counts", 
-  compression = c("gzip", "none", "lzf"), 
-  ...
-) {
+    sce,
+    anndata_file,
+    x_assay_name = "counts",
+    compression = c("gzip", "none", "lzf"),
+    ...) {
   if (!requireNamespace("zellkonverter", quietly = TRUE)) {
     stop("The zellkonverter package must be installed to convert objects to AnnData. No output file written.")
   }
