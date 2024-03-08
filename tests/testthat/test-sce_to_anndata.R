@@ -71,13 +71,11 @@ test_that("Conversion of SCE to AnnData works as expected", {
 })
 
 test_that("Conversion of SCE to AnnData works with additional arguments", {
-
   # test that the H5 file is created with additional options
   expect_snapshot_file({
     sce_to_anndata(sce, anndata_file, verbose = FALSE)
     anndata_file
   })
-
 })
 
 test_that("Conversion of SCE to AnnData fails as expected", {
@@ -94,5 +92,4 @@ test_that("Conversion of SCE to AnnData fails as expected", {
 
   # check that conversion fails with wrong compression type
   expect_error(sce_to_anndata(sce, anndata_file, compression = "not a compression"))
-
 })
