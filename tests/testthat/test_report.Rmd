@@ -15,4 +15,3 @@ output: html_document
 ```{r}
 sessioninfo::session_info()
 ```
-
