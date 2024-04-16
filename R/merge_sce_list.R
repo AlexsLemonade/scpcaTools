@@ -160,9 +160,11 @@ merge_sce_list <- function(
       purrr::walk(
         \(altexp_name) {
           sce_list |>
-            purrr::keep(\(sce) altexp_name %in% altExpNames(sce)) |>
-            purrr::map(altExp, altexp_name) |>
-            check_metadata()
+            purrr::walk(\(sce) {
+              if (altexp_name %in% altExpNames(sce)) {
+                check_metadata(altExp(sce, altexp_name))
+              }
+            })
         }
       )
   } else {
@@ -231,6 +233,7 @@ merge_sce_list <- function(
           retain_coldata_cols = unique(altexp_coldata_cols),
           preserve_rowdata_cols = unique(altexp_rowdata_cols)
         )
+      gc(verbose = FALSE)
     }
   }
 
