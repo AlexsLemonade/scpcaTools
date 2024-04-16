@@ -2,7 +2,7 @@
 % Please edit documentation in R/read_cellranger.R
 \name{read_cellranger}
 \alias{read_cellranger}
-\title{Read in counts data processed with Cellranger}
+\title{Read in counts data processed with Cell Ranger}
 \usage{
 read_cellranger(quant_dir)
 }
@@ -13,7 +13,7 @@ read_cellranger(quant_dir)
 SingleCellExperiment of gene x cell counts matrix
 }
 \description{
-Read in counts data processed with Cellranger
+Read in counts data processed with Cell Ranger
 }
 \examples{
 \dontrun{

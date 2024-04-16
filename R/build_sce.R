@@ -5,15 +5,16 @@
 #'   with intron counts marked by "-U" and ambiguous counts "-A".
 #' @param include_unspliced Whether or not to include the unspliced reads in the counts matrix.
 #'   If TRUE, the main "counts" assay will contain unspliced reads and spliced reads and an additional "spliced"
-#'   assay will contain spliced reads only. If TRUE, requires that data has been aligned to a reference contianing
+#'   assay will contain spliced reads only. If TRUE, requires that data has been aligned to a reference containing
 #'   spliced and unspliced reads.
 #'   Default is TRUE.
 #' @param round_counts Logical indicating in the count matrix should be rounded to integers on import.
 #'   Default is TRUE.
 #'
-#' @return SingleCellExperiment object containing either just a counts assay with spliced cDNA only if
-#'   `include_unspliced` is FALSE. If `include_unspliced` is TRUE, the counts assay will contain both spliced and unspliced
-#'    counts and the spliced assay will contain the counts for just the spliced cDNA.
+#' @return SingleCellExperiment object. If `include_unspliced` is TRUE (default), the counts assay will contain
+#'   both spliced and unspliced counts and the spliced assay will contain the counts for just the spliced cDNA.
+#'   If `include_unspliced` is FALSE, the counts assay will contain spliced cDNA counts only.
+#'
 #'
 #' @examples
 #' \dontrun{
@@ -41,13 +42,13 @@ build_sce <- function(counts,
   # define if counts matrix has any unspliced reads
   has_unspliced <- any(grep("-[IU]$", rownames(counts)))
 
-  if (include_unspliced & !has_unspliced) {
+  if (include_unspliced && !has_unspliced) {
     stop("No counts corresponding to intronic reads detected.
           If `include_unspliced` is TRUE a reference with spliced and unspliced reads must be used.")
   }
 
   # if has unspliced data get counts for both unspliced and spliced
-  if (include_unspliced & has_unspliced) {
+  if (include_unspliced && has_unspliced) {
     total <- collapse_intron_counts(counts, which_counts = c("total"))
     spliced <- collapse_intron_counts(counts, which_counts = c("spliced"))
 
@@ -88,7 +89,7 @@ build_sce <- function(counts,
       counts = total,
       spliced = spliced
     )
-  } else if (!include_unspliced & has_unspliced) {
+  } else if (!include_unspliced && has_unspliced) {
     # still aligned to introns, but want to collapse and just return spliced
     spliced <- collapse_intron_counts(counts, which_counts = c("spliced"))
     assay_list <- list(counts = spliced)

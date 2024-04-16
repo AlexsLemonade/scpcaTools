@@ -1,18 +1,19 @@
 #' Import Gene Expression Quantification Data for Single-Cell RNA-Seq
 #'
-#' Imports the gene x cell matrix output from either Alevin, Alevin-fry, Cellranger, or Kallisto and returns a SingleCellExperiment.
+#' Imports the gene x cell matrix output from either Alevin, Alevin-fry, Cell Ranger, or Kallisto
+#'   and returns a SingleCellExperiment.
 #'
 #' @param quant_dir Path to directory where output files are located.
 #' @param tool Type of tool used to create files (alevin, alevin-fry, cellranger, or kallisto).
 #' @param include_unspliced Whether or not to include the unspliced reads in the counts matrix.
 #'   If TRUE, the main "counts" assay will contain unspliced reads and spliced reads and an additional "spliced"
-#'   assay will contain spliced reads only. If TRUE, requires that data has been aligned to a reference contianing
+#'   assay will contain spliced reads only. If TRUE, requires that data has been aligned to a reference containing
 #'   spliced and unspliced reads.
 #'   Default is TRUE.
 #' @param usa_mode Logical indicating if Alevin-fry was used, if the USA mode was invoked.
 #'   Default is FALSE.
 #' @param filter Logical indicating whether or not to filter the counts matrix.
-#'   Filtering is performed using DropletUtils::emptyDrops and cannot be performed with Cellranger.
+#'   Filtering is performed using DropletUtils::emptyDrops and cannot be performed with Cell Ranger.
 #' @param fdr_cutoff FDR cutoff to use for DropletUtils::emptyDrops.
 #'   Default is 0.01.
 #' @param tech_version Technology or kit used to process library (i.e. 10Xv3, 10Xv3.1).
@@ -64,40 +65,22 @@ import_quant_data <- function(quant_dir,
                               ...) {
   which_counts <- match.arg(which_counts)
 
-  if (!(tool %in% c("cellranger", "alevin", "alevin-fry", "kallisto"))) {
-    stop("Tool must be either cellranger, alevin, alevin-fry, or kallisto.")
-  }
+  stopifnot(
+    "Tool must be one of cellranger, alevin, alevin-fry, or kallisto." =
+      tool %in% c("cellranger", "alevin", "alevin-fry", "kallisto"),
+    "include_unspliced must be set as TRUE or FALSE" = is.logical(include_unspliced),
+    "usa_mode must be set as TRUE or FALSE" = is.logical(usa_mode),
+    "filter must be set as TRUE or FALSE" = is.logical(filter),
+    "USA mode only compatible with alevin-fry." = !(usa_mode && tool %in% c("cellranger", "alevin", "kallisto")),
+    "Include unspliced not compatible with cellranger." = !(include_unspliced && tool %in% c("cellranger")),
+    "Cannot perform emptyDrops filtering on cellranger output." = !(filter && tool == "cellranger")
+  )
 
-  # checks for intron_mode and usa_mode
-  if (!is.logical(include_unspliced)) {
-    stop("include_unspliced must be set as TRUE or FALSE")
-  }
-  if (!is.logical(usa_mode)) {
-    stop("usa_mode must be set as TRUE or FALSE")
-  }
-  if (!is.logical(filter)) {
-    stop("filter must be set as TRUE or FALSE")
-  }
-
-  # check that usa_mode and intron_mode are used with the proper tools
-  if (usa_mode & tool %in% c("cellranger", "alevin", "kallisto")) {
-    stop("USA mode only compatible with alevin-fry.")
-  }
-  if (include_unspliced & tool %in% c("cellranger")) {
-    stop("Include unspliced not compatible with cellranger.")
-  }
-
-  # check that filter is not used with cellranger
-  if (filter & tool == "cellranger") {
-    stop("Cannot perform emptyDrops filtering on cellranger output.")
-  }
   if (filter) {
-    if (!(is.numeric(fdr_cutoff))) {
-      stop("fdr_cutoff is not a number.")
-    }
-    if (fdr_cutoff < 0 | fdr_cutoff > 1) {
-      stop("fdr_cutoff must be a number between 0 - 1.")
-    }
+    stopifnot(
+      "fdr_cutoff must be a number." = is.numeric(fdr_cutoff),
+      "fdr_cutoff must be a number between 0 - 1." = fdr_cutoff >= 0 && fdr_cutoff <= 1
+    )
   }
 
   if (tool %in% c("alevin-fry", "alevin")) {

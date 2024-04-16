@@ -7,7 +7,7 @@
 #'   Default is FALSE.
 #' @param include_unspliced Whether or not to include the unspliced reads in the counts matrix.
 #'   If TRUE, the main "counts" assay will contain unspliced reads and spliced reads and an additional "spliced"
-#'   assay will contain spliced reads only. If TRUE, requires that data has been aligned to a reference contianing
+#'   assay will contain spliced reads only. If TRUE, requires that data has been aligned to a reference containing
 #'   spliced and unspliced reads.
 #'   Default is TRUE.
 #' @param feature_data Logical indicating if the data being read in contains feature data.

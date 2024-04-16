@@ -565,7 +565,7 @@ check_metadata <- function(sce_list, expected_fields = c("library_id", "sample_i
 
 
 #' Helper function to get altExp metadata from an SCE that may not have the altexp
-#' Returns main experminet metadata if the altExp is not present in the SCE
+#' Returns main experiment metadata if the altExp is not present in the SCE
 #'
 #' @param sce SCE object to extract metadata from
 #' @param altexp_name Name of the altExp to extract metadata for
