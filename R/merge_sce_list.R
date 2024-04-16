@@ -160,11 +160,14 @@ merge_sce_list <- function(
       purrr::walk(
         \(altexp_name) {
           sce_list |>
-            purrr::walk(\(sce) {
+            purrr::map(\(sce) {
               if (altexp_name %in% altExpNames(sce)) {
-                check_metadata(altExp(sce, altexp_name))
+                altExp(sce, altexp_name)
               }
-            })
+            }) |>
+            # remove nulls
+            purrr::keep(\(sce) is(sce, "SingleCellExperiment")) |>
+            check_metadata()
         }
       )
   } else {
@@ -233,7 +236,6 @@ merge_sce_list <- function(
           retain_coldata_cols = unique(altexp_coldata_cols),
           preserve_rowdata_cols = unique(altexp_rowdata_cols)
         )
-      gc(verbose = FALSE)
     }
   }
 
