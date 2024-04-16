@@ -2,6 +2,7 @@ Alevin
 altExp
 altexp
 barcode
+bioconductor
 CMD
 colData
 coldata
@@ -10,6 +11,7 @@ Dockerfile
 Ensembl
 ensembl
 Kallisto
+LinkingTo
 nf
 pre
 PRs
@@ -22,7 +24,9 @@ SCE's
 SCEs
 ScPCA
 scpca
+scpcaData
 scpcaTools
 SingleCellExperiment
 tidyverse
 unspliced
+vcs
