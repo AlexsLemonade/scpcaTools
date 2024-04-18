@@ -31,4 +31,6 @@ apt-get -y --no-install-recommends install \
     pandoc \
     python3-pip
 
+apt-get clean
+
 rm -rf /var/lib/apt/lists/*
