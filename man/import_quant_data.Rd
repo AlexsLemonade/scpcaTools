@@ -22,7 +22,7 @@ import_quant_data(
 
 \item{include_unspliced}{Whether or not to include the unspliced reads in the counts matrix.
 If TRUE, the main "counts" assay will contain unspliced reads and spliced reads and an additional "spliced"
-assay will contain spliced reads only. If TRUE, requires that data has been aligned to a reference contianing
+assay will contain spliced reads only. If TRUE, requires that data has been aligned to a reference containing
 spliced and unspliced reads.
 Default is TRUE.}
 
@@ -30,7 +30,7 @@ Default is TRUE.}
 Default is FALSE.}
 
 \item{filter}{Logical indicating whether or not to filter the counts matrix.
-Filtering is performed using DropletUtils::emptyDrops and cannot be performed with Cellranger.}
+Filtering is performed using DropletUtils::emptyDrops and cannot be performed with Cell Ranger.}
 
 \item{fdr_cutoff}{FDR cutoff to use for DropletUtils::emptyDrops.
 Default is 0.01.}
@@ -43,7 +43,8 @@ Default is 0.01.}
 SingleCellExperiment of unfiltered gene x cell counts matrix
 }
 \description{
-Imports the gene x cell matrix output from either Alevin, Alevin-fry, Cellranger, or Kallisto and returns a SingleCellExperiment.
+Imports the gene x cell matrix output from either Alevin, Alevin-fry, Cell Ranger, or Kallisto
+  and returns a SingleCellExperiment.
 }
 \examples{
 \dontrun{

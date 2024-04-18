@@ -1,4 +1,4 @@
-#' Read in counts data processed with Cellranger
+#' Read in counts data processed with Cell Ranger
 #'
 #' @param quant_dir Path to directory where output files are located.
 #'

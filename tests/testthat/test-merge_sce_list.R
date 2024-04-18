@@ -878,12 +878,12 @@ test_that("check_metadata throws an error when a field is missing", {
   expect_no_error(check_metadata(sce_list, expected_fields = "sample_id"))
 })
 
-test_that("extract_metadata_for_altexp returns the correct values", {
+test_that("get_altexp_metadata returns the correct values", {
   expected_list <- list(
     "library_id" = "library-sce1",
     "sample_id"  = "sample-sce1"
   )
-  observed_list <- extract_metadata_for_altexp(sce_list[[1]])
+  observed_list <- get_altexp_metadata(sce_list[[1]], "MISSING_ALTEXP_NAME")
   expect_equal(observed_list, expected_list)
 })
 

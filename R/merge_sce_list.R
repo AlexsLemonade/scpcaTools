@@ -160,8 +160,13 @@ merge_sce_list <- function(
       purrr::walk(
         \(altexp_name) {
           sce_list |>
-            purrr::keep(\(sce) altexp_name %in% altExpNames(sce)) |>
-            purrr::map(altExp, altexp_name) |>
+            purrr::map(\(sce) {
+              if (altexp_name %in% altExpNames(sce)) {
+                altExp(sce, altexp_name)
+              }
+            }) |>
+            # remove nulls
+            purrr::keep(\(sce) is(sce, "SingleCellExperiment")) |>
             check_metadata()
         }
       )
@@ -244,24 +249,9 @@ merge_sce_list <- function(
 
   if (include_altexp) {
     for (altexp_name in names(altexp_attributes)) {
-      has_altexp_name <- sce_list |>
-        purrr::map_lgl(\(sce) (altexp_name %in% altExpNames(sce)))
-
-      # For any SCEs without this altExp, create the library_id and sample_id metadata
-      additional_metadata <- sce_list |>
-        purrr::discard(has_altexp_name) |>
-        purrr::map(extract_metadata_for_altexp)
-
       # Update metadata in altExps that were originally present
       altexp_metadata_list <- sce_list |>
-        purrr::keep(has_altexp_name) |>
-        purrr::map(altExp, altexp_name) |>
-        purrr::map(metadata) |>
-        # Tack on the metadata we created for libraries without altExps
-        c(additional_metadata)
-
-      # Ensure correct order
-      altexp_metadata_list <- altexp_metadata_list[names(sce_list)]
+        purrr::map(get_altexp_metadata, altexp_name = altexp_name)
 
       metadata(altExp(merged_sce, altexp_name)) <- prepare_merged_metadata(altexp_metadata_list)
     }
@@ -572,14 +562,27 @@ check_metadata <- function(sce_list, expected_fields = c("library_id", "sample_i
   }
 }
 
-#' Helper function to extract main SCE metadata for inclusion in an altExp
+
+
+#' Helper function to get altExp metadata from an SCE that may not have the altexp
+#' Returns main experiment metadata if the altExp is not present in the SCE
 #'
 #' @param sce SCE object to extract metadata from
+#' @param altexp_name Name of the altExp to extract metadata for
 #'
 #' @return List with fields `library_id` and `sample_id`
-extract_metadata_for_altexp <- function(sce) {
-  list(
-    library_id = metadata(sce)$library_id,
-    sample_id = metadata(sce)$sample_id
-  )
+get_altexp_metadata <- function(sce, altexp_name) {
+  if (altexp_name %in% altExpNames(sce)) {
+    return(
+      metadata(altExp(sce, altexp_name))
+    )
+  } else {
+    # if the altExp is not present, return partial main SCE metadata
+    return(
+      list(
+        library_id = metadata(sce)$library_id,
+        sample_id = metadata(sce)$sample_id
+      )
+    )
+  }
 }

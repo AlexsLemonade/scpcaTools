@@ -2,9 +2,21 @@
 % Please edit documentation in R/scpcaTools-package.R
 \docType{package}
 \name{scpcaTools-package}
+\alias{scpcaTools}
 \alias{scpcaTools-package}
 \title{scpcaTools: Useful tools for analysis of single-cell RNA seq counts data}
 \description{
 The scpcaTools package contains a set of tools for working with single-cell and single-nuclei RNA-seq counts data.
-Mainly, this package can work with data that has been produced using Alevin, Alevin-Fry, Cellranger, or Kallisto.
+Mainly, this package can work with data that has been produced using Alevin, Alevin-Fry, Cell Ranger, or Kallisto.
+}
+\author{
+\strong{Maintainer}: Ally Hawkins \email{ally.hawkins@ccdatalab.org} (0000-0001-6026-3660)
+
+Authors:
+\itemize{
+  \item Joshua A. Shapiro \email{josh.shapiro@ccdatalab.org} (0000-0002-6224-0347)
+  \item Stephanie J. Spielman \email{stephanie.spielman@ccdatalab.org} (0000-0002-9090-4788)
+  \item Chanté J. Bethell (0000-0001-9653-8128)
+}
+
 }

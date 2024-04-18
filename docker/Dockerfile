@@ -1,4 +1,4 @@
-FROM rocker/r-ver:4.3.2
+FROM rocker/r-ver:4.3.3
 LABEL maintainer="ccdl@alexslemonade.org"
 LABEL org.opencontainers.image.source https://github.com/AlexsLemonade/scpcaTools
 
@@ -13,10 +13,9 @@ RUN Rscript -e "install.packages(c('remotes', 'renv'))"
 
 WORKDIR /usr/local/renv
 COPY renv.lock renv.lock
-# restore with PPM repo set for binary installs
-RUN Rscript -e "renv::consent(provided = TRUE); \
-      renv::restore(repos = 'https://packagemanager.posit.co/cran/latest')" && \
-      rm -rf ~/.local/share/renv && \
+# restore renv and remove cache files
+RUN Rscript -e "renv::restore()" && \
+      rm -rf ~/.cache/R/renv && \
       rm -rf /tmp/downloaded_packages && \
       rm -rf /tmp/Rtmp*
 
@@ -27,7 +26,7 @@ RUN Rscript -e "proc <- basilisk::basiliskStart(env = zellkonverter::zellkonvert
 
 #### Python packages
 COPY requirements.txt requirements.txt
-RUN pip install -r requirements.txt && pip cache purge
+RUN pip install --no-cache-dir -r requirements.txt
 
 
 ##########################
