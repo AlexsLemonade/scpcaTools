@@ -7,8 +7,8 @@ set -euo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
 # Python package lists
-pip-compile --no-annotate --output-file=requirements.txt requirements.in
-pip-compile --no-annotate --output-file=requirements_slim.txt requirements_slim.in
+pip-compile --no-annotate --strip-extras --output-file=requirements.txt requirements.in
+pip-compile --no-annotate --strip-extras --output-file=requirements_slim.txt requirements_slim.in
 
 # move up a directory for R scripts to capture the package files
 cd ..
