@@ -126,6 +126,7 @@
       "Package": "Biobase",
       "Version": "2.62.0",
       "Source": "Bioconductor",
+      "Repository": "RSPM",
       "Requirements": [
         "BiocGenerics",
         "R",
@@ -172,6 +173,7 @@
       "Package": "BiocIO",
       "Version": "1.12.0",
       "Source": "Bioconductor",
+      "Repository": "RSPM",
       "Requirements": [
         "BiocGenerics",
         "R",
@@ -350,6 +352,7 @@
       "Package": "DelayedArray",
       "Version": "0.28.0",
       "Source": "Bioconductor",
+      "Repository": "RSPM",
       "Requirements": [
         "BiocGenerics",
         "IRanges",
@@ -369,6 +372,7 @@
       "Package": "DelayedMatrixStats",
       "Version": "1.24.0",
       "Source": "Bioconductor",
+      "Repository": "RSPM",
       "Requirements": [
         "DelayedArray",
         "IRanges",
@@ -384,6 +388,7 @@
       "Package": "DropletUtils",
       "Version": "1.22.0",
       "Source": "Bioconductor",
+      "Repository": "RSPM",
       "Requirements": [
         "BH",
         "BiocGenerics",
@@ -471,7 +476,7 @@
       "Package": "GenomicAlignments",
       "Version": "1.38.2",
       "Source": "Bioconductor",
-      "Repository": "Bioconductor 3.18",
+      "Repository": "RSPM",
       "Requirements": [
         "BiocGenerics",
         "BiocParallel",
@@ -568,7 +573,7 @@
       "Package": "HDF5Array",
       "Version": "1.30.1",
       "Source": "Bioconductor",
-      "Repository": "Bioconductor 3.18",
+      "Repository": "RSPM",
       "Requirements": [
         "BiocGenerics",
         "DelayedArray",
@@ -664,6 +669,7 @@
       "Package": "MatrixGenerics",
       "Version": "1.14.0",
       "Source": "Bioconductor",
+      "Repository": "RSPM",
       "Requirements": [
         "matrixStats",
         "methods"
@@ -932,7 +938,7 @@
       "Package": "Rhdf5lib",
       "Version": "1.24.2",
       "Source": "Bioconductor",
-      "Repository": "Bioconductor 3.18",
+      "Repository": "RSPM",
       "Requirements": [
         "R"
       ],
@@ -959,6 +965,7 @@
       "Package": "Rsamtools",
       "Version": "2.18.0",
       "Source": "Bioconductor",
+      "Repository": "RSPM",
       "Requirements": [
         "BiocGenerics",
         "BiocParallel",
@@ -993,7 +1000,7 @@
       "Package": "S4Arrays",
       "Version": "1.2.1",
       "Source": "Bioconductor",
-      "Repository": "Bioconductor 3.18",
+      "Repository": "RSPM",
       "Requirements": [
         "BiocGenerics",
         "IRanges",
@@ -1026,6 +1033,7 @@
       "Package": "ScaledMatrix",
       "Version": "1.10.0",
       "Source": "Bioconductor",
+      "Repository": "RSPM",
       "Requirements": [
         "DelayedArray",
         "Matrix",
@@ -1132,6 +1140,7 @@
       "Package": "SingleCellExperiment",
       "Version": "1.24.0",
       "Source": "Bioconductor",
+      "Repository": "RSPM",
       "Requirements": [
         "BiocGenerics",
         "DelayedArray",
@@ -1171,7 +1180,7 @@
       "Package": "SparseArray",
       "Version": "1.2.4",
       "Source": "Bioconductor",
-      "Repository": "Bioconductor 3.18",
+      "Repository": "RSPM",
       "Requirements": [
         "BiocGenerics",
         "IRanges",
@@ -1191,6 +1200,7 @@
       "Package": "SummarizedExperiment",
       "Version": "1.32.0",
       "Source": "Bioconductor",
+      "Repository": "RSPM",
       "Requirements": [
         "Biobase",
         "BiocGenerics",
@@ -1300,7 +1310,7 @@
       "Package": "basilisk.utils",
       "Version": "1.14.1",
       "Source": "Bioconductor",
-      "Repository": "Bioconductor 3.18",
+      "Repository": "RSPM",
       "Requirements": [
         "dir.expiry",
         "methods",
@@ -1341,7 +1351,7 @@
       "Package": "beachmat",
       "Version": "2.18.1",
       "Source": "Bioconductor",
-      "Repository": "Bioconductor 3.18",
+      "Repository": "RSPM",
       "Requirements": [
         "BiocGenerics",
         "DelayedArray",
@@ -1369,7 +1379,7 @@
       "Package": "biomaRt",
       "Version": "2.58.2",
       "Source": "Bioconductor",
-      "Repository": "Bioconductor 3.18",
+      "Repository": "RSPM",
       "Requirements": [
         "AnnotationDbi",
         "BiocFileCache",
@@ -1832,6 +1842,7 @@
       "Package": "dir.expiry",
       "Version": "1.10.0",
       "Source": "Bioconductor",
+      "Repository": "RSPM",
       "Requirements": [
         "filelock",
         "utils"
@@ -1921,7 +1932,7 @@
       "Package": "edgeR",
       "Version": "4.0.16",
       "Source": "Bioconductor",
-      "Repository": "Bioconductor 3.18",
+      "Repository": "RSPM",
       "Requirements": [
         "R",
         "Rcpp",
@@ -2501,6 +2512,7 @@
       "Package": "graph",
       "Version": "1.80.0",
       "Source": "Bioconductor",
+      "Repository": "RSPM",
       "Requirements": [
         "BiocGenerics",
         "R",
@@ -2929,6 +2941,7 @@
       "Package": "limma",
       "Version": "3.58.1",
       "Source": "Bioconductor",
+      "Repository": "RSPM",
       "Requirements": [
         "R",
         "grDevices",
@@ -3539,6 +3552,7 @@
       "Package": "qvalue",
       "Version": "2.34.0",
       "Source": "Bioconductor",
+      "Repository": "RSPM",
       "Requirements": [
         "R",
         "ggplot2",
@@ -3711,7 +3725,7 @@
       "Package": "rhdf5",
       "Version": "2.46.1",
       "Source": "Bioconductor",
-      "Repository": "Bioconductor 3.18",
+      "Repository": "RSPM",
       "Requirements": [
         "R",
         "Rhdf5lib",
@@ -3725,7 +3739,7 @@
       "Package": "rhdf5filters",
       "Version": "1.14.1",
       "Source": "Bioconductor",
-      "Repository": "Bioconductor 3.18",
+      "Repository": "RSPM",
       "Requirements": [
         "Rhdf5lib"
       ],
@@ -3807,6 +3821,7 @@
       "Package": "rtracklayer",
       "Version": "1.62.0",
       "Source": "Bioconductor",
+      "Repository": "RSPM",
       "Requirements": [
         "BiocGenerics",
         "BiocIO",
@@ -3990,6 +4005,7 @@
       "Package": "scuttle",
       "Version": "1.12.0",
       "Source": "Bioconductor",
+      "Repository": "RSPM",
       "Requirements": [
         "BiocGenerics",
         "BiocParallel",
@@ -4147,6 +4163,7 @@
       "Package": "sparseMatrixStats",
       "Version": "1.14.0",
       "Source": "Bioconductor",
+      "Repository": "RSPM",
       "Requirements": [
         "Matrix",
         "MatrixGenerics",
