@@ -1,7 +1,11 @@
-FROM bioconductor/bioconductor_docker:RELEASE_3_18
+FROM rocker/r-ver:4.3.3
 LABEL maintainer="ccdl@alexslemonade.org"
 LABEL org.opencontainers.image.source https://github.com/AlexsLemonade/scpcaTools
-LABEL org.opencontainers.image.title "scpcaTools-bioconductor"
+LABEL org.opencontainers.image.title "scpcatools-slim"
+
+COPY scripts/install_scpca_deps.sh .
+
+RUN bash ./install_scpca_deps.sh
 
 #### R packages
 # Use renv for R packages
@@ -12,9 +16,9 @@ WORKDIR /usr/local/renv
 COPY renv_slim.lock renv.lock
 # restore renv and remove cache files
 RUN Rscript -e "renv::restore()" && \
-      rm -rf ~/.cache/R/renv && \
-      rm -rf /tmp/downloaded_packages && \
-      rm -rf /tmp/Rtmp*
+  rm -rf ~/.cache/R/renv && \
+  rm -rf /tmp/downloaded_packages && \
+  rm -rf /tmp/Rtmp*
 
 ##########################
 # bust cache if needed
