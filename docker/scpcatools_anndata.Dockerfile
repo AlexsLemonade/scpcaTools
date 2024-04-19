@@ -3,10 +3,6 @@ LABEL maintainer="ccdl@alexslemonade.org"
 LABEL org.opencontainers.image.source https://github.com/AlexsLemonade/scpcaTools
 LABEL org.opencontainers.image.title "scpcatools-anndata"
 
-COPY scripts/install_scpca_deps.sh .
-
-RUN bash ./install_scpca_deps.sh
-
 #### R packages
 # Use renv for R packages
 ENV RENV_CONFIG_CACHE_ENABLED FALSE
