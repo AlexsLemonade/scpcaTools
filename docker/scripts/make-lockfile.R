@@ -1,5 +1,10 @@
 #!/usr/bin/env Rscript
 
+# This script is used to make a lockfile based on the current renv environment,
+# including scpcaTools dependencies and any additional packages specified by the user.
+# This means that it does _not_ look at what files are used by scripts in the project, except
+# for the package DESCRIPTION file.
+
 library(optparse)
 
 option_list <- list(

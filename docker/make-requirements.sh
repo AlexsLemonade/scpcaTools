@@ -1,6 +1,6 @@
 #!/bin/bash
 set -euo pipefail
-# This script is used to generate requirements files for R and python packages
+# This script is used to generate requirements files for R and Python packages
 # Requires that the `pip-tools` python package is installed.
 
 # Set the working directory to the directory of this file
