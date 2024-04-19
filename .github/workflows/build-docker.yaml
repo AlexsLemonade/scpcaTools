@@ -1,4 +1,4 @@
-name: Build scpca-tools image
+name: Build scpca-tools images
 
 on:
   push:
@@ -25,8 +25,10 @@ jobs:
         include:
           - image: alexslemonade/scpcatools
             dockerfile: Dockerfile
+            suffix: ""
           - image: alexslemonade/scpcatools-slim
-            dockerfile: scpcatools-slim.Dockerfile
+            dockerfile: scpcatools_slim.Dockerfile
+            suffix: "-slim"
     steps:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
@@ -43,6 +45,7 @@ jobs:
         uses: docker/metadata-action@v4
         with:
           images: ${{ env.REGISTRY }}/${{ matrix.image }}
+          flavor: suffix=${{ matrix.suffix }},onlatest=true
           tags: |
             type=semver,pattern={{raw}}
             type=edge,branch=main
