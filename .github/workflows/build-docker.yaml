@@ -48,7 +48,7 @@ jobs:
           flavor: suffix=${{ matrix.suffix }},onlatest=true
           tags: |
             type=semver,pattern={{raw}}
-            type=edge,branch=main
+            type=edge
 
       - uses: docker/build-push-action@v4
         with:
