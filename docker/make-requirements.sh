@@ -8,21 +8,13 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 
 # Python package lists
 pip-compile --no-annotate --strip-extras --output-file=requirements.txt requirements.in
-pip-compile --no-annotate --strip-extras --output-file=requirements_slim.txt requirements_slim.in
+pip-compile --no-annotate --strip-extras --output-file=requirements_anndata.txt requirements_anndata.in
 
-# move up a directory for R scripts to capture the package files
-cd ..
-Rscript - <<EOF
-lockfile <- "docker/renv_slim.lock"
-# get dependencies of scpcaTools
-renv::snapshot(lockfile = lockfile, type = "explicit")
+# slim lockfile
+Rscript scripts/make-lockfile.R -f renv_slim.lock
 
-# additional dependencies for added packages
-added_packages <- c(
-  "tidyverse"
-)
-tools::package_dependencies(added_packages) |>
-  unlist() |>
-  unique() |>
-  renv::record(lockfile = lockfile)
-EOF
+# zellkonverter lockfile
+Rscript scripts/make-lockfile.R -f renv_zellkonverter.lock -p zellkonverter
+
+# Seurat lockfile
+Rscript scripts/make-lockfile.R -f renv_seurat.lock -p Seurat
