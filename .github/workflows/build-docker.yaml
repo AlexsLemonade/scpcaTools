@@ -12,6 +12,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
+  IMAGE: alexslemonade/scpcatools
 
 jobs:
   build_and_push:
@@ -23,8 +24,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - image: alexslemonade/scpcatools
-            dockerfile: Dockerfile
+          - dockerfile: Dockerfile
             suffix: ""
           - image: alexslemonade/scpcatools-slim
             dockerfile: scpcatools_slim.Dockerfile
@@ -44,7 +44,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v4
         with:
-          images: ${{ env.REGISTRY }}/${{ matrix.image }}
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE}}
           flavor: suffix=${{ matrix.suffix }},onlatest=true
           tags: |
             type=semver,pattern={{raw}}
