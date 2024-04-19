@@ -1,4 +1,4 @@
-FROM rocker/r-ver:4.3.3
+FROM bioconductor/r-ver:3.18
 LABEL maintainer="ccdl@alexslemonade.org"
 LABEL org.opencontainers.image.source https://github.com/AlexsLemonade/scpcaTools
 LABEL org.opencontainers.image.title "scpcatools-slim"
