@@ -33,6 +33,14 @@ setwd(here::here())
 source(".Rprofile")
 setwd(current_dir)
 
+# Check that lockfile is up to date with currently installed packages
+if (!renv::status()$synchronized) {
+  stop(paste(
+    "renv.lock file does not match installed packages.",
+    "Please run `renv::restore()` or `renv::snapshot()` from within R before running this script."
+  ))
+}
+
 # get dependencies of scpcaTools
 renv::snapshot(lockfile = opts$lockfile, type = "explicit")
 
