@@ -4,23 +4,23 @@
     "Repositories": [
       {
         "Name": "BioCsoft",
-        "URL": "https://p3m.dev/bioconductor/packages/3.18/bioc"
+        "URL": "https://bioconductor.org/packages/3.18/bioc"
       },
       {
         "Name": "BioCann",
-        "URL": "https://p3m.dev/bioconductor/packages/3.18/data/annotation"
+        "URL": "https://bioconductor.org/packages/3.18/data/annotation"
       },
       {
         "Name": "BioCexp",
-        "URL": "https://p3m.dev/bioconductor/packages/3.18/data/experiment"
+        "URL": "https://bioconductor.org/packages/3.18/data/experiment"
       },
       {
         "Name": "BioCworkflows",
-        "URL": "https://p3m.dev/bioconductor/packages/3.18/workflows"
+        "URL": "https://bioconductor.org/packages/3.18/workflows"
       },
       {
         "Name": "BioCbooks",
-        "URL": "https://p3m.dev/bioconductor/packages/3.18/books"
+        "URL": "https://bioconductor.org/packages/3.18/books"
       },
       {
         "Name": "CRAN",
@@ -55,7 +55,6 @@
       "Package": "BiocGenerics",
       "Version": "0.48.1",
       "Source": "Bioconductor",
-      "Repository": "RSPM",
       "Requirements": [
         "R",
         "graphics",
@@ -79,7 +78,7 @@
       "Package": "BiocNeighbors",
       "Version": "1.20.2",
       "Source": "Bioconductor",
-      "Repository": "RSPM",
+      "Repository": "Bioconductor 3.18",
       "Requirements": [
         "BiocParallel",
         "Matrix",
@@ -95,7 +94,6 @@
       "Package": "BiocParallel",
       "Version": "1.36.0",
       "Source": "Bioconductor",
-      "Repository": "RSPM",
       "Requirements": [
         "BH",
         "R",
@@ -114,7 +112,7 @@
       "Package": "BiocVersion",
       "Version": "3.18.1",
       "Source": "Bioconductor",
-      "Repository": "RSPM",
+      "Repository": "Bioconductor 3.18",
       "Requirements": [
         "R"
       ],
@@ -175,7 +173,7 @@
       "Package": "GenomeInfoDb",
       "Version": "1.38.8",
       "Source": "Bioconductor",
-      "Repository": "RSPM",
+      "Repository": "Bioconductor 3.18",
       "Requirements": [
         "BiocGenerics",
         "GenomeInfoDbData",
@@ -194,7 +192,6 @@
       "Package": "GenomeInfoDbData",
       "Version": "1.2.11",
       "Source": "Bioconductor",
-      "Repository": "RSPM",
       "Requirements": [
         "R"
       ],
@@ -204,7 +201,6 @@
       "Package": "GenomicRanges",
       "Version": "1.54.1",
       "Source": "Bioconductor",
-      "Repository": "RSPM",
       "Requirements": [
         "BiocGenerics",
         "GenomeInfoDb",
@@ -246,7 +242,6 @@
       "Package": "IRanges",
       "Version": "2.36.0",
       "Source": "Bioconductor",
-      "Repository": "RSPM",
       "Requirements": [
         "BiocGenerics",
         "R",
@@ -448,7 +443,6 @@
       "Package": "XVector",
       "Version": "0.42.0",
       "Source": "Bioconductor",
-      "Repository": "RSPM",
       "Requirements": [
         "BiocGenerics",
         "IRanges",
@@ -504,7 +498,7 @@
       "Package": "bluster",
       "Version": "1.12.0",
       "Source": "Bioconductor",
-      "Repository": "RSPM",
+      "Repository": "Bioconductor 3.18",
       "Requirements": [
         "BiocNeighbors",
         "BiocParallel",
@@ -662,7 +656,6 @@
       "Package": "fishpond",
       "Version": "2.8.0",
       "Source": "Bioconductor",
-      "Repository": "RSPM",
       "Requirements": [
         "GenomicRanges",
         "IRanges",
@@ -981,7 +974,6 @@
       "Package": "miQC",
       "Version": "1.10.0",
       "Source": "Bioconductor",
-      "Repository": "RSPM",
       "Requirements": [
         "R",
         "SingleCellExperiment",
@@ -1327,7 +1319,6 @@
       "Package": "tximport",
       "Version": "1.30.0",
       "Source": "Bioconductor",
-      "Repository": "RSPM",
       "Requirements": [
         "methods",
         "stats",
@@ -1395,7 +1386,7 @@
       "Package": "zlibbioc",
       "Version": "1.48.2",
       "Source": "Bioconductor",
-      "Repository": "RSPM",
+      "Repository": "Bioconductor 3.18",
       "Hash": "2344be62c2da4d9e9942b5d8db346e59"
     }
   }
