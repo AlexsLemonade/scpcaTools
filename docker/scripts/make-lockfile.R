@@ -47,7 +47,7 @@ renv::snapshot(lockfile = opts$lockfile, type = "explicit")
 # additional dependencies for added packages
 added_packages <- opts$packages |>
   stringr::str_split_1("[,;\\s]+") |>
-  c("tidyverse") |> # always include tidyverse
+  c("tidyverse", "optparse") |> # always include tidyverse and optparse
   tools::package_dependencies() |>
   unlist() |>
   unique()

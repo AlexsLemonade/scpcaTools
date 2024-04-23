@@ -16,6 +16,9 @@ pip-compile --no-annotate --strip-extras --output-file=requirements_scvi.txt req
 # slim lockfile
 Rscript scripts/make-lockfile.R -f renv_slim.lock
 
+# reports lockfile
+Rscript scripts/make-lockfile.R -f renv_reports.lock -p ComplexHeatmap,ggforce,kableExtra,rmarkdown
+
 # zellkonverter lockfile
 Rscript scripts/make-lockfile.R -f renv_zellkonverter.lock -p zellkonverter
 
