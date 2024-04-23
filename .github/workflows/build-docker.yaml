@@ -12,7 +12,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: alexslemonade/scpcatools
+  REGISTRY_USER: alexslemonade
 
 jobs:
   build_and_push:
@@ -24,10 +24,10 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - dockerfile: Dockerfile
-            suffix: ""
-          - dockerfile: scpcatools_slim.Dockerfile
-            suffix: "-slim"
+          - image_name: scpcatools
+            dockerfile: Dockerfile
+          - image_name: scpcatools-slim
+            dockerfile: scpcatools_slim.Dockerfile
     steps:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -43,8 +43,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          flavor: suffix=${{ matrix.suffix }},onlatest=true
+          images: ${{ env.REGISTRY }}/${{ env.REGISTRY_USER }}/${{ matrix.image_name }}
           tags: |
             type=semver,pattern={{raw}}
             type=edge,branch=main
