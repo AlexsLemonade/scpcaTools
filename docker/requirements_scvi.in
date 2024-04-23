@@ -1,0 +1,4 @@
+# requirements.in packages for scvi-based analysis
+anndata~=0.10
+scanpy~=1.10
+scvi-tools~=1.1
