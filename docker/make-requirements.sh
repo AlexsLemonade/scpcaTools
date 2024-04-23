@@ -8,10 +8,10 @@ set -euo pipefail
 # Set the working directory to the directory of this file
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
-# Python package lists
-pip-compile --no-annotate --strip-extras --output-file=requirements.txt requirements.in
-pip-compile --no-annotate --strip-extras --output-file=requirements_anndata.txt requirements_anndata.in
-pip-compile --no-annotate --strip-extras --output-file=requirements_scvi.txt requirements_scvi.in
+# # Python package lists
+# pip-compile --no-annotate --strip-extras --output-file=requirements.txt requirements.in
+# pip-compile --no-annotate --strip-extras --output-file=requirements_anndata.txt requirements_anndata.in
+# pip-compile --no-annotate --strip-extras --output-file=requirements_scvi.txt requirements_scvi.in
 
 # slim lockfile
 Rscript scripts/make-lockfile.R -f renv_slim.lock

@@ -49,10 +49,11 @@ added_packages <- opts$packages |>
   stringr::str_split_1("[,;\\s]+") |>
   stringr::str_subset(".+") |> # remove empty strings
   c("tidyverse", "optparse") # always include tidyverse and optparse
+
 all_packages <- added_packages |>
   tools::package_dependencies(recursive = TRUE) |>
   unlist() |>
   unique() |>
-  c(added_packages)
+  c(added_packages) # add original packages
 
 renv::record(all_packages, lockfile = opts$lockfile)
