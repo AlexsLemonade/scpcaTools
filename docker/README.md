@@ -19,15 +19,20 @@ The main image includes all of the recommended packages for `scpcaTools` (aside 
 There are also smaller images that can be built, which include only the R packages required for `scpcaTools`, with particular additions for specific purposes. These include:
 
 - `scpcatools_slim.Dockerfile`: A smaller image that includes only the required R packages for `scpcaTools`, with no additional packages.
-- `scpcatools_anndata.Dockerfile`: The slim package with the addition of the `zellkonverter` package for reading and writing `AnnData` objects, and the Python `anndata` package.
+- `scpcatools_scvi.Dockerfile`: The slim package with the addition of the `zellkonverter` package for reading and writing `AnnData` objects, and the Python `anndata` and `scvi` packages.
+- `scpcatools_reports.Dockerfile`: The slim package with the addition `rmarkdown` and `ComplexHeatmap` and associated packages for generating reports.
+- `scpcatools_seurat.Dockerfile`: The slim package with the addition `Seurat`.
 
-These images are built automatically on every update to `scpcaTools` (`main`) and pushed to `ghcr.io/alexslemonade/scpcatools:edge-slim` and `ghcr.io/alexslemonade/scpcatools:edge-anndata`, respectively.
+These images are built automatically on every update to `scpcaTools` (`main`) and pushed to `ghcr.io/alexslemonade/scpcatool-slims:edge` and `ghcr.io/alexslemonade/scpcatools-scvi:edge`, etc.
 
-## Setting R and Python dependencies
+## Generating R and Python dependency files
 
-Dependency lock files are built using the `make-requirements.sh` script.
+Dependency lock files, with the exception of `renv.lock`, are built using the `make-requirements.sh` script.
 This script depends on `pip-tools` and should be run using Python 3.10 to match the default version of Python in the Docker images.
 For convenience, a conda `environment.yml` file is included in this directory that can be used to create an `scpcatools-dev` environment with the necessary Python version and packages.
 
-This script will generate the `requirements.txt` and `renv.lock` files for each set of Python packages to be installed within the various Docker images.
-These are based on `requirements.in` files that specify the high-level package requirements for each image.
+This script will generate the `requirements_*.txt` and `renv_*.lock` files for each set of Python packages to be installed within the various Docker images.
+- The requirements files are based on `requirements_*.in` files that specify the high-level package requirements for each image.
+- The `renv_*.lock` files are strict subsets of the main `renv.lock` file that is use for development and for the full image.
+  - The main `renv.lock` file should be updated manually using `renv::snapshot()` from within the `scpcaTools` project.
+  - After updating `renv.lock`, the `make-requirements.sh` script should be run to update the `renv_*.lock` files.
