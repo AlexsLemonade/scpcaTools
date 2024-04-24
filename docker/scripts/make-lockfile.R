@@ -48,7 +48,7 @@ renv::snapshot(lockfile = opts$lockfile, type = "explicit")
 added_packages <- opts$packages |>
   stringr::str_split_1("[,;\\s]+") |>
   stringr::str_subset(".+") |> # remove empty strings
-  c("tidyverse", "optparse") # always include tidyverse and optparse
+  c("optparse", "scater", "scran", "tidyverse") # always include these
 all_packages <- added_packages |>
   tools::package_dependencies(recursive = TRUE) |>
   unlist() |>
