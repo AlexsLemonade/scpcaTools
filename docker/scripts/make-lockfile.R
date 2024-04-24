@@ -1,9 +1,11 @@
 #!/usr/bin/env Rscript
 
-# This script is used to make a lockfile based on the current renv environment,
+# This script is used to create or update a lockfile based on the current renv environment,
 # including scpcaTools dependencies and any additional packages specified by the user.
 # This means that it does _not_ look at what files are used by scripts in the project, except
 # for the package DESCRIPTION file.
+# The main `renv.lock` file is not updated by this script, but must be up to date with the
+# current environment before running this script.
 
 library(optparse)
 
@@ -48,8 +50,7 @@ renv::snapshot(lockfile = opts$lockfile, type = "explicit")
 added_packages <- opts$packages |>
   stringr::str_split_1("[,;\\s]+") |>
   stringr::str_subset(".+") |> # remove empty strings
-  c("tidyverse", "optparse") # always include tidyverse and optparse
-
+  c("optparse", "scater", "scran", "tidyverse") # always include these
 all_packages <- added_packages |>
   tools::package_dependencies(recursive = TRUE) |>
   unlist() |>

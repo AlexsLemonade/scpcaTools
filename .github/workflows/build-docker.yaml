@@ -63,8 +63,6 @@ jobs:
             dockerfile: scpcatools_slim.Dockerfile
           - image_name: scpcatools-reports
             dockerfile: scpcatools_reports.Dockerfile
-          - image_name: scpcatools-anndata
-            dockerfile: scpcatools_anndata.Dockerfile
           - image_name: scpcatools-scvi
             dockerfile: scpcatools_scvi.Dockerfile
           - image_name: scpcatools-seurat
