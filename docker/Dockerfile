@@ -12,7 +12,7 @@ RUN Rscript -e "install.packages(c('remotes', 'renv'))"
 
 COPY renv_slim.lock renv.lock
 # restore renv and remove cache files
-RUN Rscript -e "renv::restore()" && \
+RUN Rscript -e 'renv::restore()' && \
   rm -rf ~/.cache/R/renv && \
   rm -rf /tmp/downloaded_packages && \
   rm -rf /tmp/Rtmp*
@@ -23,6 +23,7 @@ ADD "https://api.github.com/repos/AlexsLemonade/scpcaTools/commits?per_page=1" l
 RUN Rscript -e "remotes::install_github('AlexsLemonade/scpcaTools', upgrade = 'never'); \
   require(scpcaTools)"
 
+CMD [ "R" ]
 
 ##########################
 # Add Seurat support target ----------------------------------------------------
@@ -30,7 +31,7 @@ FROM slim AS seurat
 LABEL org.opencontainers.image.title "scpcatools-seurat"
 
 COPY renv_seurat.lock renv.lock
-RUN Rscript -e "renv::restore()" && \
+RUN Rscript -e 'renv::restore()' && \
   rm -rf ~/.cache/R/renv && \
   rm -rf /tmp/downloaded_packages && \
   rm -rf /tmp/Rtmp*
@@ -42,7 +43,7 @@ FROM slim AS reports
 LABEL org.opencontainers.image.title "scpcatools-reports"
 
 COPY renv_reports.lock renv.lock
-RUN Rscript -e "renv::restore()" && \
+RUN Rscript -e 'renv::restore()' && \
   rm -rf ~/.cache/R/renv && \
   rm -rf /tmp/downloaded_packages && \
   rm -rf /tmp/Rtmp*
@@ -54,7 +55,7 @@ FROM slim AS anndata
 LABEL org.opencontainers.image.title "scpcatools-anndata"
 
 COPY renv_zellkonverter.lock renv.lock
-RUN Rscript -e "renv::restore()" && \
+RUN Rscript -e 'renv::restore()' && \
   rm -rf ~/.cache/R/renv && \
   rm -rf /tmp/downloaded_packages && \
   rm -rf /tmp/Rtmp*
@@ -62,7 +63,8 @@ RUN Rscript -e "renv::restore()" && \
 # Complete installation of zellkonverter conda env
 ENV BASILISK_EXTERNAL_DIR /usr/local/renv/basilisk
 RUN Rscript -e "proc <- basilisk::basiliskStart(env = zellkonverter::zellkonverterAnnDataEnv(), testload = 'anndata'); \
-  basilisk::basiliskStop(proc)"
+  basilisk::basiliskStop(proc); \
+  basilisk.utils::cleanConda()"
 
 #### Python packages
 COPY requirements_anndata.txt requirements.txt
@@ -84,7 +86,7 @@ FROM scvi AS full
 LABEL org.opencontainers.image.title "scpcatools"
 
 COPY renv.lock renv.lock
-RUN Rscript -e "renv::restore()" && \
+RUN Rscript -e 'renv::restore()' && \
   rm -rf ~/.cache/R/renv && \
   rm -rf /tmp/downloaded_packages && \
   rm -rf /tmp/Rtmp*
