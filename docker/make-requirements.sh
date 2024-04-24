@@ -1,6 +1,6 @@
 #!/bin/bash
 set -euo pipefail
-# This script is used to generate requirements files for R and Python packages
+# This script is used to generate or update requirements/lock files for R and Python packages
 # Requires that the `pip-tools` python package is installed.
 # Before running, make sure that the renv.lock file and installed libaries are
 # consistent with renv::snapshot() or renv::restore()
