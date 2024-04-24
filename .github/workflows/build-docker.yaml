@@ -15,7 +15,7 @@ env:
   REGISTRY_USER: alexslemonade
 
 jobs:
-  build_slim:
+  build_full:
     runs-on: ubuntu-22.04
     permissions:
       contents: read
@@ -35,21 +35,20 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: "{{defaultContext}}:docker"
-          file: scpcatools_slim.Dockerfile
-          tags: scpcatools:latest-slim
-          outputs: type=docker,dest=/tmp/scpcatools-slim.tar # output for sharing
+          tags: scpcatools:latest
+          outputs: type=docker,dest=/tmp/scpcatools.tar # output for sharing
           cache-from: type=gha
           cache-to: type=gha
 
       - name: Upload slim image artifact
         uses: actions/upload-artifact@v4
         with:
-          name: slim-image
-          path: /tmp/scpcatools-slim.tar
+          name: scpcatools-image
+          path: /tmp/scpcatools.tar
 
   build_and_push_matrix:
     runs-on: ubuntu-22.04
-    needs: build_slim
+    needs: build_full
     permissions:
       contents: read
       packages: write
@@ -57,35 +56,36 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - image_name: scpcatools
-            dockerfile: Dockerfile
-          - image_name: scpcatools-slim
-            dockerfile: scpcatools_slim.Dockerfile
-          - image_name: scpcatools-reports
-            dockerfile: scpcatools_reports.Dockerfile
-          - image_name: scpcatools-scvi
-            dockerfile: scpcatools_scvi.Dockerfile
-          - image_name: scpcatools-seurat
-            dockerfile: scpcatools_seurat.Dockerfile
+          - target: full
+            image_name: scpcatools
+          - target: slim
+            image_name: scpcatools-slim
+          - target: reports
+            image_name: scpcatools-reports
+          - target: scvi
+            image_name: scpcatools-scvi
+          - target: seurat
+            image_name: scpcatools-seurat
+            
     steps:
       - name: checkout
         uses: actions/checkout@v4
 
-      - name: Download slim image artifact
+      - name: Download full image 
         uses: actions/download-artifact@v4
         with:
-          name: slim-image
+          name: scpcatools-image
           path: /tmp
 
-      - name: Load slim image
+      - name: Load full image for layer cache
         run: |
-          docker load --input /tmp/scpcatools-slim.tar
+          docker load --input /tmp/scpcatools.tar
           docker image ls -a
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
         with:
-          driver: docker
+          driver: docker # allow using cached layers
 
       - name: Docker login
         uses: docker/login-action@v3
@@ -107,7 +107,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: docker
-          file: ${{ matrix.dockerfile }}
+          target: ${{ matrix.target }}
           push: ${{ github.event_name == 'push' }}
           outputs: type=docker,dest=/tmp/slim.tar # output for sharing
           tags: ${{ steps.meta.outputs.tags }}
