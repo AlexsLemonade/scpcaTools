@@ -5,25 +5,34 @@ The image is built from a versioned Rocker image, with additional R packages and
 It can be built with the following command run in this directory:
 
 ```
-docker buildx build . -t scpcatools --platform linux/amd64
+docker buildx build . --tag scpcatools --platform linux/amd64
 ```
 
 Note that this image does not include RStudio, in attempt to make the image smaller.
 
-This image is built automatically on every update to `scpcaTools` (`main`) and pushed to `ghcr.io/alexslemonade/scpca-tools:edge`.
+This image is built automatically on every update to `scpcaTools` (`main`) and pushed to `ghcr.io/alexslemonade/scpcatools:edge`.
 
 Release versions of `scpcaTools` will be tagged as `ghcr.io/alexslemonade/scpcatools:latest` and tagged by version number.
 
 The main image includes all of the recommended packages for `scpcaTools` (aside from those only required for development), as well as the Python `scanpy` and `scvi-tools` packages and dependencies.
 
-There are also smaller images that can be built, which include only the R packages required for `scpcaTools`, with particular additions for specific purposes. These include:
+There are also smaller images that can be built by using the `--target` argument to specify a sub-image to build.
+For example, to build the slim image you would use the following command:
 
-- `scpcatools_slim.Dockerfile`: A smaller image that includes only the required R packages for `scpcaTools`, with no additional packages.
-- `scpcatools_scvi.Dockerfile`: The slim package with the addition of the `zellkonverter` package for reading and writing `AnnData` objects, and the Python `anndata` and `scvi` packages.
-- `scpcatools_reports.Dockerfile`: The slim package with the addition `rmarkdown` and `ComplexHeatmap` and associated packages for generating reports.
-- `scpcatools_seurat.Dockerfile`: The slim package with the addition `Seurat`.
+```
+docker buildx build . --tag scpcatools-slim --platform linux/amd64 --target slim
+```
+
+The available targets are:
+
+- `slim`: A smaller image that includes only the required R packages for `scpcaTools`, with no additional packages.
+- `anndata`: The `slim` image with the addition of the `zellkonverter` package for reading and writing `AnnData` objects, and the Python `anndata` package.
+- `scvi`: The `anndata` image with the addition of the `scvi` package.
+- `reports`: The `slim` image with the addition `rmarkdown` and `ComplexHeatmap` and associated packages for generating reports.
+- `seurat`: The `slim` image with the addition `Seurat`.
 
 These images are built automatically on every update to `scpcaTools` (`main`) and pushed to `ghcr.io/alexslemonade/scpcatool-slims:edge` and `ghcr.io/alexslemonade/scpcatools-scvi:edge`, etc.
+Release versions will be tagged with `latest` and by version number.
 
 ## Generating R and Python dependency files
 

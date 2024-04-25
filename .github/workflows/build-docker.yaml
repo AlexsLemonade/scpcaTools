@@ -61,10 +61,12 @@ jobs:
         include:
           - target: slim
             image_name: scpcatools-slim
-          - target: reports
-            image_name: scpcatools-reports
+          - target: anndata
+            image_name: scpcatools-anndata
           - target: scvi
             image_name: scpcatools-scvi
+          - target: reports
+            image_name: scpcatools-reports
           - target: seurat
             image_name: scpcatools-seurat
 
