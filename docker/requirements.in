@@ -1,0 +1,8 @@
+anndata~=0.10
+etils<1.8 # v1.8 drops python 3.10 support
+jax[cpu]
+pandas
+scanpy~=1.10
+scvi-tools~=1.1
+torch
+torchvision

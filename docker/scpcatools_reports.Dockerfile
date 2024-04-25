@@ -1,6 +1,7 @@
 FROM bioconductor/r-ver:3.18
 LABEL maintainer="ccdl@alexslemonade.org"
 LABEL org.opencontainers.image.source https://github.com/AlexsLemonade/scpcaTools
+LABEL org.opencontainers.image.title "scpcatools-slim"
 
 #### R packages
 # Use renv for R packages
@@ -8,23 +9,12 @@ ENV RENV_CONFIG_CACHE_ENABLED FALSE
 RUN Rscript -e "install.packages(c('remotes', 'renv'))"
 
 WORKDIR /usr/local/renv
-COPY renv.lock renv.lock
+COPY renv_reports.lock renv.lock
 # restore renv and remove cache files
 RUN Rscript -e "renv::restore()" && \
   rm -rf ~/.cache/R/renv && \
   rm -rf /tmp/downloaded_packages && \
   rm -rf /tmp/Rtmp*
-
-# Complete installation of zellkonverter conda env
-ENV BASILISK_EXTERNAL_DIR /usr/local/renv/basilisk
-RUN Rscript -e "proc <- basilisk::basiliskStart(env = zellkonverter::zellkonverterAnnDataEnv(), testload = 'anndata'); \
-  basilisk::basiliskStop(proc); \
-  basilisk.utils::cleanConda()"
-
-#### Python packages
-COPY requirements.txt requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
-
 
 ##########################
 # bust cache if needed

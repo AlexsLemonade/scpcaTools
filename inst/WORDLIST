@@ -10,6 +10,8 @@ CMD
 colData
 coldata
 commenter
+conda
+dev
 Dockerfile
 DropletUtils
 emptyDrops
@@ -33,6 +35,7 @@ ScPCA
 scpca
 scpcaData
 scpcaTools
+scpcatools
 SingleCellExperiment
 Spielman
 tidyverse
