@@ -15,7 +15,7 @@ env:
   REGISTRY_USER: alexslemonade
 
 jobs:
-  build_full:
+  build_push_full:
     runs-on: ubuntu-22.04
     permissions:
       contents: read
@@ -49,9 +49,9 @@ jobs:
           cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.REGISTRY_USER }}/scpcatools:buildcache
           cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ env.REGISTRY_USER }}/scpcatools:buildcache,mode=max
 
-  build_and_push_matrix:
+  build_push_matrix:
     runs-on: ubuntu-22.04
-    needs: build_full
+    needs: build_push_full
     permissions:
       contents: read
       packages: write
