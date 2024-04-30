@@ -33,7 +33,6 @@ opts <- parse_args(OptionParser(option_list = option_list))
 current_dir <- getwd()
 setwd(here::here())
 source(".Rprofile")
-setwd(current_dir)
 
 # Check that lockfile is up to date with currently installed packages
 if (!renv::status()$synchronized) {
@@ -44,17 +43,16 @@ if (!renv::status()$synchronized) {
 }
 
 # get dependencies of scpcaTools
-renv::snapshot(lockfile = opts$lockfile, type = "explicit")
+minimal_packages <- renv::dependencies("DESCRIPTION")$Package
 
 # additional dependencies for added packages
 added_packages <- opts$packages |>
   stringr::str_split_1("[,;\\s]+") |>
   stringr::str_subset(".+") |> # remove empty strings
   c("optparse", "scater", "scran", "tidyverse") # always include these
-all_packages <- added_packages |>
-  tools::package_dependencies(recursive = TRUE) |>
-  unlist() |>
-  unique() |>
-  c(added_packages)
 
-renv::record(all_packages, lockfile = opts$lockfile)
+all_packages <- c(minimal_packages, added_packages)
+
+# go back to working directory and snapshot
+setwd(current_dir)
+renv::snapshot(lockfile = opts$lockfile, packages = all_packages)

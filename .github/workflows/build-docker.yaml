@@ -1,4 +1,4 @@
-name: Build scpca-tools images
+name: Build scpcaTools images
 
 on:
   push:
@@ -15,8 +15,43 @@ env:
   REGISTRY_USER: alexslemonade
 
 jobs:
-  build_and_push:
+  build_push_full:
     runs-on: ubuntu-22.04
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Docker login
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.REGISTRY_USER }}/scpcatools
+          tags: |
+            type=semver,pattern={{raw}}
+            type=edge,branch=main
+
+      - name: Build full image
+        uses: docker/build-push-action@v5
+        with:
+          context: "{{defaultContext}}:docker"
+          tags: ${{ steps.meta.outputs.tags }}
+          push: ${{ github.event_name == 'push' }}
+          cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.REGISTRY_USER }}/scpcatools:buildcache
+          cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ env.REGISTRY_USER }}/scpcatools:buildcache,mode=max
+
+  build_push_matrix:
+    runs-on: ubuntu-22.04
+    needs: build_push_full
     permissions:
       contents: read
       packages: write
@@ -24,16 +59,17 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - image_name: scpcatools
-            dockerfile: Dockerfile
-          - image_name: scpcatools-slim
-            dockerfile: scpcatools_slim.Dockerfile
-          - image_name: scpcatools-reports
-            dockerfile: scpcatools_reports.Dockerfile
-          - image_name: scpcatools-scvi
-            dockerfile: scpcatools_scvi.Dockerfile
-          - image_name: scpcatools-seurat
-            dockerfile: scpcatools_seurat.Dockerfile
+          - target: slim
+            image_name: scpcatools-slim
+          - target: anndata
+            image_name: scpcatools-anndata
+          - target: scvi
+            image_name: scpcatools-scvi
+          - target: reports
+            image_name: scpcatools-reports
+          - target: seurat
+            image_name: scpcatools-seurat
+
     steps:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -54,12 +90,12 @@ jobs:
             type=semver,pattern={{raw}}
             type=edge,branch=main
 
-      - uses: docker/build-push-action@v5
+      - name: Build and push image
+        uses: docker/build-push-action@v5
         with:
           context: "{{defaultContext}}:docker"
-          file: ${{ matrix.dockerfile }}
+          target: ${{ matrix.target }}
           push: ${{ github.event_name == 'push' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha
+          cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.REGISTRY_USER }}/scpcatools:buildcache
