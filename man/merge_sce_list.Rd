@@ -80,9 +80,9 @@ Original SCE contents are modified or retained as follows:
    unique cell barcode.
  - Of the original colData columns, only column names provided in the argument
    `retain_coldata_cols` will be retained.
- - The resulting colData row names will be be prefixed with `{sce_name-}`.
+ - The resulting colData row names will be be prefixed with `\{sce_name-\}`.
  - The resulting rowData slot column names will be appended with the given
-   SCE's name, as `{sce_name}-{column_name}` except for columns whose names
+   SCE's name, as `\{sce_name\}-\{column_name\}` except for columns whose names
    are indicated to preserve with the `preserve_rowdata_cols` argument.
 
  SCE altExp contents are modified or retained as follows:
@@ -92,7 +92,7 @@ Original SCE contents are modified or retained as follows:
    the argument `retain_altexp_coldata_cols`, as specified for each named
    altExp will be retained.
  - The resulting rowData slot column names will be appended with the given
-   SCE's name, as `{sce_name}-{column_name}` except for columns whose names
+   SCE's name, as `\{sce_name\}-\{column_name\}` except for columns whose names
    are indicated to preserve with the `preserve_altexp_rowdata_cols` argument.
 }
 \examples{

@@ -27,7 +27,7 @@
 #' @param ... Any additional parameters to be passed to the given integration method
 #'
 #' @return An updated merged SCE object containing a new reduced dimension named
-#'   `{integration_method}_PCA` containing the corrected PCs. In the case of `fastMNN`
+#'   `\{integration_method\}_PCA` containing the corrected PCs. In the case of `fastMNN`
 #'   integration, the SCE also includes a corrected expression assay (`fastMNN_corrected`)
 #'
 #' @import SingleCellExperiment
