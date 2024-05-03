@@ -17,6 +17,7 @@ DropletUtils
 emptyDrops
 Ensembl
 ensembl
+github
 intron
 Kallisto
 kallisto
@@ -24,8 +25,10 @@ LinkingTo
 nf
 pre
 PRs
+renv
 rowData
 rowdata
+Rproj
 RStudio
 SCE
 sce

@@ -8,29 +8,30 @@ LABEL org.opencontainers.image.source https://github.com/AlexsLemonade/scpcaTool
 #### R packages
 # Use renv for R packages
 ENV RENV_CONFIG_CACHE_ENABLED FALSE
-RUN Rscript -e "install.packages(c('remotes', 'renv'))"
+RUN Rscript -e "install.packages(c('renv'))"
 
-COPY renv_slim.lock renv.lock
+COPY docker/renv_slim.lock renv.lock
 # restore renv and remove cache files
 RUN Rscript -e 'renv::restore()' && \
   rm -rf ~/.cache/R/renv && \
   rm -rf /tmp/downloaded_packages && \
   rm -rf /tmp/Rtmp*
 
-# bust cache if needed
-ADD "https://api.github.com/repos/AlexsLemonade/scpcaTools/commits?per_page=1" latest_commit
-# Install scpcaTools package (& test loading)
-RUN Rscript -e "remotes::install_github('AlexsLemonade/scpcaTools', upgrade = 'never'); \
-  require(scpcaTools)"
 
-CMD [ "R" ]
+# Install scpcaTools package (& test loading)
+COPY . scpcaTools
+RUN R CMD INSTALL scpcaTools/ \
+  require(scpcaTools)
+
+# restore slim renv
+COPY docker/renv_slim.lock renv.lock
 
 ##########################
 # Add Seurat support target ----------------------------------------------------
 FROM slim AS seurat
 LABEL org.opencontainers.image.title "scpcatools-seurat"
 
-COPY renv_seurat.lock renv.lock
+COPY docker/renv_seurat.lock renv.lock
 RUN Rscript -e 'renv::restore()' && \
   rm -rf ~/.cache/R/renv && \
   rm -rf /tmp/downloaded_packages && \
@@ -42,7 +43,7 @@ RUN Rscript -e 'renv::restore()' && \
 FROM slim AS reports
 LABEL org.opencontainers.image.title "scpcatools-reports"
 
-COPY renv_reports.lock renv.lock
+COPY docker/renv_reports.lock renv.lock
 RUN Rscript -e 'renv::restore()' && \
   rm -rf ~/.cache/R/renv && \
   rm -rf /tmp/downloaded_packages && \
@@ -54,7 +55,7 @@ RUN Rscript -e 'renv::restore()' && \
 FROM slim AS anndata
 LABEL org.opencontainers.image.title "scpcatools-anndata"
 
-COPY renv_zellkonverter.lock renv.lock
+COPY docker/renv_zellkonverter.lock renv.lock
 RUN Rscript -e 'renv::restore()' && \
   rm -rf ~/.cache/R/renv && \
   rm -rf /tmp/downloaded_packages && \
@@ -67,7 +68,7 @@ RUN Rscript -e "proc <- basilisk::basiliskStart(env = zellkonverter::zellkonvert
   basilisk.utils::cleanConda()"
 
 #### Python packages
-COPY requirements_anndata.txt requirements.txt
+COPY docker/requirements_anndata.txt requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
 
@@ -76,7 +77,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 FROM anndata AS scvi
 LABEL org.opencontainers.image.title "scpcatools-scvi"
 
-COPY requirements_scvi.txt requirements.txt
+COPY docker/requirements_scvi.txt requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
 
@@ -91,6 +92,6 @@ RUN Rscript -e 'renv::restore()' && \
   rm -rf /tmp/downloaded_packages && \
   rm -rf /tmp/Rtmp*
 
-COPY requirements.txt requirements.txt
+COPY docker/requirements.txt requirements.txt
 
 RUN pip install --no-cache-dir -r requirements.txt

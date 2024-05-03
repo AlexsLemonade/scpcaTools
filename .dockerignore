@@ -1,0 +1,5 @@
+.github
+.git
+.Rproj.user
+renv/
+scpcaTools.Rproj
