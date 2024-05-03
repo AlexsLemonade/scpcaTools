@@ -3,7 +3,7 @@
 
 #' Integrate a merged set of SingleCellExperiment objects using a specified
 #'  integration method. The final SCE object will contain an additional reducedDim
-#'  entitled `{integration_method}_PCA`. All original SCE assays are retained.
+#'  entitled `\{integration_method\}_PCA`. All original SCE assays are retained.
 #'  `fastMNN` integration uses all default setting, but additional parameters can be supplied.
 #'  `harmony` integration uses existing PCs, but additional parameters can be supplied.
 #'
@@ -27,7 +27,7 @@
 #' @param ... Any additional parameters to be passed to the given integration method
 #'
 #' @return An updated merged SCE object containing a new reduced dimension named
-#'   `{integration_method}_PCA` containing the corrected PCs. In the case of `fastMNN`
+#'   `\{integration_method\}_PCA` containing the corrected PCs. In the case of `fastMNN`
 #'   integration, the SCE also includes a corrected expression assay (`fastMNN_corrected`)
 #'
 #' @import SingleCellExperiment
