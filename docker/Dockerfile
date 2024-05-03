@@ -1,6 +1,6 @@
 ##########################
 # Build the slim image target first --------------------------------------------
-FROM bioconductor/r-ver:3.18 AS slim
+FROM bioconductor/r-ver:3.19 AS slim
 LABEL maintainer="ccdl@alexslemonade.org"
 LABEL org.opencontainers.image.title "scpcatools-slim"
 LABEL org.opencontainers.image.source https://github.com/AlexsLemonade/scpcaTools
