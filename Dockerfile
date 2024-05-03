@@ -21,7 +21,7 @@ RUN Rscript -e 'renv::restore()' && \
 # Install scpcaTools package (& test loading)
 COPY . scpcaTools
 RUN R CMD INSTALL scpcaTools/ \
-  require(scpcaTools)
+  Rscript -e "require(scpcaTools)"
 
 # restore slim renv
 COPY docker/renv_slim.lock renv.lock
