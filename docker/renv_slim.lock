@@ -512,6 +512,19 @@
       "Repository": "RSPM",
       "Hash": "1c0aa18b97e6aaa17f93b8b866c0ace5"
     },
+    "ResidualMatrix": {
+      "Package": "ResidualMatrix",
+      "Version": "1.14.0",
+      "Source": "Bioconductor",
+      "Repository": "Bioconductor 3.19",
+      "Requirements": [
+        "DelayedArray",
+        "Matrix",
+        "S4Vectors",
+        "methods"
+      ],
+      "Hash": "26b5d104b2d27d7aa3725c4e3aa1b3b9"
+    },
     "Rhdf5lib": {
       "Package": "Rhdf5lib",
       "Version": "1.26.0",
@@ -712,6 +725,34 @@
         "R"
       ],
       "Hash": "543776ae6848fde2f48ff3816d0628bc"
+    },
+    "batchelor": {
+      "Package": "batchelor",
+      "Version": "1.20.0",
+      "Source": "Bioconductor",
+      "Repository": "Bioconductor 3.19",
+      "Requirements": [
+        "BiocGenerics",
+        "BiocNeighbors",
+        "BiocParallel",
+        "BiocSingular",
+        "DelayedArray",
+        "DelayedMatrixStats",
+        "Matrix",
+        "Rcpp",
+        "ResidualMatrix",
+        "S4Vectors",
+        "ScaledMatrix",
+        "SingleCellExperiment",
+        "SummarizedExperiment",
+        "beachmat",
+        "igraph",
+        "methods",
+        "scuttle",
+        "stats",
+        "utils"
+      ],
+      "Hash": "ec5dcf85cdf644b078d02deaf27a3bfd"
     },
     "beachmat": {
       "Package": "beachmat",
