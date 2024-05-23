@@ -39,6 +39,7 @@ jobs:
           tags: |
             type=semver,pattern={{raw}}
             type=edge,branch=main
+            type=ref,event=pr
 
       - name: Build full image
         uses: docker/build-push-action@v5

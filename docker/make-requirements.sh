@@ -14,7 +14,7 @@ pip-compile --no-annotate --strip-extras --output-file=requirements_anndata.txt 
 pip-compile --no-annotate --strip-extras --output-file=requirements_scvi.txt requirements_scvi.in
 
 # slim lockfile
-Rscript scripts/make-lockfile.R -f renv_slim.lock -p batchelor
+Rscript scripts/make-lockfile.R -f renv_slim.lock -p batchelor,rtracklayer
 
 # reports lockfile
 Rscript scripts/make-lockfile.R -f renv_reports.lock -p ComplexHeatmap,ggforce,kableExtra,rmarkdown
