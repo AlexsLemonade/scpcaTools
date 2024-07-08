@@ -4,16 +4,16 @@
 #
 #    pip-compile --no-annotate --output-file=requirements_anndata.txt --strip-extras requirements_anndata.in
 #
-anndata==0.10.7
-array-api-compat==1.6
+anndata==0.10.8
+array-api-compat==1.7.1
 exceptiongroup==1.2.1
 h5py==3.11.0
 natsort==8.4.0
-numpy==1.26.4
-packaging==24.0
+numpy==2.0.0
+packaging==24.1
 pandas==2.2.2
 python-dateutil==2.9.0.post0
 pytz==2024.1
-scipy==1.13.0
+scipy==1.14.0
 six==1.16.0
 tzdata==2024.1
