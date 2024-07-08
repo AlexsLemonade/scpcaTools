@@ -10,6 +10,9 @@ LABEL org.opencontainers.image.source https://github.com/AlexsLemonade/scpcaTool
 ENV RENV_CONFIG_CACHE_ENABLED FALSE
 RUN Rscript -e "install.packages(c('renv'))"
 
+# Install Rhtslib manually for renv/Bioc incompatibility (possibly temporary)
+RUN Rscript -e "BiocManager::install('Rhtslib')"
+
 COPY docker/renv_slim.lock renv.lock
 # restore renv and remove cache files
 RUN Rscript -e 'renv::restore()'\
