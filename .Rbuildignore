@@ -16,7 +16,9 @@
 # rendered notebooks
 ^inst/rmd/.*\.html$
 
-# Docker folder
+# Docker items
+^Dockerfile$
+^.dockerignore$
 ^docker$
 
 # development
