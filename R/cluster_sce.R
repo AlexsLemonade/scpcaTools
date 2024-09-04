@@ -9,7 +9,7 @@
 #'   results in the SCE; for naming you may want to include the type of clustering
 #'   and k value of centers, e.g., "kmeans_10"
 #' @param seed Seed for reproducibility of clustering results
-#' @param ... Additional arguments to provide to bluster::clusterRows()
+#' @param ... Additional arguments to provide to `bluster::clusterRows()`
 #'
 #' @import SingleCellExperiment
 #'

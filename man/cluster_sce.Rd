@@ -24,7 +24,7 @@ use and any additional clustering options}
 
 \item{cluster_column_name}{The name of the column to store the clustering
 results in the SCE; for naming you may want to include the type of clustering
-and k value of centers, e.g. `kmeans_10`}
+and k value of centers, e.g., "kmeans_10"}
 
 \item{seed}{Seed for reproducibility of clustering results}
 
@@ -37,8 +37,9 @@ SingleCellExperiment object containing clustering results
 Perform clustering on a SingleCellExperiment object
 }
 \examples{
- \dontrun{
-  # Perform K-means clustering with 10 centers
-  cluster_sce(sce, "PCA", bluster::KmeansParam(centers = 10), "kmeans_10")
- }
+\dontrun{
+# Perform K-means clustering with 10 centers
+cluster_sce(sce, "PCA", bluster::KmeansParam(centers = 10), "kmeans_10")
+}
+
 }

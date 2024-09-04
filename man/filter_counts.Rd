@@ -24,19 +24,21 @@ Default is 0.01.}
 
 \item{seed}{An optional random seed for reproducibility.}
 
-\item{umi_cutoff}{The minimum UMI count for cells to pass filtering, only used if emptyDropsCellRanger or emptyDrops fails.
+\item{umi_cutoff}{The minimum UMI count for cells to pass filtering.
+Only used if emptyDropsCellRanger or emptyDrops fails.
 Default is 100.}
 
-\item{...}{Any arguments to be passed into DropletUtils::emptyDropsCellRanger or DropletUtils::emptyDrops.}
+\item{...}{Any arguments to be passed into DropletUtils::emptyDropsCellRanger
+or DropletUtils::emptyDrops.}
 }
 \value{
 SingleCellExperiment with filtered gene x cell matrix.
 }
 \description{
 This function will filter a SingleCellExperiment object using DropletUtils::emptyDropsCellRanger() by default,
-  or DropletUtils::emptyDrops(), as well as any associated alternative experiments. If mean expression and percent detected
-  were previously calculated in the columns `mean` and `detected`, respectively, these
-  will be removed from both the main and alternative experiments.
+  or DropletUtils::emptyDrops(), as well as any associated alternative experiments.
+  If mean expression and percent detected were previously calculated in the columns `mean` and `detected`,
+  respectively, these will be removed from both the main and alternative experiments.
 }
 \examples{
 \dontrun{
