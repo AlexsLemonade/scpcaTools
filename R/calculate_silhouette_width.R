@@ -38,7 +38,7 @@ calculate_silhouette_width <- function(merged_sce,
   }
 
   # Check that frac_cells is in range
-  if (frac_cells <= 0 | frac_cells >= 1) {
+  if (frac_cells <= 0 || frac_cells >= 1) {
     stop("The fraction of cells to downsample should be between 0 and 1.")
   }
 
@@ -50,15 +50,16 @@ calculate_silhouette_width <- function(merged_sce,
   # Calculate the silhouette width values across list of PCs
   all_silhouette_df <- purrr::map(
     pc_names,
-    \(pcs)
-    silhouette_width_from_pcs(
-      merged_sce = merged_sce,
-      batch_column = batch_column,
-      pc_name = pcs,
-      frac_cells = frac_cells,
-      nreps = nreps,
-      seed = seed
-    )
+    \(pcs) {
+      silhouette_width_from_pcs(
+        merged_sce = merged_sce,
+        batch_column = batch_column,
+        pc_name = pcs,
+        frac_cells = frac_cells,
+        nreps = nreps,
+        seed = seed
+      )
+    }
   ) |>
     dplyr::bind_rows()
 
@@ -92,7 +93,9 @@ silhouette_width_from_pcs <-
            nreps = 20,
            seed = NULL) {
     # Set the seed for subsampling
-    set.seed(seed)
+    if (!is.null(seed)) {
+      set.seed(seed)
+    }
 
     # Pull out the PCs or analogous reduction
     pcs <- reducedDim(merged_sce, pc_name)
