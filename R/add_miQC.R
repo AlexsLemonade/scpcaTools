@@ -19,14 +19,13 @@ add_miQC <- function(sce,
                      keep_all_below_boundary = TRUE,
                      enforce_left_cutoff = TRUE,
                      seed = NULL) {
-  # check that input is a SingleCellExperiment
-  if (!is(sce, "SingleCellExperiment")) {
-    stop("sce must be a SingleCellExperiment object")
-  }
-  # check that sce has subsets_mito_percent
-  if (!("subsets_mito_percent" %in% colnames(colData(sce)))) {
-    stop("sce must have subsets_mito_percent in the column data. Use scuttle::addPerCellQCMetrics or similar to add it.")
-  }
+  stopifnot(
+    "sce must be a SingleCellExperiment object" = is(sce, "SingleCellExperiment"),
+    "sce must have subsets_mito_percent in the colData. Use scuttle::addPerCellQCMetrics or similar to add it." =
+      "subsets_mito_percent" %in% colnames(colData(sce))
+  )
+
+
   # check if prob_compromised exists
   if (!is.null(sce$prob_compromised)) {
     warning("prob_compromised was already calculated and will be replaced.")
@@ -37,7 +36,9 @@ add_miQC <- function(sce,
   }
 
   # set seed
-  set.seed(seed)
+  if (!is.null(seed)) {
+    set.seed(seed)
+  }
 
   # generate linear mixture model of probability of cells being compromised
   model <- NULL
