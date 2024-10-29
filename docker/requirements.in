@@ -1,8 +1,9 @@
-anndata~=0.10
+anndata~=0.10.8
 etils<1.8 # v1.8 drops python 3.10 support
 jax[cpu]
+lightning>=2.3.3 # critical security fix
 pandas
-scanpy~=1.10
-scvi-tools~=1.1
+scanpy~=1.10.2
+scvi-tools~=1.1.5
 torch
 torchvision

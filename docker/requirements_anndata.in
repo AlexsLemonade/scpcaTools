@@ -1,2 +1,2 @@
 # requirements.in packages for minimal ScPCA workflows
-anndata~=0.10
+anndata~=0.10.8

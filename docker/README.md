@@ -40,8 +40,9 @@ Dependency lock files, with the exception of `renv.lock`, are built using the `m
 This script depends on `pip-tools` and should be run using Python 3.10 to match the default version of Python in the Docker images.
 For convenience, a conda `environment.yml` file is included in this directory that can be used to create an `scpcatools-dev` environment with the necessary Python version and packages.
 
-This script will generate the `requirements_*.txt` and `renv_*.lock` files for each set of Python packages to be installed within the various Docker images.
-- The requirements files are based on `requirements_*.in` files that specify the high-level package requirements for each image.
+This script will generate the `requirements*.txt` and `renv*.lock` files for each set of Python packages to be installed within the various Docker images.
+- The Python requirements files are based on `requirements*.in` files that specify the high-level package requirements for each image.
+  - To upgrade existing `requirements*.txt` files, the `make-requirements.sh` script should be run with the `UPGRADE_PY` environment variable, e.g., `UPGRADE_PY=1 bash make-requirements.sh`.
 - The `renv_*.lock` files are strict subsets of the main `renv.lock` file that is use for development and for the full image.
   - The main `renv.lock` file should be updated manually using `renv::snapshot()` from within the `scpcaTools` project.
   - After updating `renv.lock`, the `make-requirements.sh` script should be run to update the `renv_*.lock` files.
