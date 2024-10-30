@@ -118,6 +118,9 @@ read_alevin <- function(
       fryDir = quant_dir,
       outputFormat = assay_formats
     )
+    if (round_counts) {
+      assays(sce) <- lapply(assays(sce), round)
+    }
   } else {
     # read in any non-USA formatted alevin-fry data or Alevin data
     counts <- read_tximport(quant_dir)
