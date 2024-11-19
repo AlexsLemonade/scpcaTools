@@ -142,6 +142,9 @@ read_alevin <- function(
     )
   }
 
+  # remove any empty droplets that may have snuck in with rounding
+  sce <- sce[, which(colSums(counts(sce)) > 0)]
+
   # add the metadata to the SCE
   meta$include_unspliced <- include_unspliced
   metadata(sce) <- meta
