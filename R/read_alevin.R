@@ -119,7 +119,7 @@ read_alevin <- function(
       outputFormat = assay_formats
     )
     if (round_counts) {
-      assays(sce) <- lapply(assays(sce), round)
+      assays(sce) <- lapply(assays(sce), \(m) Matrix::drop0(round(m)))
     }
   } else {
     # read in any non-USA formatted alevin-fry data or Alevin data
