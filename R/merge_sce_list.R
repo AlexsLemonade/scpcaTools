@@ -240,7 +240,7 @@ merge_sce_list <- function(
   }
 
   # Create the merged SCE from the processed list
-  merged_sce <- do.call(combineCols, unname(sce_list))
+  merged_sce <- do.call(combineCols, c(unname(sce_list), delayed = FALSE))
 
   # Update metadata in merged objects, using the unmerged sce_list
   metadata(merged_sce) <- sce_list |>
