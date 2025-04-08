@@ -237,10 +237,30 @@ merge_sce_list <- function(
           preserve_rowdata_cols = unique(altexp_rowdata_cols)
         )
     }
-  }
 
-  # Create the merged SCE from the processed list
-  merged_sce <- do.call(combineCols, c(unname(sce_list), delayed = FALSE))
+    # if using alt exp, need to merge and then convert to dgCMatrix
+    merged_sce <- do.call(combineCols, unname(sce_list))
+
+    # first update the assays in the main exp
+    # purrr doesn't work for updating items in place in SCE so use for loops
+    for(name in assayNames(merged_sce)){
+      assay(merged_sce, name) <- as(assay(merged_sce, name), "CsparseMatrix")
+    }
+
+    # now for the alt exps
+    for(altexp_name in names(altexp_attributes)){
+      alt_merged_sce <- altExp(merged_sce, altexp_name)
+      for(name in assayNames(alt_merged_sce)){
+        assay(alt_merged_sce, name) <- as(assay(alt_merged_sce, name), "CsparseMatrix")
+      }
+      altExp(merged_sce, altexp_name) <- alt_merged_sce
+    }
+
+  } else {
+    # Create the merged SCE from the processed list
+    # only use delayed = FALSE if no altExps
+    merged_sce <- do.call(combineCols, c(unname(sce_list), delayed = FALSE))
+  }
 
   # Update metadata in merged objects, using the unmerged sce_list
   metadata(merged_sce) <- sce_list |>
