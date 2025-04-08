@@ -182,6 +182,12 @@ test_that("merging SCEs with matching genes works as expected, no altexps", {
     c("counts", "logcounts")
   )
 
+  # check format of output
+  expect_true(
+    is(counts(merged_sce), "dgCMatrix"),
+    is(logcounts(merged_sce), "dgCMatrix")
+  )
+
   # metadata names check
   expect_contains(
     names(metadata(merged_sce)),
@@ -280,7 +286,7 @@ test_that("merging SCEs with different genes among input SCEs works as expected,
 
 
 
-test_that("merging SCEs with no matching genes fails as expected, no altexps, no altexps", {
+test_that("merging SCEs with no matching genes fails as expected, no altexps", {
   # ensure different gene names entirely
   rownames(sce_list[[1]]) <- rownames(sce_list[[2]])
   rownames(sce_list[[1]]) <- paste0(rownames(sce_list[[1]]), "-new")
@@ -481,6 +487,13 @@ test_that("merging SCEs with altExps has correct altExp colData names when retai
     expected_cols,
     observed_cols
   )
+
+  # check format of output
+  expect_true(
+    is(counts(altExp(merged_sce)), "dgCMatrix"),
+    is(logcounts(altExp(merged_sce)), "dgCMatrix")
+  )
+
 })
 
 
