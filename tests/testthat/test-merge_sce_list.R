@@ -183,10 +183,8 @@ test_that("merging SCEs with matching genes works as expected, no altexps", {
   )
 
   # check format of output
-  expect_true(
-    is(counts(merged_sce), "dgCMatrix"),
-    is(logcounts(merged_sce), "dgCMatrix")
-  )
+  expect_s4_class(counts(merged_sce), "CsparseMatrix")
+  expect_s4_class(logcounts(merged_sce), "CsparseMatrix")
 
   # metadata names check
   expect_contains(
