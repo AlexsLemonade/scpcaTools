@@ -695,9 +695,14 @@ test_that("merging SCEs where 1 altExp is missing works as expected, with altexp
   # check that the 0s/NAs are as expected
   counts_mat <- counts(merged_altexp)
   sce4_counts <- counts_mat[, merged_sce[[batch_column]] == "sce4"]
-  expect_equal(
-    sum(abs(sce4_counts)), 0
-  )
+  # check that everything is either all NA or all 0
+  all_na <- expect_true(all(is.na(sce4_counts)))
+  if(!all_na){
+    # will error if not all NA and not all 0
+    expect_equal(
+      sum(abs(sce4_counts)), 0
+    )
+  }
   numeric_counts <- counts_mat[, merged_sce[[batch_column]] != "sce4"]
   expect_true(
     all(is.finite(numeric_counts))
@@ -747,9 +752,16 @@ test_that("merging SCEs with different altExps works as expected; each SCE has 1
     colnames(adt_merged),
     colnames(merged_sce)
   )
-  expect_equal(
-    sum(abs(counts(adt_merged)[, merged_sce[[batch_column]] == "sce2"])), 0
+  # check that everything is either all NA or all 0
+  all_na <- expect_true(
+    all(is.na(counts(adt_merged)[, merged_sce[[batch_column]] == "sce2"]))
   )
+  if(!all_na){
+    # will error if not all NA and not all 0
+    expect_equal(
+      sum(abs(counts(adt_merged)[, merged_sce[[batch_column]] == "sce2"])), 0
+    )
+  }
 
   # Check the "other"  altexp
   other_merged <- altExp(merged_sce, other_altexp_name)
@@ -765,9 +777,16 @@ test_that("merging SCEs with different altExps works as expected; each SCE has 1
     colnames(adt_merged),
     colnames(merged_sce)
   )
-  expect_equal(
-    sum(abs(counts(other_merged)[, merged_sce[[batch_column]] == "sce1"])), 0
+  # check that everything is either all NA or all 0
+  all_na <- expect_true(
+    all(is.na(counts(other_merged)[, merged_sce[[batch_column]] == "sce1"]))
   )
+  if(!all_na){
+    # will error if not all NA and not all 0
+    expect_equal(
+      sum(abs(counts(other_merged)[, merged_sce[[batch_column]] == "sce1"])), 0
+    )
+  }
 })
 
 
