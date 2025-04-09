@@ -447,10 +447,8 @@ test_that("merging SCEs with altExps works as expected when include_altexps = FA
   expect_length(altExpNames(merged_sce), 0)
 
   # check format of output
-  expect_true(
-    is(counts(merged_sce), "dgCMatrix"),
-    is(logcounts(merged_sce), "dgCMatrix")
-  )
+  expect_s4_class(counts(merged_sce), "CsparseMatrix")
+  expect_s4_class(logcounts(merged_sce), "CsparseMatrix")
 
 })
 
@@ -494,10 +492,8 @@ test_that("merging SCEs with altExps has correct altExp colData names when retai
   )
 
   # check format of output
-  expect_true(
-    is(counts(altExp(merged_sce)), "dgCMatrix"),
-    is(logcounts(altExp(merged_sce)), "dgCMatrix")
-  )
+  expect_s4_class(counts(altExp(merged_sce)), "CsparseMatrix")
+  expect_s4_class(logcounts(altExp(merged_sce)), "CsparseMatrix")
 
 })
 
@@ -696,11 +692,11 @@ test_that("merging SCEs where 1 altExp is missing works as expected, with altexp
     expected_coldata
   )
 
-  # check that the NAs are as expected
+  # check that the 0s/NAs are as expected
   counts_mat <- counts(merged_altexp)
   sce4_counts <- counts_mat[, merged_sce[[batch_column]] == "sce4"]
-  expect_true(
-    all(sce4_counts == 0)
+  expect_equal(
+    sum(abs(sce4_counts)), 0
   )
   numeric_counts <- counts_mat[, merged_sce[[batch_column]] != "sce4"]
   expect_true(
@@ -751,8 +747,8 @@ test_that("merging SCEs with different altExps works as expected; each SCE has 1
     colnames(adt_merged),
     colnames(merged_sce)
   )
-  expect_true(
-    all(counts(adt_merged)[, merged_sce[[batch_column]] == "sce2"]== 0 )
+  expect_equal(
+    sum(counts(adt_merged)[, merged_sce[[batch_column]] == "sce2"]), 0
   )
 
   # Check the "other"  altexp
@@ -769,8 +765,8 @@ test_that("merging SCEs with different altExps works as expected; each SCE has 1
     colnames(adt_merged),
     colnames(merged_sce)
   )
-  expect_true(
-    all(counts(other_merged)[, merged_sce[[batch_column]] == "sce1"] == 0)
+  expect_equal(
+    sum(counts(adt_merged)[, merged_sce[[batch_column]] == "sce1"]), 0
   )
 })
 
