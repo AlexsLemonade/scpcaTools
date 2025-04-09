@@ -238,6 +238,15 @@ merge_sce_list <- function(
         )
     }
 
+  }
+
+  # Merge SCEs ------------------------------------------------------
+
+  if(!include_altexp){
+    # Create the merged SCE from the processed list
+    # only use delayed = FALSE if no altExps
+    merged_sce <- do.call(combineCols, c(unname(sce_list), delayed = FALSE))
+  } else {
     # if using alt exp, need to merge and then convert to dgCMatrix
     merged_sce <- do.call(combineCols, unname(sce_list))
 
@@ -256,10 +265,6 @@ merge_sce_list <- function(
       altExp(merged_sce, altexp_name) <- alt_merged_sce
     }
 
-  } else {
-    # Create the merged SCE from the processed list
-    # only use delayed = FALSE if no altExps
-    merged_sce <- do.call(combineCols, c(unname(sce_list), delayed = FALSE))
   }
 
   # Update metadata in merged objects, using the unmerged sce_list
