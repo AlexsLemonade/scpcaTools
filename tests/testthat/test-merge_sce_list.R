@@ -748,7 +748,7 @@ test_that("merging SCEs with different altExps works as expected; each SCE has 1
     colnames(merged_sce)
   )
   expect_equal(
-    sum(counts(adt_merged)[, merged_sce[[batch_column]] == "sce2"]), 0
+    sum(abs(counts(adt_merged)[, merged_sce[[batch_column]] == "sce2"])), 0
   )
 
   # Check the "other"  altexp
@@ -766,7 +766,7 @@ test_that("merging SCEs with different altExps works as expected; each SCE has 1
     colnames(merged_sce)
   )
   expect_equal(
-    sum(counts(adt_merged)[, merged_sce[[batch_column]] == "sce1"]), 0
+    sum(abs(counts(other_merged)[, merged_sce[[batch_column]] == "sce1"])), 0
   )
 })
 
