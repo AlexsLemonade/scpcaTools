@@ -260,7 +260,7 @@ merge_sce_list <- function(
     for(altexp_name in names(altexp_attributes)){
       alt_merged_sce <- altExp(merged_sce, altexp_name)
       for(name in assayNames(alt_merged_sce)){
-        assay(alt_merged_sce, name) <- as(assay(alt_merged_sce, name), "CsparseMatrix")
+        assay(alt_merged_sce, name) <- as(assay(alt_merged_sce, name), "Matrix")
       }
       altExp(merged_sce, altexp_name) <- alt_merged_sce
     }
