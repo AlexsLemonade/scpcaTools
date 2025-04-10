@@ -247,7 +247,7 @@ merge_sce_list <- function(
     # only use delayed = FALSE if no altExps
     merged_sce <- do.call(combineCols, c(unname(sce_list), delayed = FALSE))
   } else {
-    # if using alt exp, need to merge and then convert to dgCMatrix
+    # if using alt exp, need to merge and then convert to CsparseMatrix
     merged_sce <- do.call(combineCols, unname(sce_list))
 
     # first update the assays in the main exp
@@ -256,7 +256,7 @@ merge_sce_list <- function(
       assay(merged_sce, name) <- as(assay(merged_sce, name), "CsparseMatrix")
     }
 
-    # now for the alt exps
+    # now for the alt exps, but leave them dense
     for(altexp_name in names(altexp_attributes)){
       alt_merged_sce <- altExp(merged_sce, altexp_name)
       for(name in assayNames(alt_merged_sce)){
