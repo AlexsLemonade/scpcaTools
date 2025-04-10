@@ -256,7 +256,7 @@ merge_sce_list <- function(
       assay(merged_sce, name) <- as(assay(merged_sce, name), "CsparseMatrix")
     }
 
-    # now for the alt exps, but leave them dense
+    # now for the alt exps: make sure they are Matrix class (not Delayed)
     for(altexp_name in names(altexp_attributes)){
       alt_merged_sce <- altExp(merged_sce, altexp_name)
       for(name in assayNames(alt_merged_sce)){
