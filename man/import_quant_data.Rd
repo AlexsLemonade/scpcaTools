@@ -6,6 +6,7 @@
 \usage{
 import_quant_data(
   quant_dir,
+  cellranger_h5_file = "",
   tool = c("cellranger", "alevin", "alevin-fry", "kallisto"),
   include_unspliced = TRUE,
   usa_mode = FALSE,
@@ -16,7 +17,11 @@ import_quant_data(
 )
 }
 \arguments{
-\item{quant_dir}{Path to directory where output files are located.}
+\item{quant_dir}{Path to directory where output files are located.
+Used when tool is alevin, alevin-fry, or kallisto.}
+
+\item{cellranger_h5_file}{Optional path to H5 file output by Cell Ranger.
+Used when tool is cellranger.}
 
 \item{tool}{Type of tool used to create files (alevin, alevin-fry, cellranger, or kallisto).}
 
@@ -49,7 +54,7 @@ Imports the gene x cell matrix output from either Alevin, Alevin-fry, Cell Range
 \examples{
 \dontrun{
 # read in single cell RNA seq data processed using cellranger
-import_quant_data(quant_dir,
+import_quant_data(cellranger_h5_file,
   tool = "cellranger"
 )
 

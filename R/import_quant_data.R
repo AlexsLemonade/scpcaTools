@@ -4,6 +4,9 @@
 #'   and returns a SingleCellExperiment.
 #'
 #' @param quant_dir Path to directory where output files are located.
+#'   Used when tool is alevin, alevin-fry, or kallisto.
+#' @param cellranger_h5_file Optional path to H5 file output by Cell Ranger.
+#'   Used when tool is cellranger.
 #' @param tool Type of tool used to create files (alevin, alevin-fry, cellranger, or kallisto).
 #' @param include_unspliced Whether or not to include the unspliced reads in the counts matrix.
 #'   If TRUE, the main "counts" assay will contain unspliced reads and spliced reads and an additional "spliced"
@@ -25,7 +28,7 @@
 #' @examples
 #' \dontrun{
 #' # read in single cell RNA seq data processed using cellranger
-#' import_quant_data(quant_dir,
+#' import_quant_data(cellranger_h5_file,
 #'   tool = "cellranger"
 #' )
 #'
@@ -56,6 +59,7 @@
 #' }
 #'
 import_quant_data <- function(quant_dir,
+                              cellranger_h5_file = "",
                               tool = c("cellranger", "alevin", "alevin-fry", "kallisto"),
                               include_unspliced = TRUE,
                               usa_mode = FALSE,
@@ -68,6 +72,7 @@ import_quant_data <- function(quant_dir,
   stopifnot(
     "Tool must be one of cellranger, alevin, alevin-fry, or kallisto." =
       tool %in% c("cellranger", "alevin", "alevin-fry", "kallisto"),
+    "h5_file must be provided when using cellranger as tool" = tool == "cellranger" & file.exists(cellranger_h5_file),
     "include_unspliced must be set as TRUE or FALSE" = is.logical(include_unspliced),
     "usa_mode must be set as TRUE or FALSE" = is.logical(usa_mode),
     "filter must be set as TRUE or FALSE" = is.logical(filter),
@@ -88,7 +93,7 @@ import_quant_data <- function(quant_dir,
   } else if (tool == "kallisto") {
     sce <- read_kallisto(quant_dir, include_unspliced)
   } else if (tool == "cellranger") {
-    sce <- read_cellranger(quant_dir)
+    sce <- read_cellranger(cellranger_h5_file)
   }
 
   if (filter) {
