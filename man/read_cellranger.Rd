@@ -4,10 +4,10 @@
 \alias{read_cellranger}
 \title{Read in counts data processed with Cell Ranger}
 \usage{
-read_cellranger(quant_dir)
+read_cellranger(cellranger_h5_file)
 }
 \arguments{
-\item{quant_dir}{Path to directory where output files are located.}
+\item{cellranger_h5_file}{Path to H5AD file output from Cell Ranger.}
 }
 \value{
 SingleCellExperiment of gene x cell counts matrix
@@ -18,8 +18,8 @@ Read in counts data processed with Cell Ranger
 \examples{
 \dontrun{
 
-# Import data from cellranger output directory quant_dir
-read_cellranger(quant_dir)
+# Import data from cellranger output file
+read_cellranger(cellranger_h5_file)
 }
 
 }

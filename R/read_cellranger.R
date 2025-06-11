@@ -1,6 +1,6 @@
 #' Read in counts data processed with Cell Ranger
 #'
-#' @param quant_dir Path to directory where output files are located.
+#' @param cellranger_h5_file Path to H5AD file output from Cell Ranger.
 #'
 #' @return SingleCellExperiment of gene x cell counts matrix
 #' @export
@@ -8,25 +8,26 @@
 #' @examples
 #' \dontrun{
 #'
-#' # Import data from cellranger output directory quant_dir
-#' read_cellranger(quant_dir)
+#' # Import data from cellranger output file
+#' read_cellranger(cellranger_h5_file)
 #' }
 #'
-read_cellranger <- function(quant_dir) {
-  cellranger_file <- file.path(quant_dir, "outs", "filtered_feature_bc_matrix.h5")
-  if (!file.exists(cellranger_file)) {
-    stop("Missing filtered_feature_bc_matrix.h5 file from cellranger output")
+read_cellranger <- function(cellranger_h5_file) {
+
+  if (!file.exists(cellranger_h5_file)) {
+    stop(glue::glue("{cellranger_h5_file} does not exist"))
   }
 
-  sce <- DropletUtils::read10xCounts(cellranger_file,
-    sample.names = basename(quant_dir),
+  sce <- DropletUtils::read10xCounts(
+    cellranger_h5_file,
     col.names = TRUE
   )
 
   # for consistency with other quantifiers:
   # change the column names just the barcode value, which is the first part of the barcode name
-  # drop colData
+  # drop colData and metadata
   colnames(sce) <- str_extract(colnames(sce), "^([ACGT]+)")
   SummarizedExperiment::colData(sce) <- NULL
+  SummarizedExperiment::metadata(sce) <- list()
   return(sce)
 }
