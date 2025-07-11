@@ -85,8 +85,9 @@ test_that("`prepare_sce_for_merge` works as expected when all columns are presen
     c(glue::glue("{sce_name}-{rownames(colData(sce))}"))
   )
 
+  # the new column names should match the cell_id
   expect_equal(
-    colnames(sce),
+    colnames(result_sce),
     colData(result_sce)$cell_id
   )
 
@@ -449,7 +450,6 @@ test_that("merging SCEs with altExps works as expected when include_altexps = FA
   # check format of output
   expect_s4_class(counts(merged_sce), "CsparseMatrix")
   expect_s4_class(logcounts(merged_sce), "CsparseMatrix")
-
 })
 
 
@@ -494,7 +494,6 @@ test_that("merging SCEs with altExps has correct altExp colData names when retai
   # check format of output
   expect_s4_class(counts(altExp(merged_sce)), "Matrix")
   expect_s4_class(logcounts(altExp(merged_sce)), "Matrix")
-
 })
 
 
