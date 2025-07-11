@@ -1,3 +1,4 @@
+# nolint start: cyclocomp_linter.
 #' Merge a list of SCEs into one SCE object
 #'
 #' This function takes an optionally-named (if named, ideally by a form of
@@ -237,12 +238,11 @@ merge_sce_list <- function(
           preserve_rowdata_cols = unique(altexp_rowdata_cols)
         )
     }
-
   }
 
   # Merge SCEs ------------------------------------------------------
 
-  if(!include_altexp){
+  if (!include_altexp) {
     # Create the merged SCE from the processed list
     # only use delayed = FALSE if no altExps
     merged_sce <- do.call(combineCols, c(unname(sce_list), delayed = FALSE))
@@ -252,19 +252,18 @@ merge_sce_list <- function(
 
     # first update the assays in the main exp
     # purrr doesn't work for updating items in place in SCE so use for loops
-    for(name in assayNames(merged_sce)){
+    for (name in assayNames(merged_sce)) {
       assay(merged_sce, name) <- as(assay(merged_sce, name), "CsparseMatrix")
     }
 
     # now for the alt exps: make sure they are Matrix class (not Delayed)
-    for(altexp_name in names(altexp_attributes)){
+    for (altexp_name in names(altexp_attributes)) {
       alt_merged_sce <- altExp(merged_sce, altexp_name)
-      for(name in assayNames(alt_merged_sce)){
+      for (name in assayNames(alt_merged_sce)) {
         assay(alt_merged_sce, name) <- as(assay(alt_merged_sce, name), "Matrix")
       }
       altExp(merged_sce, altexp_name) <- alt_merged_sce
     }
-
   }
 
   # Update metadata in merged objects, using the unmerged sce_list
@@ -284,7 +283,7 @@ merge_sce_list <- function(
 
   return(merged_sce)
 }
-
+# nolint end
 
 #' Helper function to prepare an SCE object for merging
 #'
@@ -354,15 +353,15 @@ prepare_sce_for_merge <- function(
   # Add batch column
   sce[[batch_column]] <- sce_name
 
-  # Add cell_id column
-  sce[[cell_id_column]] <- colnames(sce)
-
   # Only modify column names if we are not working with an altExp.
   # This avoids having double `{sce_name}-{sce_name}` prefixes
   if (!is_altexp) {
     # Add `sce_name` to colnames so cell ids can be mapped to originating SCE
     colnames(sce) <- glue::glue("{sce_name}-{colnames(sce)}")
   }
+
+  # Add cell_id column AFTER colnames have been updated
+  sce[[cell_id_column]] <- colnames(sce)
 
   # return the processed SCE
   return(sce)
