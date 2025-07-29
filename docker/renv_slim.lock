@@ -82,13 +82,13 @@
     },
     "BiocManager": {
       "Package": "BiocManager",
-      "Version": "1.30.23",
+      "Version": "1.30.25",
       "Source": "Repository",
-      "Repository": "RSPM",
+      "Repository": "CRAN",
       "Requirements": [
         "utils"
       ],
-      "Hash": "47e968dfe563c1b22c2e20a067ec21d5"
+      "Hash": "3aec5928ca10897d7a0a1205aae64627"
     },
     "BiocNeighbors": {
       "Package": "BiocNeighbors",
