@@ -8,6 +8,11 @@ You can use the [`styler` package](https://styler.r-lib.org) to perform styling 
 If code needs styling during/after a PR, one of the repository owners can perform styling automatically by making a comment with just the word `/style` in the PR.
 (Note that for this to work, the commenter must have set their membership to "Public" in https://github.com/orgs/AlexsLemonade/people)
 
+## Environments
+
+Please refer to [`docker/README.md`](docker/README.md) for instructions on updating the Docker image(s) this repository hosts.
+
+
 ## Pre-commit hooks
 
 For convenience, we have included a set of [pre-commit hooks](https://pre-commit.com/) that can be used to automatically format code according to the above specifications, as well as to spell check and check for other common errors.
