@@ -25,7 +25,7 @@ pip-compile --no-annotate --strip-extras $UPGRADE_PY_FLAG --output-file=requirem
 pip-compile --no-annotate --strip-extras $UPGRADE_PY_FLAG --output-file=requirements_scvi.txt requirements_scvi.in
 
 # slim lockfile
-Rscript scripts/make-lockfile.R -f renv_slim.lock -p batchelor,rtracklayer
+Rscript scripts/make-lockfile.R -f renv_slim.lock -p batchelor,rtracklayer,scDblFinder
 
 # reports lockfile
 Rscript scripts/make-lockfile.R -f renv_reports.lock -p ComplexHeatmap,ggforce,kableExtra,rmarkdown
