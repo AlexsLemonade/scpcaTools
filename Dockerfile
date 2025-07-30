@@ -65,17 +65,11 @@ FROM slim AS anndata
 LABEL org.opencontainers.image.title "scpcatools-anndata"
 
 COPY docker/renv_zellkonverter.lock renv.lock
+ENV BASILISK_USE_SYSTEM_DIR=1
 RUN Rscript -e 'renv::restore()'\
   && rm -rf ~/.cache/R/renv \
   && rm -rf /tmp/downloaded_packages \
   && rm -rf /tmp/Rtmp*
-
-# Complete installation of zellkonverter conda env
-ENV BASILISK_USE_SYSTEM_DIR=1
-ENV BASILISK_EXTERNAL_DIR /usr/local/renv/basilisk
-RUN Rscript -e "proc <- basilisk::basiliskStart(env = zellkonverter::zellkonverterAnnDataEnv(), testload = 'anndata'); \
-  basilisk::basiliskStop(proc); \
-  basilisk.utils::cleanConda()"
 
 #### Python packages
 COPY docker/requirements_anndata.txt requirements.txt
