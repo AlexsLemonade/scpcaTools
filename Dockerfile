@@ -65,7 +65,7 @@ FROM slim AS anndata
 LABEL org.opencontainers.image.title "scpcatools-anndata"
 
 COPY docker/renv_zellkonverter.lock renv.lock
-ENV BASILISK_USE_SYSTEM_DIR=1
+ARG BASILISK_USE_SYSTEM_DIR=1
 RUN Rscript -e 'renv::restore()'\
   && rm -rf ~/.cache/R/renv \
   && rm -rf /tmp/downloaded_packages \
