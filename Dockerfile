@@ -5,6 +5,9 @@ LABEL maintainer="ccdl@alexslemonade.org"
 LABEL org.opencontainers.image.title "scpcatools-slim"
 LABEL org.opencontainers.image.source https://github.com/AlexsLemonade/scpcaTools
 
+#### basilisk settings 
+ARG BASILISK_USE_SYSTEM_DIR=1
+
 #### R packages
 # Use renv for R packages
 ENV RENV_CONFIG_CACHE_ENABLED FALSE
@@ -69,12 +72,6 @@ RUN Rscript -e 'renv::restore()'\
   && rm -rf ~/.cache/R/renv \
   && rm -rf /tmp/downloaded_packages \
   && rm -rf /tmp/Rtmp*
-
-# Complete installation of zellkonverter conda env
-ENV BASILISK_EXTERNAL_DIR /usr/local/renv/basilisk
-RUN Rscript -e "proc <- basilisk::basiliskStart(env = zellkonverter::zellkonverterAnnDataEnv(), testload = 'anndata'); \
-  basilisk::basiliskStop(proc); \
-  basilisk.utils::cleanConda()"
 
 #### Python packages
 COPY docker/requirements_anndata.txt requirements.txt
