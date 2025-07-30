@@ -5,6 +5,9 @@ LABEL maintainer="ccdl@alexslemonade.org"
 LABEL org.opencontainers.image.title "scpcatools-slim"
 LABEL org.opencontainers.image.source https://github.com/AlexsLemonade/scpcaTools
 
+#### basilisk settings 
+ARG BASILISK_USE_SYSTEM_DIR=1
+
 #### R packages
 # Use renv for R packages
 ENV RENV_CONFIG_CACHE_ENABLED FALSE
@@ -65,7 +68,6 @@ FROM slim AS anndata
 LABEL org.opencontainers.image.title "scpcatools-anndata"
 
 COPY docker/renv_zellkonverter.lock renv.lock
-ARG BASILISK_USE_SYSTEM_DIR=1
 RUN Rscript -e 'renv::restore()'\
   && rm -rf ~/.cache/R/renv \
   && rm -rf /tmp/downloaded_packages \
