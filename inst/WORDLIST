@@ -29,10 +29,13 @@ LinkingTo
 nf
 pre
 PRs
+RData
 renv
 reproducibility
+Rhistory
 rowData
 rowdata
+Rprofile
 Rproj
 RStudio
 SCE

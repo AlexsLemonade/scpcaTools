@@ -1,5 +1,9 @@
 .github
 .git
 .Rproj.user
+.Rhistory
+.RData
+.Rprofile
 renv/
 scpcaTools.Rproj
+.R
