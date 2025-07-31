@@ -5,6 +5,9 @@
 # user settings
 ^.*\.Rproj$
 ^\.Rproj\.user$
+^\.Rhistory$
+^\.RData$
+^\.Rprofile$
 
 # renv files
 ^renv$
