@@ -7,7 +7,7 @@ LABEL org.opencontainers.image.source="https://github.com/AlexsLemonade/scpcaToo
 
 #### Build settings for Renv and Basilisk
 ENV RENV_CONFIG_CACHE_ENABLED=FALSE
-ARG BASILISK_USE_SYSTEM_DIR=1
+ENV BASILISK_USE_SYSTEM_DIR=TRUE
 
 #### R packages
 # Use renv for R packages
