@@ -2212,6 +2212,24 @@
       ],
       "Hash": "ce5f8381cd2c38d1fc14c83d8b21efd0"
     },
+    "patchwork": {
+      "Package": "patchwork",
+      "Version": "1.2.0",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Requirements": [
+        "cli",
+        "ggplot2",
+        "grDevices",
+        "graphics",
+        "grid",
+        "gtable",
+        "rlang",
+        "stats",
+        "utils"
+      ],
+      "Hash": "9c8ab14c00ac07e9e04d1664c0b74486"
+    },
     "pheatmap": {
       "Package": "pheatmap",
       "Version": "1.0.12",
