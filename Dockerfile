@@ -7,7 +7,6 @@ LABEL org.opencontainers.image.source="https://github.com/AlexsLemonade/scpcaToo
 
 #### Build settings for Renv and Basilisk
 ENV RENV_CONFIG_CACHE_ENABLED=FALSE
-ENV BASILISK_USE_SYSTEM_DIR=1
 
 #### R packages
 # Use renv for R packages
@@ -72,6 +71,11 @@ RUN Rscript -e 'renv::restore()'\
   && rm -rf ~/.cache/R/renv \
   && rm -rf /tmp/downloaded_packages \
   && rm -rf /tmp/Rtmp*
+
+# reinstall basilisk and zellkonverter from source to force conda env installation.
+ENV BASILISK_USE_SYSTEM_DIR=1
+RUN Rscript -e 'BiocManager::install("basilisk", type = "source", force = TRUE)'
+RUN Rscript -e 'BiocManager::install("zellkonverter", type = "source", force = TRUE)'
 
 #### Python packages
 COPY docker/requirements_anndata.txt requirements.txt
