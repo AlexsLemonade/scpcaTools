@@ -26,6 +26,7 @@ docker buildx build . --tag scpcatools-slim --platform linux/amd64 --target slim
 The available targets are:
 
 - `slim`: A smaller image that includes only the required R packages for `scpcaTools`, with no additional packages.
+- `infercnv`: The `slim` image with the addition of the `infercnv` package for running the associated `scpca-nf` module.
 - `anndata`: The `slim` image with the addition of the `zellkonverter` package for reading and writing `AnnData` objects, and the Python `anndata` package.
 - `scvi`: The `anndata` image with the addition of the `scvi` package.
 - `reports`: The `slim` image with the addition `rmarkdown` and `ComplexHeatmap` and associated packages for generating reports.
