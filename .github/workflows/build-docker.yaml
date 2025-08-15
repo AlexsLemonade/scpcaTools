@@ -69,6 +69,8 @@ jobs:
             image_name: scpcatools-reports
           - target: seurat
             image_name: scpcatools-seurat
+          - target: infercnv
+            image_name: scpcatools-infercnv
 
     steps:
       - name: Set up Docker Buildx

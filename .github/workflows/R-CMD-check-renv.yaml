@@ -30,7 +30,7 @@ jobs:
 
       - name: Install additional system dependencies
         run: |
-          sudo apt-get install -y libcurl4-openssl-dev libglpk40
+          sudo apt-get install -y libcurl4-openssl-dev libglpk40 jags
 
       # remove requirements file to prevent renv from worrying about python
       - name: Remove requirements.txt file
