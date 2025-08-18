@@ -27,9 +27,6 @@ pip-compile --no-annotate --strip-extras $UPGRADE_PY_FLAG --output-file=requirem
 # slim lockfile
 Rscript scripts/make-lockfile.R -f renv_slim.lock -p batchelor,rtracklayer,scDblFinder
 
-# infercnv lockfile
-Rscript scripts/make-lockfile.R -f renv_infercnv.lock -p infercnv
-
 # reports lockfile
 Rscript scripts/make-lockfile.R -f renv_reports.lock -p ComplexHeatmap,ggforce,kableExtra,rmarkdown,ggmap,DT,patchwork
 
@@ -38,3 +35,6 @@ Rscript scripts/make-lockfile.R -f renv_zellkonverter.lock -p zellkonverter
 
 # Seurat lockfile
 Rscript scripts/make-lockfile.R -f renv_seurat.lock -p Seurat
+
+# infercnv lockfile
+Rscript scripts/make-lockfile.R -f renv_infercnv.lock -p infercnv
