@@ -42,6 +42,16 @@ RUN Rscript -e 'renv::restore()'\
   && rm -rf /tmp/downloaded_packages \
   && rm -rf /tmp/Rtmp*
 
+##########################
+# Add InferCNV support target ----------------------------------------------------
+FROM seurat AS infercnv
+LABEL org.opencontainers.image.title="scpcatools-infercnv"
+
+COPY docker/renv_infercnv.lock renv.lock
+RUN Rscript -e 'renv::restore()'\
+  && rm -rf ~/.cache/R/renv \
+  && rm -rf /tmp/downloaded_packages \
+  && rm -rf /tmp/Rtmp*
 
 ##########################
 # Add Reports support target ---------------------------------------------------
