@@ -35,3 +35,6 @@ Rscript scripts/make-lockfile.R -f renv_zellkonverter.lock -p zellkonverter
 
 # Seurat lockfile
 Rscript scripts/make-lockfile.R -f renv_seurat.lock -p Seurat
+
+# infercnv lockfile
+Rscript scripts/make-lockfile.R -f renv_infercnv.lock -p infercnv

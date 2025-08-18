@@ -30,6 +30,7 @@ The available targets are:
 - `scvi`: The `anndata` image with the addition of the `scvi` package.
 - `reports`: The `slim` image with the addition `rmarkdown` and `ComplexHeatmap` and associated packages for generating reports.
 - `seurat`: The `slim` image with the addition `Seurat`.
+- `infercnv`: The `slim` image with the addition of the `infercnv` package for running the associated `scpca-nf` module.
 
 These images are built automatically on every update to `scpcaTools` (`main`) and pushed to `ghcr.io/alexslemonade/scpcatool-slims:edge` and `ghcr.io/alexslemonade/scpcatools-scvi:edge`, etc.
 Release versions will be tagged with `latest` and by version number.
