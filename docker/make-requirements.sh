@@ -28,7 +28,7 @@ pip-compile --no-annotate --strip-extras $UPGRADE_PY_FLAG --output-file=requirem
 Rscript scripts/make-lockfile.R -f renv_slim.lock -p batchelor,rtracklayer,scDblFinder
 
 # reports lockfile
-Rscript scripts/make-lockfile.R -f renv_reports.lock -p ComplexHeatmap,ggforce,kableExtra,rmarkdown,ggmap,DT,patchwork
+Rscript scripts/make-lockfile.R -f renv_reports.lock -p ComplexHeatmap,ggforce,kableExtra,rmarkdown,ggmap,DT,patchwork,ggridges
 
 # zellkonverter lockfile
 Rscript scripts/make-lockfile.R -f renv_zellkonverter.lock -p zellkonverter
