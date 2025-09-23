@@ -65,6 +65,8 @@ jobs:
             image_name: scpcatools-anndata
           - target: scvi
             image_name: scpcatools-scvi
+          - target: scimilarity
+            image_name: scpcatools-scimilarity
           - target: reports
             image_name: scpcatools-reports
           - target: seurat
