@@ -4,6 +4,7 @@ jax[cpu]
 lightning>=2.3.3 # critical security fix
 pandas
 scanpy~=1.10.2
+scimilarity~=0.4.1
 scvi-tools~=1.1.5
 torch
 torchvision
