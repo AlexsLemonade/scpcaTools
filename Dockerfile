@@ -101,6 +101,15 @@ COPY docker/requirements_scvi.txt requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
 
+
+##########################
+# Add scimilarity support target ------------------------------------------------------
+FROM anndata AS scvi
+LABEL org.opencontainers.image.title="scpcatools-scimilarity"
+
+COPY docker/requirements_scimilarity.txt requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
+
 ##########################
 # Full image with all dependencies ---------------------------------------------
 FROM scvi AS full
