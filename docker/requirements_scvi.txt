@@ -86,7 +86,7 @@ sympy==1.13.1
 tensorstore==0.1.67
 threadpoolctl==3.5.0
 toolz==1.0.0
-torch==2.5.0
+torch==2.2.2
 torchmetrics==1.5.1
 tqdm==4.66.6
 typing-extensions==4.12.2
