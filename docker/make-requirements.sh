@@ -23,6 +23,7 @@ fi
 pip-compile --no-annotate --strip-extras $UPGRADE_PY_FLAG --output-file=requirements.txt requirements.in
 pip-compile --no-annotate --strip-extras $UPGRADE_PY_FLAG --output-file=requirements_anndata.txt requirements_anndata.in
 pip-compile --no-annotate --strip-extras $UPGRADE_PY_FLAG --output-file=requirements_scvi.txt requirements_scvi.in
+pip-compile --no-annotate --strip-extras $UPGRADE_PY_FLAG --output-file=requirements_scimilarity.txt requirements_scimilarity.in
 
 # slim lockfile
 Rscript scripts/make-lockfile.R -f renv_slim.lock -p batchelor,rtracklayer,scDblFinder
