@@ -25,7 +25,7 @@ metadata(sce) <- list(
     "char_col" = c("name1", NA),
     "num_col" = 1:2,
     "na_col" = c(NA, NA),
-    "list_col" = list(a = 1, b = "2")
+    "list_col" = list(list(a = 1, b = "foo"), list(a = 2, b = "bar"))
   ),
   # these should get removed:
   metadata_list = list(value = "value"),

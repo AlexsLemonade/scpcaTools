@@ -73,7 +73,7 @@ sce_to_anndata <- function(
   # - ensure any
   metadata_to_keep <- metadata_to_keep |>
     purrr::map(
-      \(meta) {
+      \(x) {
         if (is.data.frame(meta)) {
           meta <- meta |>
             dplyr::select(dplyr::where(\(col) !is.list(col))) |>
@@ -83,9 +83,9 @@ sce_to_anndata <- function(
             ) |>
             # ensure it's not a tibble; zellkonverter drops these since no python type
             as.data.frame()
-        } else {
-          meta
-        }
+        } 
+        # return potentially modified item
+        meta
       }
     )
 
