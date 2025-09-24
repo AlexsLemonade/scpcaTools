@@ -21,15 +21,15 @@ metadata(sce) <- list(
     library_id = "library1",
     sample_id = "sample1"
   ),
-  test_dataframe = tibble::tibble(
+  metadata_dataframe = tibble::tibble(
     "char_col" = c("name1", NA),
     "num_col" = 1:2,
     "na_col" = c(NA, NA),
     "list_col" = list(list(a = 1, b = "foo"), list(a = 2, b = "bar"))
   ),
-  # these should get removed:
-  metadata_list = list(value = "value"),
-  metadata_DataFrame = DataFrame(head(iris))
+  metadata_S4_DataFrame = DataFrame(head(iris)),
+  # this should get removed:
+  metadata_list = list(value = "value")
 )
 
 # define anndata output
@@ -52,19 +52,19 @@ test_that("Conversion of SCE to AnnData works as expected", {
 
   # expect that sample metadata has been removed from converted SCE
   expect_setequal(
-    c("library_id", "sample_metadata", "test_dataframe"),
+    c("library_id", "sample_metadata", "metadata_dataframe", "metadata_S4_DataFrame"),
     names(metadata(converted_sce))
   )
 
   # check that list columns aren't present
   expect_setequal(
-    names(metadata(converted_sce)$test_dataframe),
+    names(metadata(converted_sce)$metadata_dataframe),
     c("char_col", "num_col", "na_col")
   )
 
   # check that the NA-only column remains logical
   expect_type(
-    metadata(converted_sce)$test_dataframe$na_col,
+    metadata(converted_sce)$metadata_dataframe$na_col,
     "logical"
   )
 
