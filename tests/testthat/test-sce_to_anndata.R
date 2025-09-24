@@ -20,7 +20,16 @@ metadata(sce) <- list(
   sample_metadata = data.frame(
     library_id = "library1",
     sample_id = "sample1"
-  )
+  ),
+  test_dataframe = tibble::tibble(
+    "char_col" = c("name1", NA),
+    "num_col" = 1:2,
+    "na_col" = c(NA, NA),
+    "list_col" = list(a = 1, b = "2")
+  ),
+  # these should get removed:
+  metadata_list = list(value = "value"),
+  metadata_DataFrame = DataFrame(head(iris))
 )
 
 # define anndata output
@@ -41,11 +50,24 @@ test_that("Conversion of SCE to AnnData works as expected", {
   expect_equal(colnames(rowData(sce)), colnames(rowData(converted_sce)))
 
 
-  # expect that sample metadata has been removed from converted SCE and only library id remains
+  # expect that sample metadata has been removed from converted SCE
   expect_setequal(
-    "library_id",
+    c("library_id", "sample_metadata", "test_dataframe"),
     names(metadata(converted_sce))
   )
+
+  # check that list columns aren't present
+  expect_setequal(
+    names(metadata(converted_sce)$test_dataframe),
+    c("char_col", "num_col", "na_col")
+  )
+
+  # check that the NA-only column remains logical
+  expect_type(
+    metadata(converted_sce)$test_dataframe$na_col,
+    "logical"
+  )
+
 
   # test that H5 file is created with new assay name
   # add logcounts
