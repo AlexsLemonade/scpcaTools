@@ -62,6 +62,17 @@ sce_to_anndata <- function(
 
   # keep only vectors and data frames; no objects or DataFrames
   metadata_to_keep <- metadata(sce_to_convert) |>
+    # convert DataFrame objects to lower-case data frame if possible
+    purrr::map(
+      \(x) {
+        if (is(x, "DataFrame")) {
+          # converting will automatically make names unique
+          x <- as.data.frame(x)
+        }
+        # return potentially modified item
+        x
+      }
+    ) |>
     purrr::keep(\(x) {
       is.atomic(x) || is.data.frame(x)
     })
@@ -69,13 +80,12 @@ sce_to_anndata <- function(
 
   # prepare data frames for anndata conversion:
   # - remove any list columns
-  # - ensure any NA values in character columns are formatted as character
-  # - ensure any
+  # - convert NA values in char columns should be strings (not needed for char vectors)
   metadata_to_keep <- metadata_to_keep |>
     purrr::map(
       \(x) {
-        if (is.data.frame(meta)) {
-          meta <- meta |>
+        if (is.data.frame(x)) {
+          x <- x |>
             dplyr::select(dplyr::where(\(col) !is.list(col))) |>
             dplyr::mutate(
               dplyr::across(dplyr::where(is.character), \(col) tidyr::replace_na(col, "NA")),
@@ -83,9 +93,9 @@ sce_to_anndata <- function(
             ) |>
             # ensure it's not a tibble; zellkonverter drops these since no python type
             as.data.frame()
-        } 
+        }
         # return potentially modified item
-        meta
+        x
       }
     )
 
