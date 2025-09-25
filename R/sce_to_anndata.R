@@ -60,19 +60,11 @@ sce_to_anndata <- function(
   # assign SCE to new variable to avoid modifying input SCE
   sce_to_convert <- sce
 
-  # keep only vectors and data frames; no objects or DataFrames
+  # keep only vectors and data frames; convert DataFrames; not other objects
   metadata_to_keep <- metadata(sce_to_convert) |>
     # convert DataFrame objects to lower-case data frame if possible
-    purrr::map(
-      \(x) {
-        if (is(x, "DataFrame")) {
-          # converting will automatically make names unique
-          x <- as.data.frame(x)
-        }
-        # return potentially modified item
-        x
-      }
-    ) |>
+     # converting a DataFrame will automatically make names unique
+    purrr::map_if(\(x){is(x, "DataFrame")}, as.data.frame) |>
     purrr::keep(\(x) {
       is.atomic(x) || is.data.frame(x)
     })
