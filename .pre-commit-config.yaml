@@ -23,6 +23,7 @@ repos:
           .*\.Rds|
           .*\.Rproj|
           .*\.sh|
+          (.*/|)\.gitattributes|
           (.*/|)\.gitignore|
           (.*/|)\.gitlab-ci\.yml|
           (.*/|)\.lintr|
@@ -34,6 +35,8 @@ repos:
           (.*/|)appveyor\.yml|
           (.*/|)DESCRIPTION|
           (.*/|)NAMESPACE|
+          (.*/|)pixi\.toml|
+          (.*/|)pixi\.lock|
           (.*/|)renv/settings\.dcf|
           (.*/|)renv.*\.lock|
           (.*/|)requirements.*\.in|
