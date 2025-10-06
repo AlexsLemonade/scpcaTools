@@ -23,6 +23,8 @@ jobs:
     steps:
       - name: Clear space
         run: |
+          echo "Disk space before cleanup:"
+          df -h
           # Software to remove
           # see https://mathio28.medium.com/squeezing-disk-space-from-github-actions-runners-an-engineers-guide-d5fbe4443692
           sudo rm -rf \
@@ -37,6 +39,9 @@ jobs:
             /opt/ghc \
             /opt/az \
             /opt/hostedtoolcache
+
+          echo "Disk space after cleanup:"
+          df -h
 
       - name: Docker login
         uses: docker/login-action@v3
