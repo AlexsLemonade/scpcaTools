@@ -32,12 +32,10 @@ jobs:
             /usr/share/dotnet \
             /usr/share/swift \
             /usr/local/.ghcup \
-            /usr/local/.rustup \
             /usr/local/julia* \
             /usr/local/lib/android \
             /usr/local/share/powershell \
-            /opt/ghc \
-            /opt/az
+            /opt/hostedtoolcache
 
           echo "Disk space after cleanup:"
           df -h
@@ -102,12 +100,10 @@ jobs:
             /usr/share/dotnet \
             /usr/share/swift \
             /usr/local/.ghcup \
-            /usr/local/.rustup \
             /usr/local/julia* \
             /usr/local/lib/android \
             /usr/local/share/powershell \
-            /opt/ghc \
-            /opt/az
+            /opt/hostedtoolcache
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
