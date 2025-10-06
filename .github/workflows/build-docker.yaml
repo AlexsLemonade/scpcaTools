@@ -37,8 +37,7 @@ jobs:
             /usr/local/lib/android \
             /usr/local/share/powershell \
             /opt/ghc \
-            /opt/az \
-            /opt/hostedtoolcache
+            /opt/az
 
           echo "Disk space after cleanup:"
           df -h
@@ -108,8 +107,7 @@ jobs:
             /usr/local/lib/android \
             /usr/local/share/powershell \
             /opt/ghc \
-            /opt/az \
-            /opt/hostedtoolcache
+            /opt/az
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
