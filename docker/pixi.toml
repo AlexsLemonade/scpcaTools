@@ -1,0 +1,12 @@
+[workspace]
+authors = ["Joshua Shapiro <josh.shapiro@ccdatalab.org>"]
+channels = ["conda-forge"]
+name = "scpcatools-dev"
+platforms = ["osx-arm64", "osx-64", "linux-64", "linux-aarch64"]
+version = "0.1.0"
+
+[tasks]
+
+[dependencies]
+python = "3.10.*"
+pip-tools = "*"
