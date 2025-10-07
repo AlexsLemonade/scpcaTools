@@ -60,10 +60,32 @@ sce_to_anndata <- function(
   # assign SCE to new variable to avoid modifying input SCE
   sce_to_convert <- sce
 
-  # remove any objects or dataframes
-  metadata_to_keep <- metadata(sce_to_convert) |>
-    purrr::discard(is.object) |>
-    purrr::discard(is.list)
+  # keep only vectors and data frames; convert DataFrames but not other objects
+  metadata_to_keep <- metadata(sce) |>
+    # first, convert DataFrame objects to lower-case data frame if possible
+    # note that converting a DataFrame automatically makes names unique
+    purrr::map_if(\(x) is(x, "DataFrame"), as.data.frame) |>
+    purrr::keep(\(x) {
+      is.atomic(x) || is.data.frame(x)
+    })
+
+
+  # prepare data frames for anndata conversion:
+  # - remove any list columns
+  # - NA values in char columns should be strings (not needed for char vectors)
+  # - NA-only columns must be logical
+  metadata_to_keep <- metadata_to_keep |>
+    purrr::map_if(is.data.frame, \(x) {
+      x |>
+        dplyr::select(dplyr::where(\(col) !is.list(col))) |>
+        dplyr::mutate(
+          dplyr::across(dplyr::where(is.character), \(col) tidyr::replace_na(col, "NA")),
+          dplyr::across(dplyr::where(\(col) all(is.na(col))), as.logical)
+        ) |>
+        # ensure it's not a tibble; zellkonverter drops these since no python type
+        as.data.frame()
+    })
+
 
   # print out warning that removed objects won't be converted
   removed_metadata <- setdiff(names(metadata(sce_to_convert)), names(metadata_to_keep))
