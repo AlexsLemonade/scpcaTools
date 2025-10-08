@@ -27,15 +27,23 @@ pip-compile --no-annotate --strip-extras $UPGRADE_PY_FLAG --output-file=requirem
 
 # slim lockfile
 Rscript scripts/make-lockfile.R -f renv_slim.lock -p batchelor,rtracklayer,scDblFinder
+# replace any "RSPM" repositories with "CRAN"
+sed -i.bak 's/"Repository": "RSPM"/"Repository": "CRAN"/' renv_slim.lock
 
 # reports lockfile
 Rscript scripts/make-lockfile.R -f renv_reports.lock -p ComplexHeatmap,ggforce,kableExtra,rmarkdown,ggmap,DT,patchwork,ggridges
+sed -i.bak 's/"Repository": "RSPM"/"Repository": "CRAN"/' renv_reports.lock
 
 # zellkonverter lockfile
 Rscript scripts/make-lockfile.R -f renv_zellkonverter.lock -p zellkonverter
+sed -i.bak 's/"Repository": "RSPM"/"Repository": "CRAN"/' renv_zellkonverter.lock
 
 # Seurat lockfile
 Rscript scripts/make-lockfile.R -f renv_seurat.lock -p Seurat
+sed -i.bak 's/"Repository": "RSPM"/"Repository": "CRAN"/' renv_seurat.lock
 
 # infercnv lockfile
 Rscript scripts/make-lockfile.R -f renv_infercnv.lock -p infercnv
+sed -i.bak 's/"Repository": "RSPM"/"Repository": "CRAN"/' renv_infercnv.lock
+
+rm -r ./*.lock.bak
