@@ -18,7 +18,9 @@ add_sce_data <- function(sce, batch) {
   metadata(sce)$total_reads <- ceiling(runif(1, 100, 1000))
   metadata(sce)$sample_metadata <- data.frame(
     sample_id = sample_id,
-    library_id = library_id
+    library_id = library_id,
+    is_cell_line = TRUE,
+    age = 5
   )
 
   # Copy counts -> logcounts just to make sure the assay is retained
@@ -90,8 +92,6 @@ test_that("`prepare_sce_for_merge` works as expected when all columns are presen
     colnames(result_sce),
     colData(result_sce)$cell_id
   )
-
-
 
   # rowData names and contents:
   expect_setequal(
@@ -932,10 +932,13 @@ test_that("prepare_merged_metadata works as expected, with sample_metadata prese
       purrr::reduce(intersect),
     c("library_id", "sample_id", "total_reads")
   )
+  # check values and types at once
   expect_equal(
     data.frame(
       sample_id = expected_sample_ids,
-      library_id = expected_library_ids
+      library_id = expected_library_ids,
+      is_cell_line = TRUE,
+      age = "5"
     ),
     observed_metadata$sample_metadata
   )

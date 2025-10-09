@@ -538,8 +538,13 @@ prepare_merged_metadata <- function(metadata_list) {
       purrr::map("sample_metadata") |>
       purrr::map(\(df) {
         # make sure all column types are compatible first
+        # all columns should be character unless they start with `is_`,
+        #  in which case they should be logical
         df |>
-          dplyr::mutate(dplyr::across(dplyr::everything(), as.character))
+          dplyr::mutate(
+            dplyr::across(dplyr::starts_with("is_"), as.logical),
+            dplyr::across(!dplyr::starts_with("is_"), as.character)
+          ) 
       }) |>
       dplyr::bind_rows() |>
       dplyr::distinct()
