@@ -1,7 +1,7 @@
 Package: scpcaTools
 Type: Package
 Title: Single cell data tools for ScPCA
-Version: 0.4.3
+Version: 0.4.4
 Authors@R: c(
     person("Ally", "Hawkins",
            email = "ally.hawkins@ccdatalab.org",
