@@ -11,15 +11,19 @@ on:
       - main
 
 env:
-  REGISTRY: ghcr.io
-  REGISTRY_USER: alexslemonade
+  GH_REGISTRY: ghcr.io
+  GH_REGISTRY_USER: alexslemonade
+  AWS_REGISTRY: 997241705947.dkr.ecr.us-east-1.amazonaws.com
+  AWS_PREFIX: ghcr_io
 
 jobs:
   build_push_full:
     runs-on: ubuntu-22.04
+    environment: ${{ github.event_name == 'push' && 'prod' || '' }}
     permissions:
       contents: read
       packages: write
+      id-token: write
     steps:
       - name: Clear space
         run: |
@@ -41,13 +45,26 @@ jobs:
           echo "Disk space after cleanup:"
           df -h
 
+      - name: Configure AWS credentials
+        if: ${{ github.event_name == 'push' }}
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::997241705947:role/gha-ecr-access-role
+          role-session-name: githubActionSession
+          aws-region: us-east-1
+
+      - name: Log in to Amazon ECR
+        if: ${{ github.event_name == 'push' }}
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Docker login
+      - name: Docker login GHCR
         uses: docker/login-action@v3
         with:
-          registry: ${{ env.REGISTRY }}
+          registry: ${{ env.GH_REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
@@ -55,44 +72,49 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.REGISTRY }}/${{ env.REGISTRY_USER }}/scpcatools
+          images: |
+            ${{ env.GH_REGISTRY }}/${{ env.GH_REGISTRY_USER }}/scpcatools
+            ${{ env.AWS_REGISTRY }}/${{ env.AWS_PREFIX }}/scpcatools
           tags: |
             type=semver,pattern={{raw}}
             type=edge,branch=main
             type=ref,event=pr
 
       - name: Build full image
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           tags: ${{ steps.meta.outputs.tags }}
           push: ${{ github.event_name == 'push' }}
-          cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.REGISTRY_USER }}/scpcatools:buildcache
-          cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ env.REGISTRY_USER }}/scpcatools:buildcache,mode=max
+          cache-from: type=registry,ref=${{ env.GH_REGISTRY }}/${{ env.GH_REGISTRY_USER }}/scpcatools:buildcache
+          cache-to: type=registry,ref=${{ env.GH_REGISTRY }}/${{ env.GH_REGISTRY_USER }}/scpcatools:buildcache,mode=max
 
   build_push_matrix:
     runs-on: ubuntu-22.04
+    environment: ${{ github.event_name == 'push' && 'prod' || '' }}
     needs: build_push_full
     permissions:
       contents: read
       packages: write
+      id-token: write
+
     strategy:
       fail-fast: false
       matrix:
         include:
-          - target: slim
-            image_name: scpcatools-slim
           - target: anndata
             image_name: scpcatools-anndata
-          - target: scvi
-            image_name: scpcatools-scvi
-          - target: scimilarity
-            image_name: scpcatools-scimilarity
-          - target: reports
-            image_name: scpcatools-reports
-          - target: seurat
-            image_name: scpcatools-seurat
           - target: infercnv
             image_name: scpcatools-infercnv
+          - target: reports
+            image_name: scpcatools-reports
+          - target: scimilarity
+            image_name: scpcatools-scimilarity
+          - target: scvi
+            image_name: scpcatools-scvi
+          - target: seurat
+            image_name: scpcatools-seurat
+          - target: slim
+            image_name: scpcatools-slim
 
     steps:
       - name: Clear space
@@ -110,13 +132,26 @@ jobs:
             /usr/local/share/powershell \
             /opt/hostedtoolcache
 
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        if: ${{ github.event_name == 'push' }}
+        with:
+          role-to-assume: arn:aws:iam::997241705947:role/gha-ecr-access-role
+          role-session-name: githubActionSession-${{ matrix.image_name }}
+          aws-region: us-east-1
+
+      - name: Log in to Amazon ECR
+        if: ${{ github.event_name == 'push' }}
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Docker login
+      - name: Docker login GHCR
         uses: docker/login-action@v3
         with:
-          registry: ${{ env.REGISTRY }}
+          registry: ${{ env.GH_REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
@@ -124,7 +159,9 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.REGISTRY }}/${{ env.REGISTRY_USER }}/${{ matrix.image_name }}
+          images: |
+            ${{ env.GH_REGISTRY }}/${{ env.GH_REGISTRY_USER }}/${{ matrix.image_name }}
+            ${{ env.AWS_REGISTRY }}/${{ env.AWS_PREFIX }}/${{ matrix.image_name }}
           tags: |
             type=semver,pattern={{raw}}
             type=edge,branch=main
@@ -136,4 +173,4 @@ jobs:
           push: ${{ github.event_name == 'push' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.REGISTRY_USER }}/scpcatools:buildcache
+          cache-from: type=registry,ref=${{ env.GH_REGISTRY }}/${{ env.GH_REGISTRY_USER }}/scpcatools:buildcache
