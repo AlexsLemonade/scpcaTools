@@ -375,7 +375,8 @@
       "SystemRequirements": "cairo (>= 1.2 http://www.cairographics.org/)",
       "URL": "http://www.rforge.net/Cairo/",
       "NeedsCompilation": "yes",
-      "Repository": "CRAN"
+      "Repository": "CRAN",
+      "Encoding": "UTF-8"
     },
     "DBI": {
       "Package": "DBI",
@@ -762,7 +763,7 @@
     },
     "HDF5Array": {
       "Package": "HDF5Array",
-      "Version": "1.32.0",
+      "Version": "1.32.1",
       "Source": "Bioconductor",
       "Title": "HDF5 backend for DelayedArray objects",
       "Description": "Implement the HDF5Array, H5SparseMatrix, H5ADMatrix, and TENxMatrix classes, 4 convenient and memory-efficient array-like containers for representing and manipulating either: (1) a conventional (a.k.a. dense) HDF5 dataset, (2) an HDF5 sparse matrix (stored in CSR/CSC/Yale format), (3) the central matrix of an h5ad file (or any matrix in the /layers group), or (4) a 10x Genomics sparse matrix. All these containers are DelayedArray extensions and thus support all operations (delayed or block-processed) supported by DelayedArray objects.",
@@ -809,11 +810,11 @@
         "DelayedMatrixStats",
         "genefilter"
       ],
-      "Collate": "utils.R H5File-class.R h5ls.R H5DSetDescriptor-class.R h5utils.R h5dimscales.R uaselection.R h5mread.R h5mread_from_reshaped.R h5writeDimnames.R h5summarize.R HDF5ArraySeed-class.R HDF5Array-class.R ReshapedHDF5ArraySeed-class.R ReshapedHDF5Array-class.R dump-management.R writeHDF5Array.R saveHDF5SummarizedExperiment.R H5SparseMatrixSeed-class.R H5SparseMatrix-class.R H5ADMatrixSeed-class.R H5ADMatrix-class.R TENxMatrixSeed-class.R TENxMatrix-class.R writeTENxMatrix.R zzz.R",
+      "Collate": "utils.R H5File-class.R h5ls.R h5utils.R H5DSetDescriptor-class.R h5dimscales.R uaselection.R h5mread.R h5mread_from_reshaped.R h5writeDimnames.R h5summarize.R HDF5ArraySeed-class.R HDF5Array-class.R ReshapedHDF5ArraySeed-class.R ReshapedHDF5Array-class.R dump-management.R writeHDF5Array.R saveHDF5SummarizedExperiment.R H5SparseMatrixSeed-class.R H5SparseMatrix-class.R H5ADMatrixSeed-class.R H5ADMatrix-class.R TENxMatrixSeed-class.R TENxMatrix-class.R writeTENxMatrix.R zzz.R",
       "git_url": "https://git.bioconductor.org/packages/HDF5Array",
       "git_branch": "RELEASE_3_19",
-      "git_last_commit": "eea6c75",
-      "git_last_commit_date": "2024-04-30",
+      "git_last_commit": "fa5a1d3",
+      "git_last_commit_date": "2024-08-10",
       "Repository": "Bioconductor 3.19",
       "NeedsCompilation": "yes"
     },
@@ -898,8 +899,7 @@
       "NeedsCompilation": "yes",
       "Author": "Brian Ripley [aut, cre, cph], Bill Venables [ctb], Douglas M. Bates [ctb], Kurt Hornik [trl] (partial port ca 1998), Albrecht Gebhardt [trl] (partial port ca 1998), David Firth [ctb]",
       "Maintainer": "Brian Ripley <ripley@stats.ox.ac.uk>",
-      "Repository": "CRAN",
-      "Encoding": "UTF-8"
+      "Repository": "CRAN"
     },
     "Matrix": {
       "Package": "Matrix",
@@ -5223,8 +5223,7 @@
       "NeedsCompilation": "yes",
       "Author": "Brian Ripley [aut, cre, cph], William Venables [cph]",
       "Maintainer": "Brian Ripley <ripley@stats.ox.ac.uk>",
-      "Repository": "CRAN",
-      "Encoding": "UTF-8"
+      "Repository": "CRAN"
     },
     "openssl": {
       "Package": "openssl",
@@ -7788,7 +7787,8 @@
       "URL": "https://github.com/vubiostat/r-yaml/",
       "BugReports": "https://github.com/vubiostat/r-yaml/issues",
       "NeedsCompilation": "yes",
-      "Repository": "CRAN"
+      "Repository": "CRAN",
+      "Encoding": "UTF-8"
     },
     "zellkonverter": {
       "Package": "zellkonverter",
