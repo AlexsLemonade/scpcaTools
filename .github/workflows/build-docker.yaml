@@ -74,7 +74,7 @@ jobs:
         with:
           images: |
             ${{ env.GH_REGISTRY }}/${{ env.GH_REGISTRY_USER }}/scpcatools
-            ${{ env.AWS_REGISTRY }}/${{ env.AWS_PREFIX }}/scpcatools
+            ${{ env.AWS_REGISTRY }}/${{ env.AWS_PREFIX }}/${{ env.GH_REGISTRY_USER }}/scpcatools
           tags: |
             type=semver,pattern={{raw}}
             type=edge,branch=main
@@ -161,7 +161,7 @@ jobs:
         with:
           images: |
             ${{ env.GH_REGISTRY }}/${{ env.GH_REGISTRY_USER }}/${{ matrix.image_name }}
-            ${{ env.AWS_REGISTRY }}/${{ env.AWS_PREFIX }}/${{ matrix.image_name }}
+            ${{ env.AWS_REGISTRY }}/${{ env.AWS_PREFIX }}/${{ env.GH_REGISTRY_USER }}/${{ matrix.image_name }}
           tags: |
             type=semver,pattern={{raw}}
             type=edge,branch=main
