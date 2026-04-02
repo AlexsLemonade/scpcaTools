@@ -18,9 +18,8 @@ assignees: ''
   - [ ] Create a branch in [scpca-nf](https://github.com/AlexsLemonade/scpca-nf/) for testing the latest Docker version from the `main` branch.
   - [ ] Update [containers.config](https://github.com/AlexsLemonade/scpca-nf/blob/main/config/containers.config) with the `edge` version of the scpca-tools container: ```SCPCATOOLS_CONTAINER = 'ghcr.io/alexslemonade/scpca-tools:edge'``` and push the branch to github.
   - [ ] If necessary, update the `scpca-nf` workflow to accommodate changes in the `scpcaTools` package
-  - [ ] Perform a test run of the workflow with:
-```nextflow run AlexsLemonade/scpca-nf -r "<TESTBRANCH>" -profile batch,ccdl```
-If the [default `run_ids`](https://github.com/AlexsLemonade/scpca-nf/blob/main/config/profile_ccdl.config#L12-L13 for the workflow do not cover expected changes in this tools package, you may want to specify particular test samples or projects with the `--run_id` option (use your judgement).
+  - [ ] Perform a test run of the workflow with the [`run-scpca-nf.yaml`](https://github.com/AlexsLemonade/ScPCA-admin/blob/main/.github/workflows/run-scpca-nf.yaml) workflow in the `scpca-admin` repo, specifying `testing` mode
+If the [default `run_ids`](https://github.com/AlexsLemonade/scpca-nf/blob/main/config/ccdl_profiles.config#L24-L26) for the workflow do not cover expected changes in this tools package, you may want to specify particular test samples or projects with the `--scpca_run_ids` or `--scpca_project_ids` option (use your judgement).
 
 ### Creating a release
 - [ ] On the [releases page](https://github.com/AlexsLemonade/scpcatools/releases), choose `Draft a new release`.
