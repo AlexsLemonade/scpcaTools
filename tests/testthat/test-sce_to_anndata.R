@@ -93,10 +93,11 @@ test_that("Conversion of SCE to AnnData works as expected", {
 })
 
 test_that("Conversion of SCE to AnnData works with additional arguments", {
+  no_verbose_anndata_file <- file.path(tempdir, "no_verbose_anndata.h5")
   # test that the H5 file is created with additional options
   expect_snapshot_file({
     sce_to_anndata(sce, anndata_file, verbose = FALSE)
-    anndata_file
+    no_verbose_anndata_file
   })
 })
 
