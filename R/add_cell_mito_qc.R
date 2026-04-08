@@ -28,7 +28,7 @@ add_cell_mito_qc <- function(sce, mito, miQC = FALSE, ...) {
     stop("sce must be a SingleCellExperiment object")
   }
 
-  # check that mito is not empty, otherwise resulting colData will be innacurate
+  # check that mito is not empty, otherwise resulting colData will be inaccurate
   if (length(mito) == 0) {
     stop("Mitochondrial gene list not used, cannot calculate mitochondrial metrics.")
   }
@@ -49,7 +49,6 @@ add_cell_mito_qc <- function(sce, mito, miQC = FALSE, ...) {
     subsets = list(mito = mito[mito %in% rownames(sce)]),
     ...
   )
-
 
   if (miQC) {
     sce <- add_miQC(sce)

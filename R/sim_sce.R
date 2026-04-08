@@ -21,7 +21,7 @@ sim_sce <- function(n_genes = 200, n_cells = 100, n_empty = 1000, n_groups = 3) 
     stop("n_genes must be a positive number.")
   }
   if (n_cells < 1) {
-    stop("n_cells must be a postive number.")
+    stop("n_cells must be a positive number.")
   }
   # enforce some minimums
   n_empty <- max(n_empty, 0)

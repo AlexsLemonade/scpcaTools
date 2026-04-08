@@ -101,7 +101,6 @@ test_that("`prepare_sce_for_merge` works as expected when all columns are presen
 })
 
 
-
 test_that("`prepare_sce_for_merge` works as expected when an expected column is missing, no altexps", {
   # REMOVE "detected" column first
   # It should get re-added in as all NAs
@@ -135,7 +134,6 @@ test_that("merging SCEs with matching genes works as expected, no altexps", {
     # this row name should not be modified:
     preserve_rowdata_cols = c("gene_names")
   )
-
 
   # correct number of genes and cells:
   expect_equal(nrow(merged_sce), total_genes)
@@ -230,7 +228,7 @@ test_that("merging SCEs with multiple sample ids per library to mirror cellhash 
   sce_list <- sce_list |>
     purrr::map2(
       c("sample4", "sample5", "sample6"),
-      \(sce, other_sample)      {
+      \(sce, other_sample) {
         metadata(sce)$sample_id <- c(metadata(sce)$sample_id, other_sample)
         metadata(sce)$sample_metadata <- data.frame(
           sample_id = paste0(metadata(sce)$sample_id, collapse = ","),
@@ -239,7 +237,6 @@ test_that("merging SCEs with multiple sample ids per library to mirror cellhash 
         return(sce)
       }
     )
-
 
   # merge
   merged_sce <- merge_sce_list(
@@ -276,13 +273,10 @@ test_that("merging SCEs with different genes among input SCEs works as expected,
   # Works as expected:
   merged_sce <- merge_sce_list(sce_list)
 
-
   # correct number of genes and cells:
   expect_equal(nrow(merged_sce), 6)
   expect_equal(ncol(merged_sce), total_cells)
 })
-
-
 
 
 test_that("merging SCEs with no matching genes fails as expected, no altexps", {
@@ -299,7 +293,6 @@ test_that("merging SCEs with no matching genes fails as expected, no altexps", {
     )
   )
 })
-
 
 
 test_that("merging SCEs without names works as expected, no altexps", {
@@ -338,11 +331,12 @@ test_that("merging SCEs with library metadata fails as expected, no altexps", {
 
 ## helper function to add an altExp to a simulated SCE ----
 add_sce_altexp <- function(
-    sce,
-    batch,
-    altexp_name,
-    num_altexp_features,
-    n_cells) {
+  sce,
+  batch,
+  altexp_name,
+  num_altexp_features,
+  n_cells
+) {
   sce_alt <- sim_sce(
     n_genes = num_altexp_features,
     n_cells = n_cells,
@@ -403,7 +397,6 @@ sce_list_with_altexp <- sce_list |>
 full_altexp_features <- rownames(altExp(sce_list_with_altexp[[1]]))
 
 
-
 test_that("prepare_sce_for_merge() works as expected with is_altexp=TRUE", {
   test_altexp <- altExp(sce_list_with_altexp[[1]])
   prepared_altexp <- prepare_sce_for_merge(
@@ -424,11 +417,13 @@ test_that("prepare_sce_for_merge() works as expected with is_altexp=TRUE", {
 
   # column names should be unchanged
   expect_equal(
-    colnames(prepared_altexp), colnames(test_altexp)
+    colnames(prepared_altexp),
+    colnames(test_altexp)
   )
 
   expect_equal(
-    colnames(colData(prepared_altexp)), c("batch", "cell")
+    colnames(colData(prepared_altexp)),
+    c("batch", "cell")
   )
 })
 
@@ -479,9 +474,12 @@ test_that("merging SCEs with altExps has correct altExp colData names when retai
   # test correct altExp rowData names
   expected_cols <- c(
     "target_type",
-    "sce1-feature_column", "sce1-other_column",
-    "sce2-feature_column", "sce2-other_column",
-    "sce3-feature_column", "sce3-other_column"
+    "sce1-feature_column",
+    "sce1-other_column",
+    "sce2-feature_column",
+    "sce2-other_column",
+    "sce3-feature_column",
+    "sce3-other_column"
   )
   observed_cols <- altExp(merged_sce) |>
     rowData() |>
@@ -538,7 +536,6 @@ test_that("merging SCEs with 1 altexp and same features works as expected, with 
 
   merged_altexp <- altExp(merged_sce)
 
-
   expect_true(altExpNames(merged_sce) == altexp_name)
   expect_equal(dim(merged_altexp), c(num_altexp_features, total_cells))
   expect_equal(rownames(merged_altexp), full_altexp_features)
@@ -569,12 +566,9 @@ test_that("merging SCEs with 1 altexp and same features works as expected, with 
 })
 
 
-
-
 test_that("merging SCEs with 1 altexp but different features fails as expected, with altexps", {
   # keep only the first 3 features from the first SCE
   altExp(sce_list_with_altexp[[1]]) <- altExp(sce_list_with_altexp[[1]])[1:3, ]
-
 
   expect_error(
     merge_sce_list(
@@ -589,12 +583,10 @@ test_that("merging SCEs with 1 altexp but different features fails as expected, 
 })
 
 
-
-
 test_that("merging SCEs where 1 altExp is missing works as expected, with altexps", {
   sce_list_with_altexp$sce4 <- sce_list[[1]]
 
-  # update the metdata list with sce4 name
+  # update the metadata list with sce4 name
   metadata(sce_list_with_altexp$sce4) <- list(
     library_id = "library-sce4",
     sample_id = "sample-sce4",
@@ -633,7 +625,6 @@ test_that("merging SCEs where 1 altExp is missing works as expected, with altexp
     glue::glue("sample-{names(sce_list_with_altexp)}")
   )
 
-
   expect_setequal(
     # all but sce4 contain all metadata components
     altexp_metadata$library_metadata[-4] |>
@@ -647,7 +638,6 @@ test_that("merging SCEs where 1 altExp is missing works as expected, with altexp
     names(altexp_metadata$library_metadata$sce4),
     c("library_id", "sample_id")
   )
-
 
   expect_true(
     is.null(altexp_metadata$library_metadata$sce4$ambient_profile) &
@@ -772,7 +762,6 @@ test_that("merging SCEs with different altExps works as expected; each SCE has 1
 })
 
 
-
 test_that("merging SCEs with different altExps works as expected; each SCE has 2 different altExps", {
   other_altexp_name <- "other"
   other_n_features <- 3
@@ -866,17 +855,17 @@ test_that("merging SCEs with different altExps works as expected; each SCE has 2
 })
 
 
-
-
 ## Other tests ------------------
 
 test_that("get_altexp_attributes passes when it should pass", {
   attribute_list <- get_altexp_attributes(sce_list_with_altexp)
   expect_equal(
-    attribute_list[["adt"]][["assays"]], c("counts", "logcounts")
+    attribute_list[["adt"]][["assays"]],
+    c("counts", "logcounts")
   )
   expect_equal(
-    attribute_list[["adt"]][["features"]], full_altexp_features
+    attribute_list[["adt"]][["features"]],
+    full_altexp_features
   )
 })
 
@@ -896,7 +885,7 @@ test_that("check_metadata throws an error when a field is missing", {
 test_that("get_altexp_metadata returns the correct values", {
   expected_list <- list(
     "library_id" = "library-sce1",
-    "sample_id"  = "sample-sce1"
+    "sample_id" = "sample-sce1"
   )
   observed_list <- get_altexp_metadata(sce_list[[1]], "MISSING_ALTEXP_NAME")
   expect_equal(observed_list, expected_list)
