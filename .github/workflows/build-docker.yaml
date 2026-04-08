@@ -13,7 +13,7 @@ on:
 env:
   GH_REGISTRY: ghcr.io
   GH_REGISTRY_USER: alexslemonade
-  AWS_REGISTRY: 997241705947.dkr.ecr.us-east-1.amazonaws.com
+  AWS_REGISTRY: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com
   AWS_PREFIX: ghcr_io
 
 jobs:
@@ -49,7 +49,7 @@ jobs:
         if: ${{ github.event_name == 'push' }}
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::997241705947:role/gha-ecr-access-role
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/gha-ecr-access-role
           role-session-name: githubActionSession
           aws-region: us-east-1
 
@@ -136,7 +136,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v4
         if: ${{ github.event_name == 'push' }}
         with:
-          role-to-assume: arn:aws:iam::997241705947:role/gha-ecr-access-role
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/gha-ecr-access-role
           role-session-name: githubActionSession-${{ matrix.image_name }}
           aws-region: us-east-1
 
