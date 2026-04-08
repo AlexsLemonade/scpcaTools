@@ -2,7 +2,7 @@
 set -euo pipefail
 # This script is used to generate or update requirements/lock files for R and Python packages
 # Requires that the `pip-tools` python package is installed.
-# Before running, make sure that the renv.lock file and installed libaries are
+# Before running, make sure that the renv.lock file and installed libraries are
 # consistent with renv::snapshot() or renv::restore()
 
 # To upgrade packages, set the `UPGRADE_PY` environment variable as follows:

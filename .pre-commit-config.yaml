@@ -1,51 +1,22 @@
 # All available hooks: https://pre-commit.com/hooks.html
 # R specific hooks: https://github.com/lorenzwalthert/precommit
 repos:
-  - repo: https://github.com/lorenzwalthert/precommit
-    rev: v0.4.3
+  - repo: https://github.com/posit-dev/air-pre-commit
+    # Air version
+    rev: 0.9.0
     hooks:
-      - id: style-files
-        args: [--style_pkg=styler, --style_fun=tidyverse_style]
+      # Run the formatter
+      - id: air-format
+  - repo: https://github.com/crate-ci/typos
+    rev: v1.45.0
+    hooks:
+      - id: typos
+  - repo: https://github.com/lorenzwalthert/precommit
+    rev: v0.4.3.9021
+    hooks:
       # codemeta must be above use-tidy-description when both are used
       # -   id: codemeta-description-updated
       - id: use-tidy-description
-      - id: spell-check
-        exclude: >
-          (?x)^(
-          .*\.[rR]|
-          .*\.feather|
-          .*\.jpeg|
-          .*\.pdf|
-          .*\.png|
-          .*\.py|
-          .*\.RData|
-          .*\.rds|
-          .*\.Rds|
-          .*\.Rproj|
-          .*\.sh|
-          (.*/|)\.gitattributes|
-          (.*/|)\.gitignore|
-          (.*/|)\.gitlab-ci\.yml|
-          (.*/|)\.lintr|
-          (.*/|)\.pre-commit-.*|
-          (.*/|)\.Rbuildignore|
-          (.*/|)\.Renviron|
-          (.*/|)\.Rprofile|
-          (.*/|)\.travis\.yml|
-          (.*/|)appveyor\.yml|
-          (.*/|)DESCRIPTION|
-          (.*/|)NAMESPACE|
-          (.*/|)pixi\.toml|
-          (.*/|)pixi\.lock|
-          (.*/|)renv/settings\.dcf|
-          (.*/|)renv.*\.lock|
-          (.*/|)requirements.*\.in|
-          (.*/|)requirements.*\.txt|
-          (.*/|).*Dockerfile|
-          (.*/|)WORDLIST|
-          \.github/workflows/.*|
-          data/.*|
-          )$
       - id: lintr
       - id: parsable-R
       - id: no-browser-statement
@@ -53,9 +24,12 @@ repos:
       - id: deps-in-desc
         exclude: docker/.*|renv/.*
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.6.0
+    rev: v6.0.0
     hooks:
       - id: check-added-large-files
         args: ["--maxkb=200"]
       - id: end-of-file-fixer
         exclude: '\.Rd'
+ci:
+  autofix_prs: true # set to false if we don't want fixes automatically applied by ci
+  autoupdate_schedule: quarterly

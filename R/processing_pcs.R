@@ -22,7 +22,7 @@ filter_pcs <- function(pcs, batches, rename_pcs = TRUE) {
 
   # Check dimensions after filtering
   if (nrow(pcs) != length(batches)) {
-    stop("Incompatable PC and batch information dimensions after removing NAs.")
+    stop("Incompatible PC and batch information dimensions after removing NAs.")
   }
 
   # rename PCs to batches if specified
@@ -32,7 +32,6 @@ filter_pcs <- function(pcs, batches, rename_pcs = TRUE) {
 
   return(pcs)
 }
-
 
 
 #' Downsample PCs for use in integration metric calculations
@@ -55,10 +54,7 @@ downsample_pcs <- function(pcs, frac_cells, min_cells = 50) {
   }
 
   # Determines rows to sample
-  downsampled_indices <- sample(1:num_cells,
-    frac_cells * num_cells,
-    replace = FALSE
-  )
+  downsampled_indices <- sample(1:num_cells, frac_cells * num_cells, replace = FALSE)
 
   # Extract PCs for downsample
   downsampled_pcs <- pcs[downsampled_indices, , drop = FALSE]

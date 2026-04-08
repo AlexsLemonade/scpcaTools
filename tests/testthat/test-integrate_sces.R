@@ -12,10 +12,7 @@ rownames(colData(merged_sce)) <- new_rownames
 # Add "sample" to colData
 colData(merged_sce)$sample <- batches
 # Add in a "covariate" column for testing
-colData(merged_sce)$covariate <- sample(letters[1:4],
-  size = 300,
-  replace = TRUE
-)
+colData(merged_sce)$covariate <- sample(letters[1:4], size = 300, replace = TRUE)
 
 # add a logcounts assay for testing (numbers don't matter)
 logcounts(merged_sce) <- counts(merged_sce)
@@ -29,11 +26,9 @@ batch_column <- "sample"
 
 ################################################################################
 
-
-
 test_that("`integrate_fastmnn` works as expected", {
   suppressWarnings(
-    # warnings are supressed here b/c simulated data plays poorly enough with
+    # warnings are suppressed here b/c simulated data plays poorly enough with
     # algorithms to trigger warnings like:
     ### Warning in (function (A, nv = 5, nu = nv, maxit = 1000, work = nv + 7, reorth = TRUE,  :
     ### You're computing too large a percentage of total singular values, use a standard svd instead.
@@ -75,7 +70,6 @@ test_that("`integrate_harmony` works as expected", {
 })
 
 
-
 test_that("`integrate_harmony` fails when PCs are missing", {
   reducedDim(merged_sce, "PCA") <- NULL
   expect_error(
@@ -85,10 +79,7 @@ test_that("`integrate_harmony` fails when PCs are missing", {
 
 test_that("`integrate_harmony` fails when covariate columns are missing", {
   expect_error(
-    integrate_harmony(merged_sce,
-      batch_column,
-      covariate_cols = "not_a_column"
-    )
+    integrate_harmony(merged_sce, batch_column, covariate_cols = "not_a_column")
   )
 })
 
@@ -108,7 +99,6 @@ test_that("`integrate_harmony` fails when covariates and covariate_lambda don't 
 ################################################################################
 ################################################################################
 
-
 test_that("`integrate_sces` fail as expected", {
   # bad sce
   expect_error(
@@ -122,10 +112,7 @@ test_that("`integrate_sces` fail as expected", {
 
   # missing batch column
   expect_error(
-    integrate_sces(merged_sce,
-      "fastMNN",
-      batch_column = "not_a_column"
-    )
+    integrate_sces(merged_sce, "fastMNN", batch_column = "not_a_column")
   )
 
   # insufficient batches
@@ -163,10 +150,7 @@ test_that("`integrate_sces` works as expected for return_corrected_expression=TR
   # fastmnn:
   suppressWarnings({
     # simulated-data related numerical warnings
-    integrated_sce <- integrate_sces(merged_sce,
-      "fastMNN",
-      return_corrected_expression = TRUE
-    )
+    integrated_sce <- integrate_sces(merged_sce, "fastMNN", return_corrected_expression = TRUE)
   })
 
   expect_equal(
@@ -186,21 +170,14 @@ test_that("`integrate_sces` works as expected for return_corrected_expression=TR
 })
 
 
-
-
-
 test_that("`integrate_sces` works as expected with fastmnn extra arguments", {
   expect_no_error(
     suppressWarnings({
       # simulated-data related numerical warnings
-      integrated_sce <- integrate_sces(merged_sce,
-        "fastMNN",
-        cos.norm = FALSE
-      )
+      integrated_sce <- integrate_sces(merged_sce, "fastMNN", cos.norm = FALSE)
     })
   )
 })
-
 
 
 test_that("`integrate_sces` works as expected for harmony defaults", {
