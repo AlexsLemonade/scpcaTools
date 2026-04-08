@@ -30,3 +30,6 @@ repos:
         args: ["--maxkb=200"]
       - id: end-of-file-fixer
         exclude: '\.Rd'
+ci:
+  autofix_prs: true # set to false if we don't want fixes automatically applied by ci
+  autoupdate_schedule: quarterly
