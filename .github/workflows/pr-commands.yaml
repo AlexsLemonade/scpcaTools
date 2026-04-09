@@ -10,11 +10,11 @@ jobs:
   document:
     if: ${{ github.event.issue.pull_request && (github.event.comment.author_association == 'MEMBER' || github.event.comment.author_association == 'OWNER') && startsWith(github.event.comment.body, '/document') }}
     name: document
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v6
 
       - uses: r-lib/actions/pr-fetch@v2
         with:
@@ -55,7 +55,7 @@ jobs:
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v6
 
       - uses: r-lib/actions/pr-fetch@v2
         with:
@@ -96,8 +96,6 @@ jobs:
       - name: Style
         run: styler::style_pkg()
         shell: Rscript --no-init-file {0}
-
-
 
       - name: commit
         run: |
