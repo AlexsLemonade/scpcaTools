@@ -49,8 +49,7 @@ test_that("Conversion of SCE to AnnData works as expected", {
   expect_equal(colnames(colData(sce)), colnames(colData(converted_sce)))
   expect_equal(colnames(rowData(sce)), colnames(rowData(converted_sce)))
 
-
-  # expect that sample metadata has been removed from converted SCE
+  # expect that metadata_list has been removed from converted SCE
   expect_setequal(
     c("library_id", "sample_metadata", "metadata_dataframe", "metadata_S4_DataFrame"),
     names(metadata(converted_sce))
@@ -67,7 +66,6 @@ test_that("Conversion of SCE to AnnData works as expected", {
     metadata(converted_sce)$metadata_dataframe$na_col,
     "logical"
   )
-
 
   # test that H5 file is created with new assay name
   # add logcounts
