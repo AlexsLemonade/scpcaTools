@@ -17,8 +17,6 @@ ENV RENV_CONFIG_CACHE_ENABLED=FALSE
 # Use renv for R packages
 RUN Rscript -e "install.packages(c('renv'))"
 
-# Install Rhtslib manually for renv/Bioc incompatibility (possibly temporary)
-RUN Rscript -e "BiocManager::install('Rhtslib')"
 
 COPY docker/renv_slim.lock renv.lock
 # restore renv and remove cache files
