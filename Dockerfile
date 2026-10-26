@@ -5,6 +5,11 @@ LABEL maintainer="ccdl@alexslemonade.org"
 LABEL org.opencontainers.image.title="scpcatools-slim"
 LABEL org.opencontainers.image.source="https://github.com/AlexsLemonade/scpcaTools"
 
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends ca-certificates && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
 #### Build settings for Renv and Basilisk
 ENV RENV_CONFIG_CACHE_ENABLED=FALSE
 
