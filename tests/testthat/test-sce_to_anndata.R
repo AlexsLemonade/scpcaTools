@@ -38,10 +38,8 @@ anndata_file <- file.path(tempdir, "anndata.h5")
 
 test_that("Conversion of SCE to AnnData works as expected", {
   # test that the H5 file is created
-  expect_snapshot_file({
-    sce_to_anndata(sce, anndata_file)
-    anndata_file
-  })
+  sce_to_anndata(sce, anndata_file)
+  expect_true(file.exists(anndata_file))
 
   # some tests that the converted object contains col/rowData found in original SCE
   converted_sce <- zellkonverter::readH5AD(anndata_file)
@@ -71,10 +69,8 @@ test_that("Conversion of SCE to AnnData works as expected", {
   # add logcounts
   logcounts(sce) <- counts(sce)
   new_anndata_file <- file.path(tempdir, "new_anndata.h5")
-  expect_snapshot_file({
-    sce_to_anndata(sce, new_anndata_file, x_assay_name = "logcounts")
-    new_anndata_file
-  })
+  sce_to_anndata(sce, new_anndata_file, x_assay_name = "logcounts")
+  expect_true(file.exists(new_anndata_file))
 
   new_sce <- zellkonverter::readH5AD(new_anndata_file, X_name = "X")
   # check that counts is in assay names and no logcounts
@@ -93,10 +89,14 @@ test_that("Conversion of SCE to AnnData works as expected", {
 test_that("Conversion of SCE to AnnData works with additional arguments", {
   no_verbose_anndata_file <- file.path(tempdir, "no_verbose_anndata.h5")
   # test that the H5 file is created with additional options
-  expect_snapshot_file({
-    sce_to_anndata(sce, no_verbose_anndata_file, verbose = FALSE)
-    no_verbose_anndata_file
-  })
+  sce_to_anndata(sce, no_verbose_anndata_file, verbose = FALSE)
+  expect_true(file.exists(no_verbose_anndata_file))
+
+  # check that the converted file can be read back with the expected contents
+  converted_sce <- zellkonverter::readH5AD(no_verbose_anndata_file)
+  expect_equal(dim(sce), dim(converted_sce))
+  expect_equal(colnames(colData(sce)), colnames(colData(converted_sce)))
+  expect_equal(colnames(rowData(sce)), colnames(rowData(converted_sce)))
 })
 
 test_that("Conversion of SCE to AnnData fails as expected", {

@@ -14,6 +14,7 @@ Mainly, this package can work with data that has been produced using Alevin, Ale
 
 Authors:
 \itemize{
+  \item Ally Hawkins \email{ally.hawkins@ccdatalab.org} (0000-0001-6026-3660)
   \item Joshua A. Shapiro \email{josh.shapiro@ccdatalab.org} (0000-0002-6224-0347)
   \item Stephanie J. Spielman \email{stephanie.spielman@ccdatalab.org} (0000-0002-9090-4788)
   \item Chanté J. Bethell (0000-0001-9653-8128)
