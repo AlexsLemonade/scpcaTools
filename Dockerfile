@@ -5,6 +5,11 @@ LABEL maintainer="ccdl@alexslemonade.org"
 LABEL org.opencontainers.image.title="scpcatools-slim"
 LABEL org.opencontainers.image.source="https://github.com/AlexsLemonade/scpcaTools"
 
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends ca-certificates && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
 #### Build settings for Renv and Basilisk
 ENV RENV_CONFIG_CACHE_ENABLED=FALSE
 
@@ -12,8 +17,6 @@ ENV RENV_CONFIG_CACHE_ENABLED=FALSE
 # Use renv for R packages
 RUN Rscript -e "install.packages(c('renv'))"
 
-# Install Rhtslib manually for renv/Bioc incompatibility (possibly temporary)
-RUN Rscript -e "BiocManager::install('Rhtslib')"
 
 COPY docker/renv_slim.lock renv.lock
 # restore renv and remove cache files
