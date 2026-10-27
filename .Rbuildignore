@@ -27,3 +27,5 @@
 # development
 ^\.pre-commit-config\.yaml$
 ^\.lintr$
+^air\.toml$
+^typos\.toml$
