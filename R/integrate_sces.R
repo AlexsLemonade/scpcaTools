@@ -1,6 +1,5 @@
 # This function can perform the crux integration based on the given integration method
 
-
 #' Integrate a merged set of SingleCellExperiment objects using a specified
 #'  integration method. The final SCE object will contain an additional reducedDim
 #'  entitled `\{integration_method\}_PCA`. All original SCE assays are retained.
@@ -33,15 +32,17 @@
 #' @import SingleCellExperiment
 #'
 #' @export
-integrate_sces <- function(merged_sce,
-                           integration_method = c("fastMNN", "harmony"),
-                           batch_column = "sample",
-                           covariate_cols = c(),
-                           batch_lambda = 1,
-                           covariate_lambda = c(),
-                           return_corrected_expression = FALSE,
-                           seed = NULL,
-                           ...) {
+integrate_sces <- function(
+  merged_sce,
+  integration_method = c("fastMNN", "harmony"),
+  batch_column = "sample",
+  covariate_cols = c(),
+  batch_lambda = 1,
+  covariate_lambda = c(),
+  return_corrected_expression = FALSE,
+  seed = NULL,
+  ...
+) {
   # Set seed
   if (!is.null(seed)) {
     set.seed(seed)
@@ -49,9 +50,10 @@ integrate_sces <- function(merged_sce,
 
   # make sure that input is a SingleCellExperiment
   if (!is(merged_sce, "SingleCellExperiment")) {
-    stop("The `merged_sce` must be a SingleCellExperiment object created with `scpcaTools::merge_sce_list().`")
+    stop(
+      "The `merged_sce` must be a SingleCellExperiment object created with `scpcaTools::merge_sce_list().`"
+    )
   }
-
 
   # Check integration_method
   integration_method <- match.arg(integration_method)
@@ -69,7 +71,6 @@ integrate_sces <- function(merged_sce,
   if (length(unique(batches)) < 2) {
     stop("At least two batches are required for integration.")
   }
-
 
   # Perform integration with specified method
   if (integration_method == "fastMNN") {
@@ -113,7 +114,6 @@ integrate_sces <- function(merged_sce,
 }
 
 
-
 #' Integrate a list of SingleCellExperiment (SCE) objects using the fastMNN
 #' approach from the `batchelor` package.
 #' Source: http://www.bioconductor.org/packages/release/bioc/html/batchelor.html
@@ -125,9 +125,7 @@ integrate_sces <- function(merged_sce,
 #' @return An integrated SCE object produced by `fastMNN`
 #'
 #' @import SingleCellExperiment
-integrate_fastmnn <- function(merged_sce,
-                              batch_column,
-                              ...) {
+integrate_fastmnn <- function(merged_sce, batch_column, ...) {
   # Check that batchelor is installed
   if (!requireNamespace("batchelor", quietly = TRUE)) {
     stop("The `batchelor` package must be installed to use fastMNN.")
@@ -139,15 +137,10 @@ integrate_fastmnn <- function(merged_sce,
   }
 
   # Perform integration
-  integrated_sce <- batchelor::fastMNN(merged_sce,
-    batch = colData(merged_sce)[, batch_column],
-    ...
-  )
+  integrated_sce <- batchelor::fastMNN(merged_sce, batch = colData(merged_sce)[, batch_column], ...)
 
   return(integrated_sce)
 }
-
-
 
 
 #' Integrate a list of SingleCellExperiment (SCE) objects using the harmony
@@ -168,12 +161,14 @@ integrate_fastmnn <- function(merged_sce,
 #' @return Integrated PCs as calculated by `harmony`
 #'
 #' @import SingleCellExperiment
-integrate_harmony <- function(merged_sce,
-                              batch_column,
-                              covariate_cols = c(),
-                              batch_lambda = 1,
-                              covariate_lambda = c(),
-                              ...) {
+integrate_harmony <- function(
+  merged_sce,
+  batch_column,
+  covariate_cols = c(),
+  batch_lambda = 1,
+  covariate_lambda = c(),
+  ...
+) {
   # Check that harmony is installed
   if (!requireNamespace("harmony", quietly = TRUE)) {
     stop("The `harmony` package must be installed to use this integration method.")
@@ -206,17 +201,15 @@ integrate_harmony <- function(merged_sce,
   lambda_vec <- c(batch_lambda, covariate_lambda)
 
   # Perform integration
-  harmony_object <- harmony::RunHarmony(
-    merged_sce,
-    group.by.vars = covariate_cols,
-    reduction.use = "PCA",
+  # use the matrix interface, which is stable across harmony versions
+  harmony_results <- harmony::RunHarmony(
+    data_mat = reducedDim(merged_sce, "PCA"),
+    meta_data = as.data.frame(colData(merged_sce)),
+    vars_use = covariate_cols,
     lambda = lambda_vec,
     verbose = FALSE,
     ...
   )
-
-  # pull out corrected pcs
-  harmony_results <- reducedDim(harmony_object, "HARMONY")
 
   # Ensure PCs have rownames
   if (is.null(rownames(harmony_results))) {
