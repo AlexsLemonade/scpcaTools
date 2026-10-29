@@ -50,17 +50,18 @@
 #' )
 #' }
 read_alevin <- function(
-    quant_dir,
-    fry_mode = FALSE,
-    include_unspliced = TRUE,
-    feature_data = FALSE,
-    round_counts = TRUE,
-    library_id = NULL,
-    sample_id = NULL,
-    project_id = NULL,
-    tech_version = NULL,
-    assay_ontology_term_id = NULL,
-    seq_unit = NULL) {
+  quant_dir,
+  fry_mode = FALSE,
+  include_unspliced = TRUE,
+  feature_data = FALSE,
+  round_counts = TRUE,
+  library_id = NULL,
+  sample_id = NULL,
+  project_id = NULL,
+  tech_version = NULL,
+  assay_ontology_term_id = NULL,
+  seq_unit = NULL
+) {
   # checks for *_mode
   if (!is.logical(fry_mode)) {
     stop("fry_mode must be set as TRUE or FALSE")
@@ -103,7 +104,7 @@ read_alevin <- function(
     # define assays to include in SCE object based on include_unspliced
     if (include_unspliced) {
       assay_formats <- list("counts" = c("S", "A", "U"), "spliced" = c("S", "A"))
-      meta$transcript_type <- c("total", "spliced")
+      meta$transcript_type <- "total,spliced"
     } else if (!feature_data) {
       assay_formats <- list("counts" = c("S", "A"))
       meta$transcript_type <- "spliced"
@@ -127,7 +128,7 @@ read_alevin <- function(
 
     # set transcript type based on including unspliced or not
     if (include_unspliced) {
-      meta$transcript_type <- c("total", "spliced")
+      meta$transcript_type <- "total,spliced"
     } else if (!feature_data) {
       meta$transcript_type <- "spliced"
     } else {
@@ -175,7 +176,6 @@ read_tximport <- function(quant_dir) {
 }
 
 
-
 #' Read alevin metadata from json files
 #'
 #' @param quant_dir Path alevin output directory.
@@ -191,13 +191,15 @@ read_tximport <- function(quant_dir) {
 #'   with NULL values for missing elements.
 #'
 #' @noRd
-read_alevin_metadata <- function(quant_dir,
-                                 tech_version,
-                                 assay_ontology_term_id = NULL,
-                                 seq_unit = NULL,
-                                 library_id = NULL,
-                                 sample_id = NULL,
-                                 project_id = NULL) {
+read_alevin_metadata <- function(
+  quant_dir,
+  tech_version,
+  assay_ontology_term_id = NULL,
+  seq_unit = NULL,
+  library_id = NULL,
+  sample_id = NULL,
+  project_id = NULL
+) {
   cmd_info_path <- file.path(quant_dir, "cmd_info.json")
   permit_json_path <- file.path(quant_dir, "generate_permit_list.json")
   # Unused file, but leaving for future reference
@@ -265,7 +267,6 @@ read_alevin_metadata <- function(quant_dir,
   meta$tech_version <- tech_version
   meta$assay_ontology_term_id <- assay_ontology_term_id
   meta$seq_unit <- seq_unit
-
 
   return(meta)
 }

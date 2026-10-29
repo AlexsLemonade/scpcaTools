@@ -22,9 +22,7 @@
 #'   which_counts = "unspliced"
 #' )
 #' }
-read_kallisto <- function(quant_dir,
-                          include_unspliced = TRUE,
-                          round_counts = TRUE) {
+read_kallisto <- function(quant_dir, include_unspliced = TRUE, round_counts = TRUE) {
   if (!is.logical(include_unspliced)) {
     stop("include_unspliced must be set as TRUE or FALSE")
   }
@@ -78,7 +76,7 @@ read_kallisto <- function(quant_dir,
 
   # set transcript type based on including unspliced or not
   if (include_unspliced) {
-    meta$transcript_type <- c("total", "spliced")
+    meta$transcript_type <- "total,spliced"
   } else {
     meta$transcript_type <- "spliced"
   }
