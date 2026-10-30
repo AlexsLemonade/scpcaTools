@@ -229,6 +229,10 @@ knitr::kable(sample_information, align = "r") |>
 ```{r }
 # define transcript type
 transcript_type <- unfiltered_meta$transcript_type
+# transcript type may be missing (e.g., simulated data), which case_when can't handle
+if (is.null(transcript_type)) {
+  transcript_type <- NA_character_
+}
 
 processing_info <- tibble::tibble(
   "Salmon version" = format(unfiltered_meta$salmon_version),
