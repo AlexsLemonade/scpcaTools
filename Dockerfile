@@ -6,9 +6,9 @@ LABEL org.opencontainers.image.title="scpcatools-slim"
 LABEL org.opencontainers.image.source="https://github.com/AlexsLemonade/scpcaTools"
 
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends ca-certificates && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+  apt-get install -y --no-install-recommends ca-certificates && \
+  apt-get clean && \
+  rm -rf /var/lib/apt/lists/*
 
 #### Build settings for Renv and Basilisk
 ENV RENV_CONFIG_CACHE_ENABLED=FALSE
@@ -109,6 +109,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Add scimilarity support target ------------------------------------------------------
 FROM anndata AS scimilarity
 LABEL org.opencontainers.image.title="scpcatools-scimilarity"
+
+# ensure hndswlib doesn't use machine-specific compilers
+ENV HNSWLIB_NO_NATIVE=1
 
 COPY docker/requirements_scimilarity.txt requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
